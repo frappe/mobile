@@ -4,8 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../utils/http.dart';
 import '../utils/helpers.dart';
-import './filterIssueList.dart';
-import './issueDetail.dart';
+// import './filterIssueList.dart';
+import './issue_detail.dart';
 
 class Issue {
   final List keys;
@@ -124,21 +124,21 @@ class _IssueListState extends State<IssueList> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => FilterIssueList(),
-              ));
-        },
-        child: Icon(
-          Icons.filter_list,
-          color: Colors.blueGrey,
-          size: 50,
-        ),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   backgroundColor: Colors.white,
+      //   onPressed: () {
+      //     Navigator.push(
+      //         context,
+      //         MaterialPageRoute(
+      //           builder: (context) => FilterIssueList(),
+      //         ));
+      //   },
+      //   child: Icon(
+      //     Icons.filter_list,
+      //     color: Colors.blueGrey,
+      //     size: 50,
+      //   ),
+      // ),
       appBar: AppBar(
         title: Text('Issue List'),
         actions: <Widget>[
