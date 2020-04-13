@@ -13,15 +13,16 @@ logout(context) async {
       port: int.parse("8000", radix: 16),
       host: "erpnext.dev2"));
 
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-          builder: (context) => MyApp(),
-        ), (Route<dynamic> route) => false);
+  Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MyApp(),
+      ),
+      (Route<dynamic> route) => false);
 }
 
 getMeta(doctype) async {
-  var queryParams = {
-    'doctype': doctype
-  };
+  var queryParams = {'doctype': doctype};
 
   final response2 = await dio.get('/method/frappe.desk.form.load.getdoctype',
       queryParameters: queryParams);
@@ -37,17 +38,36 @@ getMeta(doctype) async {
   }
 }
 
-Future<Map> processData(Map data) async {
-  var meta = await getMeta(data["doctype"]);
-  
-  List fields = meta.values.docs[0]["fields"];
-  
-  data["grids"].forEach((g) {
-    if(g["widget"]["fieldtype"] == "Select") {
-      var fi = fields.where((f) => f["fieldtype"] == 'Select' && f["fieldname"] == g["widget"]["fieldname"]).toList();
-      g["widget"]["options"] = fi[0]["options"].split('\n');
-    }
-  });
+Future<Map> processData(Map data, bool metaRequired) async {
+  data["fieldnames"] = [];
+  if (!metaRequired) {
+    data["fields"].forEach((field) {
+      if (field["in_list_view"] != null) {
+        data["fieldnames"]
+            .add("`tab${data["doctype"]}`.`${field["fieldname"]}`");
+      }
+    });
+  } else {
+    var meta = await getMeta(data["doctype"]);
+
+    List meta_fields = meta.values.docs[0]["fields"];
+
+    data["fields"].forEach((field) {
+      if (field["fieldtype"] == "Select") {
+        var fi = meta_fields
+            .firstWhere((meta_field) =>
+                meta_field["fieldtype"] == 'Select' &&
+                meta_field["fieldname"] == field["fieldname"] &&
+                meta_field["is_custom_field"] == field["is_custom_field"], orElse: () => null);
+        
+        if(fi != null) {
+          field["options"] = fi["options"].split('\n');
+        } else {
+          field["skip_field"] = true;
+        }
+      }
+    });
+  }
 
   return data;
 }
@@ -70,11 +90,10 @@ Widget generateChildWidget(Map widget, val, callback) {
     case "Select":
       {
         value = SelectField(
-          options: widget["options"],
-          value: val,
-          hint: Text(widget["hint"]),
-          onChanged: callback
-        );
+            options: widget["options"],
+            value: val,
+            hint: Text(widget["hint"]),
+            onChanged: callback);
       }
       break;
   }

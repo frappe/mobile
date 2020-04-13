@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:support_app/routes/communication.dart';
+import 'package:support_app/widgets/communication.dart';
 import 'package:support_app/utils/helpers.dart';
 import 'package:support_app/utils/http.dart';
 import 'package:support_app/utils/response_models.dart';
@@ -42,8 +42,9 @@ class DetailView extends StatefulWidget {
   final String doctype;
   final String name;
   final Map wireframe;
+  final String app_bar_title;
 
-  DetailView({@required this.doctype, @required this.name, this.wireframe});
+  DetailView({@required this.doctype, @required this.name, this.wireframe, @required this.app_bar_title});
 
   @override
   _DetailViewState createState() => _DetailViewState();
@@ -107,7 +108,7 @@ class _DetailViewState extends State<DetailView> {
             : null,
       ),
       appBar: AppBar(
-        title: Text(widget.wireframe['appBarTitle']),
+        title: Text(widget.app_bar_title),
       ),
       body: FutureBuilder(
         future: futureIssueDetail,
@@ -130,15 +131,16 @@ class _DetailViewState extends State<DetailView> {
                       padding: EdgeInsets.all(10),
                       childAspectRatio: 2.0,
                       crossAxisCount: 2,
-                      children: widget.wireframe["grids"].map<Widget>((grid) {
-                        Map widget = grid["widget"];
-                        var val = docs[0][widget["fieldname"]];
+                      children: widget.wireframe["fields"].where((field) {
+                        return field["hidden"] == false && field["skip_field"] != true;
+                      }).map<Widget>((field) {
+                        var val = docs[0][field["fieldname"]];
                         return GridTile(
                           // header: Text(grid["header"]),
-                          child: generateChildWidget(widget, val, (item) {
-                            updateObj[widget["fieldname"]] = item;
+                          child: generateChildWidget(field, val, (item) {
+                            updateObj[field["fieldname"]] = item;
                             setState(() {
-                              docs[0][widget["fieldname"]] = item;
+                              docs[0][field["fieldname"]] = item;
                               formChanged = true;
                             });
                           }),

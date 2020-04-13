@@ -92,3 +92,41 @@ class DioGetMetaResponse {
       : values = List(),
         error = errorValue;
 }
+
+class GetReportViewResponse {
+  final List keys;
+  final List values;
+
+  GetReportViewResponse({
+    this.keys,
+    this.values,
+  });
+
+  factory GetReportViewResponse.fromJson(json) {
+    if(json.length == 0) {
+      return GetReportViewResponse(
+        keys: [],
+        values: [],
+      );
+    }
+    return GetReportViewResponse(
+      keys: json['keys'],
+      values: json['values'],
+    );
+  }
+}
+
+class DioGetReportViewResponse {
+  final values;
+  final String error;
+
+  DioGetReportViewResponse(this.values, this.error);
+
+  DioGetReportViewResponse.fromJson(json)
+      : values = GetReportViewResponse.fromJson(json["message"]),
+        error = "";
+
+  DioGetReportViewResponse.withError(String errorValue)
+      : values = List(),
+        error = errorValue;
+}
