@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:support_app/utils/helpers.dart';
-import 'package:support_app/widgets/detail_view.dart';
+import 'package:support_app/widgets/form_view.dart';
 import 'package:support_app/widgets/filter_list.dart';
 import 'package:support_app/widgets/list_view.dart';
 
@@ -85,7 +85,7 @@ class _IssueDetailState extends State<IssueDetail> {
         future: futureProcessedData,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return DetailView(
+            return FormView(
               app_bar_title: 'Issue Form',
               doctype: 'Issue',
               name: widget.name,

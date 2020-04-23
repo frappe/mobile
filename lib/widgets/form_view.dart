@@ -38,19 +38,19 @@ updateDoc(String name, Map updateObj, String doctype) async {
   }
 }
 
-class DetailView extends StatefulWidget {
+class FormView extends StatefulWidget {
   final String doctype;
   final String name;
   final Map wireframe;
   final String app_bar_title;
 
-  DetailView({@required this.doctype, @required this.name, this.wireframe, @required this.app_bar_title});
+  FormView({@required this.doctype, @required this.name, this.wireframe, @required this.app_bar_title});
 
   @override
-  _DetailViewState createState() => _DetailViewState();
+  _FormViewState createState() => _FormViewState();
 }
 
-class _DetailViewState extends State<DetailView> {
+class _FormViewState extends State<FormView> {
   Future<DioGetDocResponse> futureIssueDetail;
   bool formChanged = false;
   Map updateObj = {};
@@ -80,11 +80,7 @@ class _DetailViewState extends State<DetailView> {
                       "communications": docInfo["communications"],
                       "comments": docInfo["comments"]
                     };
-                    return Communication(
-                      communication: communcation,
-                      refDoctype: widget.doctype,
-                      refName: widget.name,
-                    );
+                    return Communication(communication: communcation, refDoctype: widget.doctype, refName: widget.name,);
                   }));
                 },
               ),

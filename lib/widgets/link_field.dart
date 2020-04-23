@@ -1,11 +1,9 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-
-import 'package:support_app/utils/http.dart';
 import 'package:support_app/utils/response_models.dart';
+import 'package:support_app/utils/rest_apis.dart';
 
-Future<DioLinkFieldResponse> fetchLinkField(doctype, refDoctype, txt) async {
+Future fetchLinkField(doctype, refDoctype, txt) async {
   var queryParams = {
     'txt': txt,
     'doctype': doctype,
@@ -13,18 +11,14 @@ Future<DioLinkFieldResponse> fetchLinkField(doctype, refDoctype, txt) async {
     'ignore_user_permissions': 0
   };
 
-  final response2 = await dio.post('/method/frappe.desk.search.search_link',
-      data: queryParams,
-      options: Options(contentType: Headers.formUrlEncodedContentType));
-  if (response2.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    return DioLinkFieldResponse.fromJson(response2.data);
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load album');
+  return search_link(queryParams);
+}
+
+Future fetch_values(Map data, String req_type) {
+  if(req_type == 'get_contact_list') {
+    return get_contact_list(data);
   }
+  return search_link(data);
 }
 
 class LinkField extends StatefulWidget {
@@ -35,13 +29,15 @@ class LinkField extends StatefulWidget {
   final doctype;
   final refDoctype;
   final txt;
+  final req_type;
 
   LinkField(
       {this.value,
+      this.req_type,
       this.onSuggestionSelected,
       @required this.hint,
-      @required this.doctype,
-      @required this.refDoctype,
+      this.doctype,
+      this.refDoctype,
       this.txt});
 
   @override
@@ -51,15 +47,28 @@ class LinkField extends StatefulWidget {
 class _LinkFieldState extends State<LinkField> {
   // AutoCompleteTextField searchTextField;
   String dropdownVal;
-  Future<DioLinkFieldResponse> futureVal;
+  Future futureVal;
+  var query_params;
 
   final TextEditingController _typeAheadController = TextEditingController();
 
-  
   @override
   void initState() {
     super.initState();
-    futureVal = fetchLinkField(widget.doctype, widget.refDoctype, widget.txt);
+
+    if(widget.req_type == 'get_contact_list') {
+      query_params = {
+        'txt': widget.txt
+      };
+    } else {
+      query_params = {
+        'txt': widget.txt,
+        'doctype': widget.doctype,
+        'reference_doctype': widget.refDoctype,
+        'ignore_user_permissions': 0
+      };
+    }
+    futureVal = fetch_values(query_params, widget.req_type);
   }
 
   @override
@@ -67,10 +76,14 @@ class _LinkFieldState extends State<LinkField> {
     return TypeAheadField(
       textFieldConfiguration: TextFieldConfiguration(
         controller: this._typeAheadController..text = widget.value,
+        decoration: InputDecoration(
+          hintText: widget.hint
+        )
       ),
 
       suggestionsCallback: (pattern) async {
-        DioLinkFieldResponse val = await fetchLinkField(widget.doctype, widget.refDoctype, pattern);
+        query_params["txt"] = pattern;
+        var val = await fetch_values(query_params, widget.req_type);
         return val.values;
       },
       itemBuilder: (context, item) {

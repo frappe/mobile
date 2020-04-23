@@ -130,3 +130,20 @@ class DioGetReportViewResponse {
       : values = List(),
         error = errorValue;
 }
+
+class DioGetContactListResponse {
+  final List<LinkFieldResponse> values;
+  final String error;
+
+  DioGetContactListResponse(this.values, this.error);
+
+  DioGetContactListResponse.fromJson(Map<String, dynamic> json)
+      : values = (json["message"] as List)
+            .map((i) => new LinkFieldResponse.fromJson(i))
+            .toList(),
+        error = "";
+
+  DioGetContactListResponse.withError(String errorValue)
+      : values = List(),
+        error = errorValue;
+}
