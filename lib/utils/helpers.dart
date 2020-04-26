@@ -3,7 +3,7 @@ import 'package:support_app/utils/response_models.dart';
 import 'package:support_app/widgets/link_field.dart';
 import 'package:support_app/widgets/select_field.dart';
 
-import '../main.dart';
+import '../app.dart';
 import 'http.dart';
 
 logout(context) async {
