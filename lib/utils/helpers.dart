@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:support_app/utils/response_models.dart';
 import 'package:support_app/widgets/link_field.dart';
 import 'package:support_app/widgets/select_field.dart';
@@ -12,6 +13,9 @@ logout(context) async {
       scheme: "http",
       port: int.parse("8000", radix: 16),
       host: "erpnext.dev2"));
+
+  SharedPreferences localStorage = await SharedPreferences.getInstance();
+  localStorage.setBool('isLoggedIn', false);
 
   Navigator.pushAndRemoveUntil(
       context,

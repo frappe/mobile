@@ -95,7 +95,7 @@ class _IssueDetailState extends State<IssueDetail> {
             return Text("${snapshot.error}");
           }
           // By default, show a loading spinner.
-          return CircularProgressIndicator();
+          return Center(child: CircularProgressIndicator());
         });
   }
 }
@@ -133,7 +133,7 @@ class _FilterIssueState extends State<FilterIssue> {
             return Text("${snapshot.error}");
           }
           // By default, show a loading spinner.
-          return CircularProgressIndicator();
+          return Center(child: CircularProgressIndicator());
         });
   }
 }
@@ -155,34 +155,40 @@ class _IssueListState extends State<IssueList> {
     futureProcessedData = processData(wireframe, false);
   }
 
+  Future fetchData() async {
+    futureProcessedData = processData(wireframe, false);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: futureProcessedData,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return CustomListView(
-              app_bar_title: 'Issue List',
-              doctype: 'Issue',
-              fieldnames: wireframe["fieldnames"],
-              filters: widget.filters,
-              wireframe: wireframe,
-              filterCallback: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return FilterIssue();
-                }));
-              },
-              detailCallback: (f) {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return IssueDetail(f);
-                }));
-              },
-            );
-          } else if (snapshot.hasError) {
-            return Text("${snapshot.error}");
-          }
-          // By default, show a loading spinner.
-          return CircularProgressIndicator();
-        });
+    return Scaffold(
+          body: FutureBuilder(
+      future: futureProcessedData,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return CustomListView(
+            app_bar_title: 'Issue List',
+            doctype: 'Issue',
+            fieldnames: wireframe["fieldnames"],
+            filters: widget.filters,
+            wireframe: wireframe,
+            filterCallback: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return FilterIssue();
+              }));
+            },
+            detailCallback: (f) {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return IssueDetail(f);
+              }));
+            },
+          );
+        } else if (snapshot.hasError) {
+          return Text("${snapshot.error}");
+        }
+        // By default, show a loading spinner.
+        return Center(child: CircularProgressIndicator());
+      }),
+    );
   }
 }
