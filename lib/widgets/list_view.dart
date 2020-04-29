@@ -75,23 +75,23 @@ class _CustomListViewState extends State<CustomListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: () {
-          widget.filterCallback();
-          // Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //       builder: (context) => FilterIssue(),
-          //     ));
-        },
-        child: Icon(
-          Icons.filter_list,
-          color: Colors.blueGrey,
-          size: 50,
-        ),
-      ),
+      // backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
+      // floatingActionButton: FloatingActionButton(
+      //   // backgroundColor: Colors.white,
+      //   onPressed: () {
+      //     widget.filterCallback();
+      //     // Navigator.push(
+      //     //     context,
+      //     //     MaterialPageRoute(
+      //     //       builder: (context) => FilterIssue(),
+      //     //     ));
+      //   },
+      //   child: Icon(
+      //     Icons.filter_list,
+      //     // color: Colors.blueGrey,
+      //     size: 50,
+      //   ),
+      // ),
       appBar: AppBar(
         title: Text(widget.app_bar_title),
         actions: <Widget>[
@@ -119,7 +119,7 @@ class _CustomListViewState extends State<CustomListView> {
               return Text("${snapshot.error}");
             }
             // By default, show a loading spinner.
-            return CircularProgressIndicator();
+            return Center(child: CircularProgressIndicator());
           }),
     );
   }
@@ -179,15 +179,15 @@ class _ListBuilderState extends State<ListBuilder> {
             elevation: 8.0,
             margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
             child: Container(
-              decoration: BoxDecoration(color: Color.fromRGBO(64, 75, 96, .9)),
+              // decoration: BoxDecoration(color: Color.fromRGBO(64, 75, 96, .9)),
               child: ListTile(
                 contentPadding:
                     EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                 title: Container(
                   padding: EdgeInsets.only(bottom: 5),
                   child: Text('${widget.list.values.values[index][subject_field_index]}',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
+                      // style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)
+                    ),
                 ),
                 // leading: Container(
                 //   padding: EdgeInsets.only(right: 12.0),
@@ -200,27 +200,32 @@ class _ListBuilderState extends State<ListBuilder> {
                   child: Row(
                     children: <Widget>[
                       Text('${widget.list.values.values[index][1]}',
-                          style: TextStyle(color: Colors.white)),
+                          // style: TextStyle(color: Colors.white)
+                        ),
                       SizedBox(
                         width: 10,
                       ),
                       Flexible(
                         child: Text('${widget.list.values.values[index][3]}',
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.white,
-                            )),
+                            // style: TextStyle(
+                            //   color: Colors.white,
+                            // )
+                          ),
                       ),
                       SizedBox(
                         width: 10,
                       ),
                       Text('${widget.list.values.values[index][5]}',
-                          style: TextStyle(color: Colors.white))
+                          // style: TextStyle(color: Colors.white)
+                        )
                     ],
                   ),
                 ),
                 trailing: Icon(Icons.keyboard_arrow_right,
-                    color: Colors.white, size: 30.0),
+                    // color: Colors.white, 
+                    size: 30.0
+                  ),
                 onTap: () {
                   widget.detailCallback(widget.list.values.values[index][0]);
                   // Navigator.push(

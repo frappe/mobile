@@ -148,7 +148,7 @@ class _FormViewState extends State<FormView> {
           }
 
           // By default, show a loading spinner.
-          return CircularProgressIndicator();
+          return Center(child: CircularProgressIndicator());
         },
       ),
     );
