@@ -50,24 +50,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       title: 'Flutter Demo',
-//       theme: new ThemeData(primaryColor: Color.fromRGBO(58, 66, 86, 1.0)),
-//       // theme: new ThemeData(primaryColor: Colors.white),
-//       home: GestureDetector(
-//         onTap: () {
-//           FocusScope.of(context).requestFocus(new FocusNode());
-//         },
-//               child: Scaffold(
-//           appBar: AppBar(title: Text('Form', style: TextStyle(color: Theme.of(context).primaryColor),),backgroundColor: Colors.white,),
-//           body: MyCustomForm(),
-//         ),
-//       ),
-//     );
-//   }
-// }
