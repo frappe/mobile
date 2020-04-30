@@ -9,13 +9,19 @@ import 'http.dart';
 
 logout(context) async {
   var cookieJar = await cookie();
+  // cookieJar.delete(Uri(
+  //     scheme: "http",
+  //     port: int.parse("8000", radix: 16),
+  //     host: "erpnext.dev2"));
   cookieJar.delete(Uri(
-      scheme: "http",
-      port: int.parse("8000", radix: 16),
-      host: "erpnext.dev2"));
+      scheme: "https",
+      // port: int.parse("8000", radix: 16),
+      host: "version13beta.erpnext.com"));
 
   SharedPreferences localStorage = await SharedPreferences.getInstance();
   localStorage.setBool('isLoggedIn', false);
+
+  // Navigator.of(context).pushReplacementNamed('/login');
 
   Navigator.pushAndRemoveUntil(
       context,
