@@ -1,13 +1,8 @@
-
-import 'dart:convert';
-
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'app.dart';
 import 'utils/http.dart';
-import 'routes/issue.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 
 void main() async {
   runApp(MyApp());
@@ -23,7 +18,5 @@ Future authenticate(usr, pwd) async {
   if (response.statusCode == 200) {
     localStorage.setBool('isLoggedIn', true);
   }
-    
-
   return response;
 }

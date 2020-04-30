@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:support_app/routes/issue.dart';
 
 import '../main.dart';
 
@@ -27,7 +26,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Form', style: TextStyle(color: Theme.of(context).primaryColor),),backgroundColor: Colors.white,),
+      appBar: AppBar(title: Text('Login', style: TextStyle(color: Theme.of(context).primaryColor),),backgroundColor: Colors.white,),
           body: Column(
           // mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -87,11 +86,12 @@ class _MyCustomFormState extends State<MyCustomForm> {
                   print(response2);
 
                   if (response2.statusCode == 200) {
-                    Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => IssueList(),
-                    ));
+                    Navigator.of(context).pushReplacementNamed('/issue');
+                    // Navigator.push(
+                    // context,
+                    // MaterialPageRoute(
+                    //   builder: (context) => IssueList(),
+                    // ));
                   } else {
                     // If the server did not return a 200 OK response,
                     // then throw an exception.
