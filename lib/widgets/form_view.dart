@@ -3,6 +3,7 @@ import 'package:support_app/widgets/communication.dart';
 import 'package:support_app/utils/helpers.dart';
 import 'package:support_app/utils/http.dart';
 import 'package:support_app/utils/response_models.dart';
+import 'package:support_app/widgets/email_form.dart';
 
 Future<DioGetDocResponse> fetchDoc(String doctype, String name) async {
   var queryParams = {
@@ -31,6 +32,7 @@ updateDoc(String name, Map updateObj, String doctype) async {
     // If the server did return a 200 OK response,
     // then parse the JSON.
     // return IssueDetailResponse.fromJson(response2.data);
+    return;
   } else {
     // If the server did not return a 200 OK response,
     // then throw an exception.
@@ -42,9 +44,13 @@ class FormView extends StatefulWidget {
   final String doctype;
   final String name;
   final Map wireframe;
-  final String app_bar_title;
+  final String appBarTitle;
 
-  FormView({@required this.doctype, @required this.name, this.wireframe, @required this.app_bar_title});
+  FormView(
+      {@required this.doctype,
+      @required this.name,
+      this.wireframe,
+      @required this.appBarTitle});
 
   @override
   _FormViewState createState() => _FormViewState();
@@ -54,7 +60,8 @@ class _FormViewState extends State<FormView> {
   Future<DioGetDocResponse> futureIssueDetail;
   bool formChanged = false;
   Map updateObj = {};
-  var docInfo;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final pageController = PageController(initialPage: 1);
 
   @override
   void initState() {
@@ -62,49 +69,38 @@ class _FormViewState extends State<FormView> {
     futureIssueDetail = fetchDoc(widget.doctype, widget.name);
   }
 
+  void _refresh() {
+    setState(() {
+      futureIssueDetail = fetchDoc(widget.doctype, widget.name);
+      formChanged = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: Container(
-        height: 55.0,
-        child: BottomAppBar(
-          color: Color.fromRGBO(58, 66, 86, 1.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.message, color: Colors.white),
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    var communcation = {
-                      "communications": docInfo["communications"],
-                      "comments": docInfo["comments"]
-                    };
-                    return Communication(communication: communcation, refDoctype: widget.doctype, refName: widget.name,);
-                  }));
-                },
-              ),
-            ],
-          ),
-        ),
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text(widget.appBarTitle, overflow: TextOverflow.ellipsis),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: formChanged
+                ? () async {
+                    await updateDoc(widget.name, updateObj, widget.doctype);
+                    _refresh();
+                  }
+                : null,
+          )
+        ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.grey,
-        child: Icon(
-          Icons.save,
-          color: Colors.white,
-        ),
-        onPressed: formChanged
-            ? () {
-                updateDoc(widget.name, updateObj, widget.doctype);
-                setState(() {
-                  formChanged = false;
-                });
-              }
-            : null,
-      ),
-      appBar: AppBar(
-        title: Text(widget.app_bar_title),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return EmailForm(doctype: widget.doctype, doc: widget.name);
+          }));
+        },
+        child: Icon(Icons.email),
       ),
       body: FutureBuilder(
         future: futureIssueDetail,
@@ -112,36 +108,38 @@ class _FormViewState extends State<FormView> {
           if (snapshot.hasData) {
             // processData(widget.wireframe);
             var docs = snapshot.data.values.docs;
-            docInfo = snapshot.data.values.docInfo;
+            var docInfo = snapshot.data.values.docInfo;
 
-            return Column(children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(bottom: 15),
-                child: Text(
-                  docs[0]["subject"],
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
+            return PageView(children: <Widget>[
+              GridView.count(
+                  padding: EdgeInsets.all(10),
+                  childAspectRatio: 2.0,
+                  crossAxisSpacing: 10.0,
+                  crossAxisCount: 2,
+                  children: widget.wireframe["fields"].where((field) {
+                    return field["hidden"] == false &&
+                        field["skip_field"] != true;
+                  }).map<Widget>((field) {
+                    var val = docs[0][field["fieldname"]];
+                    return GridTile(
+                      // header: Text(grid["header"]),
+                      child: generateChildWidget(field, val, (item) {
+                        updateObj[field["fieldname"]] = item;
+                        setState(() {
+                          docs[0][field["fieldname"]] = item;
+                          formChanged = true;
+                        });
+                      }),
+                    );
+                  }).toList()),
+              Communication(
+                docInfo: docInfo,
+                doctype: widget.doctype,
+                name: widget.name,
+                callback: () {
+                  _refresh();
+                },
               ),
-              Expanded(
-                  child: GridView.count(
-                      padding: EdgeInsets.all(10),
-                      childAspectRatio: 2.0,
-                      crossAxisCount: 2,
-                      children: widget.wireframe["fields"].where((field) {
-                        return field["hidden"] == false && field["skip_field"] != true;
-                      }).map<Widget>((field) {
-                        var val = docs[0][field["fieldname"]];
-                        return GridTile(
-                          // header: Text(grid["header"]),
-                          child: generateChildWidget(field, val, (item) {
-                            updateObj[field["fieldname"]] = item;
-                            setState(() {
-                              docs[0][field["fieldname"]] = item;
-                              formChanged = true;
-                            });
-                          }),
-                        );
-                      }).toList()))
             ]);
           } else if (snapshot.hasError) {
             return Text("${snapshot.error}");

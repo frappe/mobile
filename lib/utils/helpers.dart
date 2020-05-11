@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:support_app/utils/response_models.dart';
 import 'package:support_app/widgets/link_field.dart';
+import 'package:support_app/widgets/multi-select.dart';
 import 'package:support_app/widgets/select_field.dart';
 
 import '../app.dart';
@@ -49,6 +50,7 @@ getMeta(doctype) async {
 }
 
 Future<Map> processData(Map data, bool metaRequired) async {
+  // layout
   data["fieldnames"] = [];
   if (!metaRequired) {
     data["fields"].forEach((field) {
@@ -84,6 +86,7 @@ Future<Map> processData(Map data, bool metaRequired) async {
 }
 
 Widget generateChildWidget(Map widget, val, callback) {
+  // rename makeControl
   Widget value;
 
   switch (widget["fieldtype"]) {
@@ -110,9 +113,8 @@ Widget generateChildWidget(Map widget, val, callback) {
 
     case "MultiSelect":
       {
-        value = LinkField(
+        value = MultiSelect(
           hint: widget["fieldname"],
-          req_type: 'get_contact_list',
           onSuggestionSelected: callback,
           value: val,
         );
@@ -121,7 +123,7 @@ Widget generateChildWidget(Map widget, val, callback) {
 
     case "Small Text": {
       value = TextField(
-        controller: widget["controller"],
+        onChanged: callback,
         decoration: InputDecoration(hintText: widget["hint"]),
       );
     }
@@ -141,3 +143,59 @@ Widget generateChildWidget(Map widget, val, callback) {
   }
   return value;
 }
+
+// Widget generateLayout(fields) {
+//   var layout = [];
+//   var colBreak = true;
+//   var rows = [];
+//   var row1Count = 0;
+//   var row2Count = 0;
+//   var collapsible;
+
+//   // 1 section can contain one colbreak
+
+//   fields.asMap().forEach((index, field) {
+    
+//     if (field["fieldtype"] == "Section Break") {
+//       collapsible = false;
+//       colBreak = false;
+//       row1Count = 0;
+//       row2Count = 0;
+//       if(field["collapsible"] == 1) {
+//         collapsible = true;
+//       }
+//       rows.add('section');
+//       // generate section
+//     } else if (field["fieldtype" == "Column Break"]) {
+//       if(colBreak == true) {
+//         // throw error
+//       }
+//       colBreak = true;
+//       row2Count = row1Count;
+//     } else {
+//       if(colBreak == true) {
+//         if(collapsible = true) {
+//           rows.add(generateCollapsible(fields.sublist(index+1)));
+//         }
+//         rows[row1Count - row2Count].add('widget2');
+//         row2Count -= 1;
+//       } else {
+//         row1Count += 1;
+//         rows.add(['widget']);
+//       }
+//     }
+
+//   });
+
+//   // return Column(children: <Widget>[
+//   //   Row(children: rows)
+//   // ],);
+// }
+
+// Widget generateCollapsible(fields) {
+//   var collapsibleFields = fields.takeWhile((field) {
+//     return field["fieldtype"] != 'Section Break';
+//   });
+
+//   // wrap in collapsible
+// }

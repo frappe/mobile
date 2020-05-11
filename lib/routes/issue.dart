@@ -63,8 +63,9 @@ Map wireframe = {
 
 class IssueDetail extends StatefulWidget {
   final String name;
+  final String title;
 
-  const IssueDetail(this.name);
+  const IssueDetail(this.name, this.title);
 
   @override
   _IssueDetailState createState() => _IssueDetailState();
@@ -86,7 +87,7 @@ class _IssueDetailState extends State<IssueDetail> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return FormView(
-              app_bar_title: 'Issue Form',
+              appBarTitle: widget.title,
               doctype: 'Issue',
               name: widget.name,
               wireframe: wireframe,
@@ -177,9 +178,9 @@ class _IssueListState extends State<IssueList> {
                 return FilterIssue();
               }));
             },
-            detailCallback: (f) {
+            detailCallback: (name, title) {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return IssueDetail(f);
+                return IssueDetail(name, title);
               }));
             },
           );

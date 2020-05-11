@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:support_app/utils/response_models.dart';
 import 'package:support_app/utils/rest_apis.dart';
 
 Future fetchLinkField(doctype, refDoctype, txt) async {

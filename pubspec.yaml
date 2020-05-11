@@ -17,10 +17,12 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  timeago: ^2.0.26
+  flutter_tagging: ^1.0.1
   file_picker: ^1.6.3+2
   notus: ^0.1.5
   markdown: ^2.1.3
-  zefyr: ^0.10.0
+  # zefyr: ^0.10.0
   quill_delta: ^1.0.1
   html2md: ^0.5.1
   flutter_typeahead: ^1.8.0

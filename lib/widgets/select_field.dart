@@ -13,10 +13,10 @@ class SelectField extends StatefulWidget {
 }
 
 class _SelectFieldState extends State<SelectField> {
-
   @override
   Widget build(BuildContext context) {
-      return DropdownButton(
+    return Container(
+      child: DropdownButton(
         value: widget.value,
         onChanged: (dynamic newVal) {
           widget.onChanged(newVal);
@@ -28,6 +28,7 @@ class _SelectFieldState extends State<SelectField> {
             child: Text(option),
           );
         }).toList(),
-      );
+      ),
+    );
   }
 }
