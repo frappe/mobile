@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:support_app/config/palette.dart';
 import 'package:support_app/utils/http.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -40,12 +41,24 @@ class _CommentBoxState extends State<CommentBox> {
   Widget build(BuildContext context) {
     var time = timeago.format(DateTime.parse(widget.data["creation"]));
     return Container(
-      decoration: BoxDecoration(border: Border.all()),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Palette.lightGrey,
+        ),
+      ),
       child: Column(
         children: <Widget>[
           Container(
             height: 30,
-            decoration: BoxDecoration(color: Colors.black12),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Palette.lightGrey,
+                  width: 0.5,
+                ),
+              ),
+              color: Palette.offWhite
+            ),
             child: Row(
               children: <Widget>[
                 Padding(
@@ -54,11 +67,15 @@ class _CommentBoxState extends State<CommentBox> {
                 Icon(
                   Icons.comment,
                   size: 18,
+                  color: Palette.darkGrey
                 ),
                 SizedBox(
                   width: 4,
                 ),
-                Text('${widget.data["owner"]} - $time'),
+                Text(
+                  '${widget.data["owner"]} - $time',
+                  style: TextStyle(color: Palette.darkGrey),
+                ),
                 Spacer(),
                 ButtonTheme(
                   minWidth: 1.0,
@@ -88,14 +105,20 @@ class _CommentBoxState extends State<CommentBox> {
                             );
                           });
                     },
-                    child: Icon(Icons.delete),
+                    child: Icon(
+                      Icons.delete,
+                      color: Palette.darkGrey
+                    ),
                   ),
                 ),
                 ButtonTheme(
                   minWidth: 1.0,
                   child: FlatButton(
                     onPressed: () {},
-                    child: Text("Edit"),
+                    child: Text(
+                      "Edit",
+                      style: TextStyle(color: Palette.darkGrey),
+                    ),
                   ),
                 ),
               ],

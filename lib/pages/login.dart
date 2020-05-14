@@ -90,7 +90,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                         padding: EdgeInsets.symmetric(
                           horizontal: 80,
                         ),
-                        color: Color(0xff5364ff),
+                        color: Theme.of(context).primaryColor,
                         onPressed: () async {
                           if (_formKey.currentState.validate()) {
                             Scaffold.of(context).showSnackBar(

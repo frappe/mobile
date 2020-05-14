@@ -41,6 +41,11 @@ class _EmailFormState extends State<EmailForm> {
         "hint": "Subject",
       },
       {
+        "fieldtype": "Text Editor",
+        "fieldname": "content",
+        "hint": "Message",
+      },
+      {
         "fieldname": "send_me_a_copy",
         "fieldtype": "Check",
         "val": false,
@@ -57,11 +62,6 @@ class _EmailFormState extends State<EmailForm> {
         "fieldtype": "Check",
         "val": false,
         "hint": "Attach Document Print"
-      },
-      {
-        "fieldtype": "Small Text",
-        "fieldname": "content",
-        "hint": "content",
       },
       // {"label":"Select Attachments",
       // "fieldtype":"HTML",
@@ -112,36 +112,29 @@ class _EmailFormState extends State<EmailForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: () {
-          // print(txt);
-          print(emailObj);
-          _sendEmail(
-              recipients: emailObj["recipients"],
-              subject: emailObj["subject"],
-              content: emailObj["content"],
-              doctype: widget.doctype,
-              doctypeName: widget.doc);
-        },
-        child: Icon(
-          Icons.send,
-          color: Colors.blueGrey,
-          size: 50,
-        ),
+      appBar: AppBar(
+        title: Text('Send Email'),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () {
+              _sendEmail(
+                  recipients: emailObj["recipients"],
+                  subject: emailObj["subject"],
+                  content: emailObj["content"],
+                  doctype: widget.doctype,
+                  doctypeName: widget.doc);
+            },
+            child: Icon(
+              Icons.send,
+              color: Colors.white,
+            ),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(15.0),
           child: Column(children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(bottom: 15),
-              child: Text(
-                "PlaceHolder",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              ),
-            ),
             generateChildWidget(dummyData["fields"][0], null, (item) {
               emailObj[dummyData["fields"][0]["fieldname"]] = item;
               setState(() {
@@ -151,8 +144,10 @@ class _EmailFormState extends State<EmailForm> {
             Divider(
               thickness: 2.0,
             ),
-            Collapsible("CC, BCC, Email Template", (item) {
-              print(item);
+            Collapsible("CC, BCC", (item) {
+              emailObj.addAll(
+                item
+              );
             }),
             Divider(
               thickness: 2.0,
@@ -164,29 +159,39 @@ class _EmailFormState extends State<EmailForm> {
                 dummyData["fields"][4]["val"] = item;
               });
             }),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: generateChildWidget(
-                      dummyData["fields"][5], dummyData["fields"][5]["val"],
-                      (item) {
-                    emailObj[dummyData["fields"][5]["fieldname"]] = item;
-                    setState(() {
-                      dummyData["fields"][5]["val"] = item;
-                    });
-                  }),
-                ),
-                Expanded(
-                  child: generateChildWidget(
-                      dummyData["fields"][6], dummyData["fields"][6]["val"],
-                      (item) {
-                    emailObj[dummyData["fields"][6]["fieldname"]] = item;
-                    setState(() {
-                      dummyData["fields"][6]["val"] = item;
-                    });
-                  }),
-                )
-              ],
+            generateChildWidget(
+                dummyData["fields"][5], dummyData["fields"][5]["val"], (item) {
+              emailObj[dummyData["fields"][5]["fieldname"]] = item;
+              setState(() {
+                dummyData["fields"][5]["val"] = item;
+              });
+            }),
+            Padding(
+              padding: EdgeInsets.only(top: 10),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: generateChildWidget(
+                        dummyData["fields"][8], dummyData["fields"][8]["val"],
+                        (item) {
+                      emailObj[dummyData["fields"][8]["fieldname"]] = item;
+                      setState(() {
+                        dummyData["fields"][8]["val"] = item;
+                      });
+                    }),
+                  ),
+                  Expanded(
+                    child: generateChildWidget(
+                        dummyData["fields"][6], dummyData["fields"][6]["val"],
+                        (item) {
+                      emailObj[dummyData["fields"][6]["fieldname"]] = item;
+                      setState(() {
+                        dummyData["fields"][6]["val"] = item;
+                      });
+                    }),
+                  )
+                ],
+              ),
             ),
             Row(
               children: <Widget>[
@@ -201,14 +206,7 @@ class _EmailFormState extends State<EmailForm> {
                   }),
                 )
               ],
-            ),
-            generateChildWidget(
-                dummyData["fields"][8], dummyData["fields"][8]["val"], (item) {
-              emailObj[dummyData["fields"][8]["fieldname"]] = item;
-              setState(() {
-                dummyData["fields"][8]["val"] = item;
-              });
-            })
+            )
           ]),
         ),
       ),

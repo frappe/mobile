@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:support_app/config/palette.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class DocVersion extends StatelessWidget {
@@ -33,13 +34,18 @@ class DocVersion extends StatelessWidget {
     txt += "- $time";
 
     return Container(
-      decoration: BoxDecoration(border: Border.all(color: Colors.black26)),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Palette.lightGrey,
+        ),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Icon(
             Icons.edit,
             size: 20,
+            color: Palette.lightGrey,
           ),
           Expanded(
             child: Html(data: txt),

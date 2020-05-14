@@ -1,4 +1,10 @@
+import 'dart:io';
+
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:support_app/utils/response_models.dart';
 import 'package:support_app/widgets/link_field.dart';
@@ -114,32 +120,43 @@ Widget generateChildWidget(Map widget, val, callback) {
     case "MultiSelect":
       {
         value = MultiSelect(
-          hint: widget["fieldname"],
+          hint: widget["label"],
           onSuggestionSelected: callback,
           value: val,
         );
       }
       break;
 
-    case "Small Text": {
-      value = TextField(
-        onChanged: callback,
-        decoration: InputDecoration(hintText: widget["hint"]),
-      );
-    }
-    break;
-
-    case "Check": {
-      if(val == null) {
-        val = false;
+    case "Small Text":
+      {
+        value = TextField(
+          onChanged: callback,
+          decoration: InputDecoration(hintText: widget["hint"]),
+        );
       }
-      value = CheckboxListTile(
-        title: Text(widget["hint"]),
-        value: val,
-        onChanged: callback,
-      );
+      break;
+
+    case "Check":
+      {
+        if (val == null) {
+          val = false;
+        }
+        value = CheckboxListTile(
+          title: Text(widget["hint"]),
+          value: val,
+          onChanged: callback,
+        );
+      }
+      break;
+
+    case "Text Editor":
+    {
+      value = TextField(
+          onChanged: callback,
+          decoration: InputDecoration(hintText: widget["hint"]),
+          maxLines: 10,
+        );
     }
-    break;
   }
   return value;
 }
@@ -155,7 +172,7 @@ Widget generateChildWidget(Map widget, val, callback) {
 //   // 1 section can contain one colbreak
 
 //   fields.asMap().forEach((index, field) {
-    
+
 //     if (field["fieldtype"] == "Section Break") {
 //       collapsible = false;
 //       colBreak = false;
@@ -199,3 +216,53 @@ Widget generateChildWidget(Map widget, val, callback) {
 
 //   // wrap in collapsible
 // }
+
+downloadFile(String fileUrl) async {
+  await _checkPermission();
+  var cookieJar = await cookie();
+  // var cookies = CookieManager.getCookies(cookieJar);
+
+  var cookies = cookieJar.loadForRequest(Uri(
+      scheme: "https",
+      // port: int.parse("8000", radix: 16),
+      host: "version13beta.erpnext.com"));
+
+  print(cookies);
+
+  var c= CookieManager.getCookies(cookies);
+
+  final url = "$baseUrl$fileUrl";
+  var encoded = Uri.encodeFull(url);
+  final Directory downloadsDirectory =
+      await DownloadsPathProvider.downloadsDirectory;
+  final String downloadsPath = downloadsDirectory.path;
+  await FlutterDownloader.enqueue(
+    headers: {HttpHeaders.cookieHeader:c},
+    url: encoded,
+    savedDir: downloadsPath,
+    showNotification:
+        true, // show download progress in status bar (for Android)
+    openFileFromNotification:
+        true, // click on notification to open downloaded file (for Android)
+  );
+}
+
+Future<bool> _checkPermission() async {
+  if (Platform.isAndroid) {
+    PermissionStatus permission = await PermissionHandler()
+        .checkPermissionStatus(PermissionGroup.storage);
+    if (permission != PermissionStatus.granted) {
+      Map<PermissionGroup, PermissionStatus> permissions =
+          await PermissionHandler()
+              .requestPermissions([PermissionGroup.storage]);
+      if (permissions[PermissionGroup.storage] == PermissionStatus.granted) {
+        return true;
+      }
+    } else {
+      return true;
+    }
+  } else {
+    return true;
+  }
+  return false;
+}

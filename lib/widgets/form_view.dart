@@ -4,6 +4,7 @@ import 'package:support_app/utils/helpers.dart';
 import 'package:support_app/utils/http.dart';
 import 'package:support_app/utils/response_models.dart';
 import 'package:support_app/widgets/email_form.dart';
+import 'package:support_app/widgets/view_attachments.dart';
 
 Future<DioGetDocResponse> fetchDoc(String doctype, String name) async {
   var queryParams = {
@@ -62,6 +63,7 @@ class _FormViewState extends State<FormView> {
   Map updateObj = {};
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final pageController = PageController(initialPage: 1);
+  var docInfo;
 
   @override
   void initState() {
@@ -76,6 +78,14 @@ class _FormViewState extends State<FormView> {
     });
   }
 
+  void _choiceAction(String choice) {
+    if (choice == 'Attachments') {
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return ViewAttachments(docInfo["attachments"]);
+          }));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,8 +93,18 @@ class _FormViewState extends State<FormView> {
       appBar: AppBar(
         title: Text(widget.appBarTitle, overflow: TextOverflow.ellipsis),
         actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: _choiceAction,
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem<String>(
+                  value: 'Attachments',
+                  child: Text('View Attachments'),
+                )];
+            }
+          ),
           IconButton(
-            icon: Icon(Icons.save),
+            icon: Icon(Icons.save, color: Colors.white,),
             onPressed: formChanged
                 ? () async {
                     await updateDoc(widget.name, updateObj, widget.doctype);
@@ -108,7 +128,7 @@ class _FormViewState extends State<FormView> {
           if (snapshot.hasData) {
             // processData(widget.wireframe);
             var docs = snapshot.data.values.docs;
-            var docInfo = snapshot.data.values.docInfo;
+            docInfo = snapshot.data.values.docInfo;
 
             return PageView(children: <Widget>[
               GridView.count(

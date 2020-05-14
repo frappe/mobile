@@ -3,7 +3,6 @@ import 'package:support_app/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:support_app/routes/issue.dart';
 
-
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
@@ -16,7 +15,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    _checkIfLoggedIn();
+    // _checkIfLoggedIn();
     super.initState();
   }
 
@@ -47,26 +46,22 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Support App',
       theme: new ThemeData(
-        // primaryColor: Color.fromRGBO(58, 66, 86, 1.0),
-        primaryColor: Color(0xff5e64ff),
+        primaryColor: Colors.black,
+        accentColor: Colors.black54,
       ),
-      // theme: new ThemeData(primaryColor: Colors.white),
       home: GestureDetector(
         onTap: () {
           FocusScope.of(context).requestFocus(new FocusNode());
         },
-              child: Scaffold(
-          // appBar: AppBar(title: Text('Form', style: TextStyle(color: Theme.of(context).primaryColor),),backgroundColor: Colors.white,),
-          body: _isLoaded ? _isLoggedIn ? IssueList() : MyCustomForm() : Center(child: CircularProgressIndicator()),
-          // _isLoaded ? _defaultHome : Center(child: CircularProgressIndicator()),
-          // _isLoaded ? _isLoggedIn ? IssueList() : MyCustomForm() : Center(child: CircularProgressIndicator()),
-        ),
+        child: Scaffold(
+            // body: _isLoaded ? _isLoggedIn ? IssueList() : MyCustomForm() : Center(child: CircularProgressIndicator()),
+            body: MyCustomForm()),
       ),
       routes: <String, WidgetBuilder>{
-      // Set routes for using the Navigator.
-      '/issue': (BuildContext context) => IssueList(),
-      '/login': (BuildContext context) => MyCustomForm()
-    },
+        // Set routes for using the Navigator.
+        '/issue': (BuildContext context) => IssueList(),
+        '/login': (BuildContext context) => MyCustomForm()
+      },
     );
   }
 }

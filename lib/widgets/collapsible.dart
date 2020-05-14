@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:support_app/widgets/link_field.dart';
+// import 'package:support_app/widgets/link_field.dart';
 import 'package:support_app/widgets/multi-select.dart';
 
 class Collapsible extends StatefulWidget {
@@ -33,17 +33,17 @@ class _CollapsibleState extends State<Collapsible> {
               widget.callback({"bcc": item});
             },
           ),
-          LinkField(
-            doctype: "Email Template",
-            hint: "Email Template",
-            refDoctype: "Issue",
-            value: dropdownVal,
-            onSuggestionSelected: (item) {
-              setState(() {
-                dropdownVal = item;
-              }); 
-              widget.callback({"email template": item});
-            })
+          // LinkField(
+            // doctype: "Email Template",
+            // hint: "Email Template",
+            // refDoctype: "Issue",
+            // value: dropdownVal,
+            // onSuggestionSelected: (item) {
+            //   setState(() {
+            //     dropdownVal = item;
+            //   }); 
+            //   widget.callback({"email template": item});
+            // })
         ],
       
     );

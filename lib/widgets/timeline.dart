@@ -55,7 +55,7 @@ class Timeline extends StatelessWidget {
               Container(
                   height: 30,
                   child: VerticalDivider(
-                    thickness: 4,
+                    thickness: 2,
                   )),
             ],
           );

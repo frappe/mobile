@@ -46,25 +46,33 @@ class CommentInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(border: Border.all()),
+      decoration: BoxDecoration(
+          border: Border.all(color: Color.fromRGBO(209, 216, 221, 1))),
       child: Column(
         children: <Widget>[
           Container(
             height: 30,
-            decoration: BoxDecoration(color: Colors.black12),
+            decoration: BoxDecoration(
+                color: Color.fromRGBO(250, 251, 252, 1),
+                border: Border(
+                    bottom: BorderSide(
+                        width: 0.5, color: Color.fromRGBO(209, 216, 221, 1)))),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(left: 5),
-                  child: Text('Add a Comment'),
+                  child: Text(
+                    'Add a Comment',
+                    style: TextStyle(color: Color.fromRGBO(141, 153, 166, 1)),
+                  ),
                 ),
-                RaisedButton(
+                FlatButton(
                   onPressed: () {
                     FocusScope.of(context).unfocus();
                     _postComment(doctype, name, input.text, authorEmail);
                   },
-                  color: Colors.blueAccent,
+                  color: Color.fromRGBO(240,244,247, 1),
                   child: Text('Comment'),
                 )
               ],

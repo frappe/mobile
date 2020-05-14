@@ -40,7 +40,7 @@ class _MultiSelectState extends State<MultiSelect> {
       padding: EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(20.0)),
-        color: Colors.pinkAccent,
+        color: Theme.of(context).accentColor,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -51,7 +51,7 @@ class _MultiSelectState extends State<MultiSelect> {
             size: 15.0,
           ),
           Text(
-            "Add New Tag",
+            "Add User",
             style: TextStyle(color: Colors.white, fontSize: 14.0),
           ),
         ],
@@ -72,7 +72,7 @@ class _MultiSelectState extends State<MultiSelect> {
               hintText: widget.hint,
               labelText: widget.hint),
           addButtonWidget: _buildAddButton(),
-          chipsColor: Colors.pinkAccent,
+          chipsColor: Theme.of(context).accentColor,
           chipsFontColor: Colors.white,
           deleteIcon: Icon(Icons.cancel, color: Colors.white),
           chipsPadding: EdgeInsets.all(2.0),
