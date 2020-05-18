@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:support_app/widgets/comment_input.dart';
-import 'package:support_app/widgets/timeline.dart';
+
+import '../widgets/comment_input.dart';
+import '../widgets/timeline.dart';
 
 class Communication extends StatefulWidget {
   final Map docInfo;

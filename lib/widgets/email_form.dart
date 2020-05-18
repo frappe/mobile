@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:support_app/utils/helpers.dart';
-import 'package:support_app/utils/http.dart';
-import 'package:support_app/widgets/collapsible.dart';
+import '../utils/helpers.dart';
+import '../utils/http.dart';
+import '../widgets/collapsible.dart';
 
 class EmailForm extends StatefulWidget {
   final String doctype;

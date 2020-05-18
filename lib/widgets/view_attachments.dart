@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:support_app/utils/helpers.dart';
+
+import '../utils/helpers.dart';
 
 class ViewAttachments extends StatelessWidget {
   final List data;

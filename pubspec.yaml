@@ -1,4 +1,4 @@
-name: support_app
+name: frappe_app
 description: A new Flutter project.
 
 # The following defines the version and build number for your application.
@@ -17,6 +17,8 @@ environment:
   sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
+  html: ^0.14.0+3
+  url_launcher: ^5.4.7
   downloads_path_provider: ^0.1.0
   permission_handler: ^4.0.0
   flutter_downloader: ^1.4.4

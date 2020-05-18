@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:support_app/widgets/communication.dart';
-import 'package:support_app/utils/helpers.dart';
-import 'package:support_app/utils/http.dart';
-import 'package:support_app/utils/response_models.dart';
-import 'package:support_app/widgets/email_form.dart';
-import 'package:support_app/widgets/view_attachments.dart';
+
+import '../widgets/communication.dart';
+import '../utils/helpers.dart';
+import '../utils/http.dart';
+import '../utils/response_models.dart';
+import '../widgets/email_form.dart';
+import '../widgets/view_attachments.dart';
 
 Future<DioGetDocResponse> fetchDoc(String doctype, String name) async {
   var queryParams = {

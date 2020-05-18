@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:support_app/utils/enums.dart';
-import 'package:support_app/widgets/comment_box.dart';
-import 'package:support_app/widgets/doc_version.dart';
-import 'package:support_app/widgets/email_box.dart';
+import '../utils/enums.dart';
+import '../widgets/comment_box.dart';
+import '../widgets/doc_version.dart';
+import '../widgets/email_box.dart';
 
 class Event extends StatelessWidget {
   final EventType eventType;

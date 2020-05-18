@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-// import 'package:support_app/widgets/link_field.dart';
-import 'package:support_app/widgets/multi-select.dart';
+
+// import '../widgets/link_field.dart';
+import '../widgets/multi-select.dart';
 
 class Collapsible extends StatefulWidget {
   final String header;

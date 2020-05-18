@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:support_app/config/palette.dart';
 import 'package:timeago/timeago.dart' as timeago;
+
+import '../config/palette.dart';
 
 class EmailBox extends StatelessWidget {
   final Map data;
@@ -11,6 +12,7 @@ class EmailBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var time = timeago.format(DateTime.parse(data["creation"]));
+    
     return Container(
       decoration: BoxDecoration(
         border: Border.all(

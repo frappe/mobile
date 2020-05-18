@@ -1,9 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:support_app/utils/helpers.dart';
-import 'package:support_app/utils/http.dart';
-import 'package:support_app/utils/response_models.dart';
+
+import '../utils/helpers.dart';
+import '../utils/http.dart';
+import '../utils/response_models.dart';
 
 import '../constants.dart';
 
@@ -46,7 +47,7 @@ class CustomListView extends StatefulWidget {
   final List<List<String>> filters;
   final Function filterCallback;
   final Function detailCallback;
-  final String app_bar_title;
+  final String appBarTitle;
   final wireframe;
 
   CustomListView(
@@ -55,7 +56,7 @@ class CustomListView extends StatefulWidget {
       @required this.fieldnames,
       this.filters,
       this.filterCallback,
-      @required this.app_bar_title,
+      @required this.appBarTitle,
       this.detailCallback});
 
   @override
@@ -103,7 +104,7 @@ class _CustomListViewState extends State<CustomListView> {
         ),
       ),
       appBar: AppBar(
-        title: Text(widget.app_bar_title),
+        title: Text(widget.appBarTitle),
         actions: <Widget>[
           PopupMenuButton<String>(
             onSelected: choiceAction,
@@ -207,7 +208,7 @@ class _ListBuilderState extends State<ListBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    int subject_field_index =
+    int subjectFieldIndex =
         widget.list.values.keys.indexOf(widget.wireframe["subject_field"]);
 
     return ListView.builder(
@@ -233,7 +234,7 @@ class _ListBuilderState extends State<ListBuilder> {
                   ),
                 ),
                 title: Text(
-                    '${widget.list.values.values[index][subject_field_index]}',
+                    '${widget.list.values.values[index][subjectFieldIndex]}',
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                         color: Colors.grey[900],
@@ -268,7 +269,7 @@ class _ListBuilderState extends State<ListBuilder> {
                 ),
                 onTap: () {
                   widget.detailCallback(widget.list.values.values[index][0],
-                      widget.list.values.values[index][subject_field_index]);
+                      widget.list.values.values[index][subjectFieldIndex]);
                 },
               ),
             ],

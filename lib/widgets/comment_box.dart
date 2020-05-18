@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:support_app/config/palette.dart';
-import 'package:support_app/utils/http.dart';
 import 'package:timeago/timeago.dart' as timeago;
+
+import '../config/palette.dart';
+import '../utils/http.dart';
 
 class CommentBox extends StatefulWidget {
   final Map data;
@@ -107,6 +108,7 @@ class _CommentBoxState extends State<CommentBox> {
                     },
                     child: Icon(
                       Icons.delete,
+                      size: 20,
                       color: Palette.darkGrey
                     ),
                   ),

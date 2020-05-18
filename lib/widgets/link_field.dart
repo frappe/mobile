@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:support_app/utils/rest_apis.dart';
+
+import '../utils/rest_apis.dart';
 
 Future fetchLinkField(doctype, refDoctype, txt) async {
   var queryParams = {
@@ -10,14 +11,14 @@ Future fetchLinkField(doctype, refDoctype, txt) async {
     'ignore_user_permissions': 0
   };
 
-  return search_link(queryParams);
+  return searchLink(queryParams);
 }
 
-Future fetch_values(Map data, String req_type) {
-  if(req_type == 'get_contact_list') {
-    return get_contact_list(data);
+Future fetchValues(Map data, String reqType) {
+  if(reqType == 'get_contact_list') {
+    return getContactList(data);
   }
-  return search_link(data);
+  return searchLink(data);
 }
 
 class LinkField extends StatefulWidget {
@@ -28,11 +29,11 @@ class LinkField extends StatefulWidget {
   final doctype;
   final refDoctype;
   final txt;
-  final req_type;
+  final reqType;
 
   LinkField(
       {this.value,
-      this.req_type,
+      this.reqType,
       this.onSuggestionSelected,
       @required this.hint,
       this.doctype,
@@ -47,7 +48,7 @@ class _LinkFieldState extends State<LinkField> {
   // AutoCompleteTextField searchTextField;
   String dropdownVal;
   Future futureVal;
-  var query_params;
+  var queryParams;
 
   final TextEditingController _typeAheadController = TextEditingController();
 
@@ -55,19 +56,19 @@ class _LinkFieldState extends State<LinkField> {
   void initState() {
     super.initState();
 
-    if(widget.req_type == 'get_contact_list') {
-      query_params = {
+    if(widget.reqType == 'get_contact_list') {
+      queryParams = {
         'txt': widget.txt
       };
     } else {
-      query_params = {
+      queryParams = {
         'txt': widget.txt,
         'doctype': widget.doctype,
         'reference_doctype': widget.refDoctype,
         'ignore_user_permissions': 0
       };
     }
-    futureVal = fetch_values(query_params, widget.req_type);
+    futureVal = fetchValues(queryParams, widget.reqType);
   }
 
   @override
@@ -81,8 +82,8 @@ class _LinkFieldState extends State<LinkField> {
       ),
 
       suggestionsCallback: (pattern) async {
-        query_params["txt"] = pattern;
-        var val = await fetch_values(query_params, widget.req_type);
+        queryParams["txt"] = pattern;
+        var val = await fetchValues(queryParams, widget.reqType);
         return val.values;
       },
       itemBuilder: (context, item) {

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:support_app/utils/helpers.dart';
+
+import '../utils/helpers.dart';
 
 class FilterList extends StatefulWidget {
   final Function filterCallback;
   final Map wireframe;
-  final String app_bar_title;
+  final String appBarTitle;
 
-  FilterList({@required this.filterCallback, @required this.wireframe, @required this.app_bar_title});
+  FilterList({@required this.filterCallback, @required this.wireframe, @required this.appBarTitle});
 
   @override
   _FilterListState createState() => _FilterListState();
@@ -27,7 +28,7 @@ class _FilterListState extends State<FilterList> {
               },
             )
           ],
-          title: Text(widget.app_bar_title),
+          title: Text(widget.appBarTitle),
         ),
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.white,

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:support_app/utils/http.dart';
+
+import '../utils/http.dart';
 
 class CommentInput extends StatelessWidget {
   final String doctype;

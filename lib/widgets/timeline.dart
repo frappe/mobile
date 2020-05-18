@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:support_app/utils/enums.dart';
-import 'package:support_app/widgets/event.dart';
+
+import '../utils/enums.dart';
+import '../widgets/event.dart';
 
 class Timeline extends StatelessWidget {
   final Map data;

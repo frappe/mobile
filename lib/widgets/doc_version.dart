@@ -2,8 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:support_app/config/palette.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:url_launcher/url_launcher.dart';
+
+import '../config/palette.dart';
+import '../utils/http.dart';
 
 class DocVersion extends StatelessWidget {
   final Map data;
@@ -48,7 +51,25 @@ class DocVersion extends StatelessWidget {
             color: Palette.lightGrey,
           ),
           Expanded(
-            child: Html(data: txt),
+            child: Html(
+              data: txt,
+              onImageError: (a, b) {
+                // TODO
+                print(a);
+                print(b);
+              },
+              onLinkTap: (url) async {
+                final absoluteUrl = getAbsoluteUrl(url);
+                if (await canLaunch(absoluteUrl)) {
+                  await launch(
+                    absoluteUrl,
+                    headers: await getCookiesWithHeader(),
+                  );
+                } else {
+                  throw 'Could not launch $url';
+                }
+              },
+            ),
           ),
         ],
       ),

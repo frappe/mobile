@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tagging/flutter_tagging.dart';
-import 'package:support_app/utils/response_models.dart';
-import 'package:support_app/utils/rest_apis.dart';
+
+import '../utils/response_models.dart';
+import '../utils/rest_apis.dart';
 
 
 class MultiSelect extends StatefulWidget {
@@ -32,7 +33,7 @@ class _MultiSelectState extends State<MultiSelect> {
   var selectedValues = [];
 
   Future _fetchValues(Map data) {
-    return get_contact_list(data);
+    return getContactList(data);
   }
 
   Widget _buildAddButton() {

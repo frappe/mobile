@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../main.dart';
+import '../utils/http.dart';
 
-class MyCustomForm extends StatefulWidget {
+class Login extends StatefulWidget {
   @override
-  _MyCustomFormState createState() => _MyCustomFormState();
+  _LoginState createState() => _LoginState();
 }
 
-class _MyCustomFormState extends State<MyCustomForm> {
+class _LoginState extends State<Login> {
   static final _formKey = GlobalKey<FormState>();
   bool _isOn = true;
 
@@ -20,6 +21,17 @@ class _MyCustomFormState extends State<MyCustomForm> {
     usrTextController.dispose();
     pwdTextController.dispose();
     super.dispose();
+  }
+
+  Future _authenticate(usr, pwd) async {
+    final response =
+        await dio.post('/method/login', data: {'usr': usr, 'pwd': pwd});
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    localStorage.setBool('isLoggedIn', false);
+    if (response.statusCode == 200) {
+      localStorage.setBool('isLoggedIn', true);
+    }
+    return response;
   }
 
   @override
@@ -95,8 +107,9 @@ class _MyCustomFormState extends State<MyCustomForm> {
                           if (_formKey.currentState.validate()) {
                             Scaffold.of(context).showSnackBar(
                                 SnackBar(content: Text('Logging In')));
-                            var response2 = await authenticate(
-                                usrTextController.text, pwdTextController.text);
+                            var response2 = await _authenticate(
+                                usrTextController.text.trimRight(),
+                                pwdTextController.text);
                             print(response2);
 
                             if (response2.statusCode == 200) {

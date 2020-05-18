@@ -1,10 +1,10 @@
 
 import 'package:dio/dio.dart';
-import 'package:support_app/utils/response_models.dart';
 
-import 'http.dart';
+import '../utils/response_models.dart';
+import './http.dart';
 
-Future<DioLinkFieldResponse> search_link(data) async {
+Future<DioLinkFieldResponse> searchLink(data) async {
     final response = await dio.post('/method/frappe.desk.search.search_link',
       data: data,
       options: Options(contentType: Headers.formUrlEncodedContentType));
@@ -19,7 +19,7 @@ Future<DioLinkFieldResponse> search_link(data) async {
   }
 }
 
-Future<DioGetContactListResponse> get_contact_list(data) async {
+Future<DioGetContactListResponse> getContactList(data) async {
     final response = await dio.post('/method/frappe.email.get_contact_list',
       data: data,
       options: Options(contentType: Headers.formUrlEncodedContentType));

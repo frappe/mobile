@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:support_app/utils/helpers.dart';
-import 'package:support_app/widgets/form_view.dart';
-import 'package:support_app/widgets/filter_list.dart';
-import 'package:support_app/widgets/list_view.dart';
+
+import '../utils/helpers.dart';
+import '../widgets/form_view.dart';
+import '../widgets/filter_list.dart';
+import '../widgets/list_view.dart';
 
 Map wireframe = {
   "doctype": "Issue",
@@ -122,7 +123,7 @@ class _FilterIssueState extends State<FilterIssue> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return FilterList(
-              app_bar_title: 'Filter Issue',
+              appBarTitle: 'Filter Issue',
               filterCallback: (f) {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return IssueList(filters: f);
@@ -168,7 +169,7 @@ class _IssueListState extends State<IssueList> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return CustomListView(
-            app_bar_title: 'Issue List',
+            appBarTitle: 'Issue List',
             doctype: 'Issue',
             fieldnames: wireframe["fieldnames"],
             filters: widget.filters,
