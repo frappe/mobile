@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/form/multi_select.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -88,7 +90,7 @@ Future<Map> processData(Map data, bool metaRequired) async {
   return data;
 }
 
-Widget generateChildWidget(Map widget, val, callback) {
+Widget generateChildWidget(Map widget, [val, callback]) {
   // rename makeControl
   Widget value;
 
@@ -116,9 +118,10 @@ Widget generateChildWidget(Map widget, val, callback) {
 
     case "MultiSelect":
       {
-        value = MultiSelect(
+        value = MultiSelectFormField(
+          attribute: widget["fieldname"],
           hint: widget["label"],
-          onSuggestionSelected: callback,
+          callback: callback,
           value: val,
         );
       }
@@ -126,34 +129,40 @@ Widget generateChildWidget(Map widget, val, callback) {
 
     case "Small Text":
       {
-        value = TextField(
+        value = FormBuilderTextField(
           onChanged: callback,
+          attribute: widget["fieldname"],
           decoration: InputDecoration(hintText: widget["hint"]),
+          validators: [
+            FormBuilderValidators.required(),
+          ],
         );
       }
       break;
 
     case "Check":
       {
-        if (val == null) {
-          val = false;
-        }
-        value = CheckboxListTile(
-          title: Text(widget["hint"]),
-          value: val,
-          onChanged: callback,
+        value = FormBuilderCheckbox(
+          attribute: widget["fieldname"],
+          label: Text(widget["hint"]),
+          validators: [
+          ],
         );
       }
       break;
 
     case "Text Editor":
-    {
-      value = TextField(
-          onChanged: callback,
-          decoration: InputDecoration(hintText: widget["hint"]),
+      {
+        value = FormBuilderTextField(
           maxLines: 10,
+          onChanged: callback,
+          attribute: widget["fieldname"],
+          decoration: InputDecoration(hintText: widget["hint"]),
+          validators: [
+            FormBuilderValidators.required(),
+          ],
         );
-    }
+      }
   }
   return value;
 }

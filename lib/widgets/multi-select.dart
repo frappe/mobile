@@ -8,18 +8,14 @@ import '../utils/rest_apis.dart';
 class MultiSelect extends StatefulWidget {
   final value;
   final hint;
-  final Function onSuggestionSelected;
+  final Function callback;
 
-  final doctype;
-  final refDoctype;
   final txt;
 
   MultiSelect(
       {this.value,
-      this.onSuggestionSelected,
+      this.callback,
       @required this.hint,
-      this.doctype,
-      this.refDoctype,
       this.txt});
 
   @override
@@ -96,7 +92,7 @@ class _MultiSelectState extends State<MultiSelect> {
               result.forEach((r) {
                 text += '${r["name"]},';
               });
-              widget.onSuggestionSelected(text);
+              widget.callback(text);
             });
           },
         ),
