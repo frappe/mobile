@@ -4,30 +4,19 @@ import 'package:flutter_tagging/flutter_tagging.dart';
 import '../utils/response_models.dart';
 import '../utils/rest_apis.dart';
 
-
 class MultiSelect extends StatefulWidget {
-  final value;
   final hint;
   final Function callback;
 
   final txt;
 
-  MultiSelect(
-      {this.value,
-      this.callback,
-      @required this.hint,
-      this.txt});
+  MultiSelect({this.callback, @required this.hint, this.txt});
 
   @override
   _MultiSelectState createState() => _MultiSelectState();
 }
 
 class _MultiSelectState extends State<MultiSelect> {
-  String dropdownVal;
-  final TextEditingController _typeAheadController = TextEditingController();
-  var queryParams = {};
-  var selectedValues = [];
-
   Future _fetchValues(Map data) {
     return getContactList(data);
   }
@@ -81,8 +70,12 @@ class _MultiSelectState extends State<MultiSelect> {
               pattern = 'a';
             }
             var val = await _fetchValues({"txt": pattern});
-            if(val.values.length == 0) {
-              val = DioLinkFieldResponse.fromJson({"results": [{"value": pattern}]});
+            if (val.values.length == 0) {
+              val = DioLinkFieldResponse.fromJson({
+                "results": [
+                  {"value": pattern}
+                ]
+              });
             }
             var d = val.values.map((v) => {"name": v.value});
             return d;

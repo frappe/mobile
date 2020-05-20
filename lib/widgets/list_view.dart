@@ -76,9 +76,7 @@ class _CustomListViewState extends State<CustomListView> {
   }
 
   void choiceAction(String choice) {
-    if (choice == Constants.Settings) {
-      print('Settings');
-    } else if (choice == Constants.SignOut) {
+    if (choice == Constants.Logout) {
       logout(context);
     }
   }

@@ -4,17 +4,14 @@ import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/form/link_field.dart';
 import 'package:frappe_app/form/multi_select.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/response_models.dart';
-import '../widgets/link_field.dart';
-import '../widgets/multi-select.dart';
-import '../widgets/select_field.dart';
-
 import '../app.dart';
-import 'http.dart';
+import './http.dart';
 
 logout(context) async {
   var cookieJar = await getCookiePath();
@@ -97,22 +94,34 @@ Widget generateChildWidget(Map widget, [val, callback]) {
   switch (widget["fieldtype"]) {
     case "Link":
       {
-        value = LinkField(
+        value = LinkFormField(
+            attribute: widget["fieldname"],
             doctype: widget["doctype"],
             hint: widget["hint"],
             refDoctype: widget["refDoctype"],
             value: val,
-            onSuggestionSelected: callback);
+            callback: callback);
       }
       break;
 
     case "Select":
       {
-        value = SelectField(
-            options: widget["options"],
-            value: val,
-            hint: Text(widget["hint"]),
-            onChanged: callback);
+        value = FormBuilderDropdown(
+          onChanged: callback,
+          initialValue: val,
+          attribute: widget["fieldname"],
+          decoration: InputDecoration(
+            labelText: widget["hint"],
+          ),
+          // hint: Text(widget["hint"]),
+          validators: [FormBuilderValidators.required()],
+          items: widget["options"]
+              .map<DropdownMenuItem>((option) => DropdownMenuItem(
+                    value: option,
+                    child: Text('$option'),
+                  ))
+              .toList(),
+        );
       }
       break;
 
@@ -122,7 +131,6 @@ Widget generateChildWidget(Map widget, [val, callback]) {
           attribute: widget["fieldname"],
           hint: widget["label"],
           callback: callback,
-          value: val,
         );
       }
       break;
@@ -145,8 +153,7 @@ Widget generateChildWidget(Map widget, [val, callback]) {
         value = FormBuilderCheckbox(
           attribute: widget["fieldname"],
           label: Text(widget["hint"]),
-          validators: [
-          ],
+          validators: [],
         );
       }
       break;

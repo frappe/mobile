@@ -1,18 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/widgets/multi-select.dart';
+
+import '../widgets/multi-select.dart';
 
 class MultiSelectFormField extends StatefulWidget {
   final String hint;
-  final String value;
   final String attribute;
   final Function callback;
 
   MultiSelectFormField({
     @required this.attribute,
     @required this.hint,
-    @required this.value,
     @required this.callback,
   });
 
@@ -35,7 +34,6 @@ class _MultiSelectFormFieldState extends State<MultiSelectFormField> {
             decoration: InputDecoration(errorText: field.errorText),
             child: MultiSelect(
               hint: widget.hint,
-              value: widget.value,
               callback: field.didChange,
             ),
           );

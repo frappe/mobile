@@ -3,24 +3,6 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 import '../utils/rest_apis.dart';
 
-Future fetchLinkField(doctype, refDoctype, txt) async {
-  var queryParams = {
-    'txt': txt,
-    'doctype': doctype,
-    'reference_doctype': refDoctype,
-    'ignore_user_permissions': 0
-  };
-
-  return searchLink(queryParams);
-}
-
-Future fetchValues(Map data, String reqType) {
-  if(reqType == 'get_contact_list') {
-    return getContactList(data);
-  }
-  return searchLink(data);
-}
-
 class LinkField extends StatefulWidget {
   final value;
   final hint;
@@ -28,62 +10,48 @@ class LinkField extends StatefulWidget {
 
   final doctype;
   final refDoctype;
-  final txt;
   final reqType;
 
-  LinkField(
-      {this.value,
-      this.reqType,
-      this.onSuggestionSelected,
-      @required this.hint,
-      this.doctype,
-      this.refDoctype,
-      this.txt});
+  LinkField({
+    this.value,
+    this.reqType,
+    @required this.onSuggestionSelected,
+    @required this.hint,
+    @required this.doctype,
+    @required this.refDoctype,
+  });
 
   @override
   _LinkFieldState createState() => _LinkFieldState();
 }
 
 class _LinkFieldState extends State<LinkField> {
-  // AutoCompleteTextField searchTextField;
-  String dropdownVal;
-  Future futureVal;
-  var queryParams;
 
   final TextEditingController _typeAheadController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
+  Future _fetchLinkField(doctype, refDoctype, txt) async {
+    var queryParams = {
+      'txt': txt,
+      'doctype': doctype,
+      'reference_doctype': refDoctype,
+      'ignore_user_permissions': 0
+    };
 
-    if(widget.reqType == 'get_contact_list') {
-      queryParams = {
-        'txt': widget.txt
-      };
-    } else {
-      queryParams = {
-        'txt': widget.txt,
-        'doctype': widget.doctype,
-        'reference_doctype': widget.refDoctype,
-        'ignore_user_permissions': 0
-      };
-    }
-    futureVal = fetchValues(queryParams, widget.reqType);
+    return searchLink(queryParams);
   }
 
   @override
   Widget build(BuildContext context) {
     return TypeAheadField(
       textFieldConfiguration: TextFieldConfiguration(
-        controller: this._typeAheadController..text = widget.value,
-        decoration: InputDecoration(
-          hintText: widget.hint
-        )
-      ),
-
+          controller: this._typeAheadController..text = widget.value,
+          decoration: InputDecoration(
+            labelText: widget.hint,
+            // hintText: widget.hint,
+          )),
       suggestionsCallback: (pattern) async {
-        queryParams["txt"] = pattern;
-        var val = await fetchValues(queryParams, widget.reqType);
+        var val =
+            await _fetchLinkField(widget.doctype, widget.refDoctype, pattern);
         return val.values;
       },
       itemBuilder: (context, item) {

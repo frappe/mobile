@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import '../widgets/communication.dart';
 import '../utils/helpers.dart';
@@ -59,6 +60,7 @@ class FormView extends StatefulWidget {
 }
 
 class _FormViewState extends State<FormView> {
+  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   Future<DioGetDocResponse> futureIssueDetail;
   bool formChanged = false;
   Map updateObj = {};
@@ -82,8 +84,8 @@ class _FormViewState extends State<FormView> {
   void _choiceAction(String choice) {
     if (choice == 'Attachments') {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return ViewAttachments(docInfo["attachments"]);
-          }));
+        return ViewAttachments(docInfo["attachments"]);
+      }));
     }
   }
 
@@ -95,24 +97,31 @@ class _FormViewState extends State<FormView> {
         title: Text(widget.appBarTitle, overflow: TextOverflow.ellipsis),
         actions: <Widget>[
           PopupMenuButton<String>(
-            onSelected: _choiceAction,
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem<String>(
-                  value: 'Attachments',
-                  child: Text('View Attachments'),
-                )];
-            }
-          ),
+              onSelected: _choiceAction,
+              itemBuilder: (BuildContext context) {
+                return [
+                  PopupMenuItem<String>(
+                    value: 'Attachments',
+                    child: Text('View Attachments'),
+                  )
+                ];
+              }),
           IconButton(
-            icon: Icon(Icons.save, color: Colors.white,),
-            onPressed: formChanged
-                ? () async {
-                    await updateDoc(widget.name, updateObj, widget.doctype);
-                    _refresh();
-                  }
-                : null,
-          )
+              disabledColor: Colors.white70,
+              color: Colors.white,
+              icon: Icon(
+                Icons.save,
+                // color: Colors.red,
+              ),
+              onPressed: formChanged
+                  ? () async {
+                      if (_fbKey.currentState.saveAndValidate()) {
+                        var formValue = _fbKey.currentState.value;
+                        await updateDoc(widget.name, formValue, widget.doctype);
+                        _refresh();
+                      }
+                    }
+                  : null)
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -132,27 +141,28 @@ class _FormViewState extends State<FormView> {
             docInfo = snapshot.data.values.docInfo;
 
             return PageView(children: <Widget>[
-              GridView.count(
-                  padding: EdgeInsets.all(10),
-                  childAspectRatio: 2.0,
-                  crossAxisSpacing: 10.0,
-                  crossAxisCount: 2,
-                  children: widget.wireframe["fields"].where((field) {
-                    return field["hidden"] == false &&
-                        field["skip_field"] != true;
-                  }).map<Widget>((field) {
-                    var val = docs[0][field["fieldname"]];
-                    return GridTile(
-                      // header: Text(grid["header"]),
-                      child: generateChildWidget(field, val, (item) {
-                        updateObj[field["fieldname"]] = item;
-                        setState(() {
-                          docs[0][field["fieldname"]] = item;
-                          formChanged = true;
-                        });
-                      }),
-                    );
-                  }).toList()),
+              FormBuilder(
+                key: _fbKey,
+                child: GridView.count(
+                    padding: EdgeInsets.all(10),
+                    childAspectRatio: 2.0,
+                    crossAxisSpacing: 10.0,
+                    crossAxisCount: 2,
+                    children: widget.wireframe["fields"].where((field) {
+                      return field["hidden"] == false &&
+                          field["skip_field"] != true;
+                    }).map<Widget>((field) {
+                      var val = docs[0][field["fieldname"]];
+                      return GridTile(
+                        child: generateChildWidget(field, val, (item) {
+                          setState(() {
+                            docs[0][field["fieldname"]] = item;
+                            formChanged = true;
+                          });
+                        }),
+                      );
+                    }).toList()),
+              ),
               Communication(
                 docInfo: docInfo,
                 doctype: widget.doctype,
