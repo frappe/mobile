@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 
+import '../main.dart';
 import '../utils/http.dart';
 
 class Login extends StatefulWidget {
@@ -9,29 +10,24 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  static final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   bool _isOn = true;
-
-  final TextEditingController usrTextController = new TextEditingController();
-  final TextEditingController pwdTextController = new TextEditingController();
-
-  @override
-  void dispose() {
-    // Clean up the controller when the widget is disposed.
-    usrTextController.dispose();
-    pwdTextController.dispose();
-    super.dispose();
-  }
+  var serverURL;
 
   Future _authenticate(usr, pwd) async {
     final response =
         await dio.post('/method/login', data: {'usr': usr, 'pwd': pwd});
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
     localStorage.setBool('isLoggedIn', false);
     if (response.statusCode == 200) {
       localStorage.setBool('isLoggedIn', true);
     }
     return response;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    serverURL = localStorage.getString('serverURL');
   }
 
   @override
@@ -44,7 +40,7 @@ class _LoginState extends State<Login> {
         ),
         backgroundColor: Colors.white,
       ),
-      body: Column(
+      body: ListView(
         // mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Padding(
@@ -52,18 +48,31 @@ class _LoginState extends State<Login> {
             child: Column(
               // mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Form(
-                  key: _formKey,
+                FormBuilder(
+                  key: _fbKey,
                   child: Column(
                     children: <Widget>[
-                      TextFormField(
-                        controller: usrTextController,
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'please enter email';
-                          }
-                          return null;
-                        },
+                      FormBuilderTextField(
+                        attribute: 'serverURL',
+                        initialValue: serverURL,
+                        validators: [
+                          FormBuilderValidators.required(),
+                          FormBuilderValidators.url()
+                        ],
+                        decoration: InputDecoration(
+                          focusColor: Colors.black,
+                          labelText: "Server URL",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      FormBuilderTextField(
+                        attribute: 'usr',
+                        validators: [
+                          FormBuilderValidators.required(),
+                        ],
                         decoration: InputDecoration(
                           focusColor: Colors.black,
                           labelText: "Email",
@@ -73,14 +82,12 @@ class _LoginState extends State<Login> {
                       SizedBox(
                         height: 20.0,
                       ),
-                      TextFormField(
-                        controller: pwdTextController,
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'please enter password';
-                          }
-                          return null;
-                        },
+                      FormBuilderTextField(
+                        maxLines: 1,
+                        attribute: 'pwd',
+                        validators: [
+                          FormBuilderValidators.required(),
+                        ],
                         decoration: InputDecoration(
                             labelText: "Password",
                             border: OutlineInputBorder(),
@@ -104,12 +111,16 @@ class _LoginState extends State<Login> {
                         ),
                         color: Theme.of(context).primaryColor,
                         onPressed: () async {
-                          if (_formKey.currentState.validate()) {
+                          if (_fbKey.currentState.saveAndValidate()) {
+                            var formValue = _fbKey.currentState.value;
+
+                            await setBaseUrl(formValue["serverURL"]);
+
                             Scaffold.of(context).showSnackBar(
                                 SnackBar(content: Text('Logging In')));
                             var response2 = await _authenticate(
-                                usrTextController.text.trimRight(),
-                                pwdTextController.text);
+                                formValue["usr"].trimRight(),
+                                formValue["pwd"]);
                             print(response2);
 
                             if (response2.statusCode == 200) {

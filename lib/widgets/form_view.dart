@@ -64,7 +64,6 @@ class _FormViewState extends State<FormView> {
   Future<DioGetDocResponse> futureIssueDetail;
   bool formChanged = false;
   Map updateObj = {};
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
   final pageController = PageController(initialPage: 1);
   var docInfo;
 
@@ -92,7 +91,6 @@ class _FormViewState extends State<FormView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(widget.appBarTitle, overflow: TextOverflow.ellipsis),
         actions: <Widget>[

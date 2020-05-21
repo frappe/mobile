@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import './pages/login.dart';
 import './routes/issue.dart';
+import './main.dart';
 
 class FrappeApp extends StatefulWidget {
   @override
@@ -19,8 +19,7 @@ class _FrappeAppState extends State<FrappeApp> {
     super.initState();
   }
 
-  void _checkIfLoggedIn() async {
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
+  void _checkIfLoggedIn() {
     if (localStorage.containsKey('isLoggedIn')) {
       bool loggedIn = localStorage.getBool('isLoggedIn');
       setState(() {

@@ -5,14 +5,36 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 
-final String baseUrl = "https://version13beta.erpnext.com";
+import '../main.dart';
 
-BaseOptions options =
-    new BaseOptions(baseUrl: "$baseUrl/api");
-// BaseOptions options = new BaseOptions(baseUrl: "https://mycom.erpnext.com/api");
-// BaseOptions options = new BaseOptions(baseUrl: "http://erpnext.dev2:8000/api");
+Dio dio;
+Uri uri;
+var baseUrl;
 
-Dio dio = new Dio(options);
+void initConfig() async {
+  if (localStorage.containsKey('serverURL')) {
+    uri = Uri.parse(localStorage.getString('serverURL'));
+    baseUrl = uri.origin;
+    BaseOptions options = new BaseOptions(baseUrl: "$baseUrl/api");
+    dio = Dio(options);
+    var cookieJar = await getCookiePath();
+    dio.interceptors.add(CookieManager(cookieJar));
+  }
+}
+
+void setBaseUrl(url) async {
+
+  baseUrl = url;
+  BaseOptions options = new BaseOptions(baseUrl: "$url/api");
+  dio = Dio(options);
+
+  var cookieJar = await getCookiePath();
+  dio.interceptors.add(CookieManager(cookieJar));
+
+  uri = Uri.parse(url);
+
+  localStorage.setString('serverURL', url);
+}
 
 Future getCookiePath() async {
   Directory appDocDir = await getApplicationSupportDirectory();
@@ -27,10 +49,7 @@ Future getCookiePath() async {
 Future<Map<String, String>> getCookiesWithHeader() async {
   var cookieJar = await getCookiePath();
 
-  var cookies = cookieJar.loadForRequest(Uri(
-      scheme: "https",
-      // port: int.parse("8000", radix: 16),
-      host: "version13beta.erpnext.com"));
+  var cookies = cookieJar.loadForRequest(uri);
 
   var cookie = CookieManager.getCookies(cookies);
 

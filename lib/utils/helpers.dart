@@ -7,8 +7,8 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/form/link_field.dart';
 import 'package:frappe_app/form/multi_select.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import '../main.dart';
 import '../utils/response_models.dart';
 import '../app.dart';
 import './http.dart';
@@ -16,12 +16,8 @@ import './http.dart';
 logout(context) async {
   var cookieJar = await getCookiePath();
 
-  cookieJar.delete(Uri(
-      scheme: "https",
-      // port: int.parse("8000", radix: 16),
-      host: "version13beta.erpnext.com"));
+  cookieJar.delete(uri);
 
-  SharedPreferences localStorage = await SharedPreferences.getInstance();
   localStorage.setBool('isLoggedIn', false);
 
   // Navigator.of(context).pushReplacementNamed('/login');
