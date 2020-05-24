@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import '../utils/helpers.dart';
 
@@ -7,7 +8,10 @@ class FilterList extends StatefulWidget {
   final Map wireframe;
   final String appBarTitle;
 
-  FilterList({@required this.filterCallback, @required this.wireframe, @required this.appBarTitle});
+  FilterList(
+      {@required this.filterCallback,
+      @required this.wireframe,
+      @required this.appBarTitle});
 
   @override
   _FilterListState createState() => _FilterListState();
@@ -40,24 +44,31 @@ class _FilterListState extends State<FilterList> {
             color: Colors.blueGrey,
           ),
         ),
-        body: GridView.count(
-            padding: EdgeInsets.all(10),
-            childAspectRatio: 2.0,
-            crossAxisCount: 2,
-            children: widget.wireframe["fields"].where((field) {
-              return field["in_standard_filter"] == true;
-            }).map<Widget>((field) {
-              var val = field["val"];
-              return GridTile(
-                // header: Text(grid["header"]),
-                child: generateChildWidget(field, val, (item) {
-                  filters.add([widget.wireframe["doctype"], field["fieldname"], "=", item]);
-                  setState(() {
-                    field["val"] = item;
-                    // formChanged = true;
-                  });
-                }),
-              );
-            }).toList()));
+        body: FormBuilder(
+          child: GridView.count(
+              padding: EdgeInsets.all(10),
+              childAspectRatio: 2.0,
+              crossAxisCount: 2,
+              children: widget.wireframe["fields"].where((field) {
+                return field["in_standard_filter"] == true;
+              }).map<Widget>((field) {
+                var val = field["val"];
+                return GridTile(
+                  // header: Text(grid["header"]),
+                  child: generateChildWidget(field, val, (item) {
+                    filters.add([
+                      widget.wireframe["doctype"],
+                      field["fieldname"],
+                      "=",
+                      item
+                    ]);
+                    setState(() {
+                      field["val"] = item;
+                      // formChanged = true;
+                    });
+                  }),
+                );
+              }).toList()),
+        ));
   }
 }

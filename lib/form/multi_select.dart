@@ -31,7 +31,10 @@ class _MultiSelectFormFieldState extends State<MultiSelectFormField> {
         enabled: true,
         builder: (FormFieldState<dynamic> field) {
           return InputDecorator(
-            decoration: InputDecoration(errorText: field.errorText),
+            decoration: InputDecoration(
+              errorText: field.errorText,
+              enabledBorder: InputBorder.none,
+            ),
             child: MultiSelect(
               hint: widget.hint,
               callback: field.didChange,

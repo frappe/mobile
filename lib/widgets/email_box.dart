@@ -12,77 +12,27 @@ class EmailBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var time = timeago.format(DateTime.parse(data["creation"]));
-    
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Palette.lightGrey,
-        ),
-      ),
+    return Card(
       child: Column(
         children: <Widget>[
-          Container(
-            height: 30,
-            decoration: BoxDecoration(
-              color: Palette.offWhite,
-              border: Border.all(
-                color: Palette.lightGrey,
+          ListTile(
+              leading: CircleAvatar(
+                child: Icon(Icons.person)
               ),
-            ),
-            child: Row(
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(left: 5),
-                ),
-                Icon(
-                  Icons.email,
-                  size: 18,
-                  color: Palette.lightGrey,
-                ),
-                SizedBox(
-                  width: 4,
-                ),
-                Text('${data["sender_full_name"]} - $time',
-                    style: TextStyle(color: Palette.darkGrey)),
-              ],
-            ),
-          ),
-          Container(
-            height: 30,
-            child: Row(
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(left: 5),
-                  child: Text(
-                    'Title:',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 4,
-                ),
-                Text('${data["subject"]}'),
-              ],
-            ),
-          ),
-          Divider(
-            thickness: 2,
-          ),
-          ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: 30,
-              ),
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: Html(data: data["content"]
-                      // maxLines: 1000,
-                      ),
-                ),
+              title: Text('${data["subject"]}'),
+              subtitle: Text('${data["sender_full_name"]} - $time'),
+              trailing: PopupMenuButton(
+                itemBuilder: (context) {
+                  return [
+                    PopupMenuItem(child: Text('Reply'), value: 'Reply',)
+                  ];
+                },
               )),
+          ListTile(
+            title: Html(
+              data: data["content"],
+            ),
+          )
         ],
       ),
     );

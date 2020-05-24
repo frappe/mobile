@@ -34,44 +34,45 @@ class DocVersion extends StatelessWidget {
       txt = "Unhandled txt";
     }
 
-    txt += "- $time";
+    // txt += "- $time";
 
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Palette.lightGrey,
+    return Card(
+      // decoration: BoxDecoration(
+      //   border: Border.all(
+      //     color: Palette.lightGrey,
+      //   ),
+      // ),
+      // padding: EdgeInsets.fromLTRB(10,10,10,20),
+      child: ListTile(
+        // crossAxisAlignment: CrossAxisAlignment.start,
+        subtitle: Text(time),
+        title: Html(
+          data: txt,
+          onImageError: (a, b) {
+            // TODO
+            print(a);
+            print(b);
+          },
+          onLinkTap: (url) async {
+            final absoluteUrl = getAbsoluteUrl(url);
+            if (await canLaunch(absoluteUrl)) {
+              await launch(
+                absoluteUrl,
+                headers: await getCookiesWithHeader(),
+              );
+            } else {
+              throw 'Could not launch $url';
+            }
+          },
         ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Icon(
-            Icons.edit,
-            size: 20,
-            color: Palette.lightGrey,
-          ),
-          Expanded(
-            child: Html(
-              data: txt,
-              onImageError: (a, b) {
-                // TODO
-                print(a);
-                print(b);
-              },
-              onLinkTap: (url) async {
-                final absoluteUrl = getAbsoluteUrl(url);
-                if (await canLaunch(absoluteUrl)) {
-                  await launch(
-                    absoluteUrl,
-                    headers: await getCookiesWithHeader(),
-                  );
-                } else {
-                  throw 'Could not launch $url';
-                }
-              },
-            ),
-          ),
-        ],
+        // Icon(
+        //   Icons.edit,
+        //   size: 20,
+        //   color: Palette.lightGrey,
+        // ),
+        // Expanded(
+        //   child:
+        // ),
       ),
     );
   }

@@ -64,8 +64,13 @@ class _FormViewState extends State<FormView> {
   Future<DioGetDocResponse> futureIssueDetail;
   bool formChanged = false;
   Map updateObj = {};
-  final pageController = PageController(initialPage: 1);
+  final _pageController = PageController(
+    initialPage: 0,
+    keepPage: true,
+  );
   var docInfo;
+  var docs;
+  int bottomSelectedIndex = 0;
 
   @override
   void initState() {
@@ -80,104 +85,217 @@ class _FormViewState extends State<FormView> {
     });
   }
 
-  void _choiceAction(String choice) {
-    if (choice == 'Attachments') {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return ViewAttachments(docInfo["attachments"]);
-      }));
-    }
+  List<BottomNavigationBarItem> buildBottomNavBarItems() {
+    return [
+      BottomNavigationBarItem(
+        icon: Icon(
+          Icons.details,
+        ),
+        title: Text('Form'),
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(
+          Icons.message,
+        ),
+        title: Text('Timeline'),
+      )
+    ];
+  }
+
+  void pageChanged(int index) {
+    setState(() {
+      bottomSelectedIndex = index;
+    });
+  }
+
+  void bottomTapped(int index) {
+    setState(() {
+      bottomSelectedIndex = index;
+      _pageController.animateToPage(index,
+          duration: Duration(milliseconds: 500), curve: Curves.ease);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.appBarTitle, overflow: TextOverflow.ellipsis),
-        actions: <Widget>[
-          PopupMenuButton<String>(
-              onSelected: _choiceAction,
-              itemBuilder: (BuildContext context) {
-                return [
-                  PopupMenuItem<String>(
-                    value: 'Attachments',
-                    child: Text('View Attachments'),
-                  )
-                ];
-              }),
-          IconButton(
-              disabledColor: Colors.white70,
-              color: Colors.white,
-              icon: Icon(
-                Icons.save,
-                // color: Colors.red,
-              ),
-              onPressed: formChanged
-                  ? () async {
-                      if (_fbKey.currentState.saveAndValidate()) {
-                        var formValue = _fbKey.currentState.value;
-                        await updateDoc(widget.name, formValue, widget.doctype);
-                        _refresh();
-                      }
-                    }
-                  : null)
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return EmailForm(doctype: widget.doctype, doc: widget.name);
-          }));
-        },
-        child: Icon(Icons.email),
-      ),
-      body: FutureBuilder(
+    return FutureBuilder(
         future: futureIssueDetail,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             // processData(widget.wireframe);
-            var docs = snapshot.data.values.docs;
+            docs = snapshot.data.values.docs;
             docInfo = snapshot.data.values.docInfo;
 
-            return PageView(children: <Widget>[
-              FormBuilder(
-                key: _fbKey,
-                child: GridView.count(
-                    padding: EdgeInsets.all(10),
-                    childAspectRatio: 2.0,
-                    crossAxisSpacing: 10.0,
-                    crossAxisCount: 2,
-                    children: widget.wireframe["fields"].where((field) {
-                      return field["hidden"] == false &&
-                          field["skip_field"] != true;
-                    }).map<Widget>((field) {
-                      var val = docs[0][field["fieldname"]];
-                      return GridTile(
-                        child: generateChildWidget(field, val, (item) {
-                          setState(() {
-                            docs[0][field["fieldname"]] = item;
-                            formChanged = true;
-                          });
-                        }),
-                      );
-                    }).toList()),
-              ),
-              Communication(
-                docInfo: docInfo,
-                doctype: widget.doctype,
-                name: widget.name,
-                callback: () {
-                  _refresh();
-                },
-              ),
-            ]);
+            return Scaffold(
+                bottomNavigationBar: Container(
+                  child: BottomNavigationBar(
+                    selectedItemColor: Colors.black,
+                    unselectedItemColor: Colors.black38,
+                    backgroundColor: Color.fromRGBO(237, 242, 247, 1),
+                    currentIndex: bottomSelectedIndex,
+                    items: buildBottomNavBarItems(),
+                    onTap: (index) {
+                      bottomTapped(index);
+                    },
+                  ),
+                ),
+                appBar: PreferredSize(
+                  preferredSize: Size.fromHeight(200),
+                  child: AppBar(
+                    elevation: 0,
+                    bottom: PreferredSize(
+                      preferredSize: Size.fromHeight(110),
+                      child: Container(
+                        padding: EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              child: Text(
+                                widget.appBarTitle,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 28),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Icon(
+                                  Icons.lens,
+                                  size: 10,
+                                  color: setStatusColor(docs[0]['status']),
+                                ),
+                                SizedBox(
+                                  width: 6,
+                                ),
+                                Text(docs[0]['status'].toUpperCase()),
+                                SizedBox(
+                                  width: 16,
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.attach_file),
+                                  onPressed: () {
+                                    Navigator.push(context,
+                                        MaterialPageRoute(builder: (context) {
+                                      return ViewAttachments(
+                                          docInfo["attachments"]);
+                                    }));
+                                  },
+                                ),
+                                Spacer(),
+                                Column(
+                                  children: <Widget>[
+                                    CircleAvatar(child: Icon(Icons.person)),
+                                    SizedBox(
+                                      height: 4,
+                                    ),
+                                    docInfo["assignments"].length != 0
+                                        ? Text(
+                                            docInfo["assignments"][0]["owner"])
+                                        : Text('Unassigned')
+                                  ],
+                                )
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    actions: <Widget>[
+                      IconButton(
+                          disabledColor: Colors.black54,
+                          color: Colors.black,
+                          icon: Icon(
+                            Icons.save,
+                          ),
+                          onPressed: formChanged
+                              ? () async {
+                                  if (_fbKey.currentState.saveAndValidate()) {
+                                    var formValue = _fbKey.currentState.value;
+                                    await updateDoc(
+                                        widget.name, formValue, widget.doctype);
+                                    _refresh();
+                                  }
+                                }
+                              : null)
+                    ],
+                  ),
+                ),
+                floatingActionButton: FloatingActionButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return EmailForm(
+                          doctype: widget.doctype, doc: widget.name);
+                    }));
+                  },
+                  child: Icon(Icons.email),
+                ),
+                body: Column(children: <Widget>[
+                  Container(
+                    color: Color.fromRGBO(237, 242, 247, 1),
+                    height: 30,
+                  ),
+                  Expanded(
+                    child: PageView(
+                        onPageChanged: (index) {
+                          pageChanged(index);
+                        },
+                        controller: _pageController,
+                        children: <Widget>[
+                          FormBuilder(
+                            key: _fbKey,
+                            child: Column(children: <Widget>[
+                              Expanded(
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: GridView.count(
+                                      padding: EdgeInsets.all(10),
+                                      childAspectRatio: 2.0,
+                                      crossAxisSpacing: 10.0,
+                                      crossAxisCount: 2,
+                                      children: widget.wireframe["fields"]
+                                          .where((field) {
+                                        return field["hidden"] == false &&
+                                            field["skip_field"] != true;
+                                      }).map<Widget>((field) {
+                                        var val = docs[0][field["fieldname"]];
+                                        return GridTile(
+                                          child: generateChildWidget(field, val,
+                                              (item) {
+                                            setState(() {
+                                              docs[0][field["fieldname"]] =
+                                                  item;
+                                              formChanged = true;
+                                            });
+                                          }),
+                                        );
+                                      }).toList()),
+                                ),
+                              ),
+                            ]),
+                          ),
+                          Communication(
+                            docInfo: docInfo,
+                            doctype: widget.doctype,
+                            name: widget.name,
+                            callback: () {
+                              _refresh();
+                            },
+                          ),
+                        ]),
+                  ),
+                ]));
           } else if (snapshot.hasError) {
             return Text("${snapshot.error}");
           }
 
           // By default, show a loading spinner.
           return Center(child: CircularProgressIndicator());
-        },
-      ),
-    );
+        });
   }
 }

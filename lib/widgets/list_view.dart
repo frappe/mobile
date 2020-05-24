@@ -170,20 +170,6 @@ class _ListBuilderState extends State<ListBuilder> {
 
   int page = 1;
 
-  Color setStatusColor(String status) {
-    Color _color;
-    if (status == 'Open') {
-      _color = Color(0xffffa00a);
-    } else if (status == 'Replied') {
-      _color = Color(0xffb8c2cc);
-    } else if (status == 'Hold') {
-      _color = Colors.redAccent[400];
-    } else if (status == 'Closed') {
-      _color = Color(0xff98d85b);
-    }
-    return _color;
-  }
-
   @override
   void initState() {
     super.initState();

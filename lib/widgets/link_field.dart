@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/utils/response_models.dart';
 
 import '../utils/rest_apis.dart';
@@ -47,7 +48,9 @@ class _LinkFieldState extends State<LinkField> {
       textFieldConfiguration: TextFieldConfiguration(
         controller: this._typeAheadController..text = widget.value,
         decoration: InputDecoration(
-          labelText: widget.hint,
+          labelStyle: Palette.labelStyle,
+          labelText: widget.hint.toUpperCase(),
+          enabledBorder: InputBorder.none,
           // hintText: widget.hint,
         ),
       ),

@@ -4,6 +4,7 @@ import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/form/link_field.dart';
 import 'package:frappe_app/form/multi_select.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -107,7 +108,9 @@ Widget generateChildWidget(Map widget, [val, callback]) {
           initialValue: val,
           attribute: widget["fieldname"],
           decoration: InputDecoration(
-            labelText: widget["hint"],
+            labelText: widget["hint"].toUpperCase(),
+            labelStyle: Palette.labelStyle,
+            enabledBorder: InputBorder.none
           ),
           // hint: Text(widget["hint"]),
           validators: [FormBuilderValidators.required()],
@@ -265,4 +268,18 @@ Future<bool> _checkPermission() async {
     return true;
   }
   return false;
+}
+
+Color setStatusColor(String status) {
+  Color _color;
+  if (status == 'Open') {
+    _color = Color(0xffffa00a);
+  } else if (status == 'Replied') {
+    _color = Color(0xffb8c2cc);
+  } else if (status == 'Hold') {
+    _color = Colors.redAccent[400];
+  } else if (status == 'Closed') {
+    _color = Color(0xff98d85b);
+  }
+  return _color;
 }

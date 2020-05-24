@@ -42,25 +42,23 @@ class Timeline extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         children: sortedEvents.map<Widget>((event) {
           var eventType;
-          if(event["communication_medium"] == "Email") {
+          if (event["communication_medium"] == "Email") {
             eventType = EventType.email;
           } else if (event["comment_type"] == "Comment") {
             eventType = EventType.comment;
-          } else if (event["data"] != null || event["comment_type"] == "Attachment") {
+          } else if (event["data"] != null ||
+              event["comment_type"] == "Attachment") {
+            eventType = EventType.docVersion;
+          } else {
             eventType = EventType.docVersion;
           }
 
-          return Column(
-            children: <Widget>[
-              Event(eventType, event, callback),
-              Container(
-                  height: 30,
-                  child: VerticalDivider(
-                    thickness: 2,
-                  )),
-            ],
-          );
-        }).toList()
-        );
+          return Column(children: <Widget>[
+            Event(eventType, event, callback),
+            Container(
+              height: 20,
+            ),
+          ]);
+        }).toList());
   }
 }

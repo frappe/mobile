@@ -24,13 +24,13 @@ class _CollapsibleState extends State<Collapsible> {
         children: <Widget>[
           MultiSelect(
             hint: "CC",
-            onSuggestionSelected: (item) {
+            callback: (item) {
               widget.callback({"cc": item});
             },
           ),
           MultiSelect(
             hint: "BCC",
-            onSuggestionSelected: (item) {
+            callback: (item) {
               widget.callback({"bcc": item});
             },
           ),

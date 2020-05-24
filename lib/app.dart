@@ -35,7 +35,8 @@ class _FrappeAppState extends State<FrappeApp> {
       debugShowCheckedModeBanner: false,
       title: 'Support App',
       theme: new ThemeData(
-        primaryColor: Colors.black,
+        // primaryColor: Color.fromRGBO(68, 65, 65, 1),
+        primaryColor: Colors.white,
         accentColor: Colors.black54,
       ),
       home: GestureDetector(
@@ -43,8 +44,10 @@ class _FrappeAppState extends State<FrappeApp> {
           FocusScope.of(context).requestFocus(new FocusNode());
         },
         child: Scaffold(
-            body: _isLoaded ? _isLoggedIn ? IssueList() : Login() : Center(child: CircularProgressIndicator())),
-            // body: Login()),
+            body: _isLoaded
+                ? _isLoggedIn ? IssueList() : Login()
+                : Center(child: CircularProgressIndicator())),
+        // body: Login()),
       ),
       routes: <String, WidgetBuilder>{
         // Set routes for using the Navigator.

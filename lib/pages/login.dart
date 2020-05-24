@@ -70,6 +70,7 @@ class _LoginState extends State<Login> {
                       ),
                       FormBuilderTextField(
                         attribute: 'usr',
+                        initialValue: 'Administrator',
                         validators: [
                           FormBuilderValidators.required(),
                         ],
@@ -85,6 +86,7 @@ class _LoginState extends State<Login> {
                       FormBuilderTextField(
                         maxLines: 1,
                         attribute: 'pwd',
+                        initialValue: '559befbe7b554114',
                         validators: [
                           FormBuilderValidators.required(),
                         ],

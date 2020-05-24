@@ -38,9 +38,65 @@ class _CommentBoxState extends State<CommentBox> {
     }
   }
 
+  void _choiceAction(String choice) {
+    if (choice == 'Delete') {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Are you sure'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('Yes'),
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                    await _deleteComment(widget.data["name"]);
+                    widget.callback();
+                  },
+                ),
+                FlatButton(
+                  child: Text('No'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var time = timeago.format(DateTime.parse(widget.data["creation"]));
+    return Card(
+      child: Column(
+        children: <Widget>[
+          ListTile(
+              leading: CircleAvatar(
+                child: Icon(Icons.person)
+              ),
+              title: Text(widget.data["owner"]),
+              subtitle: Text(time),
+              trailing: PopupMenuButton(
+                onSelected: _choiceAction,
+                itemBuilder: (context) {
+                  return [
+                    PopupMenuItem(
+                      child: Text('Delete'),
+                      value: "Delete",
+                    )
+                  ];
+                },
+              )),
+          ListTile(
+            title: Html(
+              data: widget.data["content"],
+            ),
+          )
+        ],
+      ),
+    );
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -52,24 +108,19 @@ class _CommentBoxState extends State<CommentBox> {
           Container(
             height: 30,
             decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Palette.lightGrey,
-                  width: 0.5,
+                border: Border(
+                  bottom: BorderSide(
+                    color: Palette.lightGrey,
+                    width: 0.5,
+                  ),
                 ),
-              ),
-              color: Palette.offWhite
-            ),
+                color: Palette.offWhite),
             child: Row(
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(left: 5),
                 ),
-                Icon(
-                  Icons.comment,
-                  size: 18,
-                  color: Palette.darkGrey
-                ),
+                Icon(Icons.comment, size: 18, color: Palette.darkGrey),
                 SizedBox(
                   width: 4,
                 ),
@@ -91,8 +142,8 @@ class _CommentBoxState extends State<CommentBox> {
                                 FlatButton(
                                   child: Text('Yes'),
                                   onPressed: () async {
-                                    await _deleteComment(widget.data["name"]);
                                     Navigator.of(context).pop();
+                                    await _deleteComment(widget.data["name"]);
                                     widget.callback();
                                   },
                                 ),
@@ -106,11 +157,8 @@ class _CommentBoxState extends State<CommentBox> {
                             );
                           });
                     },
-                    child: Icon(
-                      Icons.delete,
-                      size: 20,
-                      color: Palette.darkGrey
-                    ),
+                    child:
+                        Icon(Icons.delete, size: 20, color: Palette.darkGrey),
                   ),
                 ),
                 ButtonTheme(

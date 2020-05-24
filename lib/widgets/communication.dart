@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/palette.dart';
 
 import '../widgets/comment_input.dart';
 import '../widgets/timeline.dart';
@@ -20,15 +21,33 @@ class _CommunicationState extends State<Communication> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Container(
-        margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+        // margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              CommentInput(
-                doctype: widget.doctype,
-                name: widget.name,
-                authorEmail: "Administrator", //TODO: remove hardcoded
-                callback: widget.callback,
+              SizedBox(
+                width: double.infinity,
+                child: RaisedButton(
+                  elevation: 3,
+                  color: Colors.white,
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return CommentInput(
+                        doctype: widget.doctype,
+                        name: widget.name,
+                        authorEmail: "Administrator", //TODO: remove hardcoded
+                        callback: widget.callback,
+                      );
+                    }));
+                  },
+                  child: Text(
+                    'Comment'.toUpperCase(),
+                    style: TextStyle(
+                      color: Palette.darkGrey,
+                    ),
+                  ),
+                ),
               ),
               Timeline(widget.docInfo, widget.callback),
             ]),
