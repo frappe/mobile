@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:frappe_app/main.dart';
+import 'package:frappe_app/utils/enums.dart';
 
 import '../utils/helpers.dart';
 import '../widgets/form_view.dart';
@@ -20,12 +24,22 @@ Map wireframe = {
       "hidden": false
     },
     {
+      "fieldname": "customer",
+      "fieldtype": "Link",
+      "refDoctype": 'Issue',
+      "hint": 'Customer',
+      "doctype": 'Customer',
+      "fieldname": 'customer',
+      "hidden": false
+    },
+    {
       "header": "header",
       "fieldtype": "Link",
       "refDoctype": 'Issue',
       "hint": 'Issue Priority',
       "doctype": 'Issue Priority',
       "fieldname": 'priority',
+      "in_standard_filter": true,
       "hidden": false
     },
     {
@@ -49,14 +63,21 @@ Map wireframe = {
       "fieldtype": "Select",
       "fieldname": 'status',
       "hint": "Issue Status",
+      "in_standard_filter": true,
       "in_list_view": true,
       "hidden": false
     },
     {
       "header": "header",
-      "fieldname": 'subject',
-      "in_list_view": true
+      "fieldtype": "Link",
+      "fieldname": '_assign',
+      "hint": "Assigned To",
+      "doctype": 'User',
+      "match_operator": "like",
+      "refDoctype": 'Issue',
+      "in_standard_filter": true,
     },
+    {"header": "header", "fieldname": 'subject', "in_list_view": true},
     {"header": "header", "fieldname": 'raised_by', "in_list_view": true},
     {"header": "header", "fieldname": '_comments', "in_list_view": true},
   ]
@@ -103,6 +124,9 @@ class _IssueDetailState extends State<IssueDetail> {
 }
 
 class FilterIssue extends StatefulWidget {
+  final List filters;
+
+  FilterIssue([this.filters]);
   @override
   _FilterIssueState createState() => _FilterIssueState();
 }
@@ -113,7 +137,7 @@ class _FilterIssueState extends State<FilterIssue> {
   @override
   void initState() {
     super.initState();
-    futureProcessedData = processData(wireframe, true);
+    futureProcessedData = processData(wireframe, true, ViewType.filter);
   }
 
   @override
@@ -123,6 +147,7 @@ class _FilterIssueState extends State<FilterIssue> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return FilterList(
+              filters: widget.filters,
               appBarTitle: 'Filter Issue',
               filterCallback: (f) {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -163,34 +188,59 @@ class _IssueListState extends State<IssueList> {
 
   @override
   Widget build(BuildContext context) {
+    List defaultFilters = [];
+
+    if (widget.filters == null) {
+      // cached filters
+      if (localStorage.containsKey('IssueFilter')) {
+        defaultFilters = json.decode(localStorage.getString('IssueFilter'));
+      } else if (localStorage.containsKey('user')) {
+        defaultFilters.add([
+          wireframe["doctype"],
+          "_assign",
+          "like",
+          "%${localStorage.getString('user')}%"
+        ]);
+      }
+    }
     return Scaffold(
-          body: FutureBuilder(
-      future: futureProcessedData,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return CustomListView(
-            appBarTitle: 'Issue List',
-            doctype: 'Issue',
-            fieldnames: wireframe["fieldnames"],
-            filters: widget.filters,
-            wireframe: wireframe,
-            filterCallback: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return FilterIssue();
-              }));
-            },
-            detailCallback: (name, title) {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return IssueDetail(name, title);
-              }));
-            },
-          );
-        } else if (snapshot.hasError) {
-          return Text("${snapshot.error}");
-        }
-        // By default, show a loading spinner.
-        return Center(child: CircularProgressIndicator());
-      }),
+      body: FutureBuilder(
+          future: futureProcessedData,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return CustomListView(
+                appBarTitle: wireframe["doctype"],
+                doctype: wireframe["doctype"],
+                fieldnames: wireframe["fieldnames"],
+                filters: widget.filters ?? defaultFilters,
+                wireframe: wireframe,
+                filterCallback: (filters) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return FilterIssue(filters);
+                      },
+                    ),
+                  );
+                },
+                detailCallback: (name, title) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return IssueDetail(name, title);
+                      },
+                    ),
+                  );
+                },
+              );
+            } else if (snapshot.hasError) {
+              return Text("${snapshot.error}");
+            }
+            // By default, show a loading spinner.
+            return Center(child: CircularProgressIndicator());
+          }),
     );
   }
 }

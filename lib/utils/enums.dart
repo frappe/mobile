@@ -8,3 +8,7 @@ enum Order {
   asc,
   desc
 }
+
+enum ViewType {
+  filter
+}

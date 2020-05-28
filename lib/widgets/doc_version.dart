@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:frappe_app/utils/helpers.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 
@@ -23,56 +24,56 @@ class DocVersion extends StatelessWidget {
       var changed = decoded["changed"];
       var author = data["owner"];
 
-      txt = "$author changed value of ";
-
+      txt = "<b>$author</b> changed value of ";
+    
       changed.forEach((c) {
-        txt += "${c[0]} from ${c[1]} to ${c[2]} ";
+        var fromVal;
+        var toVal;
+        if (c[1] == null || c[1] == "") {
+          fromVal = '""';
+        } else {
+          fromVal = c[1];
+        }
+
+        if (c[2] == null || c[2] == "") {
+          toVal = '""';
+        } else {
+          toVal = c[2];
+        }
+
+        txt += "${toTitleCase(c[0])} from <b>$fromVal</b> to <b>$toVal</b> ";
       });
     } else if (data["comment_type"] == "Attachment") {
-      txt = "${data["owner"]} ${data["content"]}";
+      txt = "<b>${data["owner"]}</b> ${data["content"]}";
     } else {
-      txt = "Unhandled txt";
+      txt = data["content"];
     }
 
-    // txt += "- $time";
-
     return Card(
-      // decoration: BoxDecoration(
-      //   border: Border.all(
-      //     color: Palette.lightGrey,
-      //   ),
-      // ),
-      // padding: EdgeInsets.fromLTRB(10,10,10,20),
       child: ListTile(
-        // crossAxisAlignment: CrossAxisAlignment.start,
         subtitle: Text(time),
-        title: Html(
-          data: txt,
-          onImageError: (a, b) {
-            // TODO
-            print(a);
-            print(b);
-          },
-          onLinkTap: (url) async {
-            final absoluteUrl = getAbsoluteUrl(url);
-            if (await canLaunch(absoluteUrl)) {
-              await launch(
-                absoluteUrl,
-                headers: await getCookiesWithHeader(),
-              );
-            } else {
-              throw 'Could not launch $url';
-            }
-          },
+        title: Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Html(
+            data: txt,
+            onImageError: (a, b) {
+              // TODO
+              print(a);
+              print(b);
+            },
+            onLinkTap: (url) async {
+              final absoluteUrl = getAbsoluteUrl(url);
+              if (await canLaunch(absoluteUrl)) {
+                await launch(
+                  absoluteUrl,
+                  headers: await getCookiesWithHeader(),
+                );
+              } else {
+                throw 'Could not launch $url';
+              }
+            },
+          ),
         ),
-        // Icon(
-        //   Icons.edit,
-        //   size: 20,
-        //   color: Palette.lightGrey,
-        // ),
-        // Expanded(
-        //   child:
-        // ),
       ),
     );
   }

@@ -1,6 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/main.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 import '../utils/helpers.dart';
 import '../utils/http.dart';
@@ -44,7 +47,7 @@ Future<DioGetReportViewResponse> fetchList(
 class CustomListView extends StatefulWidget {
   final String doctype;
   final List fieldnames;
-  final List<List<String>> filters;
+  final List filters;
   final Function filterCallback;
   final Function detailCallback;
   final String appBarTitle;
@@ -84,20 +87,12 @@ class _CustomListViewState extends State<CustomListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Color.fromRGBO(58, 66, 86, 1.0),
       floatingActionButton: FloatingActionButton(
-        // backgroundColor: Colors.white,
         onPressed: () {
-          widget.filterCallback();
-          // Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //       builder: (context) => FilterIssue(),
-          //     ));
+          widget.filterCallback(widget.filters);
         },
         child: Icon(
           Icons.filter_list,
-          // color: Colors.blueGrey,
           size: 50,
         ),
       ),
@@ -115,26 +110,55 @@ class _CustomListViewState extends State<CustomListView> {
               }).toList();
             },
           ),
-          // IconButton(
-          //   icon: Icon(Icons.exit_to_app),
-          //   onPressed: () async {
-          //     logout(context);
-          //   },
-          // )
         ],
       ),
       body: FutureBuilder<DioGetReportViewResponse>(
           future: futureList,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return ListBuilder(
-                list: snapshot.data,
-                filters: widget.filters,
-                fieldnames: widget.fieldnames,
-                doctype: widget.doctype,
-                detailCallback: widget.detailCallback,
-                wireframe: widget.wireframe,
-              );
+              return Column(children: [
+                Container(
+                  height: 60,
+                  color: Color.fromRGBO(237, 242, 247, 1),
+                  padding: EdgeInsets.only(left: 16, right: 6),
+                  child: Row(
+                    children: <Widget>[
+                      widget.filters.length > 0
+                          ? Text('Filters Applied')
+                          : Text('No Filters'),
+                      // Text(widget.filters.toString()),
+                      widget.filters.length > 0
+                          ? IconButton(
+                              icon: Icon(Icons.clear),
+                              onPressed: () {
+                                setState(() {
+                                  widget.filters.clear();
+                                  localStorage.setString('IssueFilter', null);
+                                  futureList = fetchList(
+                                    filters: widget.filters,
+                                    fieldnames: widget.fieldnames,
+                                    doctype: widget.doctype,
+                                  );
+                                });
+                              },
+                            )
+                          : Container(),
+                      // Spacer(),
+                      // Text('20 of 99')
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListBuilder(
+                    list: snapshot.data,
+                    filters: widget.filters,
+                    fieldnames: widget.fieldnames,
+                    doctype: widget.doctype,
+                    detailCallback: widget.detailCallback,
+                    wireframe: widget.wireframe,
+                  ),
+                ),
+              ]);
             } else if (snapshot.hasError) {
               return Text("${snapshot.error}");
             }
@@ -147,7 +171,7 @@ class _CustomListViewState extends State<CustomListView> {
 
 class ListBuilder extends StatefulWidget {
   final list;
-  final List<List<String>> filters;
+  final List filters;
   final List fieldnames;
   final String doctype;
   final Function detailCallback;
@@ -195,69 +219,138 @@ class _ListBuilderState extends State<ListBuilder> {
     int subjectFieldIndex =
         widget.list.values.keys.indexOf(widget.wireframe["subject_field"]);
 
-    return ListView.builder(
-        controller: _scrollController,
-        itemCount: widget.list.values.values.length,
-        itemBuilder: (context, index) {
-          // if(index == widget.issues.values.length) {
-          //   return CupertinoActivityIndicator();
-          // }
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Divider(
-                height: 10.0,
-              ),
-              ListTile(
-                leading: Padding(
-                  padding: const EdgeInsets.only(top: 8, left: 10),
-                  child: Icon(
-                    Icons.lens,
-                    size: 20,
-                    color: setStatusColor(widget.list.values.values[index][1]),
-                  ),
-                ),
-                title: Text(
-                    '${widget.list.values.values[index][subjectFieldIndex]}',
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        color: Colors.grey[900],
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18)),
-                subtitle: Container(
-                  padding: EdgeInsets.only(top: 10.0),
-                  child: Row(
-                    children: <Widget>[
-                      Flexible(
-                        child: Text('${widget.list.values.values[index][3]}',
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w400,
-                                fontSize: 16)),
-                      ),
-                    ],
-                  ),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
+    return Column(children: [
+      Expanded(
+        child: ListView.builder(
+            controller: _scrollController,
+            itemCount: widget.list.values.values.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Icon(Icons.question_answer,
-                        color: Colors.grey[600], size: 20.0),
-                    Text('${widget.list.values.values[index][5]}',
+                    ListTile(
+                      title: Text(
+                        '${widget.list.values.values[index][subjectFieldIndex]}',
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600)),
+                          color: Colors.grey[900],
+                          fontSize: 18,
+                        ),
+                      ),
+                      subtitle: Container(
+                        padding: EdgeInsets.only(top: 10.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.lens,
+                                    size: 12,
+                                    color: setStatusColor(
+                                      widget.list.values.values[index][1],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 4,
+                                  ),
+                                  Text(
+                                    widget.list.values.values[index][1],
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Row(
+                                children: <Widget>[
+                                  // Flexible(
+                                  //   flex: 9,
+                                  //   child: Container(
+                                  //     constraints: BoxConstraints(
+                                  //       minWidth: 100,
+                                  //     ),
+                                  //     child: Text('Raised By: '),
+                                  //   ),
+                                  // ),
+                                  // SizedBox(
+                                  //   width: 20,
+                                  // ),
+                                  // Text(
+                                  //   '${widget.list.values.values[index][3]}',
+                                  //   overflow: TextOverflow.ellipsis,
+                                  //   style: TextStyle(
+                                  //     color: Colors.black,
+                                  //     fontWeight: FontWeight.w400,
+                                  //     fontSize: 16,
+                                  //   ),
+                                  // ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      trailing: Container(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            Container(
+                              height: 20,
+                              width: 20,
+                              decoration: new BoxDecoration(
+                                border: Border.all(),
+                                borderRadius: BorderRadius.horizontal(
+                                  left: Radius.circular(5),
+                                  right: Radius.circular(5),
+                                ),
+                              ),
+                              child: Text(
+                                '${widget.list.values.values[index][6]}',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Spacer(),
+                            Container(
+                              child: Text(
+                                "${timeago.format(DateTime.parse(
+                                      widget.list.values.values[index][5],
+                                    ), locale: 'en_short')}",
+                                textAlign: TextAlign.end,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      onTap: () {
+                        widget.detailCallback(widget.list.values.values[index][0],
+                            widget.list.values.values[index][subjectFieldIndex]);
+                      },
+                    ),
+                    Divider(
+                      height: 10.0,
+                      thickness: 2,
+                    ),
                   ],
                 ),
-                onTap: () {
-                  widget.detailCallback(widget.list.values.values[index][0],
-                      widget.list.values.values[index][subjectFieldIndex]);
-                },
-              ),
-            ],
-          );
-        });
+              );
+            }),
+      ),
+    ]);
   }
 }

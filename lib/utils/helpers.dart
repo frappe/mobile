@@ -7,6 +7,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/form/link_field.dart';
 import 'package:frappe_app/form/multi_select.dart';
+import 'package:frappe_app/utils/enums.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../main.dart';
@@ -48,7 +49,8 @@ getMeta(doctype) async {
   }
 }
 
-Future<Map> processData(Map data, bool metaRequired) async {
+Future<Map> processData(Map data, bool metaRequired,
+    [ViewType viewType]) async {
   // layout
   data["fieldnames"] = [];
   if (!metaRequired) {
@@ -58,6 +60,7 @@ Future<Map> processData(Map data, bool metaRequired) async {
             .add("`tab${data["doctype"]}`.`${field["fieldname"]}`");
       }
     });
+    data["fieldnames"].add("`tab${data["doctype"]}`.`${"modified"}`");
   } else {
     var meta = await getMeta(data["doctype"]);
 
@@ -76,6 +79,10 @@ Future<Map> processData(Map data, bool metaRequired) async {
           field["options"] = fi["options"].split('\n');
         } else {
           field["skip_field"] = true;
+        }
+
+        if (viewType == ViewType.filter) {
+          field["options"].insert(0, null);
         }
       }
     });
@@ -110,16 +117,16 @@ Widget generateChildWidget(Map widget, [val, callback]) {
           decoration: InputDecoration(
             labelText: widget["hint"].toUpperCase(),
             labelStyle: Palette.labelStyle,
-            enabledBorder: InputBorder.none
+            enabledBorder: InputBorder.none,
           ),
           // hint: Text(widget["hint"]),
-          validators: [FormBuilderValidators.required()],
-          items: widget["options"]
-              .map<DropdownMenuItem>((option) => DropdownMenuItem(
-                    value: option,
-                    child: Text('$option'),
-                  ))
-              .toList(),
+          // validators: [FormBuilderValidators.required()],
+          items: widget["options"].map<DropdownMenuItem>((option) {
+            return DropdownMenuItem(
+              value: option,
+              child: option != null ? Text('$option') : Text(''),
+            );
+          }).toList(),
         );
       }
       break;
@@ -150,6 +157,7 @@ Widget generateChildWidget(Map widget, [val, callback]) {
     case "Check":
       {
         value = FormBuilderCheckbox(
+          leadingInput: true,
           attribute: widget["fieldname"],
           label: Text(widget["hint"]),
           validators: [],
@@ -282,4 +290,22 @@ Color setStatusColor(String status) {
     _color = Color(0xff98d85b);
   }
   return _color;
+}
+
+String toTitleCase(String str) {
+  return str
+      .replaceAllMapped(
+          RegExp(
+              r'[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+'),
+          (Match m) =>
+              "${m[0][0].toUpperCase()}${m[0].substring(1).toLowerCase()}")
+      .replaceAll(RegExp(r'(_|-)+'), ' ');
+}
+
+void showSnackBar(String txt, context) {
+  Scaffold.of(context).showSnackBar(
+    SnackBar(
+      content: Text(txt),
+    ),
+  );
 }

@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/main.dart';
 
 import '../utils/helpers.dart';
 
@@ -7,18 +10,22 @@ class FilterList extends StatefulWidget {
   final Function filterCallback;
   final Map wireframe;
   final String appBarTitle;
+  final List filters;
 
-  FilterList(
-      {@required this.filterCallback,
-      @required this.wireframe,
-      @required this.appBarTitle});
+  FilterList({
+    @required this.filterCallback,
+    @required this.wireframe,
+    @required this.appBarTitle,
+    this.filters,
+  });
 
   @override
   _FilterListState createState() => _FilterListState();
 }
 
 class _FilterListState extends State<FilterList> {
-  List<List<String>> filters = [];
+  List filters = [];
+  GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +44,21 @@ class _FilterListState extends State<FilterList> {
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.white,
           onPressed: () {
+            _fbKey.currentState.save();
+            var formValue = _fbKey.currentState.value;
+            formValue.forEach((k, v) {
+              if (v != null) {
+                if (k == '_assign' && v != '') {
+                  filters.add([widget.wireframe["doctype"], k, "like", "%$v%"]);
+                } else {
+                  if (v != "") {
+                    filters.add([widget.wireframe["doctype"], k, "=", v]);
+                  }
+                }
+              }
+            });
+
+            localStorage.setString('IssueFilter', json.encode(filters));
             widget.filterCallback(filters);
           },
           child: Icon(
@@ -45,28 +67,36 @@ class _FilterListState extends State<FilterList> {
           ),
         ),
         body: FormBuilder(
-          child: GridView.count(
+          key: _fbKey,
+          child: ListView(
               padding: EdgeInsets.all(10),
-              childAspectRatio: 2.0,
-              crossAxisCount: 2,
               children: widget.wireframe["fields"].where((field) {
                 return field["in_standard_filter"] == true;
               }).map<Widget>((field) {
                 var val = field["val"];
-                return GridTile(
-                  // header: Text(grid["header"]),
-                  child: generateChildWidget(field, val, (item) {
-                    filters.add([
-                      widget.wireframe["doctype"],
-                      field["fieldname"],
-                      "=",
-                      item
-                    ]);
-                    setState(() {
-                      field["val"] = item;
-                      // formChanged = true;
-                    });
-                  }),
+
+                if (val == null) {
+                  if (widget.filters != null && widget.filters.length > 0) {
+                    for (int i = 0; i < widget.filters.length; i++) {
+                      if (widget.filters[i][1] == field["fieldname"]) {
+                        val = widget.filters[i][3];
+                      }
+                    }
+                  }
+                }
+                return Column(
+                  children: <Widget>[
+                    ListTile(
+                      title: generateChildWidget(field, val, (item) {
+                        setState(() {
+                          field["val"] = item;
+                        });
+                      }),
+                    ),
+                    Divider(
+                      height: 10.0,
+                    ),
+                  ],
                 );
               }).toList()),
         ));

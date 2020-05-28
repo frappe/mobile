@@ -9,6 +9,7 @@ class LinkField extends StatefulWidget {
   final value;
   final hint;
   final Function onSuggestionSelected;
+  final bool showInputBorder;
 
   final doctype;
   final refDoctype;
@@ -17,6 +18,7 @@ class LinkField extends StatefulWidget {
   LinkField({
     this.value,
     this.reqType,
+    this.showInputBorder: false,
     @required this.onSuggestionSelected,
     @required this.hint,
     @required this.doctype,
@@ -44,13 +46,14 @@ class _LinkFieldState extends State<LinkField> {
   @override
   Widget build(BuildContext context) {
     return TypeAheadField(
+      autoFlipDirection: true,
       getImmediateSuggestions: true,
       textFieldConfiguration: TextFieldConfiguration(
         controller: this._typeAheadController..text = widget.value,
         decoration: InputDecoration(
           labelStyle: Palette.labelStyle,
           labelText: widget.hint.toUpperCase(),
-          enabledBorder: InputBorder.none,
+          enabledBorder: widget.showInputBorder ? null : InputBorder.none,
           // hintText: widget.hint,
         ),
       ),
@@ -74,6 +77,7 @@ class _LinkFieldState extends State<LinkField> {
         );
       },
       onSuggestionSelected: (item) {
+        _typeAheadController.text = '';
         widget.onSuggestionSelected(item.value);
       },
     );
