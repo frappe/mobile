@@ -14,7 +14,6 @@ Map wireframe = {
   "subject_field": "subject",
   "fields": [
     {
-      "header": "header",
       "fieldtype": "Link",
       "refDoctype": 'Issue',
       "hint": 'Issue Type',
@@ -29,11 +28,9 @@ Map wireframe = {
       "refDoctype": 'Issue',
       "hint": 'Customer',
       "doctype": 'Customer',
-      "fieldname": 'customer',
       "hidden": false
     },
     {
-      "header": "header",
       "fieldtype": "Link",
       "refDoctype": 'Issue',
       "hint": 'Issue Priority',
@@ -43,7 +40,6 @@ Map wireframe = {
       "hidden": false
     },
     {
-      "header": "header",
       "fieldtype": "Select",
       "hint": 'Issues Found In',
       "fieldname": 'module',
@@ -51,15 +47,16 @@ Map wireframe = {
       "hidden": false
     },
     {
-      "header": "header",
       "fieldtype": "Select",
       "fieldname": 'agreement_fulfilled',
       "hint": "SLA",
       "hidden": false
     },
-    {"header": "header", "fieldname": 'name', "in_list_view": true},
     {
-      "header": "header",
+      "fieldname": 'name',
+      "in_list_view": true,
+    },
+    {
       "fieldtype": "Select",
       "fieldname": 'status',
       "hint": "Issue Status",
@@ -68,7 +65,6 @@ Map wireframe = {
       "hidden": false
     },
     {
-      "header": "header",
       "fieldtype": "Link",
       "fieldname": '_assign',
       "hint": "Assigned To",
@@ -77,9 +73,18 @@ Map wireframe = {
       "refDoctype": 'Issue',
       "in_standard_filter": true,
     },
-    {"header": "header", "fieldname": 'subject', "in_list_view": true},
-    {"header": "header", "fieldname": 'raised_by', "in_list_view": true},
-    {"header": "header", "fieldname": '_comments', "in_list_view": true},
+    {
+      "fieldname": 'subject',
+      "in_list_view": true,
+    },
+    {
+      "fieldname": 'raised_by',
+      "in_list_view": true,
+    },
+    {
+      "fieldname": '_comments',
+      "in_list_view": true,
+    },
   ]
 };
 
@@ -189,6 +194,14 @@ class _IssueListState extends State<IssueList> {
   @override
   Widget build(BuildContext context) {
     List defaultFilters = [];
+    const fieldNames = const [
+      "`tabIssue`.`name`",
+      "`tabIssue`.`status`",
+      "`tabIssue`.`subject`",
+      "`tabIssue`.`raised_by`",
+      "`tabIssue`.`_comments`",
+      "`tabIssue`.`modified`"
+    ];
 
     if (widget.filters == null) {
       // cached filters
@@ -211,7 +224,7 @@ class _IssueListState extends State<IssueList> {
               return CustomListView(
                 appBarTitle: wireframe["doctype"],
                 doctype: wireframe["doctype"],
-                fieldnames: wireframe["fieldnames"],
+                fieldnames: fieldNames,
                 filters: widget.filters ?? defaultFilters,
                 wireframe: wireframe,
                 filterCallback: (filters) {

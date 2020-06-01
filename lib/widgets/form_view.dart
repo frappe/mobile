@@ -129,51 +129,71 @@ class _FormViewState extends State<FormView> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
-                        RaisedButton(
-                          child: Text('Reply'),
-                          color: Palette.offWhite,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return EmailForm(
-                                      doctype: widget.doctype,
-                                      doc: widget.name);
-                                },
+                        Expanded(
+                          child: Container(
+                            height: 70,
+                            padding: EdgeInsets.all(8),
+                            child: RaisedButton(
+                              child: Text(
+                                'Comment',
+                                style: TextStyle(color: Colors.blueAccent),
                               ),
-                            );
-                          },
+                              color: Palette.offWhite,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return CommentInput(
+                                        doctype: widget.doctype,
+                                        name: widget.name,
+                                        authorEmail:
+                                            localStorage.getString('user'),
+                                        callback: _refresh,
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
                         ),
-                        VerticalDivider(),
-                        RaisedButton(
-                          child: Text('Comment'),
-                          color: Palette.offWhite,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return CommentInput(
-                                    doctype: widget.doctype,
-                                    name: widget.name,
-                                    authorEmail:
-                                        localStorage.getString('user'),
-                                    callback: _refresh,
-                                  );
-                                },
+                        Expanded(
+                          child: Container(
+                            height: 70,
+                            padding: EdgeInsets.all(8),
+                            child: RaisedButton(
+                              child: Text(
+                                'New Email',
+                                style: TextStyle(color: Colors.blueAccent),
                               ),
-                            );
-                          },
-                        ),
+                              color: Palette.offWhite,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return EmailForm(
+                                        subject: docs[0]["subject"],
+                                        raisedBy: docs[0]["raised_by"],
+                                        doctype: widget.doctype,
+                                        doc: widget.name,
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        )
                       ],
                     ),
                   ),
                 ),
                 appBar: PreferredSize(
-                  preferredSize: Size.fromHeight(200),
+                  preferredSize: Size.fromHeight(180),
                   child: AppBar(
-                    elevation: 4,
+                    elevation: 2,
                     bottom: PreferredSize(
                       preferredSize: Size.fromHeight(110),
                       child: Container(
@@ -189,7 +209,7 @@ class _FormViewState extends State<FormView> {
                                 maxLines: 2,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 20,
+                                  fontSize: 24,
                                 ),
                               ),
                             ),
@@ -210,8 +230,8 @@ class _FormViewState extends State<FormView> {
                                 SizedBox(
                                   width: 16,
                                 ),
-                                IconButton(
-                                  icon: Icon(Icons.attach_file),
+                                FlatButton(
+                                  child: Text("View Attachments"),
                                   onPressed: () {
                                     Navigator.push(
                                       context,
@@ -258,21 +278,22 @@ class _FormViewState extends State<FormView> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: IconButton(
-                          disabledColor: Colors.black54,
-                          color: Colors.black,
-                          icon: Text('Save'),
-                          onPressed: formChanged
-                              ? () async {
-                                  if (_fbKey.currentState.saveAndValidate()) {
-                                    var formValue = _fbKey.currentState.value;
-                                    await updateDoc(
-                                        widget.name, formValue, widget.doctype);
-                                        showSnackBar('Changes Saved', builderContext);
-                                    _refresh();
+                            disabledColor: Colors.black54,
+                            color: Colors.black,
+                            icon: Text('Save'),
+                            onPressed: formChanged
+                                ? () async {
+                                    if (_fbKey.currentState.saveAndValidate()) {
+                                      var formValue = _fbKey.currentState.value;
+                                      await updateDoc(widget.name, formValue,
+                                          widget.doctype);
+                                      showSnackBar(
+                                          'Changes Saved', builderContext);
+                                      _refresh();
+                                    }
                                   }
-                                }
-                              : () => showSnackBar('No Changes', builderContext)
-                        ),
+                                : () =>
+                                    showSnackBar('No Changes', builderContext)),
                       )
                     ],
                   ),

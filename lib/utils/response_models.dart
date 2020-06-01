@@ -147,3 +147,10 @@ class DioGetContactListResponse {
       : values = List(),
         error = errorValue;
 }
+
+class Contact {
+  final String description;
+  final String value;
+
+  Contact({this.description, this.value});
+}

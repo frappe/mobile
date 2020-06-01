@@ -15,19 +15,25 @@ class EmailBox extends StatelessWidget {
     return Card(
       child: Column(
         children: <Widget>[
-          ListTile(
-              leading: CircleAvatar(
-                child: Icon(Icons.person)
-              ),
-              title: Text('${data["subject"]}'),
-              subtitle: Text('${data["sender_full_name"]} - $time'),
-              trailing: PopupMenuButton(
-                itemBuilder: (context) {
-                  return [
-                    PopupMenuItem(child: Text('Reply'), value: 'Reply',)
-                  ];
-                },
-              )),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListTile(
+                leading: CircleAvatar(
+                  child: Icon(Icons.person)
+                ),
+                title: Padding(
+                  padding: const EdgeInsets.only(bottom:8.0),
+                  child: Text('${data["subject"]}'),
+                ),
+                subtitle: Text('${data["sender_full_name"]} - $time'),
+                trailing: PopupMenuButton(
+                  itemBuilder: (context) {
+                    return [
+                      PopupMenuItem(child: Text('Reply'), value: 'Reply',)
+                    ];
+                  },
+                )),
+          ),
           ListTile(
             title: Html(
               data: data["content"],

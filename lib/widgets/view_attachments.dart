@@ -22,7 +22,7 @@ class ViewAttachments extends StatelessWidget {
                 child: Text(ext),
               ),
               onTap: () {
-                downloadFile(attachment["file_url"]);
+                // downloadFile(attachment["file_url"]);
               },
               title: Text(fileName),
             ),

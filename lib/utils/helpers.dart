@@ -1,12 +1,13 @@
 import 'dart:io';
 
-import 'package:downloads_path_provider/downloads_path_provider.dart';
+// import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/form/link_field.dart';
 import 'package:frappe_app/form/multi_select.dart';
+import 'package:frappe_app/form/multi_select2.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -133,10 +134,14 @@ Widget generateChildWidget(Map widget, [val, callback]) {
 
     case "MultiSelect":
       {
-        value = MultiSelectFormField(
+        if(val != null) {
+          val = [Contact(value: val)];
+        }
+
+        value = MultiSelect2(
           attribute: widget["fieldname"],
           hint: widget["label"],
-          callback: callback,
+          val: val !=null ? val: [],
         );
       }
       break;
@@ -144,6 +149,7 @@ Widget generateChildWidget(Map widget, [val, callback]) {
     case "Small Text":
       {
         value = FormBuilderTextField(
+          initialValue: val,
           onChanged: callback,
           attribute: widget["fieldname"],
           decoration: InputDecoration(hintText: widget["hint"]),
@@ -237,26 +243,26 @@ Widget generateChildWidget(Map widget, [val, callback]) {
 //   // wrap in collapsible
 // }
 
-downloadFile(String fileUrl) async {
-  await _checkPermission();
+// downloadFile(String fileUrl) async {
+//   await _checkPermission();
 
-  final absoluteUrl = getAbsoluteUrl(fileUrl);
+//   final absoluteUrl = getAbsoluteUrl(fileUrl);
 
-  // TODO
-  final Directory downloadsDirectory =
-      await DownloadsPathProvider.downloadsDirectory;
-  final String downloadsPath = downloadsDirectory.path;
+//   // TODO
+//   final Directory downloadsDirectory =
+//       await DownloadsPathProvider.downloadsDirectory;
+//   final String downloadsPath = downloadsDirectory.path;
 
-  await FlutterDownloader.enqueue(
-    headers: await getCookiesWithHeader(),
-    url: absoluteUrl,
-    savedDir: downloadsPath,
-    showNotification:
-        true, // show download progress in status bar (for Android)
-    openFileFromNotification:
-        true, // click on notification to open downloaded file (for Android)
-  );
-}
+//   await FlutterDownloader.enqueue(
+//     headers: await getCookiesWithHeader(),
+//     url: absoluteUrl,
+//     savedDir: downloadsPath,
+//     showNotification:
+//         true, // show download progress in status bar (for Android)
+//     openFileFromNotification:
+//         true, // click on notification to open downloaded file (for Android)
+//   );
+// }
 
 Future<bool> _checkPermission() async {
   if (Platform.isAndroid) {

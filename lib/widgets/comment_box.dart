@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:frappe_app/main.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../config/palette.dart';
@@ -73,22 +74,23 @@ class _CommentBoxState extends State<CommentBox> {
       child: Column(
         children: <Widget>[
           ListTile(
-              leading: CircleAvatar(
-                child: Icon(Icons.person)
-              ),
-              title: Text(widget.data["owner"]),
-              subtitle: Text(time),
-              trailing: PopupMenuButton(
-                onSelected: _choiceAction,
-                itemBuilder: (context) {
-                  return [
-                    PopupMenuItem(
-                      child: Text('Delete'),
-                      value: "Delete",
-                    )
-                  ];
-                },
-              )),
+            leading: CircleAvatar(child: Icon(Icons.person)),
+            title: Text(widget.data["owner"]),
+            subtitle: Text(time),
+            trailing: localStorage.getString('user') == widget.data["owner"]
+                ? PopupMenuButton(
+                    onSelected: _choiceAction,
+                    itemBuilder: (context) {
+                      return [
+                        PopupMenuItem(
+                          child: Text('Delete'),
+                          value: "Delete",
+                        )
+                      ];
+                    },
+                  )
+                : null,
+          ),
           ListTile(
             title: Html(
               data: widget.data["content"],

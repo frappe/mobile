@@ -226,121 +226,88 @@ class _ListBuilderState extends State<ListBuilder> {
             itemCount: widget.list.values.values.length,
             itemBuilder: (context, index) {
               return Padding(
-                padding: const EdgeInsets.only(top: 8),
+                padding: const EdgeInsets.only(top: 12),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    ListTile(
-                      title: Text(
-                        '${widget.list.values.values[index][subjectFieldIndex]}',
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Colors.grey[900],
-                          fontSize: 18,
+                    Card(
+                      child: ListTile(
+                        title: Text(
+                          '${widget.list.values.values[index][subjectFieldIndex]}',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              color: Colors.grey[900],
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500),
                         ),
-                      ),
-                      subtitle: Container(
-                        padding: EdgeInsets.only(top: 10.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: Row(
-                                children: <Widget>[
-                                  Icon(
-                                    Icons.lens,
-                                    size: 12,
-                                    color: setStatusColor(
+                        subtitle: Container(
+                          padding: EdgeInsets.only(top: 10.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Text(
                                       widget.list.values.values[index][1],
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 4,
-                                  ),
-                                  Text(
-                                    widget.list.values.values[index][1],
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: Row(
-                                children: <Widget>[
-                                  // Flexible(
-                                  //   flex: 9,
-                                  //   child: Container(
-                                  //     constraints: BoxConstraints(
-                                  //       minWidth: 100,
-                                  //     ),
-                                  //     child: Text('Raised By: '),
-                                  //   ),
-                                  // ),
-                                  // SizedBox(
-                                  //   width: 20,
-                                  // ),
-                                  // Text(
-                                  //   '${widget.list.values.values[index][3]}',
-                                  //   overflow: TextOverflow.ellipsis,
-                                  //   style: TextStyle(
-                                  //     color: Colors.black,
-                                  //     fontWeight: FontWeight.w400,
-                                  //     fontSize: 16,
-                                  //   ),
-                                  // ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      trailing: Container(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                            Container(
-                              height: 20,
-                              width: 20,
-                              decoration: new BoxDecoration(
-                                border: Border.all(),
-                                borderRadius: BorderRadius.horizontal(
-                                  left: Radius.circular(5),
-                                  right: Radius.circular(5),
+                                  ],
                                 ),
                               ),
-                              child: Text(
-                                '${widget.list.values.values[index][6]}',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                            ],
+                          ),
+                        ),
+                        trailing: Container(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                                  "${timeago.format(DateTime.parse(
+                                        widget.list.values.values[index][5],
+                                      ), locale: 'en_short')}",
+                                  textAlign: TextAlign.end,
                                 ),
                               ),
-                            ),
-                            Spacer(),
-                            Container(
-                              child: Text(
-                                "${timeago.format(DateTime.parse(
-                                      widget.list.values.values[index][5],
-                                    ), locale: 'en_short')}",
-                                textAlign: TextAlign.end,
+                              Spacer(),
+                              Container(
+                                height: 20,
+                                width: 20,
+                                decoration: new BoxDecoration(
+                                  // color: Colors.grey[400],
+                                  border: Border.all(),
+                                  borderRadius: BorderRadius.horizontal(
+                                    left: Radius.circular(5),
+                                    right: Radius.circular(5),
+                                  ),
+                                ),
+                                child: Text(
+                                  '${widget.list.values.values[index][6]}',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    // color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
-                            )
-                          ],
+                            ],
+                          ),
                         ),
+                        onTap: () {
+                          widget.detailCallback(
+                              widget.list.values.values[index][0],
+                              widget.list.values.values[index]
+                                  [subjectFieldIndex]);
+                        },
                       ),
-                      onTap: () {
-                        widget.detailCallback(widget.list.values.values[index][0],
-                            widget.list.values.values[index][subjectFieldIndex]);
-                      },
                     ),
                     Divider(
                       height: 10.0,

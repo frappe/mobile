@@ -51,9 +51,12 @@ class DocVersion extends StatelessWidget {
 
     return Card(
       child: ListTile(
-        subtitle: Text(time),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(bottom: 10.0),
+          child: Text(time),
+        ),
         title: Padding(
-          padding: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.only(bottom: 10, top: 10),
           child: Html(
             data: txt,
             onImageError: (a, b) {

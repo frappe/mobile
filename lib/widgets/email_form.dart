@@ -8,8 +8,15 @@ import '../widgets/collapsible.dart';
 class EmailForm extends StatefulWidget {
   final String doctype;
   final String doc;
+  final String subject;
+  final String raisedBy;
 
-  EmailForm({@required this.doctype, @required this.doc});
+  EmailForm({
+    @required this.doctype,
+    @required this.doc,
+    this.subject,
+    this.raisedBy,
+  });
 
   @override
   _EmailFormState createState() => _EmailFormState();
@@ -131,9 +138,10 @@ class _EmailFormState extends State<EmailForm> {
         title: Text('Send Email'),
         actions: <Widget>[
           FlatButton(
-            onPressed: () async{
+            onPressed: () async {
               if (_fbKey.currentState.saveAndValidate()) {
                 var formValue = _fbKey.currentState.value;
+                
                 await _sendEmail(
                     recipients: formValue["recipients"],
                     subject: formValue["subject"],
@@ -143,10 +151,7 @@ class _EmailFormState extends State<EmailForm> {
                 Navigator.of(context).pop();
               }
             },
-            child: Icon(
-              Icons.send,
-              color: Colors.white,
-            ),
+            child: Text('Send'),
           )
         ],
       ),
@@ -158,7 +163,7 @@ class _EmailFormState extends State<EmailForm> {
             child: Column(
               children: <Widget>[
                 // TO
-                generateChildWidget(dummyData["fields"][0]),
+                generateChildWidget(dummyData["fields"][0], widget.raisedBy),
                 Divider(
                   thickness: 2.0,
                 ),
@@ -170,7 +175,7 @@ class _EmailFormState extends State<EmailForm> {
                 //   thickness: 2.0,
                 // ),
                 // subject
-                generateChildWidget(dummyData["fields"][4]),
+                generateChildWidget(dummyData["fields"][4], '${widget.doctype}: ${widget.subject} (${widget.doc})'),
                 // content
                 generateChildWidget(dummyData["fields"][5]),
                 Padding(
