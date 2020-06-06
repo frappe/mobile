@@ -5,6 +5,7 @@ import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/main.dart';
 import 'package:frappe_app/widgets/add_assignees.dart';
 import 'package:frappe_app/widgets/comment_input.dart';
+import 'package:rubber/rubber.dart';
 
 import '../widgets/communication.dart';
 import '../utils/helpers.dart';
@@ -12,41 +13,6 @@ import '../utils/http.dart';
 import '../utils/response_models.dart';
 import '../widgets/email_form.dart';
 import '../widgets/view_attachments.dart';
-
-Future<DioGetDocResponse> fetchDoc(String doctype, String name) async {
-  var queryParams = {
-    'doctype': doctype,
-    'name': name,
-  };
-
-  final response2 = await dio.get('/method/frappe.desk.form.load.getdoc',
-      queryParameters: queryParams);
-
-  if (response2.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    return DioGetDocResponse.fromJson(response2.data);
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load album');
-  }
-}
-
-updateDoc(String name, Map updateObj, String doctype) async {
-  var response2 = await dio.put('/resource/$doctype/$name', data: updateObj);
-
-  if (response2.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    // return IssueDetailResponse.fromJson(response2.data);
-    return;
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load album');
-  }
-}
 
 class FormView extends StatefulWidget {
   final String doctype;
@@ -64,20 +30,66 @@ class FormView extends StatefulWidget {
   _FormViewState createState() => _FormViewState();
 }
 
-class _FormViewState extends State<FormView> {
+class _FormViewState extends State<FormView>
+    with SingleTickerProviderStateMixin {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   Future<DioGetDocResponse> futureIssueDetail;
   bool formChanged = false;
 
   @override
   void initState() {
+    futureIssueDetail = _fetchDoc(widget.doctype, widget.name);
     super.initState();
-    futureIssueDetail = fetchDoc(widget.doctype, widget.name);
+  }
+
+  _updateDoc(String name, Map updateObj, String doctype) async {
+    var response2 = await dio.put(
+      '/resource/$doctype/$name',
+      data: updateObj,
+      options: Options(
+        validateStatus: (status) {
+          return status < 500;
+        },
+      ),
+    );
+
+    if (response2.statusCode == 200) {
+      return;
+    } else if (response2.statusCode == 403) {
+      logout(context);
+    } else {
+      throw Exception('Failed to load album');
+    }
+  }
+
+  Future<DioGetDocResponse> _fetchDoc(String doctype, String name) async {
+    var queryParams = {
+      'doctype': doctype,
+      'name': name,
+    };
+
+    final response2 = await dio.get(
+      '/method/frappe.desk.form.load.getdoc',
+      queryParameters: queryParams,
+      options: Options(
+        validateStatus: (status) {
+          return status < 500;
+        },
+      ),
+    );
+
+    if (response2.statusCode == 200) {
+      return DioGetDocResponse.fromJson(response2.data);
+    } else if (response2.statusCode == 403) {
+      logout(context);
+    } else {
+      throw Exception('Failed to load album');
+    }
   }
 
   void _refresh() {
     setState(() {
-      futureIssueDetail = fetchDoc(widget.doctype, widget.name);
+      futureIssueDetail = _fetchDoc(widget.doctype, widget.name);
       formChanged = false;
     });
   }
@@ -87,18 +99,27 @@ class _FormViewState extends State<FormView> {
     List<Widget> w = [];
 
     if (l.length == 0) {
-      return [CircleAvatar(child: Icon(Icons.add))];
+      return [
+        CircleAvatar(
+          backgroundColor: Palette.bgColor,
+          child: Icon(
+            Icons.add,
+          ),
+        ),
+      ];
     }
 
     for (int i = 0; i < l.length; i++) {
       if (i < size) {
         w.add(
           CircleAvatar(
+            backgroundColor: Palette.bgColor,
             child: Text(l[i]["owner"][0].toUpperCase()),
           ),
         );
       } else {
         w.add(CircleAvatar(
+          backgroundColor: Palette.bgColor,
           child: Text('+ ${l.length - size}'),
         ));
         break;
@@ -174,6 +195,7 @@ class _FormViewState extends State<FormView> {
                                   MaterialPageRoute(
                                     builder: (context) {
                                       return EmailForm(
+                                        callback: _refresh,
                                         subject: docs[0]["subject"],
                                         raisedBy: docs[0]["raised_by"],
                                         doctype: widget.doctype,
@@ -190,182 +212,187 @@ class _FormViewState extends State<FormView> {
                     ),
                   ),
                 ),
-                appBar: PreferredSize(
-                  preferredSize: Size.fromHeight(180),
-                  child: AppBar(
-                    elevation: 2,
-                    bottom: PreferredSize(
-                      preferredSize: Size.fromHeight(110),
-                      child: Container(
-                        padding: EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Flexible(
-                              child: Text(
-                                widget.appBarTitle,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 24,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            Row(
-                              children: <Widget>[
-                                Icon(
-                                  Icons.lens,
-                                  size: 10,
-                                  color: setStatusColor(docs[0]['status']),
-                                ),
-                                SizedBox(
-                                  width: 6,
-                                ),
-                                Text(docs[0]['status'].toUpperCase()),
-                                SizedBox(
-                                  width: 16,
-                                ),
-                                FlatButton(
-                                  child: Text("View Attachments"),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) {
-                                          return ViewAttachments(
-                                              docInfo["attachments"]);
-                                        },
-                                      ),
-                                    );
-                                  },
-                                ),
-                                Spacer(),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) {
-                                          return AddAssignees(
-                                              assignments:
-                                                  docInfo["assignments"],
-                                              doctype: widget.doctype,
-                                              name: widget.name);
-                                        },
-                                      ),
-                                    ).then((val) {
-                                      _refresh();
-                                    });
-                                  },
-                                  child: Row(
-                                    // children: _generateAssignees([1,2,3]),
-                                    children: _generateAssignees(
-                                        docInfo["assignments"]),
-                                  ),
-                                )
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    actions: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: IconButton(
-                            disabledColor: Colors.black54,
-                            color: Colors.black,
-                            icon: Text('Save'),
-                            onPressed: formChanged
-                                ? () async {
-                                    if (_fbKey.currentState.saveAndValidate()) {
-                                      var formValue = _fbKey.currentState.value;
-                                      await updateDoc(widget.name, formValue,
-                                          widget.doctype);
-                                      showSnackBar(
-                                          'Changes Saved', builderContext);
-                                      _refresh();
-                                    }
-                                  }
-                                : () =>
-                                    showSnackBar('No Changes', builderContext)),
-                      )
-                    ],
-                  ),
-                ),
-                // floatingActionButton: FloatingActionButton(
-                //   onPressed: () {
-                //     Navigator.push(context,
-                //         MaterialPageRoute(builder: (context) {
-                //       return EmailForm(
-                //           doctype: widget.doctype, doc: widget.name);
-                //     }));
-                //   },
-                //   child: Icon(Icons.email),
-                // ),
                 body: Builder(
                   builder: (context) {
                     builderContext = context;
-                    return SingleChildScrollView(
-                      child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Container(
-                              color: Color.fromRGBO(237, 242, 247, 1),
-                              height: 40,
-                            ),
-                            FormBuilder(
-                              key: _fbKey,
-                              child: Flexible(
-                                child: Container(
-                                  color: Colors.white,
-                                  padding: EdgeInsets.all(10),
-                                  child: GridView.count(
-                                      shrinkWrap: true,
-                                      physics:
-                                          ScrollPhysics(), // to disable GridView's scrolling
-                                      padding: EdgeInsets.all(10),
-                                      childAspectRatio: 2.0,
-                                      crossAxisSpacing: 10.0,
-                                      crossAxisCount: 2,
-                                      children: widget.wireframe["fields"]
-                                          .where((field) {
-                                        return field["hidden"] == false &&
-                                            field["skip_field"] != true;
-                                      }).map<Widget>((field) {
-                                        var val = docs[0][field["fieldname"]];
-                                        return GridTile(
-                                          child: generateChildWidget(field, val,
-                                              (item) {
-                                            setState(() {
-                                              docs[0][field["fieldname"]] =
-                                                  item;
-                                              formChanged = true;
-                                            });
-                                          }),
-                                        );
-                                      }).toList()),
+                    return DefaultTabController(
+                      length: 2,
+                      child: NestedScrollView(
+                        headerSliverBuilder:
+                            (BuildContext context, bool innerBoxIsScrolled) {
+                          return <Widget>[
+                            SliverAppBar(
+                              flexibleSpace: FlexibleSpaceBar(
+                                background: Container(
+                                  padding: EdgeInsets.only(
+                                    top: 90,
+                                    right: 20,
+                                    left: 20,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Flexible(
+                                        child: Text(
+                                          widget.appBarTitle,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 15,
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Container(
+                                            padding: EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: Palette.lightGreen,
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                            child: Text(
+                                              docs[0]['status'].toUpperCase(),
+                                              style: TextStyle(
+                                                color: Palette.darkGreen,
+                                              ),
+                                            ),
+                                          ),
+                                          Spacer(),
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) {
+                                                    return AddAssignees(
+                                                        callback: _refresh,
+                                                        assignments: docInfo[
+                                                            "assignments"],
+                                                        doctype: widget.doctype,
+                                                        name: widget.name);
+                                                  },
+                                                ),
+                                              );
+                                            },
+                                            child: Row(
+                                              // children: _generateAssignees([1,2,3]),
+                                              children: _generateAssignees(
+                                                  docInfo["assignments"]),
+                                            ),
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
+                              actions: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: FlatButton(
+                                      // disabledColor: Colors.black54,
+                                      // color: Colors.black,
+                                      child: Text('Save'),
+                                      onPressed: formChanged
+                                          ? () async {
+                                              if (_fbKey.currentState
+                                                  .saveAndValidate()) {
+                                                var formValue =
+                                                    _fbKey.currentState.value;
+                                                await _updateDoc(
+                                                  widget.name,
+                                                  formValue,
+                                                  widget.doctype,
+                                                );
+                                                showSnackBar('Changes Saved',
+                                                    builderContext);
+                                                _refresh();
+                                              }
+                                            }
+                                          : () => showSnackBar(
+                                              'No Changes', builderContext)),
+                                )
+                              ],
+                              expandedHeight: 200.0,
+                              floating: true,
+                              pinned: true,
                             ),
-                            Container(
-                              color: Color.fromRGBO(237, 242, 247, 1),
-                              height: 30,
+                            SliverPersistentHeader(
+                              delegate: _SliverAppBarDelegate(
+                                TabBar(
+                                  labelColor: Colors.black87,
+                                  unselectedLabelColor: Colors.grey,
+                                  tabs: [
+                                    Tab(
+                                      child: Text('FORM'),
+                                    ),
+                                    Tab(
+                                      child: Text('TIMELINE'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              pinned: true,
                             ),
-                            Communication(
-                              docInfo: docInfo,
-                              doctype: widget.doctype,
-                              name: widget.name,
-                              callback: () {
-                                _refresh();
-                              },
-                            ),
-                          ]),
+                          ];
+                        },
+                        body: TabBarView(children: [
+                          Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Container(
+                                  color: Color.fromRGBO(237, 242, 247, 1),
+                                  height: 40,
+                                ),
+                                FormBuilder(
+                                  key: _fbKey,
+                                  child: Flexible(
+                                    child: Container(
+                                      color: Colors.white,
+                                      padding: EdgeInsets.all(10),
+                                      child: ListView(
+                                          padding: EdgeInsets.all(10),
+                                          children: widget.wireframe["fields"]
+                                              .where((field) {
+                                            return field["hidden"] == false &&
+                                                field["skip_field"] != true;
+                                          }).map<Widget>((field) {
+                                            var val =
+                                                docs[0][field["fieldname"]];
+                                            return GridTile(
+                                              child: generateChildWidget(
+                                                  field, val, (item) {
+                                                setState(() {
+                                                  docs[0][field["fieldname"]] =
+                                                      item;
+                                                  formChanged = true;
+                                                });
+                                              }),
+                                            );
+                                          }).toList()),
+                                    ),
+                                  ),
+                                )
+                              ]),
+                          Communication(
+                            docInfo: [
+                              ...docInfo['comments'],
+                              ...docInfo["communications"],
+                              ...docInfo["versions"]
+                            ],
+                            callback: () {
+                              _refresh();
+                            },
+                          ),
+                        ]),
+                      ),
                     );
                   },
                 ));
@@ -376,5 +403,30 @@ class _FormViewState extends State<FormView> {
           // By default, show a loading spinner.
           return Center(child: CircularProgressIndicator());
         });
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate(this._tabBar);
+
+  final TabBar _tabBar;
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return new Container(
+      color: Colors.white,
+      child: _tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return false;
   }
 }

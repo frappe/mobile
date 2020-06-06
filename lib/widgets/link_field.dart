@@ -45,41 +45,49 @@ class _LinkFieldState extends State<LinkField> {
 
   @override
   Widget build(BuildContext context) {
-    return TypeAheadField(
-      autoFlipDirection: true,
-      getImmediateSuggestions: true,
-      textFieldConfiguration: TextFieldConfiguration(
-        controller: this._typeAheadController..text = widget.value,
-        decoration: InputDecoration(
-          labelStyle: Palette.labelStyle,
-          labelText: widget.hint.toUpperCase(),
-          enabledBorder: widget.showInputBorder ? null : InputBorder.none,
-          // hintText: widget.hint,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.hint.toUpperCase(),
+          style: Palette.labelStyle
         ),
-      ),
-      suggestionsCallback: (pattern) async {
-        var val =
-            await _fetchLinkField(widget.doctype, widget.refDoctype, pattern);
+        TypeAheadField(
+          autoFlipDirection: true,
+          getImmediateSuggestions: true,
+          textFieldConfiguration: TextFieldConfiguration(
+            controller: this._typeAheadController..text = widget.value,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Palette.fieldBgColor,
+              enabledBorder: widget.showInputBorder ? null : InputBorder.none,
+            ),
+          ),
+          suggestionsCallback: (pattern) async {
+            var val = await _fetchLinkField(
+                widget.doctype, widget.refDoctype, pattern);
 
-        // TODO: find better way for removing value
-        var blankVal = DioLinkFieldResponse.fromJson({
-          "results": [
-            {"value": ''}
-          ]
-        });
-        val.values.insert(0, blankVal.values[0]);
-        return val.values;
-        // return val.values;
-      },
-      itemBuilder: (context, item) {
-        return ListTile(
-          title: Text(item.value),
-        );
-      },
-      onSuggestionSelected: (item) {
-        _typeAheadController.text = '';
-        widget.onSuggestionSelected(item.value);
-      },
+            // TODO: find better way for removing value
+            var blankVal = DioLinkFieldResponse.fromJson({
+              "results": [
+                {"value": ''}
+              ]
+            });
+            val.values.insert(0, blankVal.values[0]);
+            return val.values;
+            // return val.values;
+          },
+          itemBuilder: (context, item) {
+            return ListTile(
+              title: Text(item.value),
+            );
+          },
+          onSuggestionSelected: (item) {
+            _typeAheadController.text = '';
+            widget.onSuggestionSelected(item.value);
+          },
+        ),
+      ],
     );
   }
 }

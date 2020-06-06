@@ -65,10 +65,7 @@ class GetMetaResponse {
   final List docs;
   final String userSettings;
 
-  GetMetaResponse({
-    this.docs,
-    this.userSettings
-  });
+  GetMetaResponse({this.docs, this.userSettings});
 
   factory GetMetaResponse.fromJson(json) {
     return GetMetaResponse(
@@ -103,7 +100,7 @@ class GetReportViewResponse {
   });
 
   factory GetReportViewResponse.fromJson(json) {
-    if(json.length == 0) {
+    if (json.length == 0) {
       return GetReportViewResponse(
         keys: [],
         values: [],
@@ -117,14 +114,23 @@ class GetReportViewResponse {
 }
 
 class DioGetReportViewResponse {
-  final values;
-  final String error;
+  var values;
+  var error;
 
   DioGetReportViewResponse(this.values, this.error);
 
-  DioGetReportViewResponse.fromJson(json)
-      : values = GetReportViewResponse.fromJson(json["message"]),
-        error = "";
+  DioGetReportViewResponse.fromJson(json) {
+    var l = json["message"];
+    var newL = [];
+    for (int i = 0; i < l["values"].length; i++) {
+      newL.add([l["keys"], l["values"][i]]);
+    }
+
+    values = newL;
+    error = '';
+  }
+  // : values = GetReportViewResponse.fromJson(json["message"]),
+  //   error = "";
 
   DioGetReportViewResponse.withError(String errorValue)
       : values = List(),

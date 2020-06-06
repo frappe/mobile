@@ -18,9 +18,11 @@ environment:
 
 dependencies:
   flutter_form_builder: ^3.9.0
+  rubber: ^0.4.0
+  flutter_pagewise: ^1.2.3
   html: ^0.14.0+3
   url_launcher: ^5.4.7
-  downloads_path_provider: ^0.1.0
+  # downloads_path_provider: ^0.1.0
   permission_handler: ^4.0.0
   flutter_downloader: ^1.4.4
   timeago: ^2.0.26
@@ -33,7 +35,7 @@ dependencies:
   html2md: ^0.5.1
   flutter_typeahead: ^1.8.0
   path_provider: 1.6.5
-  flutter_html: ^0.11.1
+  flutter_html: ^1.0.0
   http: ^0.12.0+4
   dio: 3.0.9
   dio_cookie_manager: 1.0.0

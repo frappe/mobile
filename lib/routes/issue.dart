@@ -200,7 +200,12 @@ class _IssueListState extends State<IssueList> {
       "`tabIssue`.`subject`",
       "`tabIssue`.`raised_by`",
       "`tabIssue`.`_comments`",
-      "`tabIssue`.`modified`"
+      "`tabIssue`.`modified`",
+      "`tabIssue`.`_assign`",
+      "`tabIssue`.`_seen`",
+      "`tabIssue`.`priority`",
+      "`tabIssue`.`support_level`",
+      "`tabIssue`.`_liked_by`"
     ];
 
     if (widget.filters == null) {

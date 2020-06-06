@@ -4,7 +4,7 @@ import '../utils/enums.dart';
 import '../widgets/event.dart';
 
 class Timeline extends StatelessWidget {
-  final Map data;
+  final List data;
   final Function callback;
 
   Timeline(this.data, this.callback);
@@ -35,8 +35,8 @@ class Timeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var events = pickValues(data);
-    var sortedEvents = sortByDate(events, "creation", Order.desc);
+    // var events = pickValues(data);
+    var sortedEvents = sortByDate(data, "creation", Order.desc);
 
     return Column(
         mainAxisSize: MainAxisSize.max,

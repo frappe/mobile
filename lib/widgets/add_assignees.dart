@@ -11,11 +11,13 @@ class AddAssignees extends StatefulWidget {
   final List assignments;
   final String doctype;
   final String name;
+  final Function callback;
 
   AddAssignees({
     @required this.assignments,
     @required this.doctype,
     @required this.name,
+    @required this.callback
   });
 
   @override
@@ -29,7 +31,6 @@ class _AddAssigneesState extends State<AddAssignees> {
     var data = {
       'assign_to': json.encode(newAssignees),
       'assign_to_me': 0,
-      'description': 'This is better subject',
       'doctype': widget.doctype,
       'name': widget.name,
       'bulk_assign': false,
@@ -45,13 +46,9 @@ class _AddAssigneesState extends State<AddAssignees> {
     );
 
     if (response2.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      // return IssueDetailResponse.fromJson(response2.data);
+      widget.callback();
       return;
     } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
       throw Exception('Failed to load album');
     }
   }
@@ -68,13 +65,8 @@ class _AddAssigneesState extends State<AddAssignees> {
     );
 
     if (response2.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      // return IssueDetailResponse.fromJson(response2.data);
       return;
     } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
       throw Exception('Failed to load album');
     }
   }
@@ -149,7 +141,7 @@ class _AddAssigneesState extends State<AddAssignees> {
                                 return Container(
                                   margin: EdgeInsets.only(bottom: 6),
                                   decoration: BoxDecoration(
-                                    border: Border.all(),
+                                    // border: Border.all(),
                                     borderRadius: BorderRadius.horizontal(
                                       left: Radius.circular(5),
                                       right: Radius.circular(5),
@@ -228,7 +220,7 @@ class _AddAssigneesState extends State<AddAssignees> {
                                 return Container(
                                   margin: EdgeInsets.only(bottom: 6),
                                   decoration: BoxDecoration(
-                                    border: Border.all(),
+                                    // border: Border.all(),
                                     borderRadius: BorderRadius.horizontal(
                                       left: Radius.circular(5),
                                       right: Radius.circular(5),

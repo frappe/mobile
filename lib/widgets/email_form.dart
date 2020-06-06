@@ -10,12 +10,14 @@ class EmailForm extends StatefulWidget {
   final String doc;
   final String subject;
   final String raisedBy;
+  final Function callback;
 
   EmailForm({
     @required this.doctype,
     @required this.doc,
     this.subject,
     this.raisedBy,
+    @required this.callback
   });
 
   @override
@@ -121,6 +123,7 @@ class _EmailFormState extends State<EmailForm> {
         data: queryParams,
         options: Options(contentType: Headers.formUrlEncodedContentType));
     if (response2.statusCode == 200) {
+      widget.callback();
       // If the server did return a 200 OK response,
       // then parse the JSON.
       // return DioResponse.fromJson(response2.data);

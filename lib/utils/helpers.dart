@@ -111,37 +111,48 @@ Widget generateChildWidget(Map widget, [val, callback]) {
 
     case "Select":
       {
-        value = FormBuilderDropdown(
-          onChanged: callback,
-          initialValue: val,
-          attribute: widget["fieldname"],
-          decoration: InputDecoration(
-            labelText: widget["hint"].toUpperCase(),
-            labelStyle: Palette.labelStyle,
-            enabledBorder: InputBorder.none,
+        value = Padding(
+          padding: const EdgeInsets.only(bottom: 12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget["hint"].toUpperCase(),
+                style: Palette.labelStyle
+              ),
+              FormBuilderDropdown(
+                onChanged: callback,
+                initialValue: val,
+                attribute: widget["fieldname"],
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Palette.fieldBgColor,
+                  enabledBorder: InputBorder.none,
+                ),
+                // validators: [FormBuilderValidators.required()],
+                items: widget["options"].map<DropdownMenuItem>((option) {
+                  return DropdownMenuItem(
+                    value: option,
+                    child: option != null ? Text('$option') : Text(''),
+                  );
+                }).toList(),
+              ),
+            ],
           ),
-          // hint: Text(widget["hint"]),
-          // validators: [FormBuilderValidators.required()],
-          items: widget["options"].map<DropdownMenuItem>((option) {
-            return DropdownMenuItem(
-              value: option,
-              child: option != null ? Text('$option') : Text(''),
-            );
-          }).toList(),
         );
       }
       break;
 
     case "MultiSelect":
       {
-        if(val != null) {
+        if (val != null) {
           val = [Contact(value: val)];
         }
 
         value = MultiSelect2(
           attribute: widget["fieldname"],
           hint: widget["label"],
-          val: val !=null ? val: [],
+          val: val != null ? val : [],
         );
       }
       break;

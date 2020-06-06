@@ -18,12 +18,18 @@ class _LoginState extends State<Login> {
   var savedPwd;
 
   Future _authenticate(usr, pwd) async {
-    final response = await dio.post('/method/login', data: {
-      'usr': usr,
-      'pwd': pwd,
-    }, options: Options(validateStatus: (status) {
-      return status < 500;
-    }));
+    final response = await dio.post(
+      '/method/login',
+      data: {
+        'usr': usr,
+        'pwd': pwd,
+      },
+      options: Options(
+        validateStatus: (status) {
+          return status < 500;
+        },
+      ),
+    );
     localStorage.setBool('isLoggedIn', false);
     if (response.statusCode == 200) {
       localStorage.setBool('isLoggedIn', true);
