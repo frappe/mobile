@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -5,6 +7,7 @@ import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/main.dart';
 import 'package:frappe_app/widgets/add_assignees.dart';
 import 'package:frappe_app/widgets/comment_input.dart';
+import 'package:frappe_app/widgets/like_doc.dart';
 import 'package:rubber/rubber.dart';
 
 import '../widgets/communication.dart';
@@ -18,13 +21,12 @@ class FormView extends StatefulWidget {
   final String doctype;
   final String name;
   final Map wireframe;
-  final String appBarTitle;
 
-  FormView(
-      {@required this.doctype,
-      @required this.name,
-      this.wireframe,
-      @required this.appBarTitle});
+  FormView({
+    @required this.doctype,
+    @required this.name,
+    this.wireframe,
+  });
 
   @override
   _FormViewState createState() => _FormViewState();
@@ -35,6 +37,8 @@ class _FormViewState extends State<FormView>
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   Future<DioGetDocResponse> futureIssueDetail;
   bool formChanged = false;
+  bool editMode = false;
+  final user = localStorage.getString('user');
 
   @override
   void initState() {
@@ -91,6 +95,7 @@ class _FormViewState extends State<FormView>
     setState(() {
       futureIssueDetail = _fetchDoc(widget.doctype, widget.name);
       formChanged = false;
+      editMode = false;
     });
   }
 
@@ -138,6 +143,10 @@ class _FormViewState extends State<FormView>
             var docs = snapshot.data.values.docs;
             var docInfo = snapshot.data.values.docInfo;
             var builderContext;
+            var likedBy = docs[0]['_liked_by'] != null
+                ? json.decode(docs[0]['_liked_by'])
+                : [];
+            var isLikedByUser = likedBy.contains(user);
 
             return Scaffold(
                 bottomNavigationBar: Container(
@@ -236,7 +245,8 @@ class _FormViewState extends State<FormView>
                                     children: <Widget>[
                                       Flexible(
                                         child: Text(
-                                          widget.appBarTitle,
+                                          docs[0][widget
+                                              .wireframe["subject_field"]],
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 2,
                                           style: TextStyle(
@@ -294,30 +304,51 @@ class _FormViewState extends State<FormView>
                                 ),
                               ),
                               actions: <Widget>[
+                                LikeDoc(
+                                  doctype: widget.doctype,
+                                  name: widget.name,
+                                  isFav: isLikedByUser,
+                                ),
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
-                                  child: FlatButton(
-                                      // disabledColor: Colors.black54,
-                                      // color: Colors.black,
-                                      child: Text('Save'),
-                                      onPressed: formChanged
-                                          ? () async {
-                                              if (_fbKey.currentState
-                                                  .saveAndValidate()) {
-                                                var formValue =
-                                                    _fbKey.currentState.value;
-                                                await _updateDoc(
-                                                  widget.name,
-                                                  formValue,
-                                                  widget.doctype,
-                                                );
-                                                showSnackBar('Changes Saved',
-                                                    builderContext);
-                                                _refresh();
+                                  child: IconButton(
+                                    iconSize: 18,
+                                    icon:
+                                        editMode ? Text('Save') : Text('Edit'),
+                                    onPressed: editMode
+                                        ? formChanged
+                                            ? () async {
+                                                if (_fbKey.currentState
+                                                    .saveAndValidate()) {
+                                                  var formValue =
+                                                      _fbKey.currentState.value;
+                                                  await _updateDoc(
+                                                    widget.name,
+                                                    formValue,
+                                                    widget.doctype,
+                                                  );
+                                                  showSnackBar(
+                                                    'Changes Saved',
+                                                    builderContext,
+                                                  );
+                                                  _refresh();
+                                                }
                                               }
-                                            }
-                                          : () => showSnackBar(
-                                              'No Changes', builderContext)),
+                                            : () {
+                                                showSnackBar(
+                                                  'No Changes',
+                                                  builderContext,
+                                                );
+                                                setState(() {
+                                                  editMode = false;
+                                                });
+                                              }
+                                        : () {
+                                            setState(() {
+                                              editMode = true;
+                                            });
+                                          },
+                                  ),
                                 )
                               ],
                               expandedHeight: 200.0,
@@ -344,43 +375,47 @@ class _FormViewState extends State<FormView>
                           ];
                         },
                         body: TabBarView(children: [
-                          Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Container(
-                                  color: Color.fromRGBO(237, 242, 247, 1),
-                                  height: 40,
-                                ),
-                                FormBuilder(
-                                  key: _fbKey,
-                                  child: Flexible(
-                                    child: Container(
-                                      color: Colors.white,
+                          Column(mainAxisSize: MainAxisSize.min, children: <
+                              Widget>[
+                            Container(
+                              color: Color.fromRGBO(237, 242, 247, 1),
+                              height: 40,
+                            ),
+                            FormBuilder(
+                              readOnly: editMode ? false : true,
+                              key: _fbKey,
+                              child: Flexible(
+                                child: Container(
+                                  color: Colors.white,
+                                  padding: EdgeInsets.all(10),
+                                  child: ListView(
                                       padding: EdgeInsets.all(10),
-                                      child: ListView(
-                                          padding: EdgeInsets.all(10),
-                                          children: widget.wireframe["fields"]
-                                              .where((field) {
-                                            return field["hidden"] == false &&
-                                                field["skip_field"] != true;
-                                          }).map<Widget>((field) {
-                                            var val =
-                                                docs[0][field["fieldname"]];
-                                            return GridTile(
-                                              child: generateChildWidget(
-                                                  field, val, (item) {
-                                                setState(() {
-                                                  docs[0][field["fieldname"]] =
-                                                      item;
-                                                  formChanged = true;
-                                                });
-                                              }),
-                                            );
-                                          }).toList()),
-                                    ),
-                                  ),
-                                )
-                              ]),
+                                      children: widget.wireframe["fields"]
+                                          .where((field) {
+                                        return field["hidden"] == false &&
+                                            field["skip_field"] != true;
+                                      }).map<Widget>((field) {
+                                        var val = docs[0][field["fieldname"]];
+                                        return Visibility(
+                                          visible: editMode
+                                              ? true
+                                              : val != null && val != '',
+                                          child: GridTile(
+                                            child: generateChildWidget(
+                                                field, val, (item) {
+                                              setState(() {
+                                                docs[0][field["fieldname"]] =
+                                                    item;
+                                                formChanged = true;
+                                              });
+                                            }),
+                                          ),
+                                        );
+                                      }).toList()),
+                                ),
+                              ),
+                            )
+                          ]),
                           Communication(
                             docInfo: [
                               ...docInfo['comments'],

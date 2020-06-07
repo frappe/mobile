@@ -163,55 +163,69 @@ class _CustomListViewState extends State<CustomListView> with ChangeNotifier {
             ),
           ];
         },
-        body: Container(
-          color: Palette.bgColor,
-          child: PagewiseListView(
-            pageLoadController: _pageLoadController,
-            itemBuilder: ((buildContext, entry, _) {
-              int subjectFieldIndex =
-                  entry[0].indexOf(widget.wireframe["subject_field"]);
-              var key = entry[0];
-              var value = entry[1];
-              var assignee = value[6] != null ? json.decode(value[6]) : null;
+        body: RefreshIndicator(
+          onRefresh: () {
+            var val =  _fetchList(
+              doctype: widget.doctype,
+              fieldnames: widget.fieldnames,
+              pageLength: PAGE_SIZE,
+              filters: widget.filters,
+            );
+            setState(() {
+              
+            });
+            return val;
+          },
+          child: Container(
+            color: Palette.bgColor,
+            child: PagewiseListView(
+              pageLoadController: _pageLoadController,
+              itemBuilder: ((buildContext, entry, _) {
+                int subjectFieldIndex =
+                    entry[0].indexOf(widget.wireframe["subject_field"]);
+                var key = entry[0];
+                var value = entry[1];
+                var assignee = value[6] != null ? json.decode(value[6]) : null;
 
-              var likedBy = value[10] != null ? json.decode(value[10]) : [];
-              var isLikedByUser = likedBy.contains(user);
+                var likedBy = value[10] != null ? json.decode(value[10]) : [];
+                var isLikedByUser = likedBy.contains(user);
 
-              var seenBy = value[7] != null ? json.decode(value[7]) : [];
-              var isSeenByUser = seenBy.contains(user);
+                var seenBy = value[7] != null ? json.decode(value[7]) : [];
+                var isSeenByUser = seenBy.contains(user);
 
-              return ListItem(
-                doctype: widget.doctype,
-                onListTap: () {
-                  widget.detailCallback(
-                    value[0],
-                    value[subjectFieldIndex],
-                  );
-                },
-                isFav: isLikedByUser,
-                seen: isSeenByUser,
-                assignee: assignee != null && assignee.length > 0
-                    ? [key[6], assignee[0]]
-                    : null,
-                onButtonTap: (k, v) {
-                  if (k == '_assign') {
-                    widget.filters.add([widget.doctype, k, 'like', '%$v%']);
-                  } else {
-                    widget.filters.add([widget.doctype, k, '=', v]);
-                  }
-                  localStorage.setString(
-                      'IssueFilter', json.encode(widget.filters));
-                  setState(() {});
-                },
-                title: value[subjectFieldIndex],
-                modifiedOn: "${timeago.format(DateTime.parse(
-                  value[5],
-                ))}",
-                name: value[0],
-                status: [key[1],value[1]],
-                commentCount: value[11],
-              );
-            }),
+                return ListItem(
+                  doctype: widget.doctype,
+                  onListTap: () {
+                    widget.detailCallback(
+                      value[0],
+                      value[subjectFieldIndex],
+                    );
+                  },
+                  isFav: isLikedByUser,
+                  seen: isSeenByUser,
+                  assignee: assignee != null && assignee.length > 0
+                      ? [key[6], assignee[0]]
+                      : null,
+                  onButtonTap: (k, v) {
+                    if (k == '_assign') {
+                      widget.filters.add([widget.doctype, k, 'like', '%$v%']);
+                    } else {
+                      widget.filters.add([widget.doctype, k, '=', v]);
+                    }
+                    localStorage.setString(
+                        'IssueFilter', json.encode(widget.filters));
+                    setState(() {});
+                  },
+                  title: value[subjectFieldIndex],
+                  modifiedOn: "${timeago.format(DateTime.parse(
+                    value[5],
+                  ))}",
+                  name: value[0],
+                  status: [key[1], value[1]],
+                  commentCount: value[11],
+                );
+              }),
+            ),
           ),
         ),
       ),

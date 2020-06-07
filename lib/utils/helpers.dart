@@ -4,13 +4,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/form/link_field.dart';
-import 'package:frappe_app/form/multi_select.dart';
-import 'package:frappe_app/form/multi_select2.dart';
-import 'package:frappe_app/utils/enums.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../config/palette.dart';
+import '../form/link_field2.dart';
+import '../form/multi_select2.dart';
+import '../utils/enums.dart';
 import '../main.dart';
 import '../utils/response_models.dart';
 import '../app.dart';
@@ -99,7 +98,7 @@ Widget generateChildWidget(Map widget, [val, callback]) {
   switch (widget["fieldtype"]) {
     case "Link":
       {
-        value = LinkFormField(
+        value = LinkField2(
             attribute: widget["fieldname"],
             doctype: widget["doctype"],
             hint: widget["hint"],
@@ -116,10 +115,7 @@ Widget generateChildWidget(Map widget, [val, callback]) {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                widget["hint"].toUpperCase(),
-                style: Palette.labelStyle
-              ),
+              Text(widget["hint"].toUpperCase(), style: Palette.labelStyle),
               FormBuilderDropdown(
                 onChanged: callback,
                 initialValue: val,

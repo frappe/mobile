@@ -114,7 +114,6 @@ class _IssueDetailState extends State<IssueDetail> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return FormView(
-              appBarTitle: widget.title,
               doctype: 'Issue',
               name: widget.name,
               wireframe: wireframe,
