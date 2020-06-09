@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/style.dart';
 import 'package:frappe_app/utils/helpers.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
@@ -24,8 +25,8 @@ class DocVersion extends StatelessWidget {
       var changed = decoded["changed"];
       var author = data["owner"];
 
-      txt = "<b>$author</b> changed value of ";
-    
+      txt = "<div><b>$author</b> changed value of ";
+
       changed.forEach((c) {
         var fromVal;
         var toVal;
@@ -44,39 +45,43 @@ class DocVersion extends StatelessWidget {
         txt += "${toTitleCase(c[0])} from <b>$fromVal</b> to <b>$toVal</b> ";
       });
     } else if (data["comment_type"] == "Attachment") {
-      txt = "<b>${data["owner"]}</b> ${data["content"]}";
+      txt = "<div><b>${data["owner"]}</b> ${data["content"]}";
+    } else if (data["comment_type"] == "Like") {
+      txt = "<div>${data["content"]} by ${data["owner"]}";
     } else {
-      txt = data["content"];
+      txt = "<div>${data["content"]}";
     }
 
-    return Card(
-      child: ListTile(
-        subtitle: Padding(
-          padding: const EdgeInsets.only(bottom: 10.0),
-          child: Text(time),
-        ),
-        title: Padding(
-          padding: const EdgeInsets.only(bottom: 10, top: 10),
-          child: Html(
-            data: txt,
-            onImageError: (a, b) {
-              // TODO
-              print(a);
-              print(b);
-            },
-            onLinkTap: (url) async {
-              final absoluteUrl = getAbsoluteUrl(url);
-              if (await canLaunch(absoluteUrl)) {
-                await launch(
-                  absoluteUrl,
-                  headers: await getCookiesWithHeader(),
-                );
-              } else {
-                throw 'Could not launch $url';
-              }
-            },
+    txt += "<span> - $time</span></div>";
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4.0, top: 4.0),
+      child: Html(
+        data: txt,
+        style: {
+          "div": Style(
+            fontSize: FontSize(12),
           ),
-        ),
+          "span": Style(
+            color: Palette.dimTxtColor
+          )
+        },
+        onImageError: (a, b) {
+          // TODO
+          print(a);
+          print(b);
+        },
+        onLinkTap: (url) async {
+          final absoluteUrl = getAbsoluteUrl(url);
+          if (await canLaunch(absoluteUrl)) {
+            await launch(
+              absoluteUrl,
+              headers: await getCookiesWithHeader(),
+            );
+          } else {
+            throw 'Could not launch $url';
+          }
+        },
       ),
     );
   }

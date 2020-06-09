@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/palette.dart';
 
 import '../widgets/timeline.dart';
 
@@ -15,9 +16,14 @@ class Communication extends StatefulWidget {
 class _CommunicationState extends State<Communication> {
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    // return Timeline(widget.docInfo, widget.callback);
+    return Container(
+      color: Palette.bgColor,
+      child: ListView(
         children: <Widget>[
           Timeline(widget.docInfo, widget.callback),
-        ]);
+        ],
+      ),
+    );
   }
 }

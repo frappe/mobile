@@ -11,7 +11,8 @@ class Event extends StatelessWidget {
 
   Event(this.eventType, this.data, this.callback);
 
-  Widget _eventWidget(EventType eventType, Map data, [Function callback]) {
+  @override
+  Widget build(BuildContext context) {
     Widget val;
 
     switch (eventType) {
@@ -27,50 +28,10 @@ class Event extends StatelessWidget {
         val = DocVersion(data);
         break;
 
-      // case EventType.newEmail:
-      //   val = RaisedButton(
-      //     onPressed: () {},
-      //     child: Text('New Email'),
-      //   );
-      //   break;
-
       default:
         break;
     }
 
     return val;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _eventWidget(eventType, data, callback);
-    // return Row(
-    //     children: <Widget>[
-    //       Container(
-    //         width: 20,
-    //         child: Stack(
-    //           children: <Widget>[
-    //             Container(
-    //               height: 100,
-    //               child: VerticalDivider(
-    //                 thickness: 2,
-    //               ),
-    //             ),
-    //             Positioned(
-    //               top: 40,
-    //               child: Icon(
-    //                 Icons.lens,
-    //                 size: 15,
-    //                 color: Colors.black26,
-    //               ),
-    //             ),
-    //           ],
-    //         ),
-    //       ),
-    //       Expanded(
-    //         child: _eventWidget(eventType, data),
-    //       ),
-    //     ],
-    // );
   }
 }

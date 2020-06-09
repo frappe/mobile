@@ -40,6 +40,7 @@ class _CustomListViewState extends State<CustomListView> with ChangeNotifier {
   Future<DioGetReportViewResponse> futureList;
   static const int PAGE_SIZE = 10;
   final user = localStorage.getString('user');
+  bool showLiked = false;
 
   Future<List> _fetchList(
       {@required List fieldnames,
@@ -81,6 +82,22 @@ class _CustomListViewState extends State<CustomListView> with ChangeNotifier {
   void choiceAction(String choice) {
     if (choice == Constants.Logout) {
       logout(context);
+    } else if (choice == 'showLiked') {
+      if(!showLiked) {
+        widget.filters.add([widget.doctype, '_liked_by', 'like', '%$user%']);
+      } else {
+        int likedByIdx;
+        for(int i = 0; i < widget.filters.length; i++) {
+          if (widget.filters[i][1] == '_liked_by') {
+            likedByIdx = i;
+            break;
+          }
+        }
+        widget.filters.removeAt(likedByIdx);
+      }
+      showLiked = !showLiked;
+
+      setState(() {});
     }
   }
 
@@ -133,6 +150,24 @@ class _CustomListViewState extends State<CustomListView> with ChangeNotifier {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
+              leading: PopupMenuButton<String>(
+                onSelected: choiceAction,
+                icon: CircleAvatar(
+                  child: Text(
+                    user[0].toUpperCase(),
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  backgroundColor: Palette.bgColor,
+                ),
+                itemBuilder: (BuildContext context) {
+                  return Constants.choices.map((String choice) {
+                    return PopupMenuItem<String>(
+                      value: choice,
+                      child: Text(choice),
+                    );
+                  }).toList();
+                },
+              ),
               pinned: true,
               snap: true,
               floating: true,
@@ -149,31 +184,27 @@ class _CustomListViewState extends State<CustomListView> with ChangeNotifier {
                   },
                 ),
                 PopupMenuButton<String>(
-                  onSelected: choiceAction,
-                  itemBuilder: (BuildContext context) {
-                    return Constants.choices.map((String choice) {
-                      return PopupMenuItem<String>(
-                        value: choice,
-                        child: Text(choice),
-                      );
-                    }).toList();
-                  },
-                ),
+                    onSelected: choiceAction,
+                    itemBuilder: (BuildContext context) => [
+                          CheckedPopupMenuItem(
+                            checked: showLiked,
+                            value: 'showLiked',
+                            child: Text("Show liked"),
+                          )
+                        ]),
               ],
             ),
           ];
         },
         body: RefreshIndicator(
           onRefresh: () {
-            var val =  _fetchList(
+            var val = _fetchList(
               doctype: widget.doctype,
               fieldnames: widget.fieldnames,
               pageLength: PAGE_SIZE,
               filters: widget.filters,
             );
-            setState(() {
-              
-            });
+            setState(() {});
             return val;
           },
           child: Container(

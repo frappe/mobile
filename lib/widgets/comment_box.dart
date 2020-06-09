@@ -70,13 +70,15 @@ class _CommentBoxState extends State<CommentBox> {
   @override
   Widget build(BuildContext context) {
     var time = timeago.format(DateTime.parse(widget.data["creation"]));
+
     return Card(
       child: Column(
-        children: <Widget>[
+        children: [
           ListTile(
-            leading: CircleAvatar(child: Icon(Icons.person)),
-            title: Text(widget.data["owner"]),
-            subtitle: Text(time),
+            title: Text('${widget.data["owner"]}'),
+            subtitle: Container(
+              child: Text(time),
+            ),
             trailing: localStorage.getString('user') == widget.data["owner"]
                 ? PopupMenuButton(
                     onSelected: _choiceAction,
@@ -91,11 +93,14 @@ class _CommentBoxState extends State<CommentBox> {
                   )
                 : null,
           ),
-          ListTile(
-            title: Html(
-              data: widget.data["content"],
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Html(
+                data: widget.data["content"],
+              ),
             ),
-          )
+          ),
         ],
       ),
     );

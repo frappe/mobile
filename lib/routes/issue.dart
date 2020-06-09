@@ -104,7 +104,7 @@ class _IssueDetailState extends State<IssueDetail> {
   @override
   void initState() {
     super.initState();
-    futureProcessedData = processData(wireframe, true);
+    futureProcessedData = processData(wireframe, true,);
   }
 
   @override
@@ -141,7 +141,7 @@ class _FilterIssueState extends State<FilterIssue> {
   @override
   void initState() {
     super.initState();
-    futureProcessedData = processData(wireframe, true, ViewType.filter);
+    futureProcessedData = processData(wireframe, true, viewType: ViewType.filter);
   }
 
   @override

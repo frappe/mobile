@@ -1,6 +1,7 @@
 import 'dart:io';
 
 // import 'package:downloads_path_provider/downloads_path_provider.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -32,16 +33,25 @@ logout(context) async {
       (Route<dynamic> route) => false);
 }
 
-getMeta(doctype) async {
+getMeta(doctype, context) async {
   var queryParams = {'doctype': doctype};
 
-  final response2 = await dio.get('/method/frappe.desk.form.load.getdoctype',
-      queryParameters: queryParams);
+  final response2 = await dio.get(
+    '/method/frappe.desk.form.load.getdoctype',
+    queryParameters: queryParams,
+    options: Options(
+      validateStatus: (status) {
+        return status < 500;
+      },
+    ),
+  );
 
   if (response2.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
     return DioGetMetaResponse.fromJson(response2.data);
+  } else if (response2.statusCode == 403) {
+    logout(context);
   } else {
     // If the server did not return a 200 OK response,
     // then throw an exception.
@@ -50,7 +60,7 @@ getMeta(doctype) async {
 }
 
 Future<Map> processData(Map data, bool metaRequired,
-    [ViewType viewType]) async {
+    {ViewType viewType, context}) async {
   // layout
   data["fieldnames"] = [];
   if (!metaRequired) {
@@ -62,7 +72,7 @@ Future<Map> processData(Map data, bool metaRequired,
     });
     data["fieldnames"].add("`tab${data["doctype"]}`.`${"modified"}`");
   } else {
-    var meta = await getMeta(data["doctype"]);
+    var meta = await getMeta(data["doctype"], context);
 
     List metaFields = meta.values.docs[0]["fields"];
 
