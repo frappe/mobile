@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/app.dart';
 import 'package:frappe_app/main.dart';
+import 'package:frappe_app/utils/enums.dart';
 
 import '../utils/helpers.dart';
 
@@ -13,7 +15,7 @@ class FilterList extends StatefulWidget {
   final List filters;
 
   FilterList({
-    @required this.filterCallback,
+    this.filterCallback,
     @required this.wireframe,
     @required this.appBarTitle,
     this.filters,
@@ -49,17 +51,30 @@ class _FilterListState extends State<FilterList> {
             formValue.forEach((k, v) {
               if (v != null) {
                 if (k == '_assign' && v != '') {
-                  filters.add([widget.wireframe["doctype"], k, "like", "%$v%"]);
+                  filters.add([widget.wireframe["name"], k, "like", "%$v%"]);
                 } else {
                   if (v != "") {
-                    filters.add([widget.wireframe["doctype"], k, "=", v]);
+                    filters.add([widget.wireframe["name"], k, "=", v]);
                   }
                 }
               }
             });
 
-            localStorage.setString('IssueFilter', json.encode(filters));
-            widget.filterCallback(filters);
+            localStorage.setString(
+                '${widget.wireframe["name"]}Filter', json.encode(filters));
+            // widget.filterCallback(filters);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return Router(
+                    viewType: ViewType.list,
+                    doctype: widget.wireframe["name"],
+                    filters: filters,
+                  );
+                },
+              ),
+            );
           },
           child: Icon(
             Icons.done,
@@ -71,7 +86,7 @@ class _FilterListState extends State<FilterList> {
           child: ListView(
               padding: EdgeInsets.all(10),
               children: widget.wireframe["fields"].where((field) {
-                return field["in_standard_filter"] == true;
+                return field["in_standard_filter"] == 1;
               }).map<Widget>((field) {
                 var val = field["val"];
 

@@ -10,5 +10,8 @@ enum Order {
 }
 
 enum ViewType {
-  filter
+  filter,
+  list,
+  form,
+  newForm
 }

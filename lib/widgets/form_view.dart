@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/main.dart';
+import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/widgets/add_assignees.dart';
 import 'package:frappe_app/widgets/comment_input.dart';
 import 'package:frappe_app/widgets/like_doc.dart';
-import 'package:rubber/rubber.dart';
 
 import '../widgets/communication.dart';
 import '../utils/helpers.dart';
@@ -36,7 +36,7 @@ class _FormViewState extends State<FormView>
     with SingleTickerProviderStateMixin {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   Future<DioGetDocResponse> futureIssueDetail;
-  bool formChanged = false;
+  bool formChanged = true;
   bool editMode = false;
   final user = localStorage.getString('user');
 
@@ -131,6 +131,39 @@ class _FormViewState extends State<FormView>
       }
     }
     return w;
+  }
+
+  List<Widget> _generateChildren(List fields, Map doc, bool editMode) {
+    List filteredFields = fields.where((field) {
+      return (field["read_only"] != 1 ||
+              field["fieldtype"] == "Section Break") &&
+          field["set_only_once"] != 1 &&
+          field["hidden"] == 0 &&
+          [
+            "Select",
+            "Link",
+            "Data",
+            "Date",
+            "Datetime",
+            "Float",
+            "Time",
+            "Section Break",
+            "Text Editor"
+          ].contains(
+            field["fieldtype"],
+          );
+    }).map((field) {
+      return {
+        ...field,
+        "_current_val": doc[field["fieldname"]],
+      };
+    }).toList();
+
+    return generateLayout(
+      fields: filteredFields,
+      viewType: ViewType.form,
+      editMode: editMode,
+    );
   }
 
   @override
@@ -268,7 +301,7 @@ class _FormViewState extends State<FormView>
                                                   BorderRadius.circular(5),
                                             ),
                                             child: Text(
-                                              docs[0]['status'].toUpperCase(),
+                                              docs[0]['status'],
                                               style: TextStyle(
                                                 color: Palette.darkGreen,
                                               ),
@@ -362,10 +395,10 @@ class _FormViewState extends State<FormView>
                                   unselectedLabelColor: Colors.grey,
                                   tabs: [
                                     Tab(
-                                      child: Text('FORM'),
+                                      child: Text('Detail'),
                                     ),
                                     Tab(
-                                      child: Text('TIMELINE'),
+                                      child: Text('Activity'),
                                     ),
                                   ],
                                 ),
@@ -375,52 +408,38 @@ class _FormViewState extends State<FormView>
                           ];
                         },
                         body: TabBarView(children: [
-                          Column(mainAxisSize: MainAxisSize.min, children: <
-                              Widget>[
-                            Container(
-                              color: Color.fromRGBO(237, 242, 247, 1),
-                              height: 40,
-                            ),
-                            FormBuilder(
-                              readOnly: editMode ? false : true,
-                              key: _fbKey,
-                              child: Flexible(
-                                child: Container(
-                                  color: Colors.white,
-                                  padding: EdgeInsets.all(10),
-                                  child: ListView(
-                                      padding: EdgeInsets.all(10),
-                                      children: widget.wireframe["fields"]
-                                          .where((field) {
-                                        return field["hidden"] == false &&
-                                            field["skip_field"] != true;
-                                      }).map<Widget>((field) {
-                                        var val = docs[0][field["fieldname"]];
-                                        return Visibility(
-                                          visible: editMode
-                                              ? true
-                                              : val != null && val != '',
-                                          child: GridTile(
-                                            child: generateChildWidget(
-                                                field, val, (item) {
-                                              setState(() {
-                                                docs[0][field["fieldname"]] =
-                                                    item;
-                                                formChanged = true;
-                                              });
-                                            }),
-                                          ),
-                                        );
-                                      }).toList()),
+                          Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Container(
+                                  color: Color.fromRGBO(237, 242, 247, 1),
+                                  height: 40,
                                 ),
-                              ),
-                            )
-                          ]),
+                                FormBuilder(
+                                  readOnly: editMode ? false : true,
+                                  key: _fbKey,
+                                  child: Flexible(
+                                    child: Container(
+                                      color: Colors.white,
+                                      padding: EdgeInsets.all(10),
+                                      child: ListView(
+                                        padding: EdgeInsets.all(10),
+                                        children: _generateChildren(
+                                          widget.wireframe["fields"],
+                                          docs[0],
+                                          editMode,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ]),
                           Communication(
                             docInfo: [
                               ...docInfo['comments'],
                               ...docInfo["communications"],
-                              ...docInfo["versions"]
+                              ...docInfo["versions"],
+                              // ...docInfo["views"],TODO
                             ],
                             callback: () {
                               _refresh();

@@ -49,11 +49,16 @@ class _LikeDocState extends State<LikeDoc> {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      iconSize: 18,
-      color: widget.isFav ? Colors.red : Palette.dimTxtColor,
-      icon: Icon(Icons.favorite),
-      onPressed: () {
+    return GestureDetector(
+      child: Container(
+        padding: const EdgeInsets.only(right: 16.0),
+        child: Icon(
+          widget.isFav ? Icons.favorite :Icons.favorite_border,
+          size: 18,
+          color: widget.isFav ? Colors.red : Palette.dimTxtColor,
+        ),
+      ),
+      onTap: () {
         _toggleFav();
       },
     );

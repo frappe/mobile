@@ -112,7 +112,7 @@ class TimelineView extends StatelessWidget {
     this.indicatorColor = Colors.blue,
     this.indicatorStyle = PaintingStyle.fill,
     this.strokeCap = StrokeCap.butt,
-    this.strokeWidth = 1.0,
+    this.strokeWidth = 0.0,
     this.style = PaintingStyle.stroke,
   })  : itemCount = children.length,
         assert(itemGap >= 0),

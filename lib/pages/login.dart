@@ -151,8 +151,7 @@ class _LoginState extends State<Login> {
                                 'pwd',
                                 formValue["pwd"],
                               );
-                              Navigator.of(context)
-                                  .pushReplacementNamed('/issue');
+                              Navigator.of(context).pushReplacementNamed('/modules');
                             } else {
                               Scaffold.of(context).showSnackBar(SnackBar(
                                 content: Text('Login Failed'),

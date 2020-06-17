@@ -3,7 +3,6 @@ import 'dart:io';
 // import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -101,51 +100,101 @@ Future<Map> processData(Map data, bool metaRequired,
   return data;
 }
 
-Widget generateChildWidget(Map widget, [val, callback]) {
+Future<GetMetaResponse> processData2(
+    String doctype, ViewType viewType, context) async {
+  //TODO: check cache
+
+  var meta = await getMeta(doctype, context);
+
+  List metaFields = meta.values.docs[0]["fields"];
+
+  metaFields.forEach((field) {
+    if (field["fieldtype"] == "Select") {
+      field["options"] = field["options"].split('\n');
+
+      if (viewType == ViewType.filter) {
+        field["options"].insert(0, null);
+      }
+    }
+  });
+
+  return meta.values;
+}
+
+Widget generateChildWidget(Map widget, [val, withLabel = true]) {
   // rename makeControl
   Widget value;
+  const fieldPadding = const EdgeInsets.only(bottom: 24.0);
+  const labelPadding = const EdgeInsets.only(bottom: 6.0);
+  List<String Function(dynamic)> validators = [];
+
+  if (widget["reqd"] == 1) {
+    validators.add(FormBuilderValidators.required());
+  }
+
+  Widget _buildDecoratedWidget(Widget fieldWidget, bool withLabel) {
+    if (withLabel) {
+      return Padding(
+        padding: fieldPadding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: labelPadding,
+              child: Text(widget["label"], style: Palette.labelStyle),
+            ),
+            fieldWidget
+          ],
+        ),
+      );
+    } else {
+      return fieldWidget;
+    }
+  }
 
   switch (widget["fieldtype"]) {
     case "Link":
       {
-        value = LinkField2(
-            attribute: widget["fieldname"],
-            doctype: widget["doctype"],
-            hint: widget["hint"],
-            refDoctype: widget["refDoctype"],
-            value: val,
-            callback: callback);
+        value = _buildDecoratedWidget(
+            LinkField2(
+              validators: validators,
+              attribute: widget["fieldname"],
+              doctype: widget["options"],
+              hint: !withLabel ? widget["label"] : null,
+              refDoctype: widget["refDoctype"],
+              value: val,
+            ),
+            withLabel);
       }
       break;
 
     case "Select":
       {
-        value = Padding(
-          padding: const EdgeInsets.only(bottom: 12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(widget["hint"].toUpperCase(), style: Palette.labelStyle),
-              FormBuilderDropdown(
-                onChanged: callback,
-                initialValue: val,
-                attribute: widget["fieldname"],
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Palette.fieldBgColor,
-                  enabledBorder: InputBorder.none,
-                ),
-                // validators: [FormBuilderValidators.required()],
-                items: widget["options"].map<DropdownMenuItem>((option) {
-                  return DropdownMenuItem(
-                    value: option,
-                    child: option != null ? Text('$option') : Text(''),
-                  );
-                }).toList(),
+        value = _buildDecoratedWidget(
+            FormBuilderDropdown(
+              initialValue: val,
+              attribute: widget["fieldname"],
+              hint: !withLabel ? Text(widget["label"]) : null,
+              decoration: Palette.formFieldDecoration(
+                withLabel,
+                widget["label"],
               ),
-            ],
-          ),
-        );
+              validators: validators,
+              items: widget["options"].map<DropdownMenuItem>((option) {
+                return DropdownMenuItem(
+                  value: option,
+                  child: option != null
+                      ? Text(
+                          '$option',
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
+                        )
+                      : Text(''),
+                );
+              }).toList(),
+            ),
+            withLabel);
       }
       break;
 
@@ -167,13 +216,28 @@ Widget generateChildWidget(Map widget, [val, callback]) {
       {
         value = FormBuilderTextField(
           initialValue: val,
-          onChanged: callback,
           attribute: widget["fieldname"],
           decoration: InputDecoration(hintText: widget["hint"]),
           validators: [
             FormBuilderValidators.required(),
           ],
         );
+      }
+      break;
+
+    case "Data":
+      {
+        value = _buildDecoratedWidget(
+            FormBuilderTextField(
+              initialValue: val,
+              attribute: widget["fieldname"],
+              decoration: Palette.formFieldDecoration(
+                withLabel,
+                widget["label"],
+              ),
+              validators: validators,
+            ),
+            withLabel);
       }
       break;
 
@@ -182,83 +246,109 @@ Widget generateChildWidget(Map widget, [val, callback]) {
         value = FormBuilderCheckbox(
           leadingInput: true,
           attribute: widget["fieldname"],
-          label: Text(widget["hint"]),
-          validators: [],
+          label: Text(widget["label"]),
+          validators: validators,
         );
       }
       break;
 
     case "Text Editor":
       {
-        value = FormBuilderTextField(
-          maxLines: 10,
-          onChanged: callback,
-          attribute: widget["fieldname"],
-          decoration: InputDecoration(hintText: widget["hint"]),
-          validators: [
-            FormBuilderValidators.required(),
-          ],
-        );
+        value = _buildDecoratedWidget(
+            FormBuilderTextField(
+              maxLines: 10,
+              attribute: widget["fieldname"],
+              decoration: Palette.formFieldDecoration(
+                withLabel,
+                widget["label"],
+              ),
+              validators: [
+                FormBuilderValidators.required(),
+              ],
+            ),
+            withLabel);
       }
+      break;
+
+    case "Datetime":
+      {
+        value = _buildDecoratedWidget(
+            FormBuilderDateTimePicker(
+              valueTransformer: (val) {
+                return val.toIso8601String();
+              },
+              initialTime: null,
+              initialValue: val,
+              attribute: widget["fieldname"],
+              decoration: Palette.formFieldDecoration(
+                withLabel,
+                widget["label"],
+              ),
+              validators: validators,
+            ),
+            withLabel);
+      }
+      break;
+
+    case "Float":
+      {
+        value = _buildDecoratedWidget(
+            FormBuilderTextField(
+              keyboardType: TextInputType.number,
+              attribute: widget["fieldname"],
+              decoration: Palette.formFieldDecoration(
+                withLabel,
+                widget["label"],
+              ),
+              validators: validators,
+            ),
+            withLabel);
+      }
+      break;
+
+    case "Time":
+      {
+        value = _buildDecoratedWidget(
+            FormBuilderDateTimePicker(
+              inputType: InputType.time,
+              valueTransformer: (val) {
+                return val.toIso8601String();
+              },
+              keyboardType: TextInputType.number,
+              attribute: widget["fieldname"],
+              decoration: Palette.formFieldDecoration(
+                withLabel,
+                widget["label"],
+              ),
+              validators: validators,
+            ),
+            withLabel);
+      }
+      break;
+
+    case "Date":
+      {
+        value = _buildDecoratedWidget(
+            FormBuilderDateTimePicker(
+              inputType: InputType.date,
+              valueTransformer: (val) {
+                return val.toIso8601String();
+              },
+              initialValue: val,
+              keyboardType: TextInputType.number,
+              attribute: widget["fieldname"],
+              decoration: Palette.formFieldDecoration(
+                withLabel,
+                widget["label"],
+              ),
+              validators: validators,
+            ),
+            withLabel);
+      }
+      break;
   }
   return value;
 }
-
-// Widget generateLayout(fields) {
-//   var layout = [];
-//   var colBreak = true;
-//   var rows = [];
-//   var row1Count = 0;
-//   var row2Count = 0;
-//   var collapsible;
-
-//   // 1 section can contain one colbreak
-
-//   fields.asMap().forEach((index, field) {
-
-//     if (field["fieldtype"] == "Section Break") {
-//       collapsible = false;
-//       colBreak = false;
-//       row1Count = 0;
-//       row2Count = 0;
-//       if(field["collapsible"] == 1) {
-//         collapsible = true;
-//       }
-//       rows.add('section');
-//       // generate section
-//     } else if (field["fieldtype" == "Column Break"]) {
-//       if(colBreak == true) {
-//         // throw error
-//       }
-//       colBreak = true;
-//       row2Count = row1Count;
-//     } else {
-//       if(colBreak == true) {
-//         if(collapsible = true) {
-//           rows.add(generateCollapsible(fields.sublist(index+1)));
-//         }
-//         rows[row1Count - row2Count].add('widget2');
-//         row2Count -= 1;
-//       } else {
-//         row1Count += 1;
-//         rows.add(['widget']);
-//       }
-//     }
-
-//   });
-
-//   // return Column(children: <Widget>[
-//   //   Row(children: rows)
-//   // ],);
-// }
-
-// Widget generateCollapsible(fields) {
-//   var collapsibleFields = fields.takeWhile((field) {
-//     return field["fieldtype"] != 'Section Break';
-//   });
-
-//   // wrap in collapsible
-// }
 
 // downloadFile(String fileUrl) async {
 //   await _checkPermission();
@@ -331,4 +421,106 @@ void showSnackBar(String txt, context) {
       content: Text(txt),
     ),
   );
+}
+
+List<Widget> generateLayout({
+  @required List fields,
+  @required ViewType viewType,
+  bool editMode,
+}) {
+  List<Widget> collapsibles = [];
+  List<Widget> widgets = [];
+
+  List<String> collapsibleLabels = [];
+
+  bool collapsible = false;
+
+  int idx = 0;
+
+  fields.forEach((field) {
+    var val;
+    if (viewType == ViewType.form &&
+        ["Datetime", "Date"].contains(field["fieldtype"])) {
+      val = field["_current_val"] != null
+          ? DateTime.parse(field["_current_val"])
+          : null;
+    } else {
+      val = field["_current_val"] ?? field["default"];
+    }
+    if (field["fieldtype"] == "Section Break") {
+      if (field["collapsible"] == 1) {
+        collapsibleLabels.add(field["label"]);
+        if (collapsible == false) {
+          collapsible = true;
+        } else {
+          var sectionVisibility = collapsibles.any((element) {
+            if (element is Visibility) {
+              return element.visible == true;
+            } else {
+              return true;
+            }
+          });
+          widgets.add(Visibility(
+            visible: sectionVisibility,
+            child: ListTileTheme(
+              contentPadding: EdgeInsets.all(0),
+              child: ExpansionTile(
+                title: Text(
+                  collapsibleLabels[idx].toUpperCase(),
+                  style: Palette.dimTxtStyle,
+                ),
+                children: [...collapsibles],
+              ),
+            ),
+          ));
+          idx += 1;
+          collapsibles.clear();
+        }
+      } else {
+        collapsible = false;
+
+        widgets.add(Padding(
+          padding: const EdgeInsets.only(bottom: 12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Divider(
+                thickness: 1,
+                color: Palette.darkGrey,
+              ),
+              Text(
+                field["label"].toUpperCase(),
+                style: Palette.dimTxtStyle,
+              ),
+            ],
+          ),
+        ));
+      }
+    } else if (collapsible == true) {
+      if (viewType == ViewType.form) {
+        collapsibles.add(Visibility(
+          visible: editMode ? true : val != null && val != '',
+          child: generateChildWidget(field, val),
+        ));
+      } else {
+        collapsibles.add(
+          generateChildWidget(field, val),
+        );
+      }
+    } else {
+      if (viewType == ViewType.form) {
+        widgets.add(Visibility(
+          visible: editMode ? true : val != null && val != '',
+          child: generateChildWidget(field, val),
+        ));
+      } else {
+        widgets.add(
+          generateChildWidget(field, val),
+        );
+      }
+    }
+  });
+
+  return widgets;
 }

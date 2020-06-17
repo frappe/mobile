@@ -8,8 +8,10 @@ class Palette {
   static Color lightGreen = Color.fromRGBO(238, 247, 241, 1);
   static Color darkGreen = Color.fromRGBO(56, 161, 96, 1);
   static Color bgColor = Color.fromRGBO(237, 242, 247, 1);
-  static Color dimTxtColor = Color.fromRGBO(185, 192, 199, 1);
+  static Color dimTxtColor = Color.fromRGBO(141, 153, 166, 1);
+  // static Color dimTxtColor = Color.fromRGBO(185, 192, 199, 1);
   static Color fieldBgColor = Color.fromRGBO(244, 245, 246, 1);
+  static Color borderColor = Color.fromRGBO(209, 216, 221, 1);
   // TODO: move
   static TextStyle labelStyle = TextStyle(
     color: Color.fromRGBO(174, 186, 202, 1),
@@ -20,5 +22,15 @@ class Palette {
   static TextStyle dimTxtStyle = TextStyle(
     color: Palette.dimTxtColor,
     fontWeight: FontWeight.bold,
+    fontSize: 12,
   );
+
+  static InputDecoration formFieldDecoration(bool withLabel, String label) {
+    return InputDecoration(
+      hintText: !withLabel ? label : null,
+      enabledBorder: InputBorder.none,
+      filled: true,
+      fillColor: Palette.fieldBgColor,
+    );
+  }
 }

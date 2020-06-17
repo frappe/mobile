@@ -2,9 +2,12 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:frappe_app/app.dart';
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/main.dart';
+import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/widgets/list_item.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -21,26 +24,28 @@ class CustomListView extends StatefulWidget {
   final Function filterCallback;
   final Function detailCallback;
   final String appBarTitle;
-  final wireframe;
+  final meta;
 
-  CustomListView(
-      {@required this.doctype,
-      this.wireframe,
-      @required this.fieldnames,
-      this.filters,
-      this.filterCallback,
-      @required this.appBarTitle,
-      this.detailCallback});
+  CustomListView({
+    @required this.doctype,
+    @required this.meta,
+    @required this.fieldnames,
+    this.filters,
+    this.filterCallback,
+    @required this.appBarTitle,
+    this.detailCallback,
+  });
 
   @override
   _CustomListViewState createState() => _CustomListViewState();
 }
 
-class _CustomListViewState extends State<CustomListView> with ChangeNotifier {
+class _CustomListViewState extends State<CustomListView> {
   Future<DioGetReportViewResponse> futureList;
   static const int PAGE_SIZE = 10;
   final user = localStorage.getString('user');
   bool showLiked = false;
+  var _pageLoadController;
 
   Future<List> _fetchList(
       {@required List fieldnames,
@@ -79,21 +84,73 @@ class _CustomListViewState extends State<CustomListView> with ChangeNotifier {
     }
   }
 
+  List<Widget> _buildFilters(List filters) {
+    // var val = (widget.meta["fields"] as List).where((field) {
+    //   return field["in_standard_filter"] == 1 && field["fieldtype"] == "Link";
+    // }).map<Widget>((filter) {
+    //   return SizedBox(
+    //     width: 1000,
+    //     child: generateChildWidget(
+    //       filter,
+    //       null,
+    //       (v) {},
+    //       false,
+    //     ),
+    //   );
+    // }).toList();
+
+    // return val;
+    var chips = filters.asMap().entries.map((entry) {
+      var value = entry.value;
+      var key = entry.key;
+      var label = widget.meta["field_label"][value[1]];
+      return Padding(
+        padding: const EdgeInsets.only(right: 8),
+        child: InputChip(
+          deleteIconColor: Palette.darkGrey,
+          backgroundColor: Colors.transparent,
+          shape: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Palette.borderColor,
+            ),
+            borderRadius: BorderRadius.all(
+              Radius.circular(5),
+            ),
+          ),
+          label: Text(
+            "$label ${value[2]} ${value[3]}",
+            style: TextStyle(fontSize: 12),
+          ),
+          onDeleted: () {
+            filters.removeAt(key);
+            _pageLoadController.reset();
+            setState(() {});
+          },
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+      );
+    }).toList();
+
+    return chips;
+  }
+
   void choiceAction(String choice) {
     if (choice == Constants.Logout) {
       logout(context);
     } else if (choice == 'showLiked') {
-      if(!showLiked) {
+      if (!showLiked) {
         widget.filters.add([widget.doctype, '_liked_by', 'like', '%$user%']);
       } else {
         int likedByIdx;
-        for(int i = 0; i < widget.filters.length; i++) {
+        for (int i = 0; i < widget.filters.length; i++) {
           if (widget.filters[i][1] == '_liked_by') {
             likedByIdx = i;
             break;
           }
         }
-        widget.filters.removeAt(likedByIdx);
+        if (likedByIdx > -1) {
+          widget.filters.removeAt(likedByIdx);
+        }
       }
       showLiked = !showLiked;
 
@@ -107,22 +164,43 @@ class _CustomListViewState extends State<CustomListView> with ChangeNotifier {
       decoration: BoxDecoration(color: Palette.offWhite),
       padding: EdgeInsets.only(top: 70, left: 16),
       child: Row(
+        // crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           widget.filters.length > 0
-              ? Text('Filters Applied')
-              : Text('No Filters'),
-          // Text(widget.filters.toString()),
-          widget.filters.length > 0
-              ? IconButton(
-                  icon: Icon(Icons.clear),
-                  onPressed: () {
-                    setState(() {
-                      widget.filters.clear();
-                      localStorage.setString('IssueFilter', null);
-                    });
-                  },
+              ? Expanded(
+                  child: FormBuilder(
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        Visibility(
+                          visible: widget.filters.length > 0,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              right: 8.0,
+                              bottom: 12,
+                              top: 12,
+                            ),
+                            child: FlatButton(
+                              color: Palette.bgColor,
+                              child: Text('Clear Filters'),
+                              onPressed: () {
+                                setState(() {
+                                  _pageLoadController.reset();
+                                  widget.filters.clear();
+                                  localStorage.setString(
+                                      '${widget.doctype}Filter', null);
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                        ..._buildFilters(widget.filters)
+                      ],
+                    ),
+                  ),
                 )
-              : Container(),
+              : Text('No Filters'),
+
           // Spacer(),
           // Text('20 of 99')
         ],
@@ -131,8 +209,9 @@ class _CustomListViewState extends State<CustomListView> with ChangeNotifier {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final _pageLoadController = PagewiseLoadController(
+  void initState() {
+    super.initState();
+    _pageLoadController = PagewiseLoadController(
       pageSize: PAGE_SIZE,
       pageFuture: (pageIndex) {
         return _fetchList(
@@ -144,68 +223,137 @@ class _CustomListViewState extends State<CustomListView> with ChangeNotifier {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _pageLoadController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO
+    // final _pageLoadController = PagewiseLoadController(
+    //   pageSize: PAGE_SIZE,
+    //   pageFuture: (pageIndex) {
+    //     return _fetchList(
+    //       doctype: widget.doctype,
+    //       fieldnames: widget.fieldnames,
+    //       pageLength: PAGE_SIZE,
+    //       filters: widget.filters,
+    //       offset: pageIndex * PAGE_SIZE,
+    //     );
+    //   },
+    // );
 
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
-              leading: PopupMenuButton<String>(
-                onSelected: choiceAction,
-                icon: CircleAvatar(
-                  child: Text(
-                    user[0].toUpperCase(),
-                    style: TextStyle(color: Colors.black),
-                  ),
-                  backgroundColor: Palette.bgColor,
-                ),
-                itemBuilder: (BuildContext context) {
-                  return Constants.choices.map((String choice) {
-                    return PopupMenuItem<String>(
-                      value: choice,
-                      child: Text(choice),
-                    );
-                  }).toList();
-                },
-              ),
               pinned: true,
               snap: true,
               floating: true,
-              expandedHeight: 80,
+              expandedHeight: 100,
               flexibleSpace: FlexibleSpaceBar(
                 background: _buildHeader(),
               ),
               title: Text(widget.appBarTitle),
               actions: <Widget>[
                 IconButton(
-                  icon: Icon(Icons.filter_list),
+                  icon: Icon(
+                    Icons.filter_list,
+                    color: Palette.darkGrey,
+                  ),
                   onPressed: () {
-                    widget.filterCallback(widget.filters);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return Router(
+                            viewType: ViewType.filter,
+                            doctype: widget.doctype,
+                            filters: widget.filters,
+                          );
+                        },
+                      ),
+                    );
                   },
                 ),
-                PopupMenuButton<String>(
-                    onSelected: choiceAction,
-                    itemBuilder: (BuildContext context) => [
-                          CheckedPopupMenuItem(
-                            checked: showLiked,
-                            value: 'showLiked',
-                            child: Text("Show liked"),
-                          )
-                        ]),
+                IconButton(
+                  icon: Icon(
+                    showLiked ? Icons.favorite : Icons.favorite_border,
+                    // size: 18,
+                    color: showLiked ? Colors.red : Palette.darkGrey,
+                  ),
+                  onPressed: () {
+                    if (!showLiked) {
+                      widget.filters.add(
+                          [widget.doctype, '_liked_by', 'like', '%$user%']);
+                    } else {
+                      int likedByIdx;
+                      for (int i = 0; i < widget.filters.length; i++) {
+                        if (widget.filters[i][1] == '_liked_by') {
+                          likedByIdx = i;
+                          break;
+                        }
+                      }
+                      if (likedByIdx != null) {
+                        widget.filters.removeAt(likedByIdx);
+                      }
+                    }
+
+                    setState(() {
+                      showLiked = !showLiked;
+                      _pageLoadController.reset();
+                    });
+                  },
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.add_circle_outline,
+                    color: Palette.darkGrey,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return Router(
+                            viewType: ViewType.newForm,
+                            doctype: widget.doctype,
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+                // PopupMenuButton<String>(
+                //     onSelected: choiceAction,
+                //     itemBuilder: (BuildContext context) => [
+                //           CheckedPopupMenuItem(
+                //             checked: showLiked,
+                //             value: 'showLiked',
+                //             child: Text("Show liked"),
+                //           )
+                //         ]),
               ],
             ),
           ];
         },
         body: RefreshIndicator(
           onRefresh: () {
-            var val = _fetchList(
-              doctype: widget.doctype,
-              fieldnames: widget.fieldnames,
-              pageLength: PAGE_SIZE,
-              filters: widget.filters,
-            );
-            setState(() {});
-            return val;
+            // var val = _fetchList(
+            //   doctype: widget.doctype,
+            //   fieldnames: widget.fieldnames,
+            //   pageLength: PAGE_SIZE,
+            //   filters: widget.filters,
+            // );
+            // setState(() {});
+            // return val;
+            _pageLoadController.reset();
+            return Future.delayed(Duration(seconds: 1));
           },
           child: Container(
             color: Palette.bgColor,
@@ -213,29 +361,37 @@ class _CustomListViewState extends State<CustomListView> with ChangeNotifier {
               pageLoadController: _pageLoadController,
               itemBuilder: ((buildContext, entry, _) {
                 int subjectFieldIndex =
-                    entry[0].indexOf(widget.wireframe["subject_field"]);
+                    entry[0].indexOf(widget.meta["subject_field"]);
                 var key = entry[0];
                 var value = entry[1];
-                var assignee = value[6] != null ? json.decode(value[6]) : null;
+                var assignee = value[4] != null ? json.decode(value[4]) : null;
 
-                var likedBy = value[10] != null ? json.decode(value[10]) : [];
+                var likedBy = value[6] != null ? json.decode(value[6]) : [];
                 var isLikedByUser = likedBy.contains(user);
 
-                var seenBy = value[7] != null ? json.decode(value[7]) : [];
+                var seenBy = value[5] != null ? json.decode(value[5]) : [];
                 var isSeenByUser = seenBy.contains(user);
 
                 return ListItem(
                   doctype: widget.doctype,
                   onListTap: () {
-                    widget.detailCallback(
-                      value[0],
-                      value[subjectFieldIndex],
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return Router(
+                            viewType: ViewType.form,
+                            doctype: widget.doctype,
+                            name: value[0],
+                          );
+                        },
+                      ),
                     );
                   },
                   isFav: isLikedByUser,
                   seen: isSeenByUser,
                   assignee: assignee != null && assignee.length > 0
-                      ? [key[6], assignee[0]]
+                      ? [key[4], assignee[0]]
                       : null,
                   onButtonTap: (k, v) {
                     if (k == '_assign') {
@@ -244,16 +400,19 @@ class _CustomListViewState extends State<CustomListView> with ChangeNotifier {
                       widget.filters.add([widget.doctype, k, '=', v]);
                     }
                     localStorage.setString(
-                        'IssueFilter', json.encode(widget.filters));
+                        '${widget.doctype}Filter', json.encode(widget.filters));
+                    _pageLoadController.reset();
                     setState(() {});
                   },
                   title: value[subjectFieldIndex],
-                  modifiedOn: "${timeago.format(DateTime.parse(
-                    value[5],
-                  ))}",
+                  modifiedOn: "${timeago.format(
+                    DateTime.parse(
+                      value[3],
+                    ),
+                  )}",
                   name: value[0],
                   status: [key[1], value[1]],
-                  commentCount: value[11],
+                  commentCount: value[8],
                 );
               }),
             ),

@@ -12,14 +12,14 @@ class LinkField2 extends StatefulWidget {
   final String refDoctype;
   final String txt;
 
-  final Function callback;
+  final List<String Function(dynamic)> validators;
 
   LinkField2({
     this.txt,
+    this.validators,
     @required this.attribute,
     @required this.hint,
     @required this.value,
-    @required this.callback,
     @required this.doctype,
     @required this.refDoctype,
   });
@@ -45,42 +45,35 @@ class _LinkField2State extends State<LinkField2> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            widget.hint.toUpperCase(),
-            style: Palette.labelStyle,
-          ),
-          FormBuilderTypeAhead(
-            decoration: InputDecoration(
-                filled: true,
-                fillColor: Palette.fieldBgColor,
-                enabledBorder: InputBorder.none),
-            selectionToTextTransformer: (item) {
-              if (item is LinkFieldResponse) {
-                return item.value;
-              } else {
-                return item;
-              }
-            },
-            attribute: widget.attribute,
-            itemBuilder: (context, item) {
-              return ListTile(
-                title: Text(item.value),
-              );
-            },
-            onChanged: (item) {
-              widget.callback(item.value);
-            },
-            initialValue: widget.value,
-            suggestionsCallback: (query) {
-              var lowercaseQuery = query.toLowerCase();
-              return _fetchLinkField(
-                  widget.doctype, widget.refDoctype, lowercaseQuery);
-            },
-          )
-        ],
+      child: FormBuilderTypeAhead(
+        validators: widget.validators,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Palette.fieldBgColor,
+          enabledBorder: InputBorder.none,
+          hintText: widget.hint
+        ),
+        selectionToTextTransformer: (item) {
+          if (item is LinkFieldResponse) {
+            return item.value;
+          } else {
+            return item;
+          }
+        },
+        attribute: widget.attribute,
+        itemBuilder: (context, item) {
+          return ListTile(
+            title: Text(
+              item.value,
+            ),
+          );
+        },
+        initialValue: widget.value,
+        suggestionsCallback: (query) {
+          var lowercaseQuery = query.toLowerCase();
+          return _fetchLinkField(
+              widget.doctype, widget.refDoctype, lowercaseQuery);
+        },
       ),
     );
   }
