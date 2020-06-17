@@ -52,7 +52,7 @@ class _EmailFormState extends State<EmailForm> {
         "label": "BCC",
       },
       {
-        "hint": "Email Template",
+        "label": "Email Template",
         "fieldname": "email_template",
         "doctype": "Email Template",
         "fieldtype": "Link"
@@ -63,30 +63,30 @@ class _EmailFormState extends State<EmailForm> {
       {
         "fieldname": "subject",
         "fieldtype": "Small Text",
-        "hint": "Subject",
+        "label": "Subject",
       },
       {
         "fieldtype": "Text Editor",
         "fieldname": "content",
-        "hint": "Message",
+        "label": "Message",
       },
       {
         "fieldname": "send_me_a_copy",
         "fieldtype": "Check",
         "val": false,
-        "hint": "Send Me A Copy"
+        "label": "Send Me A Copy"
       },
       {
         "fieldname": "send_read_receipt",
         "fieldtype": "Check",
         "val": false,
-        "hint": "Send Read Receipt"
+        "label": "Send Read Receipt"
       },
       {
         "fieldname": "attach_document_print",
         "fieldtype": "Check",
         "val": false,
-        "hint": "Attach Document Print"
+        "label": "Attach Document Print"
       },
       // {"label":"Select Attachments",
       // "fieldtype":"HTML",

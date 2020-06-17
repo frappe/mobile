@@ -5,4 +5,6 @@ class Constants{
   static const List<String> choices = <String>[
     Logout
   ];
+
+  static int PAGE_SIZE = 10;
 }
