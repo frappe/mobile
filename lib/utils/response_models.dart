@@ -160,3 +160,35 @@ class Contact {
 
   Contact({this.description, this.value});
 }
+
+class DioGetSideBarItemsResponse {
+  var values;
+  var error;
+
+  DioGetSideBarItemsResponse(this.values, this.error);
+
+  DioGetSideBarItemsResponse.fromJson(json) {
+    values = json["message"];
+    error = '';
+  }
+
+  DioGetSideBarItemsResponse.withError(String errorValue)
+      : values = List(),
+        error = errorValue;
+}
+
+class DioDesktopPageResponse {
+  var values;
+  var error;
+
+  DioDesktopPageResponse(this.values, this.error);
+
+  DioDesktopPageResponse.fromJson(json) {
+    values = json["message"];
+    error = '';
+  }
+
+  DioDesktopPageResponse.withError(String errorValue)
+      : values = List(),
+        error = errorValue;
+}

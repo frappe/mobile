@@ -141,6 +141,8 @@ class _LoginState extends State<Login> {
                                 formValue["usr"].trimRight(), formValue["pwd"]);
 
                             if (response2.statusCode == 200) {
+                              var userId = response2.headers.map["set-cookie"][3].split(';')[0].split('=')[1];
+                              localStorage.setString('userId', userId);
                               localStorage.setString(
                                   'user', response2.data["full_name"]);
                               localStorage.setString(

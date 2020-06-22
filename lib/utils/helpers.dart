@@ -7,8 +7,8 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../config/palette.dart';
-import '../form/link_field2.dart';
-import '../form/multi_select2.dart';
+import '../form/controls/link_field.dart';
+import '../form/controls/multi_select.dart';
 import '../utils/enums.dart';
 import '../main.dart';
 import '../utils/response_models.dart';
@@ -101,7 +101,10 @@ Future<Map> processData(Map data, bool metaRequired,
 }
 
 Future<GetMetaResponse> processData2(
-    String doctype, ViewType viewType, context) async {
+  String doctype,
+  ViewType viewType,
+  context,
+) async {
   //TODO: check cache
 
   var meta = await getMeta(doctype, context);
@@ -148,7 +151,10 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
         ),
       );
     } else {
-      return fieldWidget;
+      return Padding(
+        padding: fieldPadding,
+        child: fieldWidget,
+      );
     }
   }
 
@@ -156,7 +162,7 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
     case "Link":
       {
         value = _buildDecoratedWidget(
-            LinkField2(
+            LinkField(
               validators: validators,
               attribute: widget["fieldname"],
               doctype: widget["options"],
@@ -204,23 +210,32 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
           val = [Contact(value: val)];
         }
 
-        value = MultiSelect2(
-          attribute: widget["fieldname"],
-          hint: widget["label"],
-          val: val != null ? val : [],
+        value = _buildDecoratedWidget(
+          MultiSelect(
+            attribute: widget["fieldname"],
+            hint: widget["label"],
+            val: val != null ? val : [],
+          ),
+          withLabel,
         );
       }
       break;
 
     case "Small Text":
       {
-        value = FormBuilderTextField(
-          initialValue: val,
-          attribute: widget["fieldname"],
-          decoration: InputDecoration(hintText: widget["hint"]),
-          validators: [
-            FormBuilderValidators.required(),
-          ],
+        value = _buildDecoratedWidget(
+          FormBuilderTextField(
+            initialValue: val,
+            attribute: widget["fieldname"],
+            decoration: Palette.formFieldDecoration(
+              withLabel,
+              widget["label"],
+            ),
+            validators: [
+              FormBuilderValidators.required(),
+            ],
+          ),
+          withLabel,
         );
       }
       break;
@@ -243,12 +258,18 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
 
     case "Check":
       {
-        value = FormBuilderCheckbox(
-          leadingInput: true,
-          attribute: widget["fieldname"],
-          label: Text(widget["label"]),
-          validators: validators,
-        );
+        value = _buildDecoratedWidget(
+            FormBuilderCheckbox(
+              leadingInput: true,
+              attribute: widget["fieldname"],
+              label: Text(widget["label"]),
+              decoration: Palette.formFieldDecoration(
+                withLabel,
+                widget["label"],
+              ),
+              validators: validators,
+            ),
+            withLabel);
       }
       break;
 
@@ -275,10 +296,10 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
         value = _buildDecoratedWidget(
             FormBuilderDateTimePicker(
               valueTransformer: (val) {
-                return val.toIso8601String();
+                return val != null ? val.toIso8601String() : null;
               },
               initialTime: null,
-              initialValue: val,
+              initialValue: parseDate(val),
               attribute: widget["fieldname"],
               decoration: Palette.formFieldDecoration(
                 withLabel,
@@ -312,7 +333,7 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
             FormBuilderDateTimePicker(
               inputType: InputType.time,
               valueTransformer: (val) {
-                return val.toIso8601String();
+                return val != null ? val.toIso8601String() : null;
               },
               keyboardType: TextInputType.number,
               attribute: widget["fieldname"],
@@ -332,9 +353,9 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
             FormBuilderDateTimePicker(
               inputType: InputType.date,
               valueTransformer: (val) {
-                return val.toIso8601String();
+                return val != null ? val.toIso8601String() : null;
               },
-              initialValue: val,
+              initialValue: parseDate(val),
               keyboardType: TextInputType.number,
               attribute: widget["fieldname"],
               decoration: Palette.formFieldDecoration(
@@ -361,7 +382,7 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
 //   final String downloadsPath = downloadsDirectory.path;
 
 //   await FlutterDownloader.enqueue(
-//     headers: await getCookiesWithHeader(),
+//     headers: {HttpHeaders.cookieHeader: await getCookies()},
 //     url: absoluteUrl,
 //     savedDir: downloadsPath,
 //     showNotification:
@@ -427,6 +448,7 @@ List<Widget> generateLayout({
   @required List fields,
   @required ViewType viewType,
   bool editMode,
+  bool withLabel = true,
 }) {
   List<Widget> collapsibles = [];
   List<Widget> widgets = [];
@@ -438,15 +460,8 @@ List<Widget> generateLayout({
   int idx = 0;
 
   fields.forEach((field) {
-    var val;
-    if (viewType == ViewType.form &&
-        ["Datetime", "Date"].contains(field["fieldtype"])) {
-      val = field["_current_val"] != null
-          ? DateTime.parse(field["_current_val"])
-          : null;
-    } else {
-      val = field["_current_val"] ?? field["default"];
-    }
+    var val = field["_current_val"] ?? field["default"];
+
     if (field["fieldtype"] == "Section Break") {
       if (field["collapsible"] == 1) {
         collapsibleLabels.add(field["label"]);
@@ -480,19 +495,20 @@ List<Widget> generateLayout({
         collapsible = false;
 
         widgets.add(Padding(
-          padding: const EdgeInsets.only(bottom: 12.0),
+          padding: const EdgeInsets.only(bottom: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Divider(
-                thickness: 1,
                 color: Palette.darkGrey,
               ),
-              Text(
-                field["label"].toUpperCase(),
-                style: Palette.dimTxtStyle,
-              ),
+              field["label"] != null
+                  ? Text(
+                      field["label"].toUpperCase(),
+                      style: Palette.dimTxtStyle,
+                    )
+                  : Container(),
             ],
           ),
         ));
@@ -501,7 +517,7 @@ List<Widget> generateLayout({
       if (viewType == ViewType.form) {
         collapsibles.add(Visibility(
           visible: editMode ? true : val != null && val != '',
-          child: generateChildWidget(field, val),
+          child: generateChildWidget(field, val, withLabel),
         ));
       } else {
         collapsibles.add(
@@ -512,15 +528,25 @@ List<Widget> generateLayout({
       if (viewType == ViewType.form) {
         widgets.add(Visibility(
           visible: editMode ? true : val != null && val != '',
-          child: generateChildWidget(field, val),
+          child: generateChildWidget(field, val, withLabel),
         ));
       } else {
         widgets.add(
-          generateChildWidget(field, val),
+          generateChildWidget(field, val, withLabel),
         );
       }
     }
   });
 
   return widgets;
+}
+
+DateTime parseDate(val) {
+  if (val == null) {
+    return null;
+  } else if (val == "Today") {
+    return DateTime.now();
+  } else {
+    return DateTime.parse(val);
+  }
 }

@@ -23,7 +23,9 @@ void initConfig() async {
 }
 
 void setBaseUrl(url) async {
-
+  if(!url.startsWith('https://')) {
+    url = "https://$url";
+  }
   baseUrl = url;
   BaseOptions options = new BaseOptions(baseUrl: "$url/api");
   dio = Dio(options);
@@ -46,16 +48,14 @@ Future getCookiePath() async {
   );
 }
 
-Future<Map<String, String>> getCookiesWithHeader() async {
+Future<String> getCookies() async {
   var cookieJar = await getCookiePath();
 
   var cookies = cookieJar.loadForRequest(uri);
 
   var cookie = CookieManager.getCookies(cookies);
 
-  return {
-    HttpHeaders.cookieHeader: cookie,
-  };
+  return cookie;
 }
 
 String getAbsoluteUrl(String url) {

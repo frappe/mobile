@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/utils/http.dart';
-import 'package:frappe_app/widgets/link_field.dart';
+import '../form/controls/link_field.dart';
 
 class AddAssignees extends StatefulWidget {
   final List assignments;
@@ -13,12 +14,11 @@ class AddAssignees extends StatefulWidget {
   final String name;
   final Function callback;
 
-  AddAssignees({
-    @required this.assignments,
-    @required this.doctype,
-    @required this.name,
-    @required this.callback
-  });
+  AddAssignees(
+      {@required this.assignments,
+      @required this.doctype,
+      @required this.name,
+      @required this.callback});
 
   @override
   _AddAssigneesState createState() => _AddAssigneesState();
@@ -96,17 +96,19 @@ class _AddAssigneesState extends State<AddAssignees> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Container(
-                    child: LinkField(
-                      doctype: 'User',
-                      refDoctype: 'Issue',
-                      hint: 'Assign To',
-                      showInputBorder: true,
-                      onSuggestionSelected: (item) {
-                        if (item != "") {
-                          newAssignees.add(item);
-                          setState(() {});
-                        }
-                      },
+                    child: FormBuilder(
+                      child: LinkField(
+                        doctype: 'User',
+                        refDoctype: 'Issue',
+                        hint: 'Assign To',
+                        showInputBorder: true,
+                        onSuggestionSelected: (item) {
+                          if (item != "") {
+                            newAssignees.add(item.value);
+                            setState(() {});
+                          }
+                        },
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -170,7 +172,8 @@ class _AddAssigneesState extends State<AddAssignees> {
                                             widget.name,
                                             d["owner"],
                                           );
-                                          showSnackBar('User Removed', builderContext);
+                                          showSnackBar(
+                                              'User Removed', builderContext);
                                           setState(() {
                                             widget.assignments.removeAt(i);
                                           });

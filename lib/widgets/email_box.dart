@@ -79,51 +79,63 @@ class ViewEmail extends StatelessWidget {
   final String author;
   final String content;
 
-  ViewEmail(
-      {@required this.title,
-      @required this.time,
-      @required this.author,
-      @required this.content});
+  ViewEmail({
+    @required this.title,
+    @required this.time,
+    @required this.author,
+    @required this.content,
+  });
 
   @override
   Widget build(BuildContext context) {
+    var document = parse(content);
+    var imgs = document.getElementsByTagName('img');
+
+    imgs.forEach((img) {
+      if(Uri.parse(img.attributes["src"]).hasAbsolutePath) {
+        img.attributes["src"] = "$baseUrl${img.attributes["src"]}";
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Card(
-            elevation: 4,
-            child: Container(
-              color: Palette.bgColor,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      title,
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Card(
+              elevation: 4,
+              child: Container(
+                color: Palette.bgColor,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        title,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
                     ),
-                  ),
-                  ListTile(
-                    leading: CircleAvatar(
-                      child: Text(author[0].toUpperCase()),
+                    ListTile(
+                      leading: CircleAvatar(
+                        child: Text(author[0].toUpperCase()),
+                      ),
+                      title: Text(author),
+                      subtitle: Text(time),
                     ),
-                    title: Text(author),
-                    subtitle: Text(time),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.all(8.0),
-            child: Html(data: content),
-          )
-        ],
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(8.0),
+              child: Html(data: document.outerHtml),
+            )
+          ],
+        ),
       ),
     );
   }

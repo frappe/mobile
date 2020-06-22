@@ -15,8 +15,6 @@ import '../utils/helpers.dart';
 import '../utils/http.dart';
 import '../utils/response_models.dart';
 
-import '../constants.dart';
-
 class CustomListView extends StatefulWidget {
   final String doctype;
   final List fieldnames;
@@ -43,7 +41,7 @@ class CustomListView extends StatefulWidget {
 class _CustomListViewState extends State<CustomListView> {
   Future<DioGetReportViewResponse> futureList;
   static const int PAGE_SIZE = 10;
-  final user = localStorage.getString('user');
+  final userId = Uri.decodeFull(localStorage.getString('userId'));
   bool showLiked = false;
   var _pageLoadController;
 
@@ -85,21 +83,6 @@ class _CustomListViewState extends State<CustomListView> {
   }
 
   List<Widget> _buildFilters(List filters) {
-    // var val = (widget.meta["fields"] as List).where((field) {
-    //   return field["in_standard_filter"] == 1 && field["fieldtype"] == "Link";
-    // }).map<Widget>((filter) {
-    //   return SizedBox(
-    //     width: 1000,
-    //     child: generateChildWidget(
-    //       filter,
-    //       null,
-    //       (v) {},
-    //       false,
-    //     ),
-    //   );
-    // }).toList();
-
-    // return val;
     var chips = filters.asMap().entries.map((entry) {
       var value = entry.value;
       var key = entry.key;
@@ -134,37 +117,11 @@ class _CustomListViewState extends State<CustomListView> {
     return chips;
   }
 
-  void choiceAction(String choice) {
-    if (choice == Constants.Logout) {
-      logout(context);
-    } else if (choice == 'showLiked') {
-      if (!showLiked) {
-        widget.filters.add([widget.doctype, '_liked_by', 'like', '%$user%']);
-      } else {
-        int likedByIdx;
-        for (int i = 0; i < widget.filters.length; i++) {
-          if (widget.filters[i][1] == '_liked_by') {
-            likedByIdx = i;
-            break;
-          }
-        }
-        if (likedByIdx > -1) {
-          widget.filters.removeAt(likedByIdx);
-        }
-      }
-      showLiked = !showLiked;
-
-      setState(() {});
-    }
-  }
-
   Widget _buildHeader() {
     return Container(
-      // height: 80,
       decoration: BoxDecoration(color: Palette.offWhite),
       padding: EdgeInsets.only(top: 70, left: 16),
       child: Row(
-        // crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           widget.filters.length > 0
               ? Expanded(
@@ -233,20 +190,6 @@ class _CustomListViewState extends State<CustomListView> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO
-    // final _pageLoadController = PagewiseLoadController(
-    //   pageSize: PAGE_SIZE,
-    //   pageFuture: (pageIndex) {
-    //     return _fetchList(
-    //       doctype: widget.doctype,
-    //       fieldnames: widget.fieldnames,
-    //       pageLength: PAGE_SIZE,
-    //       filters: widget.filters,
-    //       offset: pageIndex * PAGE_SIZE,
-    //     );
-    //   },
-    // );
-
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
@@ -290,7 +233,7 @@ class _CustomListViewState extends State<CustomListView> {
                   onPressed: () {
                     if (!showLiked) {
                       widget.filters.add(
-                          [widget.doctype, '_liked_by', 'like', '%$user%']);
+                          [widget.doctype, '_liked_by', 'like', '%$userId%']);
                     } else {
                       int likedByIdx;
                       for (int i = 0; i < widget.filters.length; i++) {
@@ -329,29 +272,12 @@ class _CustomListViewState extends State<CustomListView> {
                     );
                   },
                 ),
-                // PopupMenuButton<String>(
-                //     onSelected: choiceAction,
-                //     itemBuilder: (BuildContext context) => [
-                //           CheckedPopupMenuItem(
-                //             checked: showLiked,
-                //             value: 'showLiked',
-                //             child: Text("Show liked"),
-                //           )
-                //         ]),
               ],
             ),
           ];
         },
         body: RefreshIndicator(
           onRefresh: () {
-            // var val = _fetchList(
-            //   doctype: widget.doctype,
-            //   fieldnames: widget.fieldnames,
-            //   pageLength: PAGE_SIZE,
-            //   filters: widget.filters,
-            // );
-            // setState(() {});
-            // return val;
             _pageLoadController.reset();
             return Future.delayed(Duration(seconds: 1));
           },
@@ -367,10 +293,10 @@ class _CustomListViewState extends State<CustomListView> {
                 var assignee = value[4] != null ? json.decode(value[4]) : null;
 
                 var likedBy = value[6] != null ? json.decode(value[6]) : [];
-                var isLikedByUser = likedBy.contains(user);
+                var isLikedByUser = likedBy.contains(userId);
 
                 var seenBy = value[5] != null ? json.decode(value[5]) : [];
-                var isSeenByUser = seenBy.contains(user);
+                var isSeenByUser = seenBy.contains(userId);
 
                 return ListItem(
                   doctype: widget.doctype,

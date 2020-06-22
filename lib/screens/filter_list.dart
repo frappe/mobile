@@ -33,14 +33,6 @@ class _FilterListState extends State<FilterList> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.exit_to_app),
-              onPressed: () async {
-                logout(context);
-              },
-            )
-          ],
           title: Text(widget.appBarTitle),
         ),
         floatingActionButton: FloatingActionButton(
@@ -61,8 +53,9 @@ class _FilterListState extends State<FilterList> {
             });
 
             localStorage.setString(
-                '${widget.wireframe["name"]}Filter', json.encode(filters));
-            // widget.filterCallback(filters);
+              '${widget.wireframe["name"]}Filter',
+              json.encode(filters),
+            );
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -102,11 +95,7 @@ class _FilterListState extends State<FilterList> {
                 return Column(
                   children: <Widget>[
                     ListTile(
-                      title: generateChildWidget(field, val, (item) {
-                        setState(() {
-                          field["val"] = item;
-                        });
-                      }),
+                      title: generateChildWidget(field, val),
                     ),
                     Divider(
                       height: 10.0,
