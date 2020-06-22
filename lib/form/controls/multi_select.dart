@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/utils/response_models.dart';
 import 'package:frappe_app/utils/rest_apis.dart';
 
-class MultiSelect2 extends StatefulWidget {
+class MultiSelect extends StatefulWidget {
   final String hint;
   final String attribute;
   final List val;
 
-  MultiSelect2(
-      {@required this.attribute,
-      @required this.hint,
-      this.val});
+  MultiSelect({
+    @required this.attribute,
+    @required this.hint,
+    this.val,
+  });
   @override
-  _MultiSelect2State createState() => _MultiSelect2State();
+  _MultiSelectState createState() => _MultiSelectState();
 }
 
-class _MultiSelect2State extends State<MultiSelect2> {
+class _MultiSelectState extends State<MultiSelect> {
   Future _fetchValues(Map data) {
     return getContactList(data);
   }
@@ -32,7 +34,12 @@ class _MultiSelect2State extends State<MultiSelect2> {
             .toList()
             .join(',');
       },
-      decoration: InputDecoration(labelText: "Users"),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Palette.fieldBgColor,
+        enabledBorder: InputBorder.none,
+        hintText: widget.hint,
+      ),
       attribute: widget.attribute,
       initialValue: widget.val,
       findSuggestions: (String query) async {
@@ -51,7 +58,20 @@ class _MultiSelect2State extends State<MultiSelect2> {
       },
       chipBuilder: (context, state, profile) {
         return InputChip(
-          label: Text(profile.value),
+          label: Text(
+            profile.value,
+            style: TextStyle(fontSize: 12),
+          ),
+          deleteIconColor: Palette.darkGrey,
+          backgroundColor: Colors.transparent,
+          shape: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Palette.borderColor,
+            ),
+            borderRadius: BorderRadius.all(
+              Radius.circular(5),
+            ),
+          ),
           onDeleted: () => state.deleteChip(profile),
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         );

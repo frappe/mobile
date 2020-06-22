@@ -4,31 +4,37 @@ import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/utils/response_models.dart';
 import 'package:frappe_app/utils/rest_apis.dart';
 
-class LinkField2 extends StatefulWidget {
+class LinkField extends StatefulWidget {
   final String hint;
   final String value;
   final String attribute;
   final String doctype;
   final String refDoctype;
   final String txt;
+  final bool showInputBorder;
+  final Function onSuggestionSelected;
 
   final List<String Function(dynamic)> validators;
 
-  LinkField2({
+  LinkField({
+    this.onSuggestionSelected,
     this.txt,
     this.validators,
-    @required this.attribute,
+    this.showInputBorder = false,
+    this.attribute,
     @required this.hint,
-    @required this.value,
+    this.value,
     @required this.doctype,
     @required this.refDoctype,
   });
 
   @override
-  _LinkField2State createState() => _LinkField2State();
+  _LinkFieldState createState() => _LinkFieldState();
 }
 
-class _LinkField2State extends State<LinkField2> {
+class _LinkFieldState extends State<LinkField> {
+  final TextEditingController _typeAheadController = TextEditingController();
+
   Future<List> _fetchLinkField(doctype, refDoctype, txt) async {
     var queryParams = {
       'txt': txt,
@@ -46,12 +52,19 @@ class _LinkField2State extends State<LinkField2> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: FormBuilderTypeAhead(
+        controller: _typeAheadController,
+        onSuggestionSelected: (item) {
+          if (widget.onSuggestionSelected != null) {
+            _typeAheadController.clear();
+            widget.onSuggestionSelected(item);
+          }
+        },
         validators: widget.validators,
         decoration: InputDecoration(
           filled: true,
           fillColor: Palette.fieldBgColor,
-          enabledBorder: InputBorder.none,
-          hintText: widget.hint
+          enabledBorder: !widget.showInputBorder ? InputBorder.none : null,
+          hintText: widget.hint,
         ),
         selectionToTextTransformer: (item) {
           if (item is LinkFieldResponse) {

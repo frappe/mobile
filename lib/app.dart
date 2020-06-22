@@ -1,18 +1,18 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/utils/enums.dart';
-import 'package:frappe_app/utils/helpers.dart';
-import 'package:frappe_app/widgets/filter_list.dart';
-import 'package:frappe_app/widgets/form_view.dart';
-import 'package:frappe_app/widgets/list_view.dart';
-import 'package:frappe_app/widgets/new_form.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import './pages/login.dart';
-import './routes/issue.dart';
 import './main.dart';
+import './utils/enums.dart';
+import './utils/helpers.dart';
+
+import './screens/filter_list.dart';
+import './screens/form_view.dart';
+import './screens/list_view.dart';
+import './screens/new_form.dart';
+import './screens/login.dart';
+import './screens/module_view.dart';
 
 class FrappeApp extends StatefulWidget {
   @override
@@ -43,10 +43,14 @@ class _FrappeAppState extends State<FrappeApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Support App',
+      title: 'Frappe',
       theme: new ThemeData(
         // primaryColor: Color.fromRGBO(68, 65, 65, 1),
-        textTheme: GoogleFonts.interTextTheme(),
+        textTheme: GoogleFonts.interTextTheme(
+          Theme.of(context).textTheme.apply(
+              // fontSizeFactor: 0.8,
+              ),
+        ),
         disabledColor: Colors.black,
         primaryColor: Colors.white,
         accentColor: Colors.black54,
@@ -56,14 +60,15 @@ class _FrappeAppState extends State<FrappeApp> {
           FocusScope.of(context).requestFocus(new FocusNode());
         },
         child: Scaffold(
-            body: _isLoaded
-                ? _isLoggedIn ? ModuleView() : Login()
-                : Center(child: CircularProgressIndicator())),
-        // body: Login()),
+          body: _isLoaded
+              ? _isLoggedIn ? ModuleView() : Login()
+              : Center(
+                  child: CircularProgressIndicator(),
+                ),
+        ),
       ),
       routes: <String, WidgetBuilder>{
         // Set routes for using the Navigator.
-        '/issue': (BuildContext context) => IssueList(),
         '/login': (BuildContext context) => Login(),
         '/modules': (BuildContext context) => ModuleView(),
       },
@@ -130,25 +135,24 @@ class Router extends StatelessWidget {
               if (filters == null) {
                 // cached filters
                 if (localStorage.containsKey('${doctype}Filter')) {
-                  defaultFilters = json.decode(
-                      localStorage.getString('${doctype}Filter'));
-                } else if (localStorage.containsKey('user')) {
+                  defaultFilters =
+                      json.decode(localStorage.getString('${doctype}Filter'));
+                } else if (localStorage.containsKey('userId')) {
                   defaultFilters.add([
                     doctype,
                     "_assign",
                     "like",
-                    "%${localStorage.getString('user')}%"
+                    "%${Uri.decodeFull(localStorage.getString('userId'))}%"
                   ]);
                 }
               }
 
               return CustomListView(
-                filters: filters ?? defaultFilters,
-                meta: docMeta,
-                doctype: doctype,
-                appBarTitle: doctype,
-                fieldnames: doctypeFieldnames[doctype]
-              );
+                  filters: filters ?? defaultFilters,
+                  meta: docMeta,
+                  doctype: doctype,
+                  appBarTitle: doctype,
+                  fieldnames: doctypeFieldnames[doctype]);
             } else if (viewType == ViewType.form) {
               return FormView(
                 doctype: doctype,

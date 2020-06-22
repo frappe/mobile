@@ -7,6 +7,7 @@ import '../widgets/event.dart';
 class Timeline extends StatelessWidget {
   final List data;
   final Function callback;
+  static const iconSize = 16.0;
 
   Timeline(this.data, this.callback);
 
@@ -50,12 +51,14 @@ class Timeline extends StatelessWidget {
         indicator = Icon(
           Icons.email,
           color: Palette.dimTxtColor,
+          size: iconSize,
         );
       } else if (event["comment_type"] == "Comment") {
         eventType = EventType.comment;
         indicator = Icon(
           Icons.comment,
           color: Palette.dimTxtColor,
+          size: iconSize,
         );
       } else if (event["data"] != null ||
           event["comment_type"] == "Attachment") {
@@ -63,18 +66,21 @@ class Timeline extends StatelessWidget {
         indicator = Icon(
           Icons.edit,
           color: Palette.dimTxtColor,
+          size: iconSize,
         );
       } else if (event["comment_type"] == "Like") {
         eventType = EventType.docVersion;
         indicator = Icon(
           Icons.favorite,
           color: Colors.red,
+          size: iconSize,
         );
       } else {
         eventType = EventType.docVersion;
         indicator = Icon(
           Icons.edit,
           color: Palette.dimTxtColor,
+          size: iconSize,
         );
       }
       children.add(Event(eventType, event, callback));

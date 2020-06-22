@@ -3,19 +3,23 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/main.dart';
-import 'package:frappe_app/utils/enums.dart';
-import 'package:frappe_app/widgets/add_assignees.dart';
-import 'package:frappe_app/widgets/comment_input.dart';
-import 'package:frappe_app/widgets/like_doc.dart';
 
-import '../widgets/communication.dart';
+import '../main.dart';
+import '../config/palette.dart';
+
+import '../utils/enums.dart';
 import '../utils/helpers.dart';
 import '../utils/http.dart';
 import '../utils/response_models.dart';
-import '../widgets/email_form.dart';
-import '../widgets/view_attachments.dart';
+
+import '../widgets/like_doc.dart';
+import '../widgets/communication.dart';
+
+import '../screens/view_attachments.dart';
+import '../screens/email_form.dart';
+import '../screens/add_assignees.dart';
+import '../screens/comment_input.dart';
+
 
 class FormView extends StatefulWidget {
   final String doctype;
@@ -147,8 +151,7 @@ class _FormViewState extends State<FormView>
             "Datetime",
             "Float",
             "Time",
-            "Section Break",
-            "Text Editor"
+            "Section Break"
           ].contains(
             field["fieldtype"],
           );
@@ -264,6 +267,7 @@ class _FormViewState extends State<FormView>
                             (BuildContext context, bool innerBoxIsScrolled) {
                           return <Widget>[
                             SliverAppBar(
+                              elevation: 0,
                               flexibleSpace: FlexibleSpaceBar(
                                 background: Container(
                                   padding: EdgeInsets.only(
@@ -325,7 +329,6 @@ class _FormViewState extends State<FormView>
                                               );
                                             },
                                             child: Row(
-                                              // children: _generateAssignees([1,2,3]),
                                               children: _generateAssignees(
                                                   docInfo["assignments"]),
                                             ),

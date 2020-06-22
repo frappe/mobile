@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -76,7 +77,9 @@ class DocVersion extends StatelessWidget {
           if (await canLaunch(absoluteUrl)) {
             await launch(
               absoluteUrl,
-              headers: await getCookiesWithHeader(),
+              headers: {
+                HttpHeaders.cookieHeader: await getCookies()
+              },
             );
           } else {
             throw 'Could not launch $url';
