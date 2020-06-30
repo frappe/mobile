@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/widgets/timeline.dart';
 
 import '../main.dart';
 import '../config/palette.dart';
@@ -13,13 +14,10 @@ import '../utils/http.dart';
 import '../utils/response_models.dart';
 
 import '../widgets/like_doc.dart';
-import '../widgets/communication.dart';
 
-import '../screens/view_attachments.dart';
+import '../screens/view_docinfo.dart';
 import '../screens/email_form.dart';
-import '../screens/add_assignees.dart';
 import '../screens/comment_input.dart';
-
 
 class FormView extends StatefulWidget {
   final String doctype;
@@ -151,7 +149,8 @@ class _FormViewState extends State<FormView>
             "Datetime",
             "Float",
             "Time",
-            "Section Break"
+            "Section Break",
+            "Text Editor"
           ].contains(
             field["fieldtype"],
           );
@@ -175,7 +174,6 @@ class _FormViewState extends State<FormView>
         future: futureIssueDetail,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            // processData(widget.wireframe);
             var docs = snapshot.data.values.docs;
             var docInfo = snapshot.data.values.docInfo;
             var builderContext;
@@ -275,67 +273,86 @@ class _FormViewState extends State<FormView>
                                     right: 20,
                                     left: 20,
                                   ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Flexible(
-                                        child: Text(
-                                          docs[0][widget
-                                              .wireframe["subject_field"]],
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 2,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18,
+                                  child: GestureDetector(
+                                    behavior: HitTestBehavior.translucent,
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) {
+                                            return ViewDocInfo(
+                                              docInfo: docInfo,
+                                              doctype: widget.doctype,
+                                              name: widget.name,
+                                              callback: _refresh,
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    },
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        Flexible(
+                                          child: Text(
+                                            docs[0][widget
+                                                .wireframe["subject_field"]],
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height: 15,
-                                      ),
-                                      Row(
-                                        children: <Widget>[
-                                          Container(
-                                            padding: EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              color: Palette.lightGreen,
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                            ),
-                                            child: Text(
-                                              docs[0]['status'],
-                                              style: TextStyle(
-                                                color: Palette.darkGreen,
+                                        SizedBox(
+                                          height: 15,
+                                        ),
+                                        Row(
+                                          children: <Widget>[
+                                            Container(
+                                              padding: EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                color: Palette.lightGreen,
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                              child: Text(
+                                                docs[0]['status'],
+                                                style: TextStyle(
+                                                  color: Palette.darkGreen,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          Spacer(),
-                                          InkWell(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) {
-                                                    return AddAssignees(
-                                                        callback: _refresh,
-                                                        assignments: docInfo[
-                                                            "assignments"],
+                                            Spacer(),
+                                            InkWell(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) {
+                                                      return ViewDocInfo(
+                                                        docInfo: docInfo,
+                                                        pageIndex: 1,
                                                         doctype: widget.doctype,
-                                                        name: widget.name);
-                                                  },
-                                                ),
-                                              );
-                                            },
-                                            child: Row(
-                                              children: _generateAssignees(
-                                                  docInfo["assignments"]),
-                                            ),
-                                          )
-                                        ],
-                                      )
-                                    ],
+                                                        name: widget.name,
+                                                        callback: _refresh,
+                                                      );
+                                                    },
+                                                  ),
+                                                );
+                                              },
+                                              child: Row(
+                                                children: _generateAssignees(
+                                                    docInfo["assignments"]),
+                                              ),
+                                            )
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -387,7 +404,7 @@ class _FormViewState extends State<FormView>
                                   ),
                                 )
                               ],
-                              expandedHeight: 200.0,
+                              expandedHeight: 180.0,
                               floating: true,
                               pinned: true,
                             ),
@@ -424,30 +441,28 @@ class _FormViewState extends State<FormView>
                                   child: Flexible(
                                     child: Container(
                                       color: Colors.white,
-                                      padding: EdgeInsets.all(10),
-                                      child: ListView(
-                                        padding: EdgeInsets.all(10),
-                                        children: _generateChildren(
-                                          widget.wireframe["fields"],
-                                          docs[0],
-                                          editMode,
+                                      padding: EdgeInsets.all(20),
+                                      child: SingleChildScrollView(
+                                        child: Column(
+                                          children: _generateChildren(
+                                            widget.wireframe["fields"],
+                                            docs[0],
+                                            editMode,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 )
                               ]),
-                          Communication(
-                            docInfo: [
-                              ...docInfo['comments'],
-                              ...docInfo["communications"],
-                              ...docInfo["versions"],
-                              // ...docInfo["views"],TODO
-                            ],
-                            callback: () {
-                              _refresh();
-                            },
-                          ),
+                          Timeline([
+                            ...docInfo['comments'],
+                            ...docInfo["communications"],
+                            ...docInfo["versions"],
+                            // ...docInfo["views"],TODO
+                          ], () {
+                            _refresh();
+                          }),
                         ]),
                       ),
                     );

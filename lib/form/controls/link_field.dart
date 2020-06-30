@@ -12,11 +12,17 @@ class LinkField extends StatefulWidget {
   final String refDoctype;
   final String txt;
   final bool showInputBorder;
+  final bool allowClear;
   final Function onSuggestionSelected;
+  final Icon prefixIcon;
+  final Color fillColor;
 
   final List<String Function(dynamic)> validators;
 
   LinkField({
+    this.prefixIcon,
+    this.fillColor = Palette.fieldBgColor,
+    this.allowClear = true,
     this.onSuggestionSelected,
     this.txt,
     this.validators,
@@ -59,10 +65,22 @@ class _LinkFieldState extends State<LinkField> {
             widget.onSuggestionSelected(item);
           }
         },
+        onChanged: (_) {
+          setState(() {
+            
+          });
+        },
         validators: widget.validators,
         decoration: InputDecoration(
           filled: true,
-          fillColor: Palette.fieldBgColor,
+          prefixIcon: widget.prefixIcon,
+          suffixIcon: widget.allowClear ? _typeAheadController.text != '' ? IconButton(
+            icon: Icon(Icons.close, color: Colors.black),
+            onPressed: () {
+              _typeAheadController.clear();
+            },
+          ) : null : null,
+          fillColor: widget.fillColor,
           enabledBorder: !widget.showInputBorder ? InputBorder.none : null,
           hintText: widget.hint,
         ),

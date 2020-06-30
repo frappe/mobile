@@ -4,11 +4,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/style.dart';
-import 'package:frappe_app/utils/helpers.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../config/palette.dart';
+import '../utils/helpers.dart';
 import '../utils/http.dart';
 
 class DocVersion extends StatelessWidget {
@@ -25,26 +25,31 @@ class DocVersion extends StatelessWidget {
       final decoded = json.decode(data["data"]);
       var changed = decoded["changed"];
       var author = data["owner"];
+      var createdBy = decoded["created_by"];
 
-      txt = "<div><b>$author</b> changed value of ";
+      if (changed != null) {
+        txt = "<div><b>$author</b> changed value of ";
 
-      changed.forEach((c) {
-        var fromVal;
-        var toVal;
-        if (c[1] == null || c[1] == "") {
-          fromVal = '""';
-        } else {
-          fromVal = c[1];
-        }
+        changed.forEach((c) {
+          var fromVal;
+          var toVal;
+          if (c[1] == null || c[1] == "") {
+            fromVal = '""';
+          } else {
+            fromVal = c[1];
+          }
 
-        if (c[2] == null || c[2] == "") {
-          toVal = '""';
-        } else {
-          toVal = c[2];
-        }
+          if (c[2] == null || c[2] == "") {
+            toVal = '""';
+          } else {
+            toVal = c[2];
+          }
 
-        txt += "${toTitleCase(c[0])} from <b>$fromVal</b> to <b>$toVal</b> ";
-      });
+          txt += "${toTitleCase(c[0])} from <b>$fromVal</b> to <b>$toVal</b> ";
+        });
+      } else if (createdBy != null) {
+        txt = "<div><b>$createdBy</b> created";
+      }
     } else if (data["comment_type"] == "Attachment") {
       txt = "<div><b>${data["owner"]}</b> ${data["content"]}";
     } else if (data["comment_type"] == "Like") {
@@ -63,9 +68,7 @@ class DocVersion extends StatelessWidget {
           "div": Style(
             fontSize: FontSize(12),
           ),
-          "span": Style(
-            color: Palette.dimTxtColor
-          )
+          "span": Style(color: Palette.dimTxtColor)
         },
         onImageError: (a, b) {
           // TODO
@@ -77,9 +80,7 @@ class DocVersion extends StatelessWidget {
           if (await canLaunch(absoluteUrl)) {
             await launch(
               absoluteUrl,
-              headers: {
-                HttpHeaders.cookieHeader: await getCookies()
-              },
+              headers: {HttpHeaders.cookieHeader: await getCookies()},
             );
           } else {
             throw 'Could not launch $url';

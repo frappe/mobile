@@ -101,10 +101,14 @@ class _NewFormState extends State<NewForm> {
         child: Container(
           color: Colors.white,
           padding: EdgeInsets.all(10),
-          child: ListView(
-            padding: EdgeInsets.all(10),
-            children: _generateChildren(
-              widget.meta["fields"],
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                children: _generateChildren(
+                  widget.meta["fields"],
+                ),
+              ),
             ),
           ),
         ),

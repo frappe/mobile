@@ -15,3 +15,8 @@ enum ViewType {
   form,
   newForm
 }
+
+enum ButtonType {
+  primary,
+  secondary
+}

@@ -72,13 +72,12 @@ class _CommentBoxState extends State<CommentBox> {
     var time = timeago.format(DateTime.parse(widget.data["creation"]));
 
     return Card(
+      elevation: 0,
       child: Column(
         children: [
           ListTile(
             title: Text('${widget.data["owner"]}'),
-            subtitle: Container(
-              child: Text(time),
-            ),
+            subtitle: Text(time),
             trailing: localStorage.getString('user') == widget.data["owner"]
                 ? PopupMenuButton(
                     onSelected: _choiceAction,
@@ -93,12 +92,10 @@ class _CommentBoxState extends State<CommentBox> {
                   )
                 : null,
           ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Html(
-                data: widget.data["content"],
-              ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Html(
+              data: widget.data["content"],
             ),
           ),
         ],
