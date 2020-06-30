@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:frappe_app/widgets/card_list_tile.dart';
 
 import '../config/palette.dart';
 import '../utils/helpers.dart';
@@ -48,22 +49,27 @@ class ModuleView extends StatelessWidget {
           var modulesWidget = modules.where((m) {
             return _supportedModules.contains(m["name"]);
           }).map<Widget>((m) {
-            return ListTile(
-              title: Text(m["label"]),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return DoctypeView(m["name"]);
-                    },
-                  ),
-                );
-              },
+            return Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 8.0),
+              child: CardListTile(
+                title: Text(m["label"]),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return DoctypeView(m["name"]);
+                      },
+                    ),
+                  );
+                },
+              ),
             );
           }).toList();
           return Scaffold(
+            backgroundColor: Palette.bgColor,
             appBar: AppBar(
+              elevation: 0,
               leading: PopupMenuButton<String>(
                 onSelected: (choice) => _choiceAction(choice, context),
                 icon: CircleAvatar(

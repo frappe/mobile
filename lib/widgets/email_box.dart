@@ -20,8 +20,9 @@ class EmailBox extends StatelessWidget {
     String parsedContent = parse(document.body.text).documentElement.text;
 
     return Card(
+      elevation: 0,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: ListTile(
           onTap: () {
             Navigator.push(
@@ -40,7 +41,7 @@ class EmailBox extends StatelessWidget {
           },
           subtitle:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Padding(
+            Container(
               padding: const EdgeInsets.only(bottom: 8.0, top: 4.0),
               child: Text(
                 data["subject"],

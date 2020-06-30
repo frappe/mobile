@@ -1,9 +1,10 @@
 import 'dart:io';
 
-// import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../config/palette.dart';
@@ -21,8 +22,6 @@ logout(context) async {
   cookieJar.delete(uri);
 
   localStorage.setBool('isLoggedIn', false);
-
-  // Navigator.of(context).pushReplacementNamed('/login');
 
   Navigator.pushAndRemoveUntil(
       context,
@@ -58,49 +57,7 @@ getMeta(doctype, context) async {
   }
 }
 
-Future<Map> processData(Map data, bool metaRequired,
-    {ViewType viewType, context}) async {
-  // layout
-  data["fieldnames"] = [];
-  if (!metaRequired) {
-    data["fields"].forEach((field) {
-      if (field["in_list_view"] != null) {
-        data["fieldnames"]
-            .add("`tab${data["doctype"]}`.`${field["fieldname"]}`");
-      }
-    });
-    data["fieldnames"].add("`tab${data["doctype"]}`.`${"modified"}`");
-  } else {
-    var meta = await getMeta(data["doctype"], context);
-
-    List metaFields = meta.values.docs[0]["fields"];
-
-    data["fields"].forEach((field) {
-      if (field["fieldtype"] == "Select") {
-        var fi = metaFields.firstWhere(
-            (metaField) =>
-                metaField["fieldtype"] == 'Select' &&
-                metaField["fieldname"] == field["fieldname"] &&
-                metaField["is_custom_field"] == field["is_custom_field"],
-            orElse: () => null);
-
-        if (fi != null) {
-          field["options"] = fi["options"].split('\n');
-        } else {
-          field["skip_field"] = true;
-        }
-
-        if (viewType == ViewType.filter) {
-          field["options"].insert(0, null);
-        }
-      }
-    });
-  }
-
-  return data;
-}
-
-Future<GetMetaResponse> processData2(
+Future<GetMetaResponse> processData(
   String doctype,
   ViewType viewType,
   context,
@@ -114,24 +71,20 @@ Future<GetMetaResponse> processData2(
   metaFields.forEach((field) {
     if (field["fieldtype"] == "Select") {
       field["options"] = field["options"].split('\n');
-
-      if (viewType == ViewType.filter) {
-        field["options"].insert(0, null);
-      }
     }
   });
 
   return meta.values;
 }
 
-Widget generateChildWidget(Map widget, [val, withLabel = true]) {
-  // rename makeControl
+Widget makeControl(Map field,
+    [val, bool withLabel = true, bool editMode = true]) {
   Widget value;
   const fieldPadding = const EdgeInsets.only(bottom: 24.0);
   const labelPadding = const EdgeInsets.only(bottom: 6.0);
   List<String Function(dynamic)> validators = [];
 
-  if (widget["reqd"] == 1) {
+  if (field["reqd"] == 1) {
     validators.add(FormBuilderValidators.required());
   }
 
@@ -144,7 +97,7 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
           children: <Widget>[
             Padding(
               padding: labelPadding,
-              child: Text(widget["label"], style: Palette.labelStyle),
+              child: Text(field["label"], style: Palette.labelStyle),
             ),
             fieldWidget
           ],
@@ -158,16 +111,17 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
     }
   }
 
-  switch (widget["fieldtype"]) {
+  switch (field["fieldtype"]) {
     case "Link":
       {
         value = _buildDecoratedWidget(
             LinkField(
+              allowClear: editMode,
               validators: validators,
-              attribute: widget["fieldname"],
-              doctype: widget["options"],
-              hint: !withLabel ? widget["label"] : null,
-              refDoctype: widget["refDoctype"],
+              attribute: field["fieldname"],
+              doctype: field["options"],
+              hint: !withLabel ? field["label"] : null,
+              refDoctype: field["refDoctype"],
               value: val,
             ),
             withLabel);
@@ -179,14 +133,15 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
         value = _buildDecoratedWidget(
             FormBuilderDropdown(
               initialValue: val,
-              attribute: widget["fieldname"],
-              hint: !withLabel ? Text(widget["label"]) : null,
+              allowClear: editMode,
+              attribute: field["fieldname"],
+              hint: !withLabel ? Text(field["label"]) : null,
               decoration: Palette.formFieldDecoration(
                 withLabel,
-                widget["label"],
+                field["label"],
               ),
               validators: validators,
-              items: widget["options"].map<DropdownMenuItem>((option) {
+              items: field["options"].map<DropdownMenuItem>((option) {
                 return DropdownMenuItem(
                   value: option,
                   child: option != null
@@ -212,8 +167,8 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
 
         value = _buildDecoratedWidget(
           MultiSelect(
-            attribute: widget["fieldname"],
-            hint: widget["label"],
+            attribute: field["fieldname"],
+            hint: field["label"],
             val: val != null ? val : [],
           ),
           withLabel,
@@ -226,10 +181,10 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
         value = _buildDecoratedWidget(
           FormBuilderTextField(
             initialValue: val,
-            attribute: widget["fieldname"],
+            attribute: field["fieldname"],
             decoration: Palette.formFieldDecoration(
               withLabel,
-              widget["label"],
+              field["label"],
             ),
             validators: [
               FormBuilderValidators.required(),
@@ -245,10 +200,10 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
         value = _buildDecoratedWidget(
             FormBuilderTextField(
               initialValue: val,
-              attribute: widget["fieldname"],
+              attribute: field["fieldname"],
               decoration: Palette.formFieldDecoration(
                 withLabel,
-                widget["label"],
+                field["label"],
               ),
               validators: validators,
             ),
@@ -261,11 +216,11 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
         value = _buildDecoratedWidget(
             FormBuilderCheckbox(
               leadingInput: true,
-              attribute: widget["fieldname"],
-              label: Text(widget["label"]),
+              attribute: field["fieldname"],
+              label: Text(field["label"]),
               decoration: Palette.formFieldDecoration(
                 withLabel,
-                widget["label"],
+                field["label"],
               ),
               validators: validators,
             ),
@@ -278,10 +233,11 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
         value = _buildDecoratedWidget(
             FormBuilderTextField(
               maxLines: 10,
-              attribute: widget["fieldname"],
+              initialValue: val,
+              attribute: field["fieldname"],
               decoration: Palette.formFieldDecoration(
                 withLabel,
-                widget["label"],
+                field["label"],
               ),
               validators: [
                 FormBuilderValidators.required(),
@@ -298,12 +254,13 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
               valueTransformer: (val) {
                 return val != null ? val.toIso8601String() : null;
               },
+              resetIcon: editMode ? Icon(Icons.close) : null,
               initialTime: null,
               initialValue: parseDate(val),
-              attribute: widget["fieldname"],
+              attribute: field["fieldname"],
               decoration: Palette.formFieldDecoration(
                 withLabel,
-                widget["label"],
+                field["label"],
               ),
               validators: validators,
             ),
@@ -316,10 +273,10 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
         value = _buildDecoratedWidget(
             FormBuilderTextField(
               keyboardType: TextInputType.number,
-              attribute: widget["fieldname"],
+              attribute: field["fieldname"],
               decoration: Palette.formFieldDecoration(
                 withLabel,
-                widget["label"],
+                field["label"],
               ),
               validators: validators,
             ),
@@ -336,10 +293,10 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
                 return val != null ? val.toIso8601String() : null;
               },
               keyboardType: TextInputType.number,
-              attribute: widget["fieldname"],
+              attribute: field["fieldname"],
               decoration: Palette.formFieldDecoration(
                 withLabel,
-                widget["label"],
+                field["label"],
               ),
               validators: validators,
             ),
@@ -357,10 +314,10 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
               },
               initialValue: parseDate(val),
               keyboardType: TextInputType.number,
-              attribute: widget["fieldname"],
+              attribute: field["fieldname"],
               decoration: Palette.formFieldDecoration(
                 withLabel,
-                widget["label"],
+                field["label"],
               ),
               validators: validators,
             ),
@@ -371,26 +328,32 @@ Widget generateChildWidget(Map widget, [val, withLabel = true]) {
   return value;
 }
 
-// downloadFile(String fileUrl) async {
-//   await _checkPermission();
+downloadFile(String fileUrl) async {
+  await _checkPermission();
 
-//   final absoluteUrl = getAbsoluteUrl(fileUrl);
+  final absoluteUrl = getAbsoluteUrl(fileUrl);
+  var downloadsPath;
 
-//   // TODO
-//   final Directory downloadsDirectory =
-//       await DownloadsPathProvider.downloadsDirectory;
-//   final String downloadsPath = downloadsDirectory.path;
+  // TODO
+  if (Platform.isAndroid) {
+    downloadsPath = '/storage/emulated/0/Download/';
+  } else if (Platform.isIOS) {
+    final Directory downloadsDirectory = await getApplicationDocumentsDirectory();
+    downloadsPath = downloadsDirectory.path;
+  }
 
-//   await FlutterDownloader.enqueue(
-//     headers: {HttpHeaders.cookieHeader: await getCookies()},
-//     url: absoluteUrl,
-//     savedDir: downloadsPath,
-//     showNotification:
-//         true, // show download progress in status bar (for Android)
-//     openFileFromNotification:
-//         true, // click on notification to open downloaded file (for Android)
-//   );
-// }
+  await FlutterDownloader.enqueue(
+    headers: {
+      HttpHeaders.cookieHeader: await getCookies(),
+    },
+    url: absoluteUrl,
+    savedDir: downloadsPath,
+    showNotification:
+        true, // show download progress in status bar (for Android)
+    openFileFromNotification:
+        true, // click on notification to open downloaded file (for Android)
+  );
+}
 
 Future<bool> _checkPermission() async {
   if (Platform.isAndroid) {
@@ -447,7 +410,7 @@ void showSnackBar(String txt, context) {
 List<Widget> generateLayout({
   @required List fields,
   @required ViewType viewType,
-  bool editMode,
+  bool editMode = true,
   bool withLabel = true,
 }) {
   List<Widget> collapsibles = [];
@@ -517,22 +480,22 @@ List<Widget> generateLayout({
       if (viewType == ViewType.form) {
         collapsibles.add(Visibility(
           visible: editMode ? true : val != null && val != '',
-          child: generateChildWidget(field, val, withLabel),
+          child: makeControl(field, val, withLabel, editMode),
         ));
       } else {
         collapsibles.add(
-          generateChildWidget(field, val),
+          makeControl(field, val, withLabel, editMode),
         );
       }
     } else {
       if (viewType == ViewType.form) {
         widgets.add(Visibility(
           visible: editMode ? true : val != null && val != '',
-          child: generateChildWidget(field, val, withLabel),
+          child: makeControl(field, val, withLabel, editMode),
         ));
       } else {
         widgets.add(
-          generateChildWidget(field, val, withLabel),
+          makeControl(field, val, withLabel, editMode),
         );
       }
     }

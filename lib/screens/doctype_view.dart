@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/widgets/card_list_tile.dart';
 
 import '../utils/helpers.dart';
 import '../utils/enums.dart';
@@ -46,25 +48,31 @@ class DoctypeView extends StatelessWidget {
           var modulesWidget = doctypes.where((m) {
             return _supportedDoctypes.contains(m["name"]);
           }).map<Widget>((m) {
-            return ListTile(
-              title: Text(m["label"]),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return Router(
-                        doctype: m["name"],
-                        viewType: ViewType.list,
-                      );
-                    },
-                  ),
-                );
-              },
+            return Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 8.0),
+              child: CardListTile(
+                title: Text(m["label"]),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return Router(
+                          doctype: m["name"],
+                          viewType: ViewType.list,
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
             );
           }).toList();
           return Scaffold(
-            appBar: AppBar(),
+            backgroundColor: Palette.bgColor,
+            appBar: AppBar(
+              elevation: 0,
+            ),
             body: ListView(
               children: modulesWidget,
             ),

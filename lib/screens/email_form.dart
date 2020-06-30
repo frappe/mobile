@@ -122,7 +122,8 @@ class _EmailFormState extends State<EmailForm> {
       'subject': subject,
       'content': content,
       'doctype': doctype,
-      'name': doctypeName
+      'name': doctypeName,
+      'send_email': 1
     };
 
     final response2 = await dio.post(

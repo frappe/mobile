@@ -45,10 +45,9 @@ class _FrappeAppState extends State<FrappeApp> {
       debugShowCheckedModeBanner: false,
       title: 'Frappe',
       theme: new ThemeData(
-        // primaryColor: Color.fromRGBO(68, 65, 65, 1),
         textTheme: GoogleFonts.interTextTheme(
           Theme.of(context).textTheme.apply(
-              // fontSizeFactor: 0.8,
+              // fontSizeFactor: 0.7,
               ),
         ),
         disabledColor: Colors.black,
@@ -113,7 +112,7 @@ class Router extends StatelessWidget {
   });
 
   Future _fetchMeta(String doctype, context) async {
-    return processData2(doctype, viewType, context);
+    return processData(doctype, viewType, context);
   }
 
   @override

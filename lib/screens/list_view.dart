@@ -1,19 +1,20 @@
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
-import 'package:frappe_app/app.dart';
-import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/main.dart';
-import 'package:frappe_app/utils/enums.dart';
-import 'package:frappe_app/widgets/list_item.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../main.dart';
+import '../app.dart';
+import '../config/palette.dart';
+import '../utils/enums.dart';
 import '../utils/helpers.dart';
 import '../utils/http.dart';
 import '../utils/response_models.dart';
+import '../widgets/button.dart';
+import '../widgets/list_item.dart';
 
 class CustomListView extends StatefulWidget {
   final String doctype;
@@ -119,7 +120,6 @@ class _CustomListViewState extends State<CustomListView> {
 
   Widget _buildHeader() {
     return Container(
-      decoration: BoxDecoration(color: Palette.offWhite),
       padding: EdgeInsets.only(top: 70, left: 16),
       child: Row(
         children: <Widget>[
@@ -137,9 +137,9 @@ class _CustomListViewState extends State<CustomListView> {
                               bottom: 12,
                               top: 12,
                             ),
-                            child: FlatButton(
-                              color: Palette.bgColor,
-                              child: Text('Clear Filters'),
+                            child: Button(
+                              buttonType: ButtonType.secondary,
+                              title: 'Clear Filters',
                               onPressed: () {
                                 setState(() {
                                   _pageLoadController.reset();
