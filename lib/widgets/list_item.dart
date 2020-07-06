@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/utils/helpers.dart';
 
 import 'like_doc.dart';
 
@@ -41,13 +42,16 @@ class ListItem extends StatelessWidget {
         width: 60,
         padding: EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: Palette.lightGreen,
+          color: setStatusColor(doctype, l[1])['bgColor'],
           borderRadius: BorderRadius.circular(5),
         ),
         child: Center(
           child: Text(
             l[1] ?? "",
-            style: TextStyle(color: Palette.darkGreen, fontSize: 12),
+            style: TextStyle(
+              color: setStatusColor(doctype, l[1])['txtColor'],
+              fontSize: 12,
+            ),
           ),
         ),
       ),

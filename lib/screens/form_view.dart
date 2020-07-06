@@ -38,7 +38,6 @@ class _FormViewState extends State<FormView>
     with SingleTickerProviderStateMixin {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   Future<DioGetDocResponse> futureIssueDetail;
-  bool formChanged = true;
   bool editMode = false;
   final user = localStorage.getString('user');
 
@@ -96,7 +95,6 @@ class _FormViewState extends State<FormView>
   void _refresh() {
     setState(() {
       futureIssueDetail = _fetchDoc(widget.doctype, widget.name);
-      formChanged = false;
       editMode = false;
     });
   }
@@ -312,20 +310,7 @@ class _FormViewState extends State<FormView>
                                         ),
                                         Row(
                                           children: <Widget>[
-                                            Container(
-                                              padding: EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                color: Palette.lightGreen,
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
-                                              ),
-                                              child: Text(
-                                                docs[0]['status'],
-                                                style: TextStyle(
-                                                  color: Palette.darkGreen,
-                                                ),
-                                              ),
-                                            ),
+                                            buildStatusButton(widget.doctype, docs[0]['status']),
                                             Spacer(),
                                             InkWell(
                                               onTap: () {
@@ -362,46 +347,39 @@ class _FormViewState extends State<FormView>
                                   name: widget.name,
                                   isFav: isLikedByUser,
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: IconButton(
-                                    iconSize: 18,
-                                    icon:
-                                        editMode ? Text('Save') : Text('Edit'),
-                                    onPressed: editMode
-                                        ? formChanged
-                                            ? () async {
-                                                if (_fbKey.currentState
-                                                    .saveAndValidate()) {
-                                                  var formValue =
-                                                      _fbKey.currentState.value;
-                                                  await _updateDoc(
-                                                    widget.name,
-                                                    formValue,
-                                                    widget.doctype,
-                                                  );
-                                                  showSnackBar(
-                                                    'Changes Saved',
-                                                    builderContext,
-                                                  );
-                                                  _refresh();
-                                                }
-                                              }
-                                            : () {
-                                                showSnackBar(
-                                                  'No Changes',
-                                                  builderContext,
-                                                );
-                                                setState(() {
-                                                  editMode = false;
-                                                });
-                                              }
-                                        : () {
-                                            setState(() {
-                                              editMode = true;
-                                            });
-                                          },
+                                if (editMode)
+                                  FlatButton(
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      _fbKey.currentState.reset();
+                                      _refresh();
+                                    },
                                   ),
+                                FlatButton(
+                                  child: editMode ? Text('Save') : Text('Edit'),
+                                  onPressed: editMode
+                                      ? () async {
+                                          if (_fbKey.currentState
+                                              .saveAndValidate()) {
+                                            var formValue =
+                                                _fbKey.currentState.value;
+                                            await _updateDoc(
+                                              widget.name,
+                                              formValue,
+                                              widget.doctype,
+                                            );
+                                            showSnackBar(
+                                              'Changes Saved',
+                                              builderContext,
+                                            );
+                                            _refresh();
+                                          }
+                                        }
+                                      : () {
+                                          setState(() {
+                                            editMode = true;
+                                          });
+                                        },
                                 )
                               ],
                               expandedHeight: 180.0,

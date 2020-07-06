@@ -38,35 +38,44 @@ class Button extends StatelessWidget {
     }
 
     if (icon != null) {
-      return FlatButton.icon(
-        label: Text(title, style: _textStyle,),
-        icon: Icon(icon),
-        onPressed: onPressed,
-        shape: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.transparent,
+      return ButtonTheme(
+        height: 32,
+        child: FlatButton.icon(
+          label: Text(
+            title,
+            style: _textStyle,
           ),
-          borderRadius: BorderRadius.all(
-            Radius.circular(6),
+          icon: Icon(icon),
+          onPressed: onPressed,
+          shape: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.transparent,
+            ),
+            borderRadius: BorderRadius.all(
+              Radius.circular(6),
+            ),
           ),
+          color: _buttonColor,
+          disabledColor: _buttonColor,
         ),
-        color: _buttonColor,
-        disabledColor: _buttonColor,
       );
     } else {
-      return FlatButton(
-        onPressed: onPressed,
-        shape: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.transparent,
+      return ButtonTheme(
+        height: 32,
+        child: FlatButton(
+          onPressed: onPressed,
+          shape: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.transparent,
+            ),
+            borderRadius: BorderRadius.all(
+              Radius.circular(6),
+            ),
           ),
-          borderRadius: BorderRadius.all(
-            Radius.circular(6),
-          ),
+          color: _buttonColor,
+          disabledColor: _buttonColor,
+          child: Text(title, style: _textStyle),
         ),
-        color: _buttonColor,
-        disabledColor: _buttonColor,
-        child: Text(title, style: _textStyle),
       );
     }
   }

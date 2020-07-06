@@ -15,6 +15,7 @@ import '../main.dart';
 import '../utils/response_models.dart';
 import '../app.dart';
 import './http.dart';
+import '../widgets/custom_expansion_tile.dart';
 
 logout(context) async {
   var cookieJar = await getCookiePath();
@@ -232,17 +233,14 @@ Widget makeControl(Map field,
       {
         value = _buildDecoratedWidget(
             FormBuilderTextField(
-              maxLines: 10,
-              initialValue: val,
-              attribute: field["fieldname"],
-              decoration: Palette.formFieldDecoration(
-                withLabel,
-                field["label"],
-              ),
-              validators: [
-                FormBuilderValidators.required(),
-              ],
-            ),
+                maxLines: 10,
+                initialValue: val,
+                attribute: field["fieldname"],
+                decoration: Palette.formFieldDecoration(
+                  withLabel,
+                  field["label"],
+                ),
+                validators: validators),
             withLabel);
       }
       break;
@@ -338,7 +336,8 @@ downloadFile(String fileUrl) async {
   if (Platform.isAndroid) {
     downloadsPath = '/storage/emulated/0/Download/';
   } else if (Platform.isIOS) {
-    final Directory downloadsDirectory = await getApplicationDocumentsDirectory();
+    final Directory downloadsDirectory =
+        await getApplicationDocumentsDirectory();
     downloadsPath = downloadsDirectory.path;
   }
 
@@ -375,18 +374,34 @@ Future<bool> _checkPermission() async {
   return false;
 }
 
-Color setStatusColor(String status) {
-  Color _color;
-  if (status == 'Open') {
-    _color = Color(0xffffa00a);
-  } else if (status == 'Replied') {
-    _color = Color(0xffb8c2cc);
-  } else if (status == 'Hold') {
-    _color = Colors.redAccent[400];
-  } else if (status == 'Closed') {
-    _color = Color(0xff98d85b);
+Map<String, Color> setStatusColor(String doctype, String status) {
+  var doctypeColor = {
+    'Issue': {
+      'Open': Colors.red,
+      'Closed': Colors.green,
+    }
+  };
+
+  if (doctypeColor[doctype] != null && doctypeColor[doctype][status] != null) {
+    return {
+      'bgColor': doctypeColor[doctype][status][100],
+      'txtColor': doctypeColor[doctype][status][900]
+    };
+  } else {
+    return {'bgColor': Colors.grey[100], 'txtColor': Colors.grey[800]};
   }
-  return _color;
+
+  // Color _color;
+  // if (status == 'Open') {
+  //   _color = Color(0xffffa00a);
+  // } else if (status == 'Replied') {
+  //   _color = Color(0xffb8c2cc);
+  // } else if (status == 'Hold') {
+  //   _color = Colors.redAccent[400];
+  // } else if (status == 'Closed') {
+  //   _color = Color(0xff98d85b);
+  // }
+  // return _color;
 }
 
 String toTitleCase(String str) {
@@ -442,7 +457,8 @@ List<Widget> generateLayout({
             visible: sectionVisibility,
             child: ListTileTheme(
               contentPadding: EdgeInsets.all(0),
-              child: ExpansionTile(
+              child: CustomExpansionTile(
+                maintainState: true,
                 title: Text(
                   collapsibleLabels[idx].toUpperCase(),
                   style: Palette.dimTxtStyle,
@@ -512,4 +528,24 @@ DateTime parseDate(val) {
   } else {
     return DateTime.parse(val);
   }
+}
+
+Widget buildStatusButton(String doctype, String status) {
+  return Container(
+    width: 60,
+    padding: EdgeInsets.all(4),
+    decoration: BoxDecoration(
+      color: setStatusColor(doctype, status)['bgColor'],
+      borderRadius: BorderRadius.circular(5),
+    ),
+    child: Center(
+      child: Text(
+        status ?? "",
+        style: TextStyle(
+          color: setStatusColor(doctype, status)['txtColor'],
+          fontSize: 12,
+        ),
+      ),
+    ),
+  );
 }

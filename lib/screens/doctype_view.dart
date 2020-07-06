@@ -71,6 +71,7 @@ class DoctypeView extends StatelessWidget {
           return Scaffold(
             backgroundColor: Palette.bgColor,
             appBar: AppBar(
+              title: Text(module),
               elevation: 0,
             ),
             body: ListView(
