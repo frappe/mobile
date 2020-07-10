@@ -3,11 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:dio/dio.dart';
 
-import '../config/palette.dart';
+import '../utils/backend_service.dart';
 import '../utils/enums.dart';
-import '../utils/http.dart';
+import '../config/palette.dart';
 import '../widgets/button.dart';
 import '../widgets/card_list_tile.dart';
 
@@ -25,6 +24,13 @@ class CustomFilePicker extends StatefulWidget {
 class _FilePickerState extends State<CustomFilePicker> {
   List<File> _files = [];
   bool _loadingPath = false;
+  BackendService backendService;
+
+  @override
+  void initState() {
+    super.initState();
+    backendService = BackendService(context);
+  }
 
   void _openFileExplorer() async {
     setState(() => _loadingPath = true);
@@ -40,30 +46,6 @@ class _FilePickerState extends State<CustomFilePicker> {
     setState(() {
       _loadingPath = false;
     });
-  }
-
-  _uploadFile() async {
-    for (File file in _files) {
-      String fileName = file.path.split('/').last;
-      FormData formData = FormData.fromMap({
-        "file": await MultipartFile.fromFile(
-          file.path,
-          filename: fileName,
-        ),
-        "docname": widget.name,
-        "doctype": widget.doctype,
-        "is_private": 1,
-        "folder": "Home/Attachments"
-      });
-
-      var response = await dio.post("/method/upload_file", data: formData);
-      if (response.statusCode != 200) {
-        throw Exception('Failed to load album');
-      }
-    }
-
-    widget.callback();
-    Navigator.of(context).pop();
   }
 
   @override
@@ -83,7 +65,15 @@ class _FilePickerState extends State<CustomFilePicker> {
               title: 'Upload',
               buttonType: ButtonType.primary,
               onPressed: _files != null && _files.isNotEmpty
-                  ? () => _uploadFile()
+                  ? () {
+                      backendService.uploadFile(
+                        widget.doctype,
+                        widget.name,
+                        _files,
+                      );
+                      widget.callback();
+                      Navigator.of(context).pop();
+                    }
                   : null,
             ),
           ),
@@ -106,8 +96,9 @@ class _FilePickerState extends State<CustomFilePicker> {
                           trailing: IconButton(
                             icon: Icon(Icons.clear),
                             onPressed: () {
-                              _files.removeAt(index);
-                              setState(() {});
+                              setState(() {
+                                _files.removeAt(index);
+                              });
                             },
                           ),
                         );

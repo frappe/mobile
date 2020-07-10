@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/utils/response_models.dart';
-import 'package:frappe_app/utils/rest_apis.dart';
+
+import './../../config/palette.dart';
+import './../../utils/backend_service.dart';
 
 class LinkField extends StatefulWidget {
   final String hint;
@@ -20,6 +20,9 @@ class LinkField extends StatefulWidget {
   final List<String Function(dynamic)> validators;
 
   LinkField({
+    @required this.hint,
+    @required this.doctype,
+    @required this.refDoctype,
     this.prefixIcon,
     this.fillColor = Palette.fieldBgColor,
     this.allowClear = true,
@@ -28,10 +31,7 @@ class LinkField extends StatefulWidget {
     this.validators,
     this.showInputBorder = false,
     this.attribute,
-    @required this.hint,
     this.value,
-    @required this.doctype,
-    @required this.refDoctype,
   });
 
   @override
@@ -40,71 +40,77 @@ class LinkField extends StatefulWidget {
 
 class _LinkFieldState extends State<LinkField> {
   final TextEditingController _typeAheadController = TextEditingController();
+  BackendService backendService;
 
-  Future<List> _fetchLinkField(doctype, refDoctype, txt) async {
-    var queryParams = {
-      'txt': txt,
-      'doctype': doctype,
-      'reference_doctype': refDoctype,
-      'ignore_user_permissions': 0
-    };
-
-    var val = await searchLink(queryParams);
-    return val.values;
+  @override
+  void initState() {
+    super.initState();
+    backendService = BackendService(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
-      child: FormBuilderTypeAhead(
-        controller: _typeAheadController,
-        onSuggestionSelected: (item) {
-          if (widget.onSuggestionSelected != null) {
-            _typeAheadController.clear();
-            widget.onSuggestionSelected(item);
-          }
-        },
-        onChanged: (_) {
-          setState(() {
-            
-          });
-        },
-        validators: widget.validators,
-        decoration: InputDecoration(
-          filled: true,
-          prefixIcon: widget.prefixIcon,
-          suffixIcon: widget.allowClear ? _typeAheadController.text != '' ? IconButton(
-            icon: Icon(Icons.close, color: Colors.black),
-            onPressed: () {
+      child: Theme(
+        data: Theme.of(context).copyWith(primaryColor: Colors.black),
+        child: FormBuilderTypeAhead(
+          controller: _typeAheadController,
+          onSuggestionSelected: (item) {
+            if (widget.onSuggestionSelected != null) {
               _typeAheadController.clear();
-            },
-          ) : null : null,
-          fillColor: widget.fillColor,
-          enabledBorder: !widget.showInputBorder ? InputBorder.none : null,
-          hintText: widget.hint,
-        ),
-        selectionToTextTransformer: (item) {
-          if (item is LinkFieldResponse) {
-            return item.value;
-          } else {
+              widget.onSuggestionSelected(item);
+            }
+          },
+          onChanged: (_) {
+            setState(() {});
+          },
+          validators: widget.validators,
+          decoration: InputDecoration(
+            filled: true,
+            prefixIcon: widget.prefixIcon,
+            suffixIcon: widget.allowClear
+                ? _typeAheadController.text != ''
+                    ? IconButton(
+                        icon: Icon(Icons.close, color: Colors.black),
+                        onPressed: () {
+                          _typeAheadController.clear();
+                        },
+                      )
+                    : null
+                : null,
+            fillColor: widget.fillColor,
+            enabledBorder: !widget.showInputBorder ? InputBorder.none : null,
+            hintText: widget.hint,
+          ),
+          selectionToTextTransformer: (item) {
+            if (item != null) {
+              if (item is Map) {
+                return item["value"];
+              }
+            }
             return item;
-          }
-        },
-        attribute: widget.attribute,
-        itemBuilder: (context, item) {
-          return ListTile(
-            title: Text(
-              item.value,
-            ),
-          );
-        },
-        initialValue: widget.value,
-        suggestionsCallback: (query) {
-          var lowercaseQuery = query.toLowerCase();
-          return _fetchLinkField(
-              widget.doctype, widget.refDoctype, lowercaseQuery);
-        },
+          },
+          attribute: widget.attribute,
+          itemBuilder: (context, item) {
+            return ListTile(
+              title: Text(
+                item["value"],
+              ),
+            );
+          },
+          initialValue: widget.value,
+          suggestionsCallback: (query) async {
+            var lowercaseQuery = query.toLowerCase();
+            var response = await backendService.searchLink(
+              widget.doctype,
+              widget.refDoctype,
+              lowercaseQuery,
+            );
+
+            return response["results"];
+          },
+        ),
       ),
     );
   }

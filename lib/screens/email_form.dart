@@ -1,10 +1,9 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/utils/enums.dart';
 
+import '../utils/backend_service.dart';
+import '../utils/enums.dart';
 import '../utils/helpers.dart';
-import '../utils/http.dart';
 
 class EmailForm extends StatefulWidget {
   final String doctype;
@@ -27,10 +26,12 @@ class EmailForm extends StatefulWidget {
 class _EmailFormState extends State<EmailForm> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   Map wireframe;
+  BackendService backendService;
 
   @override
   void initState() {
     super.initState();
+    backendService = BackendService(context);
     wireframe = {
       "doctype": "communication",
       "fields": [
@@ -101,42 +102,6 @@ class _EmailFormState extends State<EmailForm> {
     };
   }
 
-  _sendEmail(
-      {@required recipients,
-      cc,
-      bcc,
-      @required subject,
-      @required content,
-      @required doctype,
-      @required doctypeName,
-      sendEmail,
-      printHtml,
-      sendMeACopy,
-      printFormat,
-      emailTemplate,
-      attachments,
-      readReceipt,
-      printLetterhead}) async {
-    var queryParams = {
-      'recipients': recipients,
-      'subject': subject,
-      'content': content,
-      'doctype': doctype,
-      'name': doctypeName,
-      'send_email': 1
-    };
-
-    final response2 = await dio.post(
-        '/method/frappe.core.doctype.communication.email.make',
-        data: queryParams,
-        options: Options(contentType: Headers.formUrlEncodedContentType));
-    if (response2.statusCode == 200) {
-      widget.callback();
-    } else {
-      throw Exception('Failed to load album');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -148,13 +113,14 @@ class _EmailFormState extends State<EmailForm> {
               if (_fbKey.currentState.saveAndValidate()) {
                 var formValue = _fbKey.currentState.value;
 
-                await _sendEmail(
+                await backendService.sendEmail(
                   recipients: formValue["recipients"],
                   subject: formValue["subject"],
                   content: formValue["content"],
                   doctype: widget.doctype,
                   doctypeName: widget.doc,
                 );
+                widget.callback();
                 Navigator.of(context).pop();
               }
             },

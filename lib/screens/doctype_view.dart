@@ -1,12 +1,9 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/utils/backend_service.dart';
 import 'package:frappe_app/widgets/card_list_tile.dart';
 
-import '../utils/helpers.dart';
 import '../utils/enums.dart';
-import '../utils/http.dart';
-import '../utils/response_models.dart';
 import '../app.dart';
 
 class DoctypeView extends StatelessWidget {
@@ -16,35 +13,14 @@ class DoctypeView extends StatelessWidget {
 
   DoctypeView(this.module);
 
-  Future _fetchDoctypes(module, context) async {
-    final response2 = await dio.post(
-      '/method/frappe.desk.desktop.get_desktop_page',
-      data: {
-        'page': module,
-      },
-      options: Options(
-        validateStatus: (status) {
-          return status < 500;
-        },
-      ),
-    );
-
-    if (response2.statusCode == 200) {
-      return DioDesktopPageResponse.fromJson(response2.data).values;
-    } else if (response2.statusCode == 403) {
-      logout(context);
-    } else {
-      throw Exception('Failed to load album');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    var backendService = BackendService(context);
     return FutureBuilder(
-      future: _fetchDoctypes(module, context),
+      future: backendService.getDesktopPage(module, context),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          var doctypes = snapshot.data["cards"]["items"][0]["links"];
+          var doctypes = snapshot.data["message"]["cards"]["items"][0]["links"];
           var modulesWidget = doctypes.where((m) {
             return _supportedDoctypes.contains(m["name"]);
           }).map<Widget>((m) {

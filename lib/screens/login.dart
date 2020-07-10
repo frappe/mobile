@@ -1,6 +1,6 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/utils/backend_service.dart';
 
 import '../main.dart';
 import '../utils/http.dart';
@@ -16,30 +16,12 @@ class _LoginState extends State<Login> {
   var serverURL;
   var savedUsr;
   var savedPwd;
-
-  Future _authenticate(usr, pwd) async {
-    final response = await dio.post(
-      '/method/login',
-      data: {
-        'usr': usr,
-        'pwd': pwd,
-      },
-      options: Options(
-        validateStatus: (status) {
-          return status < 500;
-        },
-      ),
-    );
-    localStorage.setBool('isLoggedIn', false);
-    if (response.statusCode == 200) {
-      localStorage.setBool('isLoggedIn', true);
-    }
-    return response;
-  }
+  BackendService backendService;
 
   @override
   void initState() {
     super.initState();
+    backendService = BackendService(context);
     serverURL = localStorage.getString('serverURL');
     savedUsr = localStorage.getString('usr');
     savedPwd = localStorage.getString('pwd');
@@ -96,26 +78,30 @@ class _LoginState extends State<Login> {
                       SizedBox(
                         height: 20.0,
                       ),
-                      FormBuilderTextField(
-                        maxLines: 1,
-                        attribute: 'pwd',
-                        initialValue: savedPwd,
-                        validators: [
-                          FormBuilderValidators.required(),
-                        ],
-                        decoration: InputDecoration(
-                            labelText: "Password",
-                            border: OutlineInputBorder(),
-                            suffixIcon: IconButton(
-                                icon: Icon(_isOn
-                                    ? Icons.visibility_off
-                                    : Icons.visibility),
-                                onPressed: () {
-                                  setState(() {
-                                    _isOn = !_isOn;
-                                  });
-                                })),
-                        obscureText: _isOn,
+                      Theme(
+                        data: Theme.of(context)
+                            .copyWith(primaryColor: Colors.black),
+                        child: FormBuilderTextField(
+                          maxLines: 1,
+                          attribute: 'pwd',
+                          initialValue: savedPwd,
+                          validators: [
+                            FormBuilderValidators.required(),
+                          ],
+                          decoration: InputDecoration(
+                              labelText: "Password",
+                              border: OutlineInputBorder(),
+                              suffixIcon: IconButton(
+                                  icon: Icon(_isOn
+                                      ? Icons.visibility_off
+                                      : Icons.visibility),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isOn = !_isOn;
+                                    });
+                                  })),
+                          obscureText: _isOn,
+                        ),
                       ),
                       SizedBox(
                         height: 20.0,
@@ -137,11 +123,16 @@ class _LoginState extends State<Login> {
                               ),
                             );
 
-                            var response2 = await _authenticate(
+                            var response2 = await backendService.login(
                                 formValue["usr"].trimRight(), formValue["pwd"]);
 
                             if (response2.statusCode == 200) {
-                              var userId = response2.headers.map["set-cookie"][3].split(';')[0].split('=')[1];
+                              localStorage.setBool('isLoggedIn', true);
+
+                              var userId = response2
+                                  .headers.map["set-cookie"][3]
+                                  .split(';')[0]
+                                  .split('=')[1];
                               localStorage.setString('userId', userId);
                               localStorage.setString(
                                   'user', response2.data["full_name"]);
@@ -153,8 +144,11 @@ class _LoginState extends State<Login> {
                                 'pwd',
                                 formValue["pwd"],
                               );
-                              Navigator.of(context).pushReplacementNamed('/modules');
+                              Navigator.of(context)
+                                  .pushReplacementNamed('/modules');
                             } else {
+                              localStorage.setBool('isLoggedIn', false);
+
                               Scaffold.of(context).showSnackBar(SnackBar(
                                 content: Text('Login Failed'),
                               ));

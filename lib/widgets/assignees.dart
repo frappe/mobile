@@ -1,19 +1,13 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/utils/backend_service.dart';
 
 import '../config/palette.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
-import '../utils/http.dart';
 import '../widgets/button.dart';
 import '../widgets/card_list_tile.dart';
 import '../form/controls/link_field.dart';
-
-
-
 
 class Assignees extends StatefulWidget {
   final List assignments;
@@ -34,54 +28,12 @@ class Assignees extends StatefulWidget {
 
 class _AssigneesState extends State<Assignees> {
   var newAssignees = [];
+  BackendService backendService;
 
-  void _addAssignees() async {
-    var data = {
-      'assign_to': json.encode(newAssignees),
-      'assign_to_me': 0,
-      'doctype': widget.doctype,
-      'name': widget.name,
-      'bulk_assign': false,
-      're_assign': false
-    };
-
-    var response2 = await dio.post(
-      '/method/frappe.desk.form.assign_to.add',
-      data: data,
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
-    );
-
-    if (response2.statusCode == 200) {
-      widget.callback();
-      return;
-    } else {
-      throw Exception('Failed to load album');
-    }
-  }
-
-  _removeAssignee(doctype, name, assignTo) async {
-    var data = {
-      'doctype': doctype,
-      'name': name,
-      'assign_to': assignTo,
-    };
-
-    var response2 = await dio.post(
-      '/method/frappe.desk.form.assign_to.remove',
-      data: data,
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
-    );
-
-    if (response2.statusCode == 200) {
-      showSnackBar('Assignee Removed', context);
-      return;
-    } else {
-      throw Exception('Failed to load album');
-    }
+  @override
+  void initState() {
+    super.initState();
+    backendService = BackendService(context);
   }
 
   Widget _buildSelectedAssigneesHeader() {
@@ -99,7 +51,12 @@ class _AssigneesState extends State<Assignees> {
         buttonType: ButtonType.primary,
         onPressed: newAssignees.length > 0
             ? () async {
-                await _addAssignees();
+                await backendService.addAssignees(
+                  widget.doctype,
+                  widget.name,
+                  newAssignees,
+                );
+                widget.callback();
                 Navigator.of(context).pop();
               }
             : null,
@@ -168,11 +125,12 @@ class _AssigneesState extends State<Assignees> {
             icon: Icon(Icons.clear),
             onPressed: () async {
               // TODO use response of remaining assignees
-              await _removeAssignee(
+              await backendService.removeAssignee(
                 widget.doctype,
                 widget.name,
                 d["owner"],
               );
+              showSnackBar('Assignee Removed', context);
 
               setState(() {
                 widget.assignments.removeAt(i);
@@ -199,13 +157,14 @@ class _AssigneesState extends State<Assignees> {
                 Container(
                   child: FormBuilder(
                     child: LinkField(
+                      prefixIcon: Icon(Icons.search),
                       fillColor: Colors.white,
                       doctype: 'User',
                       refDoctype: 'Issue',
                       hint: 'Assign To',
                       onSuggestionSelected: (item) {
                         if (item != "") {
-                          newAssignees.add(item.value);
+                          newAssignees.add(item["value"]);
                           setState(() {});
                         }
                       },

@@ -1,17 +1,16 @@
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/utils/backend_service.dart';
 import 'package:frappe_app/widgets/timeline.dart';
+import 'package:frappe_app/widgets/user_avatar.dart';
 
 import '../main.dart';
 import '../config/palette.dart';
 
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
-import '../utils/http.dart';
-import '../utils/response_models.dart';
 
 import '../widgets/like_doc.dart';
 
@@ -37,64 +36,24 @@ class FormView extends StatefulWidget {
 class _FormViewState extends State<FormView>
     with SingleTickerProviderStateMixin {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-  Future<DioGetDocResponse> futureIssueDetail;
+  Future futureIssueDetail;
   bool editMode = false;
   final user = localStorage.getString('user');
+  BackendService backendService;
 
   @override
   void initState() {
-    futureIssueDetail = _fetchDoc(widget.doctype, widget.name);
     super.initState();
-  }
-
-  _updateDoc(String name, Map updateObj, String doctype) async {
-    var response2 = await dio.put(
-      '/resource/$doctype/$name',
-      data: updateObj,
-      options: Options(
-        validateStatus: (status) {
-          return status < 500;
-        },
-      ),
+    backendService = BackendService(context);
+    futureIssueDetail = backendService.getdoc(
+      widget.doctype,
+      widget.name,
     );
-
-    if (response2.statusCode == 200) {
-      return;
-    } else if (response2.statusCode == 403) {
-      logout(context);
-    } else {
-      throw Exception('Failed to load album');
-    }
-  }
-
-  Future<DioGetDocResponse> _fetchDoc(String doctype, String name) async {
-    var queryParams = {
-      'doctype': doctype,
-      'name': name,
-    };
-
-    final response2 = await dio.get(
-      '/method/frappe.desk.form.load.getdoc',
-      queryParameters: queryParams,
-      options: Options(
-        validateStatus: (status) {
-          return status < 500;
-        },
-      ),
-    );
-
-    if (response2.statusCode == 200) {
-      return DioGetDocResponse.fromJson(response2.data);
-    } else if (response2.statusCode == 403) {
-      logout(context);
-    } else {
-      throw Exception('Failed to load album');
-    }
   }
 
   void _refresh() {
     setState(() {
-      futureIssueDetail = _fetchDoc(widget.doctype, widget.name);
+      futureIssueDetail = backendService.getdoc(widget.doctype, widget.name);
       editMode = false;
     });
   }
@@ -117,10 +76,7 @@ class _FormViewState extends State<FormView>
     for (int i = 0; i < l.length; i++) {
       if (i < size) {
         w.add(
-          CircleAvatar(
-            backgroundColor: Palette.bgColor,
-            child: Text(l[i]["owner"][0].toUpperCase()),
-          ),
+          UserAvatar(l[i]["owner"]),
         );
       } else {
         w.add(CircleAvatar(
@@ -172,8 +128,8 @@ class _FormViewState extends State<FormView>
         future: futureIssueDetail,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            var docs = snapshot.data.values.docs;
-            var docInfo = snapshot.data.values.docInfo;
+            var docs = snapshot.data["docs"];
+            var docInfo = snapshot.data["docinfo"];
             var builderContext;
             var likedBy = docs[0]['_liked_by'] != null
                 ? json.decode(docs[0]['_liked_by'])
@@ -296,7 +252,7 @@ class _FormViewState extends State<FormView>
                                         Flexible(
                                           child: Text(
                                             docs[0][widget
-                                                .wireframe["subject_field"]],
+                                                .wireframe["title_field"]],
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 2,
                                             style: TextStyle(
@@ -310,7 +266,8 @@ class _FormViewState extends State<FormView>
                                         ),
                                         Row(
                                           children: <Widget>[
-                                            buildStatusButton(widget.doctype, docs[0]['status']),
+                                            buildStatusButton(widget.doctype,
+                                                docs[0]['status']),
                                             Spacer(),
                                             InkWell(
                                               onTap: () {
@@ -363,10 +320,10 @@ class _FormViewState extends State<FormView>
                                               .saveAndValidate()) {
                                             var formValue =
                                                 _fbKey.currentState.value;
-                                            await _updateDoc(
+                                            await backendService.updateDoc(
+                                              widget.doctype,
                                               widget.name,
                                               formValue,
-                                              widget.doctype,
                                             );
                                             showSnackBar(
                                               'Changes Saved',

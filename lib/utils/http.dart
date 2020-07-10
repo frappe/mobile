@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 
 import '../main.dart';
+import '../main.dart';
 
 Dio dio;
 Uri uri;
@@ -22,8 +23,14 @@ void initConfig() async {
   }
 }
 
+void cacheAllUsers() async {
+  if (localStorage.containsKey('allUsers')) {
+    return;
+  } else {}
+}
+
 void setBaseUrl(url) async {
-  if(!url.startsWith('https://')) {
+  if (!url.startsWith('https://')) {
     url = "https://$url";
   }
   baseUrl = url;

@@ -35,122 +35,112 @@ class ListItem extends StatelessWidget {
     @required this.onListTap,
   });
 
-  Widget _buildStatusButton(List l) {
-    return GestureDetector(
-      onTap: () => onButtonTap(l[0], l[1]),
-      child: Container(
-        width: 60,
-        padding: EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: setStatusColor(doctype, l[1])['bgColor'],
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Center(
-          child: Text(
-            l[1] ?? "",
-            style: TextStyle(
-              color: setStatusColor(doctype, l[1])['txtColor'],
-              fontSize: 12,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     double colWidth = MediaQuery.of(context).size.width * 0.8;
 
     return GestureDetector(
       onTap: onListTap,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 4.0),
-        child: Card(
-          elevation: 0,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 18.0, right: 8, bottom: 4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Row(
-                    children: <Widget>[
-                      Text(modifiedOn, style: Palette.dimTxtStyle),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 6.0, right: 6.0),
-                        child: Icon(
-                          Icons.lens,
-                          size: 5,
-                          color: Palette.dimTxtColor,
-                        ),
-                      ),
-                      Text(
-                        name,
-                        style: Palette.dimTxtStyle,
-                      ),
-                      Spacer(),
-                      LikeDoc(
-                        doctype: doctype,
-                        name: name,
-                        isFav: isFav,
-                      )
-                    ],
-                  ),
-                ),
-                Container(
-                  width: colWidth,
-                  child: Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: !seen ? FontWeight.bold : null,
-                    ),
-                  ),
-                ),
-                Row(
+      child: Card(
+        margin: EdgeInsets.zero,
+        shape: Border.symmetric(
+          vertical: BorderSide(
+            width: 0.5,
+            color: Palette.borderColor,
+          ),
+        ),
+        elevation: 0,
+        child: Container(
+          padding: const EdgeInsets.only(left: 18.0, right: 8, bottom: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Row(
                   children: <Widget>[
-                    _buildStatusButton(status),
-                    VerticalDivider(),
+                    Text(
+                      name,
+                      style: Palette.dimTxtStyle,
+                    ),
                     Padding(
-                      padding: const EdgeInsets.only(right: 6.0),
+                      padding: const EdgeInsets.only(left: 6.0, right: 6.0),
                       child: Icon(
-                        Icons.comment,
-                        size: 14,
+                        Icons.lens,
+                        size: 5,
                         color: Palette.dimTxtColor,
                       ),
                     ),
-                    Text(
-                      '$commentCount',
-                      style: Palette.dimTxtStyle,
-                    ),
+                    Text(modifiedOn, style: Palette.dimTxtStyle),
                     Spacer(),
-                    IconButton(
-                      onPressed: assignee != null
-                          ? () {
-                              onButtonTap(assignee[0], assignee[1]);
-                            }
-                          : null,
-                      icon: Container(
-                        height: 20,
-                        width: 20,
-                        color: Palette.bgColor,
-                        child: Center(
-                            child: assignee != null
-                                ? Text(
-                                    assignee[1][0].toUpperCase(),
-                                    textAlign: TextAlign.center,
-                                  )
-                                : Text('')),
-                      ),
-                    ),
+                    LikeDoc(
+                      doctype: doctype,
+                      name: name,
+                      isFav: isFav,
+                    )
                   ],
                 ),
-              ],
-            ),
+              ),
+              Container(
+                width: colWidth,
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: !seen ? FontWeight.bold : null,
+                  ),
+                ),
+              ),
+              Row(
+                children: <Widget>[
+                  GestureDetector(
+                    onTap: () => onButtonTap(
+                      status[0],
+                      status[1],
+                    ),
+                    child: buildStatusButton(
+                      doctype,
+                      status[1],
+                    ),
+                  ),
+                  VerticalDivider(),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6.0),
+                    child: Icon(
+                      Icons.comment,
+                      size: 14,
+                      color: Palette.dimTxtColor,
+                    ),
+                  ),
+                  Text(
+                    '$commentCount',
+                    style: Palette.dimTxtStyle,
+                  ),
+                  Spacer(),
+                  IconButton(
+                    onPressed: assignee != null
+                        ? () {
+                            onButtonTap(assignee[0], assignee[1]);
+                          }
+                        : null,
+                    icon: Container(
+                      height: 20,
+                      width: 20,
+                      color: Palette.bgColor,
+                      child: Center(
+                          child: assignee != null
+                              ? Text(
+                                  assignee[1][0].toUpperCase(),
+                                  textAlign: TextAlign.center,
+                                )
+                              : Text('')),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

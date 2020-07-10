@@ -1,7 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-
-import '../utils/http.dart';
+import 'package:frappe_app/utils/backend_service.dart';
 
 class CommentInput extends StatelessWidget {
   final String doctype;
@@ -17,34 +15,9 @@ class CommentInput extends StatelessWidget {
 
   final TextEditingController input = TextEditingController();
 
-  void _postComment(refDocType, refName, content, email) async {
-    var queryParams = {
-      'reference_doctype': refDocType,
-      'reference_name': refName,
-      'content': content,
-      'comment_email': email,
-      'comment_by': email
-    };
-
-    final response2 = await dio.post(
-        '/method/frappe.desk.form.utils.add_comment',
-        data: queryParams,
-        options: Options(contentType: Headers.formUrlEncodedContentType));
-    if (response2.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      // return DioResponse.fromJson(response2.data);
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load album');
-    }
-
-    callback();
-  }
-
   @override
   Widget build(BuildContext context) {
+    var backendService = BackendService(context);
     TextEditingController _input = TextEditingController();
     return Scaffold(
       appBar: AppBar(
@@ -55,7 +28,13 @@ class CommentInput extends StatelessWidget {
               if (_input.text.isEmpty) {
                 return;
               }
-              await _postComment(doctype, name, _input.text, authorEmail);
+              await backendService.postComment(
+                doctype,
+                name,
+                _input.text,
+                authorEmail,
+              );
+              callback();
               Navigator.of(context).pop();
             },
           )

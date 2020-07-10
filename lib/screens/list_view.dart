@@ -1,18 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:frappe_app/utils/backend_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../main.dart';
 import '../app.dart';
 import '../config/palette.dart';
 import '../utils/enums.dart';
-import '../utils/helpers.dart';
-import '../utils/http.dart';
-import '../utils/response_models.dart';
 import '../widgets/button.dart';
 import '../widgets/list_item.dart';
 
@@ -40,48 +37,11 @@ class CustomListView extends StatefulWidget {
 }
 
 class _CustomListViewState extends State<CustomListView> {
-  Future<DioGetReportViewResponse> futureList;
   static const int PAGE_SIZE = 10;
   final userId = Uri.decodeFull(localStorage.getString('userId'));
   bool showLiked = false;
   var _pageLoadController;
-
-  Future<List> _fetchList(
-      {@required List fieldnames,
-      @required String doctype,
-      List filters,
-      pageLength,
-      offset}) async {
-    var queryParams = {
-      'doctype': doctype,
-      'fields': jsonEncode(fieldnames),
-      'page_length': pageLength,
-      'with_comment_count': true
-    };
-
-    queryParams['limit_start'] = offset.toString();
-
-    if (filters != null && filters.length != 0) {
-      queryParams['filters'] = jsonEncode(filters);
-    }
-
-    final response2 = await dio.get(
-      '/method/frappe.desk.reportview.get',
-      queryParameters: queryParams,
-      options: Options(
-        validateStatus: (status) {
-          return status < 500;
-        },
-      ),
-    );
-    if (response2.statusCode == 200) {
-      return DioGetReportViewResponse.fromJson(response2.data).values;
-    } else if (response2.statusCode == 403) {
-      logout(context);
-    } else {
-      throw Exception('Failed to load album');
-    }
-  }
+  BackendService backendService;
 
   List<Widget> _buildFilters(List filters) {
     var chips = filters.asMap().entries.map((entry) {
@@ -125,41 +85,36 @@ class _CustomListViewState extends State<CustomListView> {
         children: <Widget>[
           widget.filters.length > 0
               ? Expanded(
-                  child: FormBuilder(
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        Visibility(
-                          visible: widget.filters.length > 0,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              right: 8.0,
-                              bottom: 12,
-                              top: 12,
-                            ),
-                            child: Button(
-                              buttonType: ButtonType.secondary,
-                              title: 'Clear Filters',
-                              onPressed: () {
-                                setState(() {
-                                  _pageLoadController.reset();
-                                  widget.filters.clear();
-                                  localStorage.setString(
-                                      '${widget.doctype}Filter', null);
-                                });
-                              },
-                            ),
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      Visibility(
+                        visible: widget.filters.length > 0,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            right: 8.0,
+                            bottom: 12,
+                            top: 12,
+                          ),
+                          child: Button(
+                            buttonType: ButtonType.secondary,
+                            title: 'Clear Filters',
+                            onPressed: () {
+                              setState(() {
+                                _pageLoadController.reset();
+                                widget.filters.clear();
+                                localStorage.setString(
+                                    '${widget.doctype}Filter', null);
+                              });
+                            },
                           ),
                         ),
-                        ..._buildFilters(widget.filters)
-                      ],
-                    ),
+                      ),
+                      ..._buildFilters(widget.filters)
+                    ],
                   ),
                 )
               : Text('No Filters'),
-
-          // Spacer(),
-          // Text('20 of 99')
         ],
       ),
     );
@@ -168,10 +123,11 @@ class _CustomListViewState extends State<CustomListView> {
   @override
   void initState() {
     super.initState();
+    backendService = BackendService(context);
     _pageLoadController = PagewiseLoadController(
       pageSize: PAGE_SIZE,
       pageFuture: (pageIndex) {
-        return _fetchList(
+        return backendService.fetchList(
           doctype: widget.doctype,
           fieldnames: widget.fieldnames,
           pageLength: PAGE_SIZE,
@@ -227,7 +183,6 @@ class _CustomListViewState extends State<CustomListView> {
                 IconButton(
                   icon: Icon(
                     showLiked ? Icons.favorite : Icons.favorite_border,
-                    // size: 18,
                     color: showLiked ? Colors.red : Palette.darkGrey,
                   ),
                   onPressed: () {
@@ -286,8 +241,8 @@ class _CustomListViewState extends State<CustomListView> {
             child: PagewiseListView(
               pageLoadController: _pageLoadController,
               itemBuilder: ((buildContext, entry, _) {
-                int subjectFieldIndex =
-                    entry[0].indexOf(widget.meta["subject_field"]);
+                int titleFieldIndex =
+                    entry[0].indexOf(widget.meta["title_field"]);
                 var key = entry[0];
                 var value = entry[1];
                 var assignee = value[4] != null ? json.decode(value[4]) : null;
@@ -330,7 +285,7 @@ class _CustomListViewState extends State<CustomListView> {
                     _pageLoadController.reset();
                     setState(() {});
                   },
-                  title: value[subjectFieldIndex],
+                  title: value[titleFieldIndex],
                   modifiedOn: "${timeago.format(
                     DateTime.parse(
                       value[3],

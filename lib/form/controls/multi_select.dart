@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/utils/response_models.dart';
-import 'package:frappe_app/utils/rest_apis.dart';
+import 'package:frappe_app/utils/backend_service.dart';
 
 class MultiSelect extends StatefulWidget {
   final String hint;
@@ -19,8 +18,12 @@ class MultiSelect extends StatefulWidget {
 }
 
 class _MultiSelectState extends State<MultiSelect> {
-  Future _fetchValues(Map data) {
-    return getContactList(data);
+  BackendService backendService;
+
+  @override
+  void initState() {
+    super.initState();
+    backendService = BackendService(context);
   }
 
   @override
@@ -45,11 +48,15 @@ class _MultiSelectState extends State<MultiSelect> {
       findSuggestions: (String query) async {
         if (query.length != 0) {
           var lowercaseQuery = query.toLowerCase();
-          var val = await _fetchValues({"txt": lowercaseQuery});
-          if (val.values.length == 0) {
-            val = [Contact(value: lowercaseQuery)];
-          } else {
-            val = val.values;
+          var response = await backendService.getContactList(lowercaseQuery);
+          var val = response["result"];
+          if (val.length == 0) {
+            val = [
+              {
+                "value": lowercaseQuery,
+                "description": lowercaseQuery,
+              }
+            ];
           }
           return val;
         } else {
@@ -59,7 +66,7 @@ class _MultiSelectState extends State<MultiSelect> {
       chipBuilder: (context, state, profile) {
         return InputChip(
           label: Text(
-            profile.value,
+            profile["value"],
             style: TextStyle(fontSize: 12),
           ),
           deleteIconColor: Palette.darkGrey,

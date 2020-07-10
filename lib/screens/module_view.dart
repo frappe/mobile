@@ -1,37 +1,16 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:frappe_app/widgets/card_list_tile.dart';
 
-import '../config/palette.dart';
-import '../utils/helpers.dart';
-import '../utils/http.dart';
-import '../utils/response_models.dart';
 import '../main.dart';
+import '../config/palette.dart';
+import '../widgets/card_list_tile.dart';
+import '../utils/backend_service.dart';
+import '../utils/helpers.dart';
 import './doctype_view.dart';
 
 class ModuleView extends StatelessWidget {
   static const _supportedModules = ['Support', 'CRM'];
   final user = localStorage.getString('user');
   static const popupOptions = const ["Logout"];
-
-  Future _fetchSideBarItems(context) async {
-    final response2 = await dio.post(
-      '/method/frappe.desk.desktop.get_desk_sidebar_items',
-      options: Options(
-        validateStatus: (status) {
-          return status < 500;
-        },
-      ),
-    );
-
-    if (response2.statusCode == 200) {
-      return DioGetSideBarItemsResponse.fromJson(response2.data).values;
-    } else if (response2.statusCode == 403) {
-      logout(context);
-    } else {
-      throw Exception('Failed to load album');
-    }
-  }
 
   void _choiceAction(String choice, context) {
     if (choice == "Logout") {
@@ -41,11 +20,12 @@ class ModuleView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var backendService = BackendService(context);
     return FutureBuilder(
-      future: _fetchSideBarItems(context),
+      future: backendService.getDeskSideBarItems(context),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          var modules = snapshot.data["Modules"];
+          var modules = snapshot.data["message"]["Modules"];
           var modulesWidget = modules.where((m) {
             return _supportedModules.contains(m["name"]);
           }).map<Widget>((m) {

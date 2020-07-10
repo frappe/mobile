@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/utils/backend_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -12,7 +12,6 @@ import '../form/controls/link_field.dart';
 import '../form/controls/multi_select.dart';
 import '../utils/enums.dart';
 import '../main.dart';
-import '../utils/response_models.dart';
 import '../app.dart';
 import './http.dart';
 import '../widgets/custom_expansion_tile.dart';
@@ -32,42 +31,16 @@ logout(context) async {
       (Route<dynamic> route) => false);
 }
 
-getMeta(doctype, context) async {
-  var queryParams = {'doctype': doctype};
-
-  final response2 = await dio.get(
-    '/method/frappe.desk.form.load.getdoctype',
-    queryParameters: queryParams,
-    options: Options(
-      validateStatus: (status) {
-        return status < 500;
-      },
-    ),
-  );
-
-  if (response2.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    return DioGetMetaResponse.fromJson(response2.data);
-  } else if (response2.statusCode == 403) {
-    logout(context);
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load album');
-  }
-}
-
-Future<GetMetaResponse> processData(
+Future processData(
   String doctype,
   ViewType viewType,
   context,
 ) async {
   //TODO: check cache
 
-  var meta = await getMeta(doctype, context);
+  var meta = await BackendService(context).getDoctype(doctype);
 
-  List metaFields = meta.values.docs[0]["fields"];
+  List metaFields = meta["docs"][0]["fields"];
 
   metaFields.forEach((field) {
     if (field["fieldtype"] == "Select") {
@@ -75,7 +48,7 @@ Future<GetMetaResponse> processData(
     }
   });
 
-  return meta.values;
+  return meta;
 }
 
 Widget makeControl(Map field,
@@ -163,7 +136,12 @@ Widget makeControl(Map field,
     case "MultiSelect":
       {
         if (val != null) {
-          val = [Contact(value: val)];
+          val = [
+            {
+              "value": val,
+              "description": val,
+            }
+          ];
         }
 
         value = _buildDecoratedWidget(
@@ -384,24 +362,49 @@ Map<String, Color> setStatusColor(String doctype, String status) {
 
   if (doctypeColor[doctype] != null && doctypeColor[doctype][status] != null) {
     return {
-      'bgColor': doctypeColor[doctype][status][100],
-      'txtColor': doctypeColor[doctype][status][900]
+      'bgColor': doctypeColor[doctype][status][50],
+      'txtColor': doctypeColor[doctype][status][800]
+    };
+  } else if (["Pending", "Review", "Medium", "Not Approved"].contains(status)) {
+    return {
+      'bgColor': Colors.orange[100],
+      'txtColor': Colors.orange[800],
+    };
+  } else if (["Open", "Urgent", "High", "Failed", "Rejected", "Error"]
+      .contains(status)) {
+    return {
+      'bgColor': Colors.red[100],
+      'txtColor': Colors.red[800],
+    };
+  } else if ([
+    "Closed",
+    "Finished",
+    "Converted",
+    "Completed",
+    "Complete",
+    "Confirmed",
+    "Approved",
+    "Yes",
+    "Active",
+    "Available",
+    "Paid",
+    "Success",
+  ].contains(status)) {
+    return {
+      'bgColor': Colors.green[100],
+      'txtColor': Colors.green[800],
+    };
+  } else if (["Submitted"].contains(status)) {
+    return {
+      'bgColor': Colors.blue[100],
+      'txtColor': Colors.blue[800],
     };
   } else {
-    return {'bgColor': Colors.grey[100], 'txtColor': Colors.grey[800]};
+    return {
+      'bgColor': Colors.grey[100],
+      'txtColor': Colors.grey[800],
+    };
   }
-
-  // Color _color;
-  // if (status == 'Open') {
-  //   _color = Color(0xffffa00a);
-  // } else if (status == 'Replied') {
-  //   _color = Color(0xffb8c2cc);
-  // } else if (status == 'Hold') {
-  //   _color = Colors.redAccent[400];
-  // } else if (status == 'Closed') {
-  //   _color = Color(0xff98d85b);
-  // }
-  // return _color;
 }
 
 String toTitleCase(String str) {

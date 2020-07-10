@@ -121,7 +121,7 @@ class Router extends StatelessWidget {
         future: _fetchMeta(doctype, context),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            var docMeta = snapshot.data.docs[0];
+            var docMeta = snapshot.data["docs"][0];
             docMeta["field_label"] = {
               "_assign": "Assigned To",
               "_liked_by": "Liked By"

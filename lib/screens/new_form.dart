@@ -1,11 +1,8 @@
-import 'dart:convert';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/utils/backend_service.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/helpers.dart';
-import 'package:frappe_app/utils/http.dart';
 
 import '../app.dart';
 
@@ -19,39 +16,17 @@ class NewForm extends StatefulWidget {
 }
 
 class _NewFormState extends State<NewForm> {
+  BackendService backendService;
+
+  @override
+  void initState() {
+    super.initState();
+    backendService = BackendService(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-
-    void _saveForm(doctype, formValue) async {
-      var data = {
-        "doctype": doctype,
-        ...formValue,
-      };
-
-      final response = await dio.post(
-        '/method/frappe.desk.form.save.savedocs',
-        data: "doc=${Uri.encodeFull(json.encode(data))}&action=Save",
-        options: Options(
-          contentType: Headers.formUrlEncodedContentType,
-        ),
-      );
-      if (response.statusCode == 200) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return Router(
-                  viewType: ViewType.form,
-                  doctype: doctype,
-                  name: response.data["docs"][0]["name"]);
-            },
-          ),
-        );
-      } else {
-        throw Exception('Failed to load album');
-      }
-    }
 
     List<Widget> _generateChildren(List fields) {
       List filteredFields = fields.where((field) {
@@ -87,9 +62,20 @@ class _NewFormState extends State<NewForm> {
             onPressed: () async {
               if (_fbKey.currentState.saveAndValidate()) {
                 var formValue = _fbKey.currentState.value;
-                await _saveForm(
+                var response = await backendService.saveDocs(
                   widget.meta["name"],
                   formValue,
+                );
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return Router(
+                          viewType: ViewType.form,
+                          doctype: widget.meta["name"],
+                          name: response.data["docs"][0]["name"]);
+                    },
+                  ),
                 );
               }
             },
