@@ -117,60 +117,62 @@ class Router extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _fetchMeta(doctype, context),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            var docMeta = snapshot.data["docs"][0];
-            docMeta["field_label"] = {
-              "_assign": "Assigned To",
-              "_liked_by": "Liked By"
-            };
-            docMeta["fields"].forEach((field) {
-              docMeta["field_label"][field["fieldname"]] = field["label"];
-            });
-            if (viewType == ViewType.list) {
-              var defaultFilters = [];
-              if (filters == null) {
-                // cached filters
-                if (localStorage.containsKey('${doctype}Filter')) {
-                  defaultFilters =
-                      json.decode(localStorage.getString('${doctype}Filter'));
-                } else if (localStorage.containsKey('userId')) {
-                  defaultFilters.add([
-                    doctype,
-                    "_assign",
-                    "like",
-                    "%${Uri.decodeFull(localStorage.getString('userId'))}%"
-                  ]);
+    return Scaffold(
+      body: FutureBuilder(
+          future: _fetchMeta(doctype, context),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              var docMeta = snapshot.data["docs"][0];
+              docMeta["field_label"] = {
+                "_assign": "Assigned To",
+                "_liked_by": "Liked By"
+              };
+              docMeta["fields"].forEach((field) {
+                docMeta["field_label"][field["fieldname"]] = field["label"];
+              });
+              if (viewType == ViewType.list) {
+                var defaultFilters = [];
+                if (filters == null) {
+                  // cached filters
+                  if (localStorage.containsKey('${doctype}Filter')) {
+                    defaultFilters =
+                        json.decode(localStorage.getString('${doctype}Filter'));
+                  } else if (localStorage.containsKey('userId')) {
+                    defaultFilters.add([
+                      doctype,
+                      "_assign",
+                      "like",
+                      "%${Uri.decodeFull(localStorage.getString('userId'))}%"
+                    ]);
+                  }
                 }
-              }
 
-              return CustomListView(
-                  filters: filters ?? defaultFilters,
-                  meta: docMeta,
+                return CustomListView(
+                    filters: filters ?? defaultFilters,
+                    meta: docMeta,
+                    doctype: doctype,
+                    appBarTitle: doctype,
+                    fieldnames: doctypeFieldnames[doctype]);
+              } else if (viewType == ViewType.form) {
+                return FormView(
                   doctype: doctype,
-                  appBarTitle: doctype,
-                  fieldnames: doctypeFieldnames[doctype]);
-            } else if (viewType == ViewType.form) {
-              return FormView(
-                doctype: doctype,
-                name: name,
-                wireframe: docMeta,
-              );
-            } else if (viewType == ViewType.filter) {
-              return FilterList(
-                filters: filters,
-                wireframe: docMeta,
-                appBarTitle: "Filter $doctype",
-              );
-            } else if (viewType == ViewType.newForm) {
-              return NewForm(docMeta);
+                  name: name,
+                  wireframe: docMeta,
+                );
+              } else if (viewType == ViewType.filter) {
+                return FilterList(
+                  filters: filters,
+                  wireframe: docMeta,
+                  appBarTitle: "Filter $doctype",
+                );
+              } else if (viewType == ViewType.newForm) {
+                return NewForm(docMeta);
+              }
+            } else if (snapshot.hasError) {
+              return Text("${snapshot.error}");
             }
-          } else if (snapshot.hasError) {
-            return Text("${snapshot.error}");
-          }
-          return Center(child: CircularProgressIndicator());
-        });
+            return Center(child: CircularProgressIndicator());
+          }),
+    );
   }
 }
