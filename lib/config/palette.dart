@@ -7,7 +7,7 @@ class Palette {
   static Color darkGrey = Color.fromRGBO(141, 153, 166, 1);
   static Color lightGreen = Color.fromRGBO(238, 247, 241, 1);
   static Color darkGreen = Color.fromRGBO(56, 161, 96, 1);
-  static Color bgColor = Color.fromRGBO(237, 242, 247, 1);
+  static Color bgColor = Color.fromRGBO(238, 240, 242, 1);
   static Color dimTxtColor = Color.fromRGBO(141, 153, 166, 1);
   // static Color dimTxtColor = Color.fromRGBO(185, 192, 199, 1);
   static const Color fieldBgColor = Color.fromRGBO(244, 245, 246, 1);

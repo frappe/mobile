@@ -55,6 +55,7 @@ class _LinkFieldState extends State<LinkField> {
       child: Theme(
         data: Theme.of(context).copyWith(primaryColor: Colors.black),
         child: FormBuilderTypeAhead(
+          key: Key(widget.value),
           controller: _typeAheadController,
           onSuggestionSelected: (item) {
             if (widget.onSuggestionSelected != null) {

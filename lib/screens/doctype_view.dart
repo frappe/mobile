@@ -7,7 +7,7 @@ import '../utils/enums.dart';
 import '../app.dart';
 
 class DoctypeView extends StatelessWidget {
-  static const _supportedDoctypes = ['Issue', 'Opportunity'];
+  static const _supportedDoctypes = ['Issue', 'Opportunity', 'Task'];
 
   final String module;
 

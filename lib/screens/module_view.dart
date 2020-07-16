@@ -8,7 +8,7 @@ import '../utils/helpers.dart';
 import './doctype_view.dart';
 
 class ModuleView extends StatelessWidget {
-  static const _supportedModules = ['Support', 'CRM'];
+  static const _supportedModules = ['Support', 'CRM', 'Projects'];
   final user = localStorage.getString('user');
   static const popupOptions = const ["Logout"];
 

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/utils/helpers.dart';
-
-import 'like_doc.dart';
+import 'package:frappe_app/utils/indicator.dart';
 
 class ListItem extends StatelessWidget {
   final String title;
@@ -51,47 +49,62 @@ class ListItem extends StatelessWidget {
         ),
         elevation: 0,
         child: Container(
-          padding: const EdgeInsets.only(left: 18.0, right: 8, bottom: 4),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Row(
-                  children: <Widget>[
-                    Text(
-                      name,
-                      style: Palette.dimTxtStyle,
+              Row(
+                children: <Widget>[
+                  Text(
+                    name,
+                    style: Palette.dimTxtStyle,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 6.0, right: 6.0),
+                    child: Icon(
+                      Icons.lens,
+                      size: 5,
+                      color: Palette.dimTxtColor,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 6.0, right: 6.0),
-                      child: Icon(
-                        Icons.lens,
-                        size: 5,
-                        color: Palette.dimTxtColor,
+                  ),
+                  Text(modifiedOn, style: Palette.dimTxtStyle),
+                  Spacer(),
+                  !seen
+                      ? Icon(
+                          Icons.lens,
+                          size: 10,
+                          color: Palette.primaryButtonColor,
+                        )
+                      : Container(),
+                  // LikeDoc(
+                  //   doctype: doctype,
+                  //   name: name,
+                  //   isFav: isFav,
+                  // )
+                ],
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: <Widget>[
+                  Container(
+                    width: colWidth,
+                    child: Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                        // fontWeight: FontWeight.bold
+                        fontWeight: !seen ? FontWeight.bold : null,
                       ),
                     ),
-                    Text(modifiedOn, style: Palette.dimTxtStyle),
-                    Spacer(),
-                    LikeDoc(
-                      doctype: doctype,
-                      name: name,
-                      isFav: isFav,
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                width: colWidth,
-                child: Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: !seen ? FontWeight.bold : null,
                   ),
-                ),
+                ],
+              ),
+              SizedBox(
+                height: 10,
               ),
               Row(
                 children: <Widget>[
@@ -100,7 +113,7 @@ class ListItem extends StatelessWidget {
                       status[0],
                       status[1],
                     ),
-                    child: buildStatusButton(
+                    child: Indicator.buildStatusButton(
                       doctype,
                       status[1],
                     ),
@@ -119,13 +132,13 @@ class ListItem extends StatelessWidget {
                     style: Palette.dimTxtStyle,
                   ),
                   Spacer(),
-                  IconButton(
-                    onPressed: assignee != null
+                  GestureDetector(
+                    onTap: assignee != null
                         ? () {
                             onButtonTap(assignee[0], assignee[1]);
                           }
                         : null,
-                    icon: Container(
+                    child: Container(
                       height: 20,
                       width: 20,
                       color: Palette.bgColor,

@@ -51,16 +51,13 @@ class _LikeDocState extends State<LikeDoc> {
   Widget build(BuildContext context) {
     return GestureDetector(
       child: Container(
-        padding: const EdgeInsets.only(right: 16.0),
         child: Icon(
-          widget.isFav ? Icons.favorite :Icons.favorite_border,
+          widget.isFav ? Icons.favorite : Icons.favorite_border,
           size: 18,
           color: widget.isFav ? Colors.red : Palette.dimTxtColor,
         ),
       ),
-      onTap: () {
-        _toggleFav();
-      },
+      onTap: _toggleFav,
     );
   }
 }

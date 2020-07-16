@@ -75,28 +75,28 @@ class _FrappeAppState extends State<FrappeApp> {
   }
 }
 
-const doctypeFieldnames = {
-  'Issue': [
-    "`tabIssue`.`name`",
-    "`tabIssue`.`status`",
-    "`tabIssue`.`subject`",
-    "`tabIssue`.`modified`",
-    "`tabIssue`.`_assign`",
-    "`tabIssue`.`_seen`",
-    "`tabIssue`.`_liked_by`",
-    "`tabIssue`.`_comments`"
-  ],
-  'Opportunity': [
-    "`tabOpportunity`.`name`",
-    "`tabOpportunity`.`status`",
-    "`tabOpportunity`.`title`",
-    "`tabOpportunity`.`modified`",
-    "`tabOpportunity`.`_assign`",
-    "`tabOpportunity`.`_seen`",
-    "`tabOpportunity`.`_liked_by`",
-    "`tabOpportunity`.`_comments`"
-  ]
-};
+// const doctypeFieldnames = {
+//   'Issue': [
+//     "`tabIssue`.`name`",
+//     "`tabIssue`.`status`",
+//     "`tabIssue`.`subject`",
+//     "`tabIssue`.`modified`",
+//     "`tabIssue`.`_assign`",
+//     "`tabIssue`.`_seen`",
+//     "`tabIssue`.`_liked_by`",
+//     "`tabIssue`.`_comments`"
+//   ],
+//   'Opportunity': [
+//     "`tabOpportunity`.`name`",
+//     "`tabOpportunity`.`status`",
+//     "`tabOpportunity`.`title`",
+//     "`tabOpportunity`.`modified`",
+//     "`tabOpportunity`.`_assign`",
+//     "`tabOpportunity`.`_seen`",
+//     "`tabOpportunity`.`_liked_by`",
+//     "`tabOpportunity`.`_comments`"
+//   ]
+// };
 
 class Router extends StatelessWidget {
   final ViewType viewType;
@@ -148,11 +148,12 @@ class Router extends StatelessWidget {
                 }
 
                 return CustomListView(
-                    filters: filters ?? defaultFilters,
-                    meta: docMeta,
-                    doctype: doctype,
-                    appBarTitle: doctype,
-                    fieldnames: doctypeFieldnames[doctype]);
+                  filters: filters ?? defaultFilters,
+                  meta: docMeta,
+                  doctype: doctype,
+                  appBarTitle: doctype,
+                  fieldnames: generateFieldnames(doctype, docMeta),
+                );
               } else if (viewType == ViewType.form) {
                 return FormView(
                   doctype: doctype,

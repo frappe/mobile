@@ -91,6 +91,11 @@ class BackendService {
     if (response.statusCode == 200) {
       var l = response.data["message"];
       var newL = [];
+
+      if (l.length == 0) {
+        return newL;
+      }
+
       for (int i = 0; i < l["values"].length; i++) {
         newL.add([l["keys"], l["values"][i]]);
       }

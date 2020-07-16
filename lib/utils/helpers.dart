@@ -106,6 +106,7 @@ Widget makeControl(Map field,
       {
         value = _buildDecoratedWidget(
             FormBuilderDropdown(
+              key: Key(val),
               initialValue: val,
               allowClear: editMode,
               attribute: field["fieldname"],
@@ -179,6 +180,7 @@ Widget makeControl(Map field,
         value = _buildDecoratedWidget(
             FormBuilderTextField(
               initialValue: val,
+              key: Key(val),
               attribute: field["fieldname"],
               decoration: Palette.formFieldDecoration(
                 withLabel,
@@ -195,6 +197,7 @@ Widget makeControl(Map field,
         value = _buildDecoratedWidget(
             FormBuilderCheckbox(
               leadingInput: true,
+              key: Key(val),
               attribute: field["fieldname"],
               label: Text(field["label"]),
               decoration: Palette.formFieldDecoration(
@@ -227,6 +230,7 @@ Widget makeControl(Map field,
       {
         value = _buildDecoratedWidget(
             FormBuilderDateTimePicker(
+              key: Key(val),
               valueTransformer: (val) {
                 return val != null ? val.toIso8601String() : null;
               },
@@ -248,6 +252,8 @@ Widget makeControl(Map field,
       {
         value = _buildDecoratedWidget(
             FormBuilderTextField(
+              key: Key(val),
+              initialValue: val.toString(),
               keyboardType: TextInputType.number,
               attribute: field["fieldname"],
               decoration: Palette.formFieldDecoration(
@@ -264,6 +270,7 @@ Widget makeControl(Map field,
       {
         value = _buildDecoratedWidget(
             FormBuilderDateTimePicker(
+              key: Key(val),
               inputType: InputType.time,
               valueTransformer: (val) {
                 return val != null ? val.toIso8601String() : null;
@@ -284,6 +291,7 @@ Widget makeControl(Map field,
       {
         value = _buildDecoratedWidget(
             FormBuilderDateTimePicker(
+              key: Key(val),
               inputType: InputType.date,
               valueTransformer: (val) {
                 return val != null ? val.toIso8601String() : null;
@@ -350,61 +358,6 @@ Future<bool> _checkPermission() async {
     return true;
   }
   return false;
-}
-
-Map<String, Color> setStatusColor(String doctype, String status) {
-  var doctypeColor = {
-    'Issue': {
-      'Open': Colors.red,
-      'Closed': Colors.green,
-    }
-  };
-
-  if (doctypeColor[doctype] != null && doctypeColor[doctype][status] != null) {
-    return {
-      'bgColor': doctypeColor[doctype][status][50],
-      'txtColor': doctypeColor[doctype][status][800]
-    };
-  } else if (["Pending", "Review", "Medium", "Not Approved"].contains(status)) {
-    return {
-      'bgColor': Colors.orange[100],
-      'txtColor': Colors.orange[800],
-    };
-  } else if (["Open", "Urgent", "High", "Failed", "Rejected", "Error"]
-      .contains(status)) {
-    return {
-      'bgColor': Colors.red[100],
-      'txtColor': Colors.red[800],
-    };
-  } else if ([
-    "Closed",
-    "Finished",
-    "Converted",
-    "Completed",
-    "Complete",
-    "Confirmed",
-    "Approved",
-    "Yes",
-    "Active",
-    "Available",
-    "Paid",
-    "Success",
-  ].contains(status)) {
-    return {
-      'bgColor': Colors.green[100],
-      'txtColor': Colors.green[800],
-    };
-  } else if (["Submitted"].contains(status)) {
-    return {
-      'bgColor': Colors.blue[100],
-      'txtColor': Colors.blue[800],
-    };
-  } else {
-    return {
-      'bgColor': Colors.grey[100],
-      'txtColor': Colors.grey[800],
-    };
-  }
 }
 
 String toTitleCase(String str) {
@@ -533,22 +486,23 @@ DateTime parseDate(val) {
   }
 }
 
-Widget buildStatusButton(String doctype, String status) {
-  return Container(
-    width: 60,
-    padding: EdgeInsets.all(4),
-    decoration: BoxDecoration(
-      color: setStatusColor(doctype, status)['bgColor'],
-      borderRadius: BorderRadius.circular(5),
-    ),
-    child: Center(
-      child: Text(
-        status ?? "",
-        style: TextStyle(
-          color: setStatusColor(doctype, status)['txtColor'],
-          fontSize: 12,
-        ),
-      ),
-    ),
-  );
+List generateFieldnames(String doctype, Map meta) {
+  const defaultFields = [
+    'name',
+    'status',
+    'modified',
+    '_assign',
+    '_seen',
+    '_liked_by',
+    '_comments',
+  ];
+
+  var transformedFields = defaultFields.map((field) {
+    return "`tab$doctype`.`$field`";
+  }).toList();
+
+  var titleField = "`tab$doctype`.`${meta["title_field"]}`";
+  transformedFields.insert(2, titleField);
+
+  return transformedFields;
 }

@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:frappe_app/screens/filter_list.dart';
 import 'package:frappe_app/utils/backend_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -39,86 +41,9 @@ class CustomListView extends StatefulWidget {
 class _CustomListViewState extends State<CustomListView> {
   static const int PAGE_SIZE = 10;
   final userId = Uri.decodeFull(localStorage.getString('userId'));
-  bool showLiked = false;
   var _pageLoadController;
   BackendService backendService;
-
-  List<Widget> _buildFilters(List filters) {
-    var chips = filters.asMap().entries.map((entry) {
-      var value = entry.value;
-      var key = entry.key;
-      var label = widget.meta["field_label"][value[1]];
-      return Padding(
-        padding: const EdgeInsets.only(right: 8),
-        child: InputChip(
-          deleteIconColor: Palette.darkGrey,
-          backgroundColor: Colors.transparent,
-          shape: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Palette.borderColor,
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(5),
-            ),
-          ),
-          label: Text(
-            "$label ${value[2]} ${value[3]}",
-            style: TextStyle(fontSize: 12),
-          ),
-          onDeleted: () {
-            filters.removeAt(key);
-            _pageLoadController.reset();
-            setState(() {});
-          },
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-      );
-    }).toList();
-
-    return chips;
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      padding: EdgeInsets.only(top: 70, left: 16),
-      child: Row(
-        children: <Widget>[
-          widget.filters.length > 0
-              ? Expanded(
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      Visibility(
-                        visible: widget.filters.length > 0,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            right: 8.0,
-                            bottom: 12,
-                            top: 12,
-                          ),
-                          child: Button(
-                            buttonType: ButtonType.secondary,
-                            title: 'Clear Filters',
-                            onPressed: () {
-                              setState(() {
-                                _pageLoadController.reset();
-                                widget.filters.clear();
-                                localStorage.setString(
-                                    '${widget.doctype}Filter', null);
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                      ..._buildFilters(widget.filters)
-                    ],
-                  ),
-                )
-              : Text('No Filters'),
-        ],
-      ),
-    );
-  }
+  bool showLiked;
 
   @override
   void initState() {
@@ -146,160 +71,288 @@ class _CustomListViewState extends State<CustomListView> {
 
   @override
   Widget build(BuildContext context) {
+    if (FilterList.getFieldFilterIndex(widget.filters, '_liked_by') != null) {
+      showLiked = true;
+    } else {
+      showLiked = false;
+    }
     return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            SliverAppBar(
-              pinned: true,
-              snap: true,
-              floating: true,
-              expandedHeight: 100,
-              flexibleSpace: FlexibleSpaceBar(
-                background: _buildHeader(),
-              ),
-              title: Text(widget.appBarTitle),
-              actions: <Widget>[
-                IconButton(
-                  icon: Icon(
-                    Icons.filter_list,
-                    color: Palette.darkGrey,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return Router(
-                            viewType: ViewType.filter,
-                            doctype: widget.doctype,
-                            filters: widget.filters,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: Icon(
-                    showLiked ? Icons.favorite : Icons.favorite_border,
-                    color: showLiked ? Colors.red : Palette.darkGrey,
-                  ),
-                  onPressed: () {
-                    if (!showLiked) {
-                      widget.filters.add(
-                          [widget.doctype, '_liked_by', 'like', '%$userId%']);
-                    } else {
-                      int likedByIdx;
-                      for (int i = 0; i < widget.filters.length; i++) {
-                        if (widget.filters[i][1] == '_liked_by') {
-                          likedByIdx = i;
-                          break;
-                        }
-                      }
-                      if (likedByIdx != null) {
-                        widget.filters.removeAt(likedByIdx);
-                      }
-                    }
-
-                    setState(() {
-                      showLiked = !showLiked;
-                      _pageLoadController.reset();
-                    });
-                  },
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.add_circle_outline,
-                    color: Palette.darkGrey,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return Router(
-                            viewType: ViewType.newForm,
-                            doctype: widget.doctype,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ];
-        },
-        body: RefreshIndicator(
-          onRefresh: () {
-            _pageLoadController.reset();
-            return Future.delayed(Duration(seconds: 1));
-          },
-          child: Container(
-            color: Palette.bgColor,
-            child: PagewiseListView(
-              pageLoadController: _pageLoadController,
-              itemBuilder: ((buildContext, entry, _) {
-                int titleFieldIndex =
-                    entry[0].indexOf(widget.meta["title_field"]);
-                var key = entry[0];
-                var value = entry[1];
-                var assignee = value[4] != null ? json.decode(value[4]) : null;
-
-                var likedBy = value[6] != null ? json.decode(value[6]) : [];
-                var isLikedByUser = likedBy.contains(userId);
-
-                var seenBy = value[5] != null ? json.decode(value[5]) : [];
-                var isSeenByUser = seenBy.contains(userId);
-
-                return ListItem(
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Palette.primaryButtonColor,
+        child: Icon(
+          Icons.add,
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return Router(
+                  viewType: ViewType.newForm,
                   doctype: widget.doctype,
-                  onListTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return Router(
-                            viewType: ViewType.form,
-                            doctype: widget.doctype,
-                            name: value[0],
-                          );
-                        },
-                      ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+      appBar: AppBar(
+        title: Text(widget.appBarTitle),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.search,
+              color: Palette.darkGrey,
+            ),
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: CustomSearch(widget),
+              );
+            },
+          ),
+          IconButton(
+            icon: Badge(
+              badgeColor: Colors.white,
+              position: BadgePosition.bottomRight(),
+              showBadge: widget.filters.isNotEmpty,
+              badgeContent: Text("${widget.filters.length}"),
+              child: Icon(
+                Icons.filter_list,
+                color:
+                    widget.filters.length > 0 ? Colors.black : Palette.darkGrey,
+              ),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return Router(
+                      viewType: ViewType.filter,
+                      doctype: widget.doctype,
+                      filters: widget.filters,
                     );
                   },
-                  isFav: isLikedByUser,
-                  seen: isSeenByUser,
-                  assignee: assignee != null && assignee.length > 0
-                      ? [key[4], assignee[0]]
-                      : null,
-                  onButtonTap: (k, v) {
-                    if (k == '_assign') {
-                      widget.filters.add([widget.doctype, k, 'like', '%$v%']);
-                    } else {
-                      widget.filters.add([widget.doctype, k, '=', v]);
-                    }
-                    localStorage.setString(
-                        '${widget.doctype}Filter', json.encode(widget.filters));
-                    _pageLoadController.reset();
-                    setState(() {});
-                  },
-                  title: value[titleFieldIndex],
-                  modifiedOn: "${timeago.format(
-                    DateTime.parse(
-                      value[3],
-                    ),
-                  )}",
-                  name: value[0],
-                  status: [key[1], value[1]],
-                  commentCount: value[8],
-                );
-              }),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              showLiked ? Icons.favorite : Icons.favorite_border,
+              color: showLiked ? Colors.red : Palette.darkGrey,
             ),
+            onPressed: () {
+              if (!showLiked) {
+                widget.filters.add([
+                  widget.doctype,
+                  '_liked_by',
+                  'like',
+                  '%$userId%',
+                ]);
+              } else {
+                int likedByIdx = FilterList.getFieldFilterIndex(
+                  widget.filters,
+                  '_liked_by',
+                );
+
+                if (likedByIdx != null) {
+                  widget.filters.removeAt(likedByIdx);
+                }
+              }
+
+              setState(() {
+                showLiked = !showLiked;
+                _pageLoadController.reset();
+              });
+            },
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await _pageLoadController.reset();
+        },
+        child: Container(
+          color: Palette.bgColor,
+          child: PagewiseListView(
+            noItemsFoundBuilder: (context) {
+              return Container(
+                padding: EdgeInsets.all(20),
+                color: Colors.white,
+                width: double.infinity,
+                child: Column(
+                  children: <Widget>[
+                    Text('No Items Found'),
+                    if (widget.filters.isNotEmpty)
+                      Button(
+                        buttonType: ButtonType.secondary,
+                        title: 'Clear Filter',
+                        onPressed: () {
+                          FilterList.clearFilters(widget.doctype);
+                          widget.filters.clear();
+                          _pageLoadController.reset();
+                          setState(() {});
+                        },
+                      ),
+                    Button(
+                      buttonType: ButtonType.primary,
+                      title: 'Create New',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return Router(
+                                viewType: ViewType.newForm,
+                                doctype: widget.doctype,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    )
+                  ],
+                ),
+              );
+            },
+            pageLoadController: _pageLoadController,
+            itemBuilder: ((buildContext, entry, _) {
+              int titleFieldIndex =
+                  entry[0].indexOf(widget.meta["title_field"]);
+              var key = entry[0];
+              var value = entry[1];
+              var assignee = value[4] != null ? json.decode(value[4]) : null;
+
+              var likedBy = value[6] != null ? json.decode(value[6]) : [];
+              var isLikedByUser = likedBy.contains(userId);
+
+              var seenBy = value[5] != null ? json.decode(value[5]) : [];
+              var isSeenByUser = seenBy.contains(userId);
+
+              return ListItem(
+                doctype: widget.doctype,
+                onListTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return Router(
+                          viewType: ViewType.form,
+                          doctype: widget.doctype,
+                          name: value[0],
+                        );
+                      },
+                    ),
+                  );
+                },
+                isFav: isLikedByUser,
+                seen: isSeenByUser,
+                assignee: assignee != null && assignee.length > 0
+                    ? [key[4], assignee[0]]
+                    : null,
+                onButtonTap: (k, v) {
+                  if (k == '_assign') {
+                    widget.filters.add([widget.doctype, k, 'like', '%$v%']);
+                  } else {
+                    widget.filters.add([widget.doctype, k, '=', v]);
+                  }
+                  localStorage.setString(
+                      '${widget.doctype}Filter', json.encode(widget.filters));
+                  _pageLoadController.reset();
+                  setState(() {});
+                },
+                title: value[titleFieldIndex],
+                modifiedOn: "${timeago.format(
+                  DateTime.parse(
+                    value[3],
+                  ),
+                )}",
+                name: value[0],
+                status: [key[1], value[1]],
+                commentCount: value[8],
+              );
+            }),
           ),
         ),
       ),
+    );
+  }
+}
+
+class CustomSearch extends SearchDelegate {
+  final data;
+
+  // TODO hintText
+  CustomSearch(this.data);
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      )
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, null);
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return Container();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return FutureBuilder(
+      future: BackendService(context).fetchList(
+          fieldnames: data.fieldnames,
+          doctype: data.doctype,
+          filters: [
+            [data.doctype, 'subject', 'like', '%$query%']
+          ]),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return ListView.builder(
+            itemCount: snapshot.data.length,
+            itemBuilder: (_, index) {
+              return ListTile(
+                title: Text(
+                  snapshot.data[index][1][2],
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return Router(
+                          viewType: ViewType.form,
+                          doctype: data.doctype,
+                          name: snapshot.data[index][1][0],
+                        );
+                      },
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        } else {
+          return CircularProgressIndicator();
+        }
+      },
     );
   }
 }
