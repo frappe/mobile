@@ -54,7 +54,7 @@ class _LikeDocState extends State<LikeDoc> {
         child: Icon(
           widget.isFav ? Icons.favorite : Icons.favorite_border,
           size: 18,
-          color: widget.isFav ? Colors.red : Palette.dimTxtColor,
+          color: widget.isFav ? Colors.red : Palette.secondaryTxtColor,
         ),
       ),
       onTap: _toggleFav,

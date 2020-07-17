@@ -34,14 +34,14 @@ class FilterList extends StatefulWidget {
   }
 
   static clearFilters(String doctype) {
-    localStorage.setString(
+    localStorage.remove(
       "${doctype}Filter",
-      json.encode([]),
     );
   }
 
   static List generateFilters(String doctype, Map filters) {
     var transformedFilters;
+    var kIdx;
     var cacheKey = '${doctype}Filter';
     if (localStorage.containsKey(cacheKey)) {
       transformedFilters = json.decode(localStorage.getString(cacheKey));
@@ -52,9 +52,17 @@ class FilterList extends StatefulWidget {
     filters.forEach((k, v) {
       if (v != null) {
         if (k == '_assign' && v != '') {
+          kIdx = getFieldFilterIndex(transformedFilters, k);
+          if (kIdx != null) {
+            transformedFilters.removeAt(kIdx);
+          }
           transformedFilters.add([doctype, k, "like", "%$v%"]);
         } else {
           if (v != "") {
+            kIdx = getFieldFilterIndex(transformedFilters, k);
+            if (kIdx != null) {
+              transformedFilters.removeAt(kIdx);
+            }
             transformedFilters.add([doctype, k, "=", v]);
           }
         }
@@ -75,10 +83,51 @@ class FilterList extends StatefulWidget {
 
 class _FilterListState extends State<FilterList> {
   GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+  List defaultFilters = [
+    {
+      "is_default_filter": 1,
+      "fieldname": "_assign",
+      "options": "User",
+      "label": "Assigned To",
+      "fieldtype": "Link"
+    },
+  ];
+
+  List<Widget> _generateChildren(var fields) {
+    fields.addAll(defaultFilters);
+    return fields.where((field) {
+      return field["in_standard_filter"] == 1 ||
+          field["is_default_filter"] == 1;
+    }).map<Widget>(
+      (field) {
+        var val;
+
+        if (widget.filters != null && widget.filters.length > 0) {
+          for (int i = 0; i < widget.filters.length; i++) {
+            if (widget.filters[i][1] == field["fieldname"]) {
+              val = widget.filters[i][3];
+            }
+          }
+        }
+
+        return Column(
+          children: <Widget>[
+            ListTile(
+              title: makeControl(field, val),
+            ),
+            Divider(
+              height: 10.0,
+            ),
+          ],
+        );
+      },
+    ).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(widget.appBarTitle),
         actions: <Widget>[
@@ -121,33 +170,9 @@ class _FilterListState extends State<FilterList> {
         key: _fbKey,
         child: ListView(
           padding: EdgeInsets.all(10),
-          children: widget.wireframe["fields"].where((field) {
-            return field["in_standard_filter"] == 1;
-          }).map<Widget>(
-            (field) {
-              var val = field["val"];
-
-              if (val == null) {
-                if (widget.filters != null && widget.filters.length > 0) {
-                  for (int i = 0; i < widget.filters.length; i++) {
-                    if (widget.filters[i][1] == field["fieldname"]) {
-                      val = widget.filters[i][3];
-                    }
-                  }
-                }
-              }
-              return Column(
-                children: <Widget>[
-                  ListTile(
-                    title: makeControl(field, val),
-                  ),
-                  Divider(
-                    height: 10.0,
-                  ),
-                ],
-              );
-            },
-          ).toList(),
+          children: _generateChildren(
+            widget.wireframe["fields"],
+          ),
         ),
       ),
     );

@@ -42,7 +42,7 @@ class _AssigneesState extends State<Assignees> {
         'Selected',
         style: TextStyle(
           fontSize: 18,
-          color: Palette.dimTxtColor,
+          color: Palette.secondaryTxtColor,
           fontWeight: FontWeight.bold,
         ),
       ),

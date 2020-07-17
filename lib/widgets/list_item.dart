@@ -43,30 +43,29 @@ class ListItem extends StatelessWidget {
         margin: EdgeInsets.zero,
         shape: Border.symmetric(
           vertical: BorderSide(
-            width: 0.5,
-            color: Palette.borderColor,
+            width: 0.1,
           ),
         ),
         elevation: 0,
         child: Container(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
           child: Column(
             children: <Widget>[
               Row(
                 children: <Widget>[
                   Text(
                     name,
-                    style: Palette.dimTxtStyle,
+                    style: Palette.secondaryTxtStyle,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 6.0, right: 6.0),
                     child: Icon(
                       Icons.lens,
                       size: 5,
-                      color: Palette.dimTxtColor,
+                      color: Palette.secondaryTxtColor,
                     ),
                   ),
-                  Text(modifiedOn, style: Palette.dimTxtStyle),
+                  Text(modifiedOn, style: Palette.secondaryTxtStyle),
                   Spacer(),
                   !seen
                       ? Icon(
@@ -75,11 +74,6 @@ class ListItem extends StatelessWidget {
                           color: Palette.primaryButtonColor,
                         )
                       : Container(),
-                  // LikeDoc(
-                  //   doctype: doctype,
-                  //   name: name,
-                  //   isFav: isFav,
-                  // )
                 ],
               ),
               SizedBox(
@@ -109,10 +103,9 @@ class ListItem extends StatelessWidget {
               Row(
                 children: <Widget>[
                   GestureDetector(
-                    onTap: () => onButtonTap(
-                      status[0],
-                      status[1],
-                    ),
+                    onTap: () => onButtonTap({
+                      status[0]: status[1],
+                    }),
                     child: Indicator.buildStatusButton(
                       doctype,
                       status[1],
@@ -124,18 +117,20 @@ class ListItem extends StatelessWidget {
                     child: Icon(
                       Icons.comment,
                       size: 14,
-                      color: Palette.dimTxtColor,
+                      color: Palette.secondaryTxtColor,
                     ),
                   ),
                   Text(
                     '$commentCount',
-                    style: Palette.dimTxtStyle,
+                    style: Palette.secondaryTxtStyle,
                   ),
                   Spacer(),
                   GestureDetector(
                     onTap: assignee != null
                         ? () {
-                            onButtonTap(assignee[0], assignee[1]);
+                            onButtonTap({
+                              assignee[0]: assignee[1],
+                            });
                           }
                         : null,
                     child: Container(

@@ -71,7 +71,10 @@ Widget makeControl(Map field,
           children: <Widget>[
             Padding(
               padding: labelPadding,
-              child: Text(field["label"], style: Palette.labelStyle),
+              child: Text(
+                field["label"],
+                style: Palette.secondaryTxtStyle,
+              ),
             ),
             fieldWidget
           ],
@@ -90,6 +93,7 @@ Widget makeControl(Map field,
       {
         value = _buildDecoratedWidget(
             LinkField(
+              fillColor: Palette.fieldBgColor,
               allowClear: editMode,
               validators: validators,
               attribute: field["fieldname"],
@@ -197,7 +201,7 @@ Widget makeControl(Map field,
         value = _buildDecoratedWidget(
             FormBuilderCheckbox(
               leadingInput: true,
-              key: Key(val),
+              key: Key(val.toString()),
               attribute: field["fieldname"],
               label: Text(field["label"]),
               decoration: Palette.formFieldDecoration(
@@ -252,7 +256,7 @@ Widget makeControl(Map field,
       {
         value = _buildDecoratedWidget(
             FormBuilderTextField(
-              key: Key(val),
+              key: Key(val.toString()),
               initialValue: val.toString(),
               keyboardType: TextInputType.number,
               attribute: field["fieldname"],
@@ -417,7 +421,7 @@ List<Widget> generateLayout({
                 maintainState: true,
                 title: Text(
                   collapsibleLabels[idx].toUpperCase(),
-                  style: Palette.dimTxtStyle,
+                  style: Palette.secondaryTxtStyle,
                 ),
                 children: [...collapsibles],
               ),
@@ -435,13 +439,11 @@ List<Widget> generateLayout({
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Divider(
-                color: Palette.darkGrey,
-              ),
+              Divider(color: Palette.iconColor),
               field["label"] != null
                   ? Text(
                       field["label"].toUpperCase(),
-                      style: Palette.dimTxtStyle,
+                      style: Palette.secondaryTxtStyle,
                     )
                   : Container(),
             ],

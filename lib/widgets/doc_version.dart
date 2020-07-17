@@ -68,7 +68,7 @@ class DocVersion extends StatelessWidget {
           "div": Style(
             fontSize: FontSize(12),
           ),
-          "span": Style(color: Palette.dimTxtColor)
+          "span": Style(color: Palette.secondaryTxtColor)
         },
         onImageError: (a, b) {
           // TODO

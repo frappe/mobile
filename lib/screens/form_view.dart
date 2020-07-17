@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/utils/backend_service.dart';
 import 'package:frappe_app/utils/indicator.dart';
+import 'package:frappe_app/widgets/button.dart';
 import 'package:frappe_app/widgets/timeline.dart';
 import 'package:frappe_app/widgets/user_avatar.dart';
 
@@ -140,9 +141,6 @@ class _FormViewState extends State<FormView>
             return Scaffold(
                 bottomNavigationBar: Container(
                   height: 70,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Palette.lightGrey),
-                  ),
                   child: BottomAppBar(
                     color: Colors.white,
                     child: Row(
@@ -152,12 +150,9 @@ class _FormViewState extends State<FormView>
                           child: Container(
                             height: 70,
                             padding: EdgeInsets.all(8),
-                            child: RaisedButton(
-                              child: Text(
-                                'Comment',
-                                style: TextStyle(color: Colors.blueAccent),
-                              ),
-                              color: Palette.offWhite,
+                            child: Button(
+                              buttonType: ButtonType.secondary,
+                              title: 'Comment',
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -181,12 +176,9 @@ class _FormViewState extends State<FormView>
                           child: Container(
                             height: 70,
                             padding: EdgeInsets.all(8),
-                            child: RaisedButton(
-                              child: Text(
-                                'New Email',
-                                style: TextStyle(color: Colors.blueAccent),
-                              ),
-                              color: Palette.offWhite,
+                            child: Button(
+                              buttonType: ButtonType.primary,
+                              title: 'New Email',
                               onPressed: () {
                                 Navigator.push(
                                   context,

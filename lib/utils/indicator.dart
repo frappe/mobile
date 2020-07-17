@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/palette.dart';
 
 class Indicator {
   static Widget buildStatusButton(String doctype, String status) {
@@ -41,31 +42,34 @@ class Indicator {
   }
 
   static Widget buildIndicator(String title, Map<String, Color> color) {
-    return Container(
-      width: 60,
-      padding: EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: color['bgColor'],
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Center(
-        child: Text(
-          title ?? "",
-          style: TextStyle(
-            color: color['txtColor'],
-            fontSize: 12,
-          ),
+    return ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: 60,
         ),
-      ),
-    );
+        child: Container(
+          padding: EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: color['bgColor'],
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Center(
+            child: Text(
+              title ?? "",
+              style: TextStyle(
+                color: color['txtColor'],
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ));
   }
 
   static Widget indicateDanger(String title) {
     return buildIndicator(
       title,
       {
-        'txtColor': Colors.red[800],
-        'bgColor': Colors.red[50],
+        'txtColor': Palette.dangerTxtColor,
+        'bgColor': Palette.dangerBgColor,
       },
     );
   }
@@ -74,8 +78,8 @@ class Indicator {
     return buildIndicator(
       title,
       {
-        'txtColor': Colors.green[800],
-        'bgColor': Colors.green[50],
+        'txtColor': Palette.successTxtColor,
+        'bgColor': Palette.successBgColor,
       },
     );
   }
@@ -84,8 +88,8 @@ class Indicator {
     return buildIndicator(
       title,
       {
-        'txtColor': Colors.orange[800],
-        'bgColor': Colors.orange[50],
+        'txtColor': Palette.warningTxtColor,
+        'bgColor': Palette.warningBgColor,
       },
     );
   }
@@ -94,8 +98,8 @@ class Indicator {
     return buildIndicator(
       title,
       {
-        'txtColor': Colors.blue[800],
-        'bgColor': Colors.blue[50],
+        'txtColor': Palette.completeTxtColor,
+        'bgColor': Palette.completeBgColor,
       },
     );
   }
@@ -104,8 +108,8 @@ class Indicator {
     return buildIndicator(
       title,
       {
-        'txtColor': Colors.grey[800],
-        'bgColor': Colors.grey[50],
+        'txtColor': Palette.undefinedTxtColor,
+        'bgColor': Palette.undefinedBgColor,
       },
     );
   }

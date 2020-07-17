@@ -49,7 +49,7 @@ class _MultiSelectState extends State<MultiSelect> {
         if (query.length != 0) {
           var lowercaseQuery = query.toLowerCase();
           var response = await backendService.getContactList(lowercaseQuery);
-          var val = response["result"];
+          var val = response["message"];
           if (val.length == 0) {
             val = [
               {
@@ -69,12 +69,9 @@ class _MultiSelectState extends State<MultiSelect> {
             profile["value"],
             style: TextStyle(fontSize: 12),
           ),
-          deleteIconColor: Palette.darkGrey,
-          backgroundColor: Colors.transparent,
-          shape: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Palette.borderColor,
-            ),
+          deleteIconColor: Palette.iconColor,
+          backgroundColor: Colors.white,
+          shape: BeveledRectangleBorder(
             borderRadius: BorderRadius.all(
               Radius.circular(5),
             ),
@@ -85,7 +82,7 @@ class _MultiSelectState extends State<MultiSelect> {
       },
       suggestionBuilder: (context, state, profile) {
         return ListTile(
-          title: Text(profile.value),
+          title: Text(profile["value"]),
           onTap: () => state.selectSuggestion(profile),
         );
       },

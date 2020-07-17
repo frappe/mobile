@@ -102,7 +102,7 @@ class _CustomListViewState extends State<CustomListView> {
           IconButton(
             icon: Icon(
               Icons.search,
-              color: Palette.darkGrey,
+              color: Palette.iconColor,
             ),
             onPressed: () {
               showSearch(
@@ -119,8 +119,9 @@ class _CustomListViewState extends State<CustomListView> {
               badgeContent: Text("${widget.filters.length}"),
               child: Icon(
                 Icons.filter_list,
-                color:
-                    widget.filters.length > 0 ? Colors.black : Palette.darkGrey,
+                color: widget.filters.length > 0
+                    ? Colors.black
+                    : Palette.iconColor,
               ),
             ),
             onPressed: () {
@@ -141,7 +142,7 @@ class _CustomListViewState extends State<CustomListView> {
           IconButton(
             icon: Icon(
               showLiked ? Icons.favorite : Icons.favorite_border,
-              color: showLiked ? Colors.red : Palette.darkGrey,
+              color: showLiked ? Colors.red : Palette.iconColor,
             ),
             onPressed: () {
               if (!showLiked) {
@@ -252,14 +253,11 @@ class _CustomListViewState extends State<CustomListView> {
                 assignee: assignee != null && assignee.length > 0
                     ? [key[4], assignee[0]]
                     : null,
-                onButtonTap: (k, v) {
-                  if (k == '_assign') {
-                    widget.filters.add([widget.doctype, k, 'like', '%$v%']);
-                  } else {
-                    widget.filters.add([widget.doctype, k, '=', v]);
-                  }
-                  localStorage.setString(
-                      '${widget.doctype}Filter', json.encode(widget.filters));
+                onButtonTap: (filter) {
+                  widget.filters.clear();
+                  widget.filters.addAll(
+                    FilterList.generateFilters(widget.doctype, filter),
+                  );
                   _pageLoadController.reset();
                   setState(() {});
                 },
