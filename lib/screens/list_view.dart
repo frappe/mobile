@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/screens/filter_list.dart';
 import 'package:frappe_app/utils/backend_service.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../main.dart';
@@ -100,8 +101,8 @@ class _CustomListViewState extends State<CustomListView> {
         title: Text(widget.appBarTitle),
         actions: <Widget>[
           IconButton(
-            icon: Icon(
-              Icons.search,
+            icon: FrappeIcon(
+              FrappeIcons.search,
               color: Palette.iconColor,
             ),
             onPressed: () {
@@ -117,8 +118,8 @@ class _CustomListViewState extends State<CustomListView> {
               position: BadgePosition.bottomRight(),
               showBadge: widget.filters.isNotEmpty,
               badgeContent: Text("${widget.filters.length}"),
-              child: Icon(
-                Icons.filter_list,
+              child: FrappeIcon(
+                FrappeIcons.filter,
                 color: widget.filters.length > 0
                     ? Colors.black
                     : Palette.iconColor,
@@ -140,9 +141,11 @@ class _CustomListViewState extends State<CustomListView> {
             },
           ),
           IconButton(
-            icon: Icon(
-              showLiked ? Icons.favorite : Icons.favorite_border,
-              color: showLiked ? Colors.red : Palette.iconColor,
+            icon: FrappeIcon(
+              showLiked
+                  ? FrappeIcons.favourite_active
+                  : FrappeIcons.favourite_resting,
+              color: showLiked ? null : Palette.iconColor,
             ),
             onPressed: () {
               if (!showLiked) {
@@ -180,10 +183,11 @@ class _CustomListViewState extends State<CustomListView> {
           child: PagewiseListView(
             noItemsFoundBuilder: (context) {
               return Container(
-                padding: EdgeInsets.all(20),
                 color: Colors.white,
-                width: double.infinity,
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height - 100,
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text('No Items Found'),
                     if (widget.filters.isNotEmpty)

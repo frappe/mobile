@@ -426,4 +426,26 @@ class BackendService {
       throw Exception('Failed to load album');
     }
   }
+
+  Future toggleLike(String doctype, String name, bool isFav) async {
+    var data = {
+      'doctype': doctype,
+      'name': name,
+      'add': isFav ? 'Yes' : 'No',
+    };
+
+    final response = await dio.post(
+      '/method/frappe.desk.like.toggle_like',
+      data: data,
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      throw Exception('Something went wrong');
+    }
+  }
 }

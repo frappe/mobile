@@ -1,7 +1,8 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/utils/http.dart';
+import 'package:frappe_app/utils/backend_service.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
 
 class LikeDoc extends StatefulWidget {
   bool isFav;
@@ -19,22 +20,23 @@ class LikeDoc extends StatefulWidget {
 }
 
 class _LikeDocState extends State<LikeDoc> {
+  BackendService backendService;
+
+  @override
+  void initState() {
+    super.initState();
+    backendService = BackendService(context);
+  }
+
   _toggleFav() async {
     setState(() {
       widget.isFav = !widget.isFav;
     });
-    var data = {
-      'doctype': widget.doctype,
-      'name': widget.name,
-      'add': widget.isFav ? 'Yes' : 'No'
-    };
 
-    final response = await dio.post(
-      '/method/frappe.desk.like.toggle_like',
-      data: data,
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
+    var response = await backendService.toggleLike(
+      widget.doctype,
+      widget.name,
+      widget.isFav,
     );
 
     if (response.statusCode == 200) {
@@ -51,10 +53,12 @@ class _LikeDocState extends State<LikeDoc> {
   Widget build(BuildContext context) {
     return GestureDetector(
       child: Container(
-        child: Icon(
-          widget.isFav ? Icons.favorite : Icons.favorite_border,
+        child: FrappeIcon(
+          widget.isFav
+              ? FrappeIcons.favourite_active
+              : FrappeIcons.favourite_resting,
           size: 18,
-          color: widget.isFav ? Colors.red : Palette.secondaryTxtColor,
+          color: widget.isFav ? null : Palette.iconColor,
         ),
       ),
       onTap: _toggleFav,

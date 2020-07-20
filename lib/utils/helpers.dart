@@ -44,7 +44,10 @@ Future processData(
 
   metaFields.forEach((field) {
     if (field["fieldtype"] == "Select") {
-      field["options"] = field["options"].split('\n');
+      if (field["hidden"] != 1) {
+        field["options"] =
+            field["options"] != null ? field["options"].split('\n') : [];
+      }
     }
   });
 

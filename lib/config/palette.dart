@@ -21,7 +21,7 @@ class Palette {
   static Color successTxtColor = FrappePalette.darkGreen[600];
   static Color successBgColor = FrappePalette.darkGreen[100];
 
-  static Color secondaryTxtColor = Color.fromRGBO(185, 192, 199, 1);
+  static Color secondaryTxtColor = Color(0xFFB9C0C7);
   static Color newIndicatorColor = Color.fromRGBO(255, 252, 231, 1);
   // TODO: move
 

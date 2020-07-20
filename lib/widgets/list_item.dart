@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/utils/indicator.dart';
 
 class ListItem extends StatelessWidget {
@@ -113,13 +115,12 @@ class ListItem extends StatelessWidget {
                   ),
                   VerticalDivider(),
                   Padding(
-                    padding: const EdgeInsets.only(right: 6.0),
-                    child: Icon(
-                      Icons.comment,
-                      size: 14,
-                      color: Palette.secondaryTxtColor,
-                    ),
-                  ),
+                      padding: const EdgeInsets.only(right: 6.0),
+                      child: FrappeIcon(
+                        FrappeIcons.message_1,
+                        size: 16,
+                        color: Palette.secondaryTxtColor,
+                      )),
                   Text(
                     '$commentCount',
                     style: Palette.secondaryTxtStyle,
