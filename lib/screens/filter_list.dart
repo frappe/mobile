@@ -5,6 +5,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/app.dart';
 import 'package:frappe_app/main.dart';
 import 'package:frappe_app/utils/enums.dart';
+import 'package:frappe_app/widgets/button.dart';
 
 import '../utils/helpers.dart';
 
@@ -83,18 +84,8 @@ class FilterList extends StatefulWidget {
 
 class _FilterListState extends State<FilterList> {
   GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-  List defaultFilters = [
-    {
-      "is_default_filter": 1,
-      "fieldname": "_assign",
-      "options": "User",
-      "label": "Assigned To",
-      "fieldtype": "Link"
-    },
-  ];
 
   List<Widget> _generateChildren(var fields) {
-    fields.addAll(defaultFilters);
     return fields.where((field) {
       return field["in_standard_filter"] == 1 ||
           field["is_default_filter"] == 1;
@@ -128,43 +119,53 @@ class _FilterListState extends State<FilterList> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      bottomNavigationBar: Container(
+        height: 60,
+        child: BottomAppBar(
+          color: Colors.white,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Button(
+                buttonType: ButtonType.secondary,
+                title: 'Clear All',
+                onPressed: () {
+                  FilterList.clearFilters(widget.wireframe["name"]);
+                  _fbKey.currentState.reset();
+                  widget.filters.clear();
+                  setState(() {});
+                },
+              ),
+              Button(
+                buttonType: ButtonType.primary,
+                onPressed: () {
+                  _fbKey.currentState.save();
+
+                  var filters = FilterList.generateFilters(
+                    widget.wireframe["name"],
+                    _fbKey.currentState.value,
+                  );
+
+                  Navigator.of(context).pop();
+
+                  widget.filterCallback(filters);
+                },
+                title: 'Apply',
+              ),
+            ],
+          ),
+        ),
+      ),
       appBar: AppBar(
-        title: Text(widget.appBarTitle),
-        actions: <Widget>[
-          FlatButton(
-            child: Text('Clear'),
-            onPressed: () {
-              FilterList.clearFilters(widget.wireframe["name"]);
-              _fbKey.currentState.reset();
-              widget.filters.clear();
-              setState(() {});
-            },
+        elevation: 0.5,
+        leading: IconButton(
+          icon: Icon(
+            Icons.close,
           ),
-          FlatButton(
-            child: Text('Apply'),
-            onPressed: () {
-              _fbKey.currentState.save();
-
-              var filters = FilterList.generateFilters(
-                widget.wireframe["name"],
-                _fbKey.currentState.value,
-              );
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return Router(
-                      viewType: ViewType.list,
-                      doctype: widget.wireframe["name"],
-                      filters: filters,
-                    );
-                  },
-                ),
-              );
-            },
-          ),
-        ],
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
       ),
       body: FormBuilder(
         key: _fbKey,

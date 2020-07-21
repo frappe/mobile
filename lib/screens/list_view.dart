@@ -78,24 +78,85 @@ class _CustomListViewState extends State<CustomListView> {
       showLiked = false;
     }
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Palette.primaryButtonColor,
-        child: Icon(
-          Icons.add,
+      bottomNavigationBar: Container(
+        height: 60,
+        child: BottomAppBar(
+          color: Colors.white,
+          child: Row(
+            children: <Widget>[
+              Spacer(),
+              RaisedButton.icon(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (BuildContext context) {
+                      return FractionallySizedBox(
+                        heightFactor: 0.96,
+                        child: Router(
+                          viewType: ViewType.filter,
+                          doctype: widget.doctype,
+                          filters: widget.filters,
+                          filterCallback: (filters) {
+                            widget.filters.clear();
+                            widget.filters.addAll(filters);
+                            setState(() {
+                              _pageLoadController.reset();
+                            });
+                          },
+                        ),
+                      );
+                    },
+                  );
+                },
+                color: Colors.white,
+                label: Text('Add Filters (${widget.filters.length})'),
+                icon: FrappeIcon(
+                  FrappeIcons.filter,
+                ),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              RaisedButton.icon(
+                onPressed: () {
+                  if (!showLiked) {
+                    widget.filters.add([
+                      widget.doctype,
+                      '_liked_by',
+                      'like',
+                      '%$userId%',
+                    ]);
+                  } else {
+                    int likedByIdx = FilterList.getFieldFilterIndex(
+                      widget.filters,
+                      '_liked_by',
+                    );
+
+                    if (likedByIdx != null) {
+                      widget.filters.removeAt(likedByIdx);
+                    }
+                  }
+
+                  setState(() {
+                    showLiked = !showLiked;
+                    _pageLoadController.reset();
+                  });
+                },
+                label: Text('Show Liked'),
+                color: Colors.white,
+                icon: showLiked
+                    ? FrappeIcon(
+                        FrappeIcons.favourite_active,
+                      )
+                    : FrappeIcon(
+                        FrappeIcons.favourite_resting,
+                      ),
+              ),
+              Spacer()
+            ],
+          ),
         ),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return Router(
-                  viewType: ViewType.newForm,
-                  doctype: widget.doctype,
-                );
-              },
-            ),
-          );
-        },
       ),
       appBar: AppBar(
         title: Text(widget.appBarTitle),
@@ -112,66 +173,94 @@ class _CustomListViewState extends State<CustomListView> {
               );
             },
           ),
-          IconButton(
-            icon: Badge(
-              badgeColor: Colors.white,
-              position: BadgePosition.bottomRight(),
-              showBadge: widget.filters.isNotEmpty,
-              badgeContent: Text("${widget.filters.length}"),
-              child: FrappeIcon(
-                FrappeIcons.filter,
-                color: widget.filters.length > 0
-                    ? Colors.black
-                    : Palette.iconColor,
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                color: Palette.primaryButtonColor,
+              ),
+              child: IconButton(
+                icon: FrappeIcon(
+                  FrappeIcons.small_add,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return Router(
+                          viewType: ViewType.newForm,
+                          doctype: widget.doctype,
+                        );
+                      },
+                    ),
+                  );
+                },
               ),
             ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return Router(
-                      viewType: ViewType.filter,
-                      doctype: widget.doctype,
-                      filters: widget.filters,
-                    );
-                  },
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: FrappeIcon(
-              showLiked
-                  ? FrappeIcons.favourite_active
-                  : FrappeIcons.favourite_resting,
-              color: showLiked ? null : Palette.iconColor,
-            ),
-            onPressed: () {
-              if (!showLiked) {
-                widget.filters.add([
-                  widget.doctype,
-                  '_liked_by',
-                  'like',
-                  '%$userId%',
-                ]);
-              } else {
-                int likedByIdx = FilterList.getFieldFilterIndex(
-                  widget.filters,
-                  '_liked_by',
-                );
+          )
+          // IconButton(
+          //   icon: Badge(
+          //     badgeColor: Colors.white,
+          //     position: BadgePosition.bottomRight(),
+          //     showBadge: widget.filters.isNotEmpty,
+          //     badgeContent: Text("${widget.filters.length}"),
+          //     child: FrappeIcon(
+          //       FrappeIcons.filter,
+          //       color: widget.filters.length > 0
+          //           ? Colors.black
+          //           : Palette.iconColor,
+          //     ),
+          //   ),
+          //   onPressed: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) {
+          //           return Router(
+          //             viewType: ViewType.filter,
+          //             doctype: widget.doctype,
+          //             filters: widget.filters,
+          //           );
+          //         },
+          //       ),
+          //     );
+          //   },
+          // ),
+          // IconButton(
+          //   icon: FrappeIcon(
+          //     showLiked
+          //         ? FrappeIcons.favourite_active
+          //         : FrappeIcons.favourite_resting,
+          //     color: showLiked ? null : Palette.iconColor,
+          //   ),
+          //   onPressed: () {
+          //     if (!showLiked) {
+          //       widget.filters.add([
+          //         widget.doctype,
+          //         '_liked_by',
+          //         'like',
+          //         '%$userId%',
+          //       ]);
+          //     } else {
+          //       int likedByIdx = FilterList.getFieldFilterIndex(
+          //         widget.filters,
+          //         '_liked_by',
+          //       );
 
-                if (likedByIdx != null) {
-                  widget.filters.removeAt(likedByIdx);
-                }
-              }
+          //       if (likedByIdx != null) {
+          //         widget.filters.removeAt(likedByIdx);
+          //       }
+          //     }
 
-              setState(() {
-                showLiked = !showLiked;
-                _pageLoadController.reset();
-              });
-            },
-          ),
+          //     setState(() {
+          //       showLiked = !showLiked;
+          //       _pageLoadController.reset();
+          //     });
+          //   },
+          // ),
         ],
       ),
       body: RefreshIndicator(
@@ -193,7 +282,7 @@ class _CustomListViewState extends State<CustomListView> {
                     if (widget.filters.isNotEmpty)
                       Button(
                         buttonType: ButtonType.secondary,
-                        title: 'Clear Filter',
+                        title: 'Clear Filters',
                         onPressed: () {
                           FilterList.clearFilters(widget.doctype);
                           widget.filters.clear();

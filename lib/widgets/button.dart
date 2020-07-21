@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/utils/enums.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
 
 class Button extends StatelessWidget {
   final Function onPressed;
   final String title;
-  final IconData icon;
+  final String icon;
   final ButtonType buttonType;
 
   Button({
@@ -45,7 +46,7 @@ class Button extends StatelessWidget {
             title,
             style: _textStyle,
           ),
-          icon: Icon(icon),
+          icon: FrappeIcon(icon),
           onPressed: onPressed,
           shape: OutlineInputBorder(
             borderSide: BorderSide(

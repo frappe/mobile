@@ -140,7 +140,7 @@ class _FormViewState extends State<FormView>
 
             return Scaffold(
                 bottomNavigationBar: Container(
-                  height: 70,
+                  height: 60,
                   child: BottomAppBar(
                     color: Colors.white,
                     child: Row(

@@ -75,105 +75,81 @@ class _FrappeAppState extends State<FrappeApp> {
   }
 }
 
-// const doctypeFieldnames = {
-//   'Issue': [
-//     "`tabIssue`.`name`",
-//     "`tabIssue`.`status`",
-//     "`tabIssue`.`subject`",
-//     "`tabIssue`.`modified`",
-//     "`tabIssue`.`_assign`",
-//     "`tabIssue`.`_seen`",
-//     "`tabIssue`.`_liked_by`",
-//     "`tabIssue`.`_comments`"
-//   ],
-//   'Opportunity': [
-//     "`tabOpportunity`.`name`",
-//     "`tabOpportunity`.`status`",
-//     "`tabOpportunity`.`title`",
-//     "`tabOpportunity`.`modified`",
-//     "`tabOpportunity`.`_assign`",
-//     "`tabOpportunity`.`_seen`",
-//     "`tabOpportunity`.`_liked_by`",
-//     "`tabOpportunity`.`_comments`"
-//   ]
-// };
-
 class Router extends StatelessWidget {
   final ViewType viewType;
   final String doctype;
   final String name;
   final List filters;
+  final Function filterCallback;
 
   Router({
     @required this.viewType,
     @required this.doctype,
     this.name,
     this.filters,
+    this.filterCallback,
   });
-
-  Future _fetchMeta(String doctype, context) async {
-    return processData(doctype, viewType, context);
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder(
-          future: _fetchMeta(doctype, context),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              var docMeta = snapshot.data["docs"][0];
-              docMeta["field_label"] = {
-                "_assign": "Assigned To",
-                "_liked_by": "Liked By"
-              };
-              docMeta["fields"].forEach((field) {
-                docMeta["field_label"][field["fieldname"]] = field["label"];
-              });
-              if (viewType == ViewType.list) {
-                var defaultFilters = [];
-                if (filters == null) {
-                  // cached filters
-                  if (localStorage.containsKey('${doctype}Filter')) {
-                    defaultFilters =
-                        json.decode(localStorage.getString('${doctype}Filter'));
-                  } else if (localStorage.containsKey('userId')) {
-                    defaultFilters.add([
-                      doctype,
-                      "_assign",
-                      "like",
-                      "%${Uri.decodeFull(localStorage.getString('userId'))}%"
-                    ]);
-                  }
-                }
+      body: Builder(
+        builder: (context) {
+          var docMeta = json.decode(localStorage.getString('${doctype}Meta'));
+          docMeta = docMeta["docs"][0];
 
-                return CustomListView(
-                  filters: filters ?? defaultFilters,
-                  meta: docMeta,
-                  doctype: doctype,
-                  appBarTitle: doctype,
-                  fieldnames: generateFieldnames(doctype, docMeta),
-                );
-              } else if (viewType == ViewType.form) {
-                return FormView(
-                  doctype: doctype,
-                  name: name,
-                  wireframe: docMeta,
-                );
-              } else if (viewType == ViewType.filter) {
-                return FilterList(
-                  filters: filters,
-                  wireframe: docMeta,
-                  appBarTitle: "Filter $doctype",
-                );
-              } else if (viewType == ViewType.newForm) {
-                return NewForm(docMeta);
+          if (viewType == ViewType.list) {
+            var defaultFilters = [];
+            if (filters == null) {
+              // cached filters
+              if (localStorage.containsKey('${doctype}Filter')) {
+                defaultFilters =
+                    json.decode(localStorage.getString('${doctype}Filter'));
+              } else if (localStorage.containsKey('userId')) {
+                defaultFilters.add([
+                  doctype,
+                  "_assign",
+                  "like",
+                  "%${Uri.decodeFull(localStorage.getString('userId'))}%"
+                ]);
               }
-            } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
             }
-            return Center(child: CircularProgressIndicator());
-          }),
+
+            return CustomListView(
+              filters: filters ?? defaultFilters,
+              meta: docMeta,
+              doctype: doctype,
+              appBarTitle: doctype,
+              fieldnames: generateFieldnames(doctype, docMeta),
+            );
+          } else if (viewType == ViewType.form) {
+            return FormView(
+              doctype: doctype,
+              name: name,
+              wireframe: docMeta,
+            );
+          } else if (viewType == ViewType.filter) {
+            List defaultFilters = [
+              {
+                "is_default_filter": 1,
+                "fieldname": "_assign",
+                "options": "User",
+                "label": "Assigned To",
+                "fieldtype": "Link"
+              },
+            ];
+            docMeta["fields"].addAll(defaultFilters);
+            return FilterList(
+              filters: filters,
+              wireframe: docMeta,
+              filterCallback: filterCallback,
+              appBarTitle: "Filter $doctype",
+            );
+          } else if (viewType == ViewType.newForm) {
+            return NewForm(docMeta);
+          }
+        },
+      ),
     );
   }
 }

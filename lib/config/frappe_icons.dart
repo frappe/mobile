@@ -7,4 +7,5 @@ class FrappeIcons {
   static const favourite_resting = '$_basePath/favourite_resting.svg';
   static const search = '$_basePath/search.svg';
   static const edit = '$_basePath/edit.svg';
+  static const small_add = '$_basePath/small_add.svg';
 }

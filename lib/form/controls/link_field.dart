@@ -16,6 +16,7 @@ class LinkField extends StatefulWidget {
   final Function onSuggestionSelected;
   final Icon prefixIcon;
   final Color fillColor;
+  final key;
 
   final List<String Function(dynamic)> validators;
 
@@ -25,6 +26,7 @@ class LinkField extends StatefulWidget {
     @required this.refDoctype,
     @required this.fillColor,
     this.prefixIcon,
+    this.key,
     this.allowClear = true,
     this.onSuggestionSelected,
     this.txt,
@@ -55,7 +57,7 @@ class _LinkFieldState extends State<LinkField> {
       child: Theme(
         data: Theme.of(context).copyWith(primaryColor: Colors.black),
         child: FormBuilderTypeAhead(
-          key: Key(widget.value),
+          key: widget.key,
           controller: _typeAheadController,
           onSuggestionSelected: (item) {
             if (widget.onSuggestionSelected != null) {

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/utils/backend_service.dart';
-import 'package:frappe_app/widgets/card_list_tile.dart';
 
-import '../utils/enums.dart';
 import '../app.dart';
+import '../config/palette.dart';
+import '../utils/backend_service.dart';
+import '../utils/enums.dart';
+import '../utils/helpers.dart';
+import '../widgets/card_list_tile.dart';
 
 class DoctypeView extends StatelessWidget {
   static const _supportedDoctypes = [
@@ -35,14 +36,20 @@ class DoctypeView extends StatelessWidget {
             var doctypes =
                 snapshot.data["message"]["cards"]["items"][0]["links"];
             var modulesWidget = doctypes.where((m) {
-              return _supportedDoctypes.contains(m["name"]);
+              return _supportedDoctypes.contains(
+                m["name"],
+              );
             }).map<Widget>((m) {
               return Padding(
-                padding:
-                    const EdgeInsets.only(left: 10.0, right: 10.0, top: 8.0),
+                padding: const EdgeInsets.only(
+                  left: 10.0,
+                  right: 10.0,
+                  top: 8.0,
+                ),
                 child: CardListTile(
                   title: Text(m["label"]),
-                  onTap: () {
+                  onTap: () async {
+                    await processData(m["name"], context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -64,7 +71,11 @@ class DoctypeView extends StatelessWidget {
           } else if (snapshot.hasError) {
             return Text("${snapshot.error}");
           }
-          return Container(child: Center(child: CircularProgressIndicator()));
+          return Container(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
         },
       ),
     );

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -33,11 +34,8 @@ logout(context) async {
 
 Future processData(
   String doctype,
-  ViewType viewType,
   context,
 ) async {
-  //TODO: check cache
-
   var meta = await BackendService(context).getDoctype(doctype);
 
   List metaFields = meta["docs"][0]["fields"];
@@ -50,6 +48,8 @@ Future processData(
       }
     }
   });
+
+  localStorage.setString('${doctype}Meta', json.encode(meta));
 
   return meta;
 }
@@ -96,6 +96,7 @@ Widget makeControl(Map field,
       {
         value = _buildDecoratedWidget(
             LinkField(
+              key: Key(val),
               fillColor: Palette.fieldBgColor,
               allowClear: editMode,
               validators: validators,

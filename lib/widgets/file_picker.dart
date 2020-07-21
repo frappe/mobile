@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
 
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
@@ -58,7 +59,7 @@ class _FilePickerState extends State<CustomFilePicker> {
             leading: Button(
               buttonType: ButtonType.secondary,
               title: "Attach File",
-              icon: Icons.add,
+              icon: FrappeIcons.small_add,
               onPressed: () => _openFileExplorer(),
             ),
             trailing: Button(
