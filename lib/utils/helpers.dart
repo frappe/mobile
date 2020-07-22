@@ -522,7 +522,7 @@ String getInitials(String txt) {
     numWords = names.length;
   }
   for (var i = 0; i < numWords; i++) {
-    initials += '${names[i][0].toUpperCase()}';
+    initials += names[i] != '' ? '${names[i][0].toUpperCase()}' : "";
   }
   return initials;
 }

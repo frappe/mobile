@@ -123,9 +123,10 @@ class _FilterListState extends State<FilterList> {
         child: BottomAppBar(
           color: Colors.white,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
+              Spacer(),
               FrappeFlatButton(
+                minWidth: 120.0,
                 buttonType: ButtonType.secondary,
                 title: 'Clear All',
                 onPressed: () {
@@ -135,7 +136,11 @@ class _FilterListState extends State<FilterList> {
                   setState(() {});
                 },
               ),
+              SizedBox(
+                width: 10,
+              ),
               FrappeFlatButton(
+                minWidth: 120.0,
                 buttonType: ButtonType.primary,
                 onPressed: () {
                   _fbKey.currentState.save();
@@ -151,6 +156,7 @@ class _FilterListState extends State<FilterList> {
                 },
                 title: 'Apply',
               ),
+              Spacer()
             ],
           ),
         ),

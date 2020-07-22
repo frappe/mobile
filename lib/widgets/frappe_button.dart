@@ -153,6 +153,7 @@ class FrappeRaisedButton extends StatelessWidget {
         height: height,
         minWidth: minWidth,
         child: RaisedButton(
+          color: color,
           onPressed: onPressed,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(6.0),

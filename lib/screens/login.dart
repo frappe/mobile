@@ -146,6 +146,8 @@ class _LoginState extends State<Login> {
                                 'pwd',
                                 formValue["pwd"],
                               );
+
+                              await cacheAllUsers(context);
                               Navigator.of(context)
                                   .pushReplacementNamed('/modules');
                             } else {

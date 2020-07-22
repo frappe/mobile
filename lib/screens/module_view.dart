@@ -23,7 +23,6 @@ class ModuleView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var backendService = BackendService(context);
-    cacheAllUsers(context);
     return Scaffold(
       backgroundColor: Palette.bgColor,
       appBar: AppBar(

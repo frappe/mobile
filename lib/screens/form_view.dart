@@ -144,60 +144,53 @@ class _FormViewState extends State<FormView>
                   child: BottomAppBar(
                     color: Colors.white,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
-                        Expanded(
-                          child: Container(
-                            height: 70,
-                            padding: EdgeInsets.all(8),
-                            child: FrappeFlatButton.small(
-                              buttonType: ButtonType.secondary,
-                              title: 'Comment',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return CommentInput(
-                                        doctype: widget.doctype,
-                                        name: widget.name,
-                                        authorEmail:
-                                            localStorage.getString('user'),
-                                        callback: _refresh,
-                                      );
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
+                        Spacer(),
+                        FrappeFlatButton(
+                          minWidth: 120,
+                          buttonType: ButtonType.secondary,
+                          title: 'Comment',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return CommentInput(
+                                    doctype: widget.doctype,
+                                    name: widget.name,
+                                    authorEmail: localStorage.getString('user'),
+                                    callback: _refresh,
+                                  );
+                                },
+                              ),
+                            );
+                          },
                         ),
-                        Expanded(
-                          child: Container(
-                            height: 70,
-                            padding: EdgeInsets.all(8),
-                            child: FrappeFlatButton.small(
-                              buttonType: ButtonType.primary,
-                              title: 'New Email',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return EmailForm(
-                                        callback: _refresh,
-                                        subject: docs[0]["subject"],
-                                        raisedBy: docs[0]["raised_by"],
-                                        doctype: widget.doctype,
-                                        doc: widget.name,
-                                      );
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        )
+                        SizedBox(
+                          width: 10,
+                        ),
+                        FrappeFlatButton(
+                          minWidth: 120,
+                          buttonType: ButtonType.primary,
+                          title: 'New Email',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return EmailForm(
+                                    callback: _refresh,
+                                    subject: docs[0]["subject"],
+                                    raisedBy: docs[0]["raised_by"],
+                                    doctype: widget.doctype,
+                                    doc: widget.name,
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        Spacer()
                       ],
                     ),
                   ),
