@@ -8,7 +8,7 @@ import 'package:frappe_app/config/frappe_icons.dart';
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
 import '../config/palette.dart';
-import '../widgets/button.dart';
+import 'frappe_button.dart';
 import '../widgets/card_list_tile.dart';
 
 class CustomFilePicker extends StatefulWidget {
@@ -56,13 +56,13 @@ class _FilePickerState extends State<CustomFilePicker> {
       child: Column(
         children: <Widget>[
           CardListTile(
-            leading: Button(
+            leading: FrappeFlatButton.small(
               buttonType: ButtonType.secondary,
               title: "Attach File",
               icon: FrappeIcons.small_add,
               onPressed: () => _openFileExplorer(),
             ),
-            trailing: Button(
+            trailing: FrappeFlatButton.small(
               title: 'Upload',
               buttonType: ButtonType.primary,
               onPressed: _files != null && _files.isNotEmpty

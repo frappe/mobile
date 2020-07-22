@@ -6,7 +6,7 @@ import 'package:frappe_app/widgets/user_avatar.dart';
 import '../config/palette.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
-import '../widgets/button.dart';
+import 'frappe_button.dart';
 import '../widgets/card_list_tile.dart';
 import '../form/controls/link_field.dart';
 
@@ -47,7 +47,7 @@ class _AssigneesState extends State<Assignees> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      trailing: Button(
+      trailing: FrappeFlatButton.small(
         title: 'Assign',
         buttonType: ButtonType.primary,
         onPressed: newAssignees.length > 0

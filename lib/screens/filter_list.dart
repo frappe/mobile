@@ -2,10 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/app.dart';
 import 'package:frappe_app/main.dart';
 import 'package:frappe_app/utils/enums.dart';
-import 'package:frappe_app/widgets/button.dart';
+import 'package:frappe_app/widgets/frappe_button.dart';
 
 import '../utils/helpers.dart';
 
@@ -126,7 +125,7 @@ class _FilterListState extends State<FilterList> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Button(
+              FrappeFlatButton(
                 buttonType: ButtonType.secondary,
                 title: 'Clear All',
                 onPressed: () {
@@ -136,7 +135,7 @@ class _FilterListState extends State<FilterList> {
                   setState(() {});
                 },
               ),
-              Button(
+              FrappeFlatButton(
                 buttonType: ButtonType.primary,
                 onPressed: () {
                   _fbKey.currentState.save();

@@ -12,7 +12,7 @@ import '../main.dart';
 import '../app.dart';
 import '../config/palette.dart';
 import '../utils/enums.dart';
-import '../widgets/button.dart';
+import '../widgets/frappe_button.dart';
 import '../widgets/list_item.dart';
 
 class CustomListView extends StatefulWidget {
@@ -84,88 +84,68 @@ class _CustomListViewState extends State<CustomListView> {
           child: Row(
             children: <Widget>[
               Spacer(),
-              ButtonTheme(
-                minWidth: 100,
-                child: RaisedButton.icon(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6.0),
-                  ),
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (BuildContext context) {
-                        return FractionallySizedBox(
-                          heightFactor: 0.96,
-                          child: Router(
-                            viewType: ViewType.filter,
-                            doctype: widget.doctype,
-                            filters: widget.filters,
-                            filterCallback: (filters) {
-                              widget.filters.clear();
-                              widget.filters.addAll(filters);
-                              setState(() {
-                                _pageLoadController.reset();
-                              });
-                            },
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  color: Colors.white,
-                  label: Text('Filters (${widget.filters.length})'),
-                  icon: FrappeIcon(
-                    FrappeIcons.filter,
-                    size: 16,
-                  ),
-                ),
+              FrappeRaisedButton(
+                minWidth: 120,
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (BuildContext context) {
+                      return FractionallySizedBox(
+                        heightFactor: 0.96,
+                        child: Router(
+                          viewType: ViewType.filter,
+                          doctype: widget.doctype,
+                          filters: widget.filters,
+                          filterCallback: (filters) {
+                            widget.filters.clear();
+                            widget.filters.addAll(filters);
+                            setState(() {
+                              _pageLoadController.reset();
+                            });
+                          },
+                        ),
+                      );
+                    },
+                  );
+                },
+                title: 'Filters (${widget.filters.length})',
+                icon: FrappeIcons.filter,
               ),
               SizedBox(
                 width: 10,
               ),
-              ButtonTheme(
-                minWidth: 100,
-                child: RaisedButton.icon(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6.0),
-                  ),
-                  onPressed: () {
-                    if (!showLiked) {
-                      widget.filters.add([
-                        widget.doctype,
-                        '_liked_by',
-                        'like',
-                        '%$userId%',
-                      ]);
-                    } else {
-                      int likedByIdx = FilterList.getFieldFilterIndex(
-                        widget.filters,
-                        '_liked_by',
-                      );
+              FrappeRaisedButton(
+                minWidth: 120,
+                onPressed: () {
+                  if (!showLiked) {
+                    widget.filters.add([
+                      widget.doctype,
+                      '_liked_by',
+                      'like',
+                      '%$userId%',
+                    ]);
+                  } else {
+                    int likedByIdx = FilterList.getFieldFilterIndex(
+                      widget.filters,
+                      '_liked_by',
+                    );
 
-                      if (likedByIdx != null) {
-                        widget.filters.removeAt(likedByIdx);
-                      }
+                    if (likedByIdx != null) {
+                      widget.filters.removeAt(likedByIdx);
                     }
+                  }
 
-                    setState(() {
-                      showLiked = !showLiked;
-                      _pageLoadController.reset();
-                    });
-                  },
-                  label: Text('Liked'),
-                  color: Colors.white,
-                  icon: showLiked
-                      ? FrappeIcon(
-                          FrappeIcons.favourite_active,
-                          size: 16,
-                        )
-                      : FrappeIcon(
-                          FrappeIcons.favourite_resting,
-                          size: 16,
-                        ),
-                ),
+                  setState(() {
+                    showLiked = !showLiked;
+                    _pageLoadController.reset();
+                  });
+                },
+                title: 'Liked',
+                icon: showLiked
+                    ? FrappeIcons.favourite_active
+                    : FrappeIcons.favourite_resting,
+                iconSize: 16.0,
               ),
               Spacer()
             ],
@@ -234,7 +214,7 @@ class _CustomListViewState extends State<CustomListView> {
                   children: <Widget>[
                     Text('No Items Found'),
                     if (widget.filters.isNotEmpty)
-                      Button(
+                      FrappeFlatButton.small(
                         buttonType: ButtonType.secondary,
                         title: 'Clear Filters',
                         onPressed: () {
@@ -244,7 +224,7 @@ class _CustomListViewState extends State<CustomListView> {
                           setState(() {});
                         },
                       ),
-                    Button(
+                    FrappeFlatButton.small(
                       buttonType: ButtonType.primary,
                       title: 'Create New',
                       onPressed: () {
