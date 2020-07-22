@@ -129,6 +129,8 @@ class _LoginState extends State<Login> {
                             if (response2.statusCode == 200) {
                               localStorage.setBool('isLoggedIn', true);
 
+                              cookies = await getCookies();
+
                               var userId = response2
                                   .headers.map["set-cookie"][3]
                                   .split(';')[0]

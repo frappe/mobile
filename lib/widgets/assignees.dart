@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/utils/backend_service.dart';
+import 'package:frappe_app/widgets/user_avatar.dart';
 
 import '../config/palette.dart';
 import '../utils/enums.dart';
@@ -94,9 +95,7 @@ class _AssigneesState extends State<Assignees> {
       var val = entry.value;
       return CardListTile(
         color: Palette.newIndicatorColor,
-        leading: CircleAvatar(
-          child: Text(val[0].toUpperCase()),
-        ),
+        leading: UserAvatar(uid: val),
         title: Text(val),
         trailing: IconButton(
           icon: Icon(Icons.clear),
@@ -115,9 +114,7 @@ class _AssigneesState extends State<Assignees> {
         var d = entry.value;
         var i = entry.key;
         return CardListTile(
-          leading: CircleAvatar(
-            child: Text(d["owner"][0].toUpperCase()),
-          ),
+          leading: UserAvatar(uid: d["owner"]),
           title: Text(
             d["owner"],
           ),

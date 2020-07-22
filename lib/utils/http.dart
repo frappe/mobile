@@ -1,16 +1,18 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:frappe_app/utils/backend_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 
-import '../main.dart';
 import '../main.dart';
 
 Dio dio;
 Uri uri;
 var baseUrl;
+String cookies;
 
 void initConfig() async {
   if (localStorage.containsKey('serverURL')) {
@@ -20,13 +22,37 @@ void initConfig() async {
     dio = Dio(options);
     var cookieJar = await getCookiePath();
     dio.interceptors.add(CookieManager(cookieJar));
+    cookies = await getCookies();
   }
 }
 
-void cacheAllUsers() async {
-  if (localStorage.containsKey('allUsers')) {
+void cacheAllUsers(context) async {
+  if (localStorage.containsKey('${baseUrl}allUsers')) {
     return;
-  } else {}
+  } else {
+    var fieldNames = [
+      "`tabUser`.`name`",
+      "`tabUser`.`full_name`",
+      "`tabUser`.`user_image`",
+    ];
+
+    var filters = [
+      ["User", "enabled", "=", 1]
+    ];
+
+    var res = await BackendService(context).fetchList(
+      fieldnames: fieldNames,
+      doctype: 'User',
+      filters: filters,
+    );
+
+    print(res);
+    var usr = {};
+    res.forEach((element) {
+      usr[element[1][0]] = element[1];
+    });
+    localStorage.setString('${baseUrl}allUsers', json.encode(usr));
+  }
 }
 
 void setBaseUrl(url) async {

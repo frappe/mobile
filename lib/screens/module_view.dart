@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/utils/http.dart';
+import 'package:frappe_app/widgets/user_avatar.dart';
 
 import '../main.dart';
 import '../config/palette.dart';
@@ -9,7 +11,7 @@ import './doctype_view.dart';
 
 class ModuleView extends StatelessWidget {
   static const _supportedModules = ['Support', 'CRM', 'Projects'];
-  final user = localStorage.getString('user');
+  final userId = Uri.decodeFull(localStorage.getString('userId'));
   static const popupOptions = const ["Logout"];
 
   void _choiceAction(String choice, context) {
@@ -21,6 +23,7 @@ class ModuleView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var backendService = BackendService(context);
+    cacheAllUsers(context);
     return Scaffold(
       backgroundColor: Palette.bgColor,
       appBar: AppBar(
@@ -28,12 +31,8 @@ class ModuleView extends StatelessWidget {
         elevation: 0,
         leading: PopupMenuButton<String>(
           onSelected: (choice) => _choiceAction(choice, context),
-          icon: CircleAvatar(
-            child: Text(
-              user[0].toUpperCase(),
-              style: TextStyle(color: Colors.black),
-            ),
-            backgroundColor: Palette.bgColor,
+          icon: UserAvatar(
+            uid: userId,
           ),
           itemBuilder: (BuildContext context) {
             return popupOptions.map((String choice) {

@@ -17,7 +17,7 @@ environment:
   sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
-  badges: ^1.1.1
+  cached_network_image: ^2.2.0+1
   google_fonts: ^1.1.0
   file_picker: ^1.12.0
   flutter_form_builder: ^3.9.0

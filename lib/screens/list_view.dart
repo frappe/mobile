@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
@@ -85,73 +84,88 @@ class _CustomListViewState extends State<CustomListView> {
           child: Row(
             children: <Widget>[
               Spacer(),
-              RaisedButton.icon(
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (BuildContext context) {
-                      return FractionallySizedBox(
-                        heightFactor: 0.96,
-                        child: Router(
-                          viewType: ViewType.filter,
-                          doctype: widget.doctype,
-                          filters: widget.filters,
-                          filterCallback: (filters) {
-                            widget.filters.clear();
-                            widget.filters.addAll(filters);
-                            setState(() {
-                              _pageLoadController.reset();
-                            });
-                          },
-                        ),
-                      );
-                    },
-                  );
-                },
-                color: Colors.white,
-                label: Text('Add Filters (${widget.filters.length})'),
-                icon: FrappeIcon(
-                  FrappeIcons.filter,
+              ButtonTheme(
+                minWidth: 100,
+                child: RaisedButton.icon(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6.0),
+                  ),
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return FractionallySizedBox(
+                          heightFactor: 0.96,
+                          child: Router(
+                            viewType: ViewType.filter,
+                            doctype: widget.doctype,
+                            filters: widget.filters,
+                            filterCallback: (filters) {
+                              widget.filters.clear();
+                              widget.filters.addAll(filters);
+                              setState(() {
+                                _pageLoadController.reset();
+                              });
+                            },
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  color: Colors.white,
+                  label: Text('Filters (${widget.filters.length})'),
+                  icon: FrappeIcon(
+                    FrappeIcons.filter,
+                    size: 16,
+                  ),
                 ),
               ),
               SizedBox(
                 width: 10,
               ),
-              RaisedButton.icon(
-                onPressed: () {
-                  if (!showLiked) {
-                    widget.filters.add([
-                      widget.doctype,
-                      '_liked_by',
-                      'like',
-                      '%$userId%',
-                    ]);
-                  } else {
-                    int likedByIdx = FilterList.getFieldFilterIndex(
-                      widget.filters,
-                      '_liked_by',
-                    );
+              ButtonTheme(
+                minWidth: 100,
+                child: RaisedButton.icon(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6.0),
+                  ),
+                  onPressed: () {
+                    if (!showLiked) {
+                      widget.filters.add([
+                        widget.doctype,
+                        '_liked_by',
+                        'like',
+                        '%$userId%',
+                      ]);
+                    } else {
+                      int likedByIdx = FilterList.getFieldFilterIndex(
+                        widget.filters,
+                        '_liked_by',
+                      );
 
-                    if (likedByIdx != null) {
-                      widget.filters.removeAt(likedByIdx);
+                      if (likedByIdx != null) {
+                        widget.filters.removeAt(likedByIdx);
+                      }
                     }
-                  }
 
-                  setState(() {
-                    showLiked = !showLiked;
-                    _pageLoadController.reset();
-                  });
-                },
-                label: Text('Show Liked'),
-                color: Colors.white,
-                icon: showLiked
-                    ? FrappeIcon(
-                        FrappeIcons.favourite_active,
-                      )
-                    : FrappeIcon(
-                        FrappeIcons.favourite_resting,
-                      ),
+                    setState(() {
+                      showLiked = !showLiked;
+                      _pageLoadController.reset();
+                    });
+                  },
+                  label: Text('Liked'),
+                  color: Colors.white,
+                  icon: showLiked
+                      ? FrappeIcon(
+                          FrappeIcons.favourite_active,
+                          size: 16,
+                        )
+                      : FrappeIcon(
+                          FrappeIcons.favourite_resting,
+                          size: 16,
+                        ),
+                ),
               ),
               Spacer()
             ],
@@ -201,66 +215,6 @@ class _CustomListViewState extends State<CustomListView> {
               ),
             ),
           )
-          // IconButton(
-          //   icon: Badge(
-          //     badgeColor: Colors.white,
-          //     position: BadgePosition.bottomRight(),
-          //     showBadge: widget.filters.isNotEmpty,
-          //     badgeContent: Text("${widget.filters.length}"),
-          //     child: FrappeIcon(
-          //       FrappeIcons.filter,
-          //       color: widget.filters.length > 0
-          //           ? Colors.black
-          //           : Palette.iconColor,
-          //     ),
-          //   ),
-          //   onPressed: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) {
-          //           return Router(
-          //             viewType: ViewType.filter,
-          //             doctype: widget.doctype,
-          //             filters: widget.filters,
-          //           );
-          //         },
-          //       ),
-          //     );
-          //   },
-          // ),
-          // IconButton(
-          //   icon: FrappeIcon(
-          //     showLiked
-          //         ? FrappeIcons.favourite_active
-          //         : FrappeIcons.favourite_resting,
-          //     color: showLiked ? null : Palette.iconColor,
-          //   ),
-          //   onPressed: () {
-          //     if (!showLiked) {
-          //       widget.filters.add([
-          //         widget.doctype,
-          //         '_liked_by',
-          //         'like',
-          //         '%$userId%',
-          //       ]);
-          //     } else {
-          //       int likedByIdx = FilterList.getFieldFilterIndex(
-          //         widget.filters,
-          //         '_liked_by',
-          //       );
-
-          //       if (likedByIdx != null) {
-          //         widget.filters.removeAt(likedByIdx);
-          //       }
-          //     }
-
-          //     setState(() {
-          //       showLiked = !showLiked;
-          //       _pageLoadController.reset();
-          //     });
-          //   },
-          // ),
         ],
       ),
       body: RefreshIndicator(

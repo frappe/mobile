@@ -78,7 +78,7 @@ class _FormViewState extends State<FormView>
     for (int i = 0; i < l.length; i++) {
       if (i < size) {
         w.add(
-          UserAvatar(l[i]["owner"]),
+          UserAvatar(uid: l[i]["owner"]),
         );
       } else {
         w.add(CircleAvatar(

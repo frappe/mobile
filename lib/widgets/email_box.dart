@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:frappe_app/widgets/user_avatar.dart';
 import 'package:html/parser.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
@@ -32,7 +33,8 @@ class EmailBox extends StatelessWidget {
                   return ViewEmail(
                     time: time,
                     title: data["subject"],
-                    author: data["sender_full_name"],
+                    senderFullName: data["sender_full_name"],
+                    sender: data["sender"],
                     content: data["content"],
                   );
                 },
@@ -77,13 +79,15 @@ class EmailBox extends StatelessWidget {
 class ViewEmail extends StatelessWidget {
   final String title;
   final String time;
-  final String author;
+  final String senderFullName;
+  final String sender;
   final String content;
 
   ViewEmail({
     @required this.title,
     @required this.time,
-    @required this.author,
+    @required this.senderFullName,
+    @required this.sender,
     @required this.content,
   });
 
@@ -93,7 +97,7 @@ class ViewEmail extends StatelessWidget {
     var imgs = document.getElementsByTagName('img');
 
     imgs.forEach((img) {
-      if(Uri.parse(img.attributes["src"]).hasAbsolutePath) {
+      if (Uri.parse(img.attributes["src"]).hasAbsolutePath) {
         img.attributes["src"] = "$baseUrl${img.attributes["src"]}";
       }
     });
@@ -120,10 +124,10 @@ class ViewEmail extends StatelessWidget {
                       ),
                     ),
                     ListTile(
-                      leading: CircleAvatar(
-                        child: Text(author[0].toUpperCase()),
+                      leading: UserAvatar(
+                        uid: sender,
                       ),
-                      title: Text(author),
+                      title: Text(senderFullName),
                       subtitle: Text(time),
                     ),
                   ],

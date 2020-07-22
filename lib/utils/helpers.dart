@@ -512,3 +512,17 @@ List generateFieldnames(String doctype, Map meta) {
 
   return transformedFields;
 }
+
+String getInitials(String txt) {
+  List<String> names = txt.split(" ");
+  String initials = "";
+  int numWords = 2;
+
+  if (names.length < numWords) {
+    numWords = names.length;
+  }
+  for (var i = 0; i < numWords; i++) {
+    initials += '${names[i][0].toUpperCase()}';
+  }
+  return initials;
+}

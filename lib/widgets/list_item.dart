@@ -3,6 +3,7 @@ import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/utils/indicator.dart';
+import 'package:frappe_app/widgets/user_avatar.dart';
 
 class ListItem extends StatelessWidget {
   final String title;
@@ -134,17 +135,10 @@ class ListItem extends StatelessWidget {
                             });
                           }
                         : null,
-                    child: Container(
-                      height: 20,
-                      width: 20,
-                      color: Palette.bgColor,
-                      child: Center(
-                          child: assignee != null
-                              ? Text(
-                                  assignee[1][0].toUpperCase(),
-                                  textAlign: TextAlign.center,
-                                )
-                              : Text('')),
+                    child: UserAvatar(
+                      borderRadius: BorderRadius.all(Radius.circular(6)),
+                      size: 24,
+                      uid: assignee != null ? assignee[1] : null,
                     ),
                   ),
                 ],
