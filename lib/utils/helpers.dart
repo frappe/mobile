@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/utils/backend_service.dart';
+import 'package:frappe_app/widgets/section.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -393,68 +394,95 @@ List<Widget> generateLayout({
   bool withLabel = true,
 }) {
   List<Widget> collapsibles = [];
+  List<Widget> sections = [];
   List<Widget> widgets = [];
 
   List<String> collapsibleLabels = [];
+  List<String> sectionLabels = [];
 
-  bool collapsible = false;
+  bool isCollapsible = false;
+  bool isSection = false;
 
-  int idx = 0;
+  int cIdx = 0;
+  int sIdx = 0;
 
   fields.forEach((field) {
     var val = field["_current_val"] ?? field["default"];
 
     if (field["fieldtype"] == "Section Break") {
-      if (field["collapsible"] == 1) {
-        collapsibleLabels.add(field["label"]);
-        if (collapsible == false) {
-          collapsible = true;
-        } else {
-          var sectionVisibility = collapsibles.any((element) {
-            if (element is Visibility) {
-              return element.visible == true;
-            } else {
-              return true;
-            }
-          });
-          widgets.add(Visibility(
+      if (sections.length > 0) {
+        var sectionVisibility = sections.any((element) {
+          if (element is Visibility) {
+            return element.visible == true;
+          } else {
+            return true;
+          }
+        });
+
+        widgets.add(
+          Visibility(
+            visible: sectionVisibility,
+            child: sectionLabels[sIdx] != ''
+                ? ListTileTheme(
+                    contentPadding: EdgeInsets.all(0),
+                    child: CustomExpansionTile(
+                      maintainState: true,
+                      initiallyExpanded: true,
+                      title: Text(
+                        sectionLabels[sIdx].toUpperCase(),
+                        style: Palette.secondaryTxtStyle,
+                      ),
+                      children: [...sections],
+                    ),
+                  )
+                : Section(
+                    title: sectionLabels[sIdx],
+                    children: [...sections],
+                  ),
+          ),
+        );
+
+        sIdx += 1;
+        sections.clear();
+      } else if (collapsibles.length > 0) {
+        var sectionVisibility = collapsibles.any((element) {
+          if (element is Visibility) {
+            return element.visible == true;
+          } else {
+            return true;
+          }
+        });
+        widgets.add(
+          Visibility(
             visible: sectionVisibility,
             child: ListTileTheme(
               contentPadding: EdgeInsets.all(0),
               child: CustomExpansionTile(
                 maintainState: true,
                 title: Text(
-                  collapsibleLabels[idx].toUpperCase(),
+                  collapsibleLabels[cIdx].toUpperCase(),
                   style: Palette.secondaryTxtStyle,
                 ),
                 children: [...collapsibles],
               ),
             ),
-          ));
-          idx += 1;
-          collapsibles.clear();
-        }
-      } else {
-        collapsible = false;
-
-        widgets.add(Padding(
-          padding: const EdgeInsets.only(bottom: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Divider(color: Palette.iconColor),
-              field["label"] != null
-                  ? Text(
-                      field["label"].toUpperCase(),
-                      style: Palette.secondaryTxtStyle,
-                    )
-                  : Container(),
-            ],
           ),
-        ));
+        );
+        cIdx += 1;
+        collapsibles.clear();
       }
-    } else if (collapsible == true) {
+
+      if (field["collapsible"] == 1) {
+        isSection = false;
+        isCollapsible = true;
+        collapsibleLabels.add(field["label"]);
+      } else {
+        isCollapsible = false;
+        isSection = true;
+        sectionLabels
+            .add(field["label"] != null ? field["label"].toUpperCase() : '');
+      }
+    } else if (isCollapsible) {
       if (viewType == ViewType.form) {
         collapsibles.add(Visibility(
           visible: editMode ? true : val != null && val != '',
@@ -462,6 +490,17 @@ List<Widget> generateLayout({
         ));
       } else {
         collapsibles.add(
+          makeControl(field, val, withLabel, editMode),
+        );
+      }
+    } else if (isSection) {
+      if (viewType == ViewType.form) {
+        sections.add(Visibility(
+          visible: editMode ? true : val != null && val != '',
+          child: makeControl(field, val, withLabel, editMode),
+        ));
+      } else {
+        sections.add(
           makeControl(field, val, withLabel, editMode),
         );
       }

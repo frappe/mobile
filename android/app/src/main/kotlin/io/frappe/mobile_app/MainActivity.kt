@@ -1,4 +1,4 @@
-package com.example.support_app
+package io.frappe.mobile_app
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

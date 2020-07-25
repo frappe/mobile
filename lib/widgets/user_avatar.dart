@@ -47,7 +47,7 @@ class UserAvatar extends StatelessWidget {
 
   Widget getAvatar(String uid) {
     if (uid == null) {
-      return _renderShape(txt: '');
+      return Container();
     }
     if (localStorage.containsKey('${baseUrl}allUsers')) {
       var allUsers = json.decode(localStorage.getString('${baseUrl}allUsers'));

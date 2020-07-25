@@ -8,15 +8,15 @@ import '../utils/helpers.dart';
 class EmailForm extends StatefulWidget {
   final String doctype;
   final String doc;
-  final String subject;
-  final String raisedBy;
+  final String subjectField;
+  final String senderField;
   final Function callback;
 
   EmailForm(
       {@required this.doctype,
       @required this.doc,
-      this.subject,
-      this.raisedBy,
+      this.subjectField,
+      this.senderField,
       @required this.callback});
 
   @override
@@ -39,7 +39,7 @@ class _EmailFormState extends State<EmailForm> {
           "fieldname": "recipients",
           "fieldtype": "MultiSelect",
           "label": "To",
-          "default": widget.raisedBy,
+          "default": widget.senderField,
           "reqd": 1
         },
         // {
@@ -70,7 +70,7 @@ class _EmailFormState extends State<EmailForm> {
           "fieldname": "subject",
           "fieldtype": "Small Text",
           "label": "Subject",
-          "default": '${widget.doctype}: ${widget.subject} (${widget.doc})'
+          "default": '${widget.doctype}: ${widget.subjectField} (${widget.doc})'
         },
         {
           "fieldtype": "Text Editor",

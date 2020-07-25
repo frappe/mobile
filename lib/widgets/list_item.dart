@@ -69,14 +69,6 @@ class ListItem extends StatelessWidget {
                     ),
                   ),
                   Text(modifiedOn, style: Palette.secondaryTxtStyle),
-                  Spacer(),
-                  !seen
-                      ? Icon(
-                          Icons.lens,
-                          size: 10,
-                          color: Palette.primaryButtonColor,
-                        )
-                      : Container(),
                 ],
               ),
               SizedBox(

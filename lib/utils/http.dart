@@ -46,7 +46,6 @@ void cacheAllUsers(context) async {
       filters: filters,
     );
 
-    print(res);
     var usr = {};
     res.forEach((element) {
       usr[element[1][0]] = element[1];

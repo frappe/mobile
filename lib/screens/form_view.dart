@@ -139,6 +139,7 @@ class _FormViewState extends State<FormView>
             var isLikedByUser = likedBy.contains(user);
 
             return Scaffold(
+                backgroundColor: Palette.bgColor,
                 bottomNavigationBar: Container(
                   height: 60,
                   child: BottomAppBar(
@@ -180,8 +181,11 @@ class _FormViewState extends State<FormView>
                                 builder: (context) {
                                   return EmailForm(
                                     callback: _refresh,
-                                    subject: docs[0]["subject"],
-                                    raisedBy: docs[0]["raised_by"],
+                                    subjectField: docs[0][
+                                        widget.wireframe["subject_field"] ??
+                                            widget.wireframe["title_field"]],
+                                    senderField: docs[0]
+                                        [widget.wireframe["sender_field"]],
                                     doctype: widget.doctype,
                                     doc: widget.name,
                                   );
@@ -351,32 +355,33 @@ class _FormViewState extends State<FormView>
                         },
                         body: TabBarView(children: [
                           Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Container(
-                                  color: Color.fromRGBO(237, 242, 247, 1),
-                                  height: 40,
-                                ),
-                                FormBuilder(
-                                  readOnly: editMode ? false : true,
-                                  key: _fbKey,
-                                  child: Flexible(
-                                    child: Container(
-                                      color: Colors.white,
-                                      padding: EdgeInsets.all(20),
-                                      child: SingleChildScrollView(
-                                        child: Column(
-                                          children: _generateChildren(
-                                            widget.wireframe["fields"],
-                                            docs[0],
-                                            editMode,
-                                          ),
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Container(
+                                color: Palette.bgColor,
+                                height: 10,
+                              ),
+                              FormBuilder(
+                                readOnly: editMode ? false : true,
+                                key: _fbKey,
+                                child: Flexible(
+                                  child: Container(
+                                    color: Colors.white,
+                                    padding: EdgeInsets.all(20),
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        children: _generateChildren(
+                                          widget.wireframe["fields"],
+                                          docs[0],
+                                          editMode,
                                         ),
                                       ),
                                     ),
                                   ),
-                                )
-                              ]),
+                                ),
+                              ),
+                            ],
+                          ),
                           Timeline([
                             ...docInfo['comments'],
                             ...docInfo["communications"],
