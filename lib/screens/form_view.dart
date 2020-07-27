@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/utils/backend_service.dart';
 import 'package:frappe_app/utils/indicator.dart';
+import 'package:frappe_app/widgets/custom_form.dart';
 import 'package:frappe_app/widgets/frappe_button.dart';
 import 'package:frappe_app/widgets/timeline.dart';
 import 'package:frappe_app/widgets/user_avatar.dart';
@@ -23,12 +24,12 @@ import '../screens/comment_input.dart';
 class FormView extends StatefulWidget {
   final String doctype;
   final String name;
-  final Map wireframe;
+  final Map meta;
 
   FormView({
     @required this.doctype,
     @required this.name,
-    this.wireframe,
+    this.meta,
   });
 
   @override
@@ -182,10 +183,10 @@ class _FormViewState extends State<FormView>
                                   return EmailForm(
                                     callback: _refresh,
                                     subjectField: docs[0][
-                                        widget.wireframe["subject_field"] ??
-                                            widget.wireframe["title_field"]],
+                                        widget.meta["subject_field"] ??
+                                            widget.meta["title_field"]],
                                     senderField: docs[0]
-                                        [widget.wireframe["sender_field"]],
+                                        [widget.meta["sender_field"]],
                                     doctype: widget.doctype,
                                     doc: widget.name,
                                   );
@@ -241,8 +242,7 @@ class _FormViewState extends State<FormView>
                                       children: <Widget>[
                                         Flexible(
                                           child: Text(
-                                            docs[0][widget
-                                                .wireframe["title_field"]],
+                                            docs[0][widget.meta["title_field"]],
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 2,
                                             style: TextStyle(
@@ -354,33 +354,23 @@ class _FormViewState extends State<FormView>
                           ];
                         },
                         body: TabBarView(children: [
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Container(
-                                color: Palette.bgColor,
-                                height: 10,
-                              ),
-                              FormBuilder(
-                                readOnly: editMode ? false : true,
-                                key: _fbKey,
-                                child: Flexible(
-                                  child: Container(
-                                    color: Colors.white,
-                                    padding: EdgeInsets.all(20),
-                                    child: SingleChildScrollView(
-                                      child: Column(
-                                        children: _generateChildren(
-                                          widget.wireframe["fields"],
-                                          docs[0],
-                                          editMode,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                          SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Container(
+                                  color: Palette.bgColor,
+                                  height: 10,
                                 ),
-                              ),
-                            ],
+                                CustomForm(
+                                  fields: widget.meta["fields"],
+                                  formKey: _fbKey,
+                                  doc: docs[0],
+                                  viewType: ViewType.form,
+                                  editMode: editMode,
+                                ),
+                              ],
+                            ),
                           ),
                           Timeline([
                             ...docInfo['comments'],

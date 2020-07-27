@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/utils/backend_service.dart';
 import 'package:frappe_app/utils/enums.dart';
-import 'package:frappe_app/utils/helpers.dart';
+import 'package:frappe_app/widgets/custom_form.dart';
 
 import '../app.dart';
 
-class NewForm extends StatefulWidget {
+class SimpleForm extends StatefulWidget {
   final Map meta;
 
-  NewForm(this.meta);
+  SimpleForm(this.meta);
 
   @override
-  _NewFormState createState() => _NewFormState();
+  _SimpleFormState createState() => _SimpleFormState();
 }
 
-class _NewFormState extends State<NewForm> {
+class _SimpleFormState extends State<SimpleForm> {
   BackendService backendService;
 
   @override
@@ -27,32 +27,6 @@ class _NewFormState extends State<NewForm> {
   @override
   Widget build(BuildContext context) {
     final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-
-    List<Widget> _generateChildren(List fields) {
-      List filteredFields = fields.where((field) {
-        return (field["read_only"] != 1 ||
-                field["fieldtype"] == "Section Break") &&
-            field["hidden"] == 0 &&
-            [
-              "Select",
-              "Link",
-              "Data",
-              "Date",
-              "Datetime",
-              "Float",
-              "Time",
-              "Section Break",
-              "Text Editor"
-            ].contains(
-              field["fieldtype"],
-            );
-      }).toList();
-
-      return generateLayout(
-        fields: filteredFields,
-        viewType: ViewType.newForm,
-      );
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -82,22 +56,10 @@ class _NewFormState extends State<NewForm> {
           ),
         ],
       ),
-      body: FormBuilder(
-        key: _fbKey,
-        child: Container(
-          color: Colors.white,
-          padding: EdgeInsets.all(10),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                children: _generateChildren(
-                  widget.meta["fields"],
-                ),
-              ),
-            ),
-          ),
-        ),
+      body: CustomForm(
+        formKey: _fbKey,
+        fields: widget.meta["fields"],
+        viewType: ViewType.newForm,
       ),
     );
   }

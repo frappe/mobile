@@ -317,6 +317,10 @@ Widget makeControl(Map field,
             withLabel);
       }
       break;
+
+    default:
+      value = Container();
+      break;
   }
   return value;
 }

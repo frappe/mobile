@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:frappe_app/utils/http.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import './main.dart';
@@ -11,7 +10,7 @@ import './utils/helpers.dart';
 import './screens/filter_list.dart';
 import './screens/form_view.dart';
 import './screens/list_view.dart';
-import './screens/new_form.dart';
+import 'screens/simple_form.dart';
 import './screens/login.dart';
 import './screens/module_view.dart';
 
@@ -127,10 +126,10 @@ class Router extends StatelessWidget {
             return FormView(
               doctype: doctype,
               name: name,
-              wireframe: docMeta,
+              meta: docMeta,
             );
           } else if (viewType == ViewType.filter) {
-            List defaultFilters = [
+            var defaultFilters = [
               {
                 "is_default_filter": 1,
                 "fieldname": "_assign",
@@ -147,7 +146,7 @@ class Router extends StatelessWidget {
               appBarTitle: "Filter $doctype",
             );
           } else if (viewType == ViewType.newForm) {
-            return NewForm(docMeta);
+            return SimpleForm(docMeta);
           }
         },
       ),
