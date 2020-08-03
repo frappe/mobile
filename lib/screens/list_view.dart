@@ -48,7 +48,7 @@ class _CustomListViewState extends State<CustomListView> {
   @override
   void initState() {
     super.initState();
-    backendService = BackendService(context);
+    backendService = BackendService(context, meta: widget.meta);
     _pageLoadController = PagewiseLoadController(
       pageSize: PAGE_SIZE,
       pageFuture: (pageIndex) {
@@ -153,6 +153,7 @@ class _CustomListViewState extends State<CustomListView> {
         ),
       ),
       appBar: AppBar(
+        elevation: 0.6,
         title: Text(widget.appBarTitle),
         actions: <Widget>[
           IconButton(
@@ -247,16 +248,17 @@ class _CustomListViewState extends State<CustomListView> {
             },
             pageLoadController: _pageLoadController,
             itemBuilder: ((buildContext, entry, _) {
-              int titleFieldIndex =
-                  entry[0].indexOf(widget.meta["title_field"]);
-              var key = entry[0];
-              var value = entry[1];
-              var assignee = value[4] != null ? json.decode(value[4]) : null;
+              var assignee = entry["_assign"] != null
+                  ? json.decode(entry["_assign"])
+                  : null;
 
-              var likedBy = value[6] != null ? json.decode(value[6]) : [];
+              var likedBy = entry["_liked_by"] != null
+                  ? json.decode(entry["_liked_by"])
+                  : [];
               var isLikedByUser = likedBy.contains(userId);
 
-              var seenBy = value[5] != null ? json.decode(value[5]) : [];
+              var seenBy =
+                  entry["_seen"] != null ? json.decode(entry["_seen"]) : [];
               var isSeenByUser = seenBy.contains(userId);
 
               return ListItem(
@@ -269,7 +271,7 @@ class _CustomListViewState extends State<CustomListView> {
                         return Router(
                           viewType: ViewType.form,
                           doctype: widget.doctype,
-                          name: value[0],
+                          name: entry["name"],
                         );
                       },
                     ),
@@ -278,7 +280,7 @@ class _CustomListViewState extends State<CustomListView> {
                 isFav: isLikedByUser,
                 seen: isSeenByUser,
                 assignee: assignee != null && assignee.length > 0
-                    ? [key[4], assignee[0]]
+                    ? ['_assign', assignee[0]]
                     : null,
                 onButtonTap: (filter) {
                   widget.filters.clear();
@@ -288,15 +290,15 @@ class _CustomListViewState extends State<CustomListView> {
                   _pageLoadController.reset();
                   setState(() {});
                 },
-                title: value[titleFieldIndex],
+                title: entry[widget.meta["title_field"]] ?? entry["name"],
                 modifiedOn: "${timeago.format(
                   DateTime.parse(
-                    value[3],
+                    entry['modified'],
                   ),
                 )}",
-                name: value[0],
-                status: [key[1], value[1]],
-                commentCount: value[8],
+                name: entry["name"],
+                status: ["status", entry["status"]],
+                commentCount: entry["_comment_count"],
               );
             }),
           ),
@@ -355,7 +357,7 @@ class CustomSearch extends SearchDelegate {
             itemBuilder: (_, index) {
               return ListTile(
                 title: Text(
-                  snapshot.data[index][1][2],
+                  snapshot.data[index][data.meta["title_field"]],
                 ),
                 onTap: () {
                   Navigator.push(
@@ -365,7 +367,7 @@ class CustomSearch extends SearchDelegate {
                         return Router(
                           viewType: ViewType.form,
                           doctype: data.doctype,
-                          name: snapshot.data[index][1][0],
+                          name: snapshot.data[index]["name"],
                         );
                       },
                     ),
@@ -375,7 +377,7 @@ class CustomSearch extends SearchDelegate {
             },
           );
         } else {
-          return CircularProgressIndicator();
+          return Center(child: CircularProgressIndicator());
         }
       },
     );

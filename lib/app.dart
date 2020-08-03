@@ -10,7 +10,7 @@ import './utils/helpers.dart';
 import './screens/filter_list.dart';
 import './screens/form_view.dart';
 import './screens/list_view.dart';
-import 'screens/simple_form.dart';
+import './screens/simple_form.dart';
 import './screens/login.dart';
 import './screens/module_view.dart';
 

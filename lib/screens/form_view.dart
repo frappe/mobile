@@ -142,7 +142,7 @@ class _FormViewState extends State<FormView>
             return Scaffold(
                 backgroundColor: Palette.bgColor,
                 bottomNavigationBar: Container(
-                  height: 60,
+                  height: editMode ? 0 : 60,
                   child: BottomAppBar(
                     color: Colors.white,
                     child: Row(
@@ -242,7 +242,9 @@ class _FormViewState extends State<FormView>
                                       children: <Widget>[
                                         Flexible(
                                           child: Text(
-                                            docs[0][widget.meta["title_field"]],
+                                            docs[0][widget
+                                                    .meta["title_field"]] ??
+                                                docs[0]["name"],
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 2,
                                             style: TextStyle(
@@ -290,11 +292,12 @@ class _FormViewState extends State<FormView>
                                 ),
                               ),
                               actions: <Widget>[
-                                LikeDoc(
-                                  doctype: widget.doctype,
-                                  name: widget.name,
-                                  isFav: isLikedByUser,
-                                ),
+                                if (!editMode)
+                                  LikeDoc(
+                                    doctype: widget.doctype,
+                                    name: widget.name,
+                                    isFav: isLikedByUser,
+                                  ),
                                 if (editMode)
                                   FlatButton(
                                     child: Text('Cancel'),
@@ -330,7 +333,7 @@ class _FormViewState extends State<FormView>
                                         },
                                 )
                               ],
-                              expandedHeight: 180.0,
+                              expandedHeight: editMode ? 0.0 : 180.0,
                               floating: true,
                               pinned: true,
                             ),

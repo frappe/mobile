@@ -40,6 +40,7 @@ class CustomExpansionTile extends StatefulWidget {
     this.tilePadding,
     this.expandedCrossAxisAlignment,
     this.expandedAlignment,
+    this.leadingArrow = false,
   })  : assert(initiallyExpanded != null),
         assert(maintainState != null),
         assert(
@@ -133,6 +134,12 @@ class CustomExpansionTile extends StatefulWidget {
   /// When the value is null, the value of `expandedCrossAxisAlignment` is [CrossAxisAlignment.center].
   final CrossAxisAlignment expandedCrossAxisAlignment;
 
+  /// Specifies whether the dropdown arrow will be leading or trailing.
+  ///
+  /// When true, the dropdown arrow will be on leading side
+  /// When false (default), the dropdown arrow will be on trailing side
+  final bool leadingArrow;
+
   @override
   _CustomExpansionTileState createState() => _CustomExpansionTileState();
 }
@@ -223,14 +230,20 @@ class _CustomExpansionTileState extends State<CustomExpansionTile>
             child: ListTile(
               onTap: _handleTap,
               contentPadding: widget.tilePadding,
-              leading: widget.leading,
+              leading: widget.leadingArrow
+                  ? RotationTransition(
+                      turns: _iconTurns,
+                      child: const Icon(Icons.expand_more),
+                    )
+                  : widget.leading,
               title: widget.title,
               subtitle: widget.subtitle,
-              trailing: widget.trailing ??
-                  RotationTransition(
-                    turns: _iconTurns,
-                    child: const Icon(Icons.expand_more),
-                  ),
+              trailing: widget.leadingArrow
+                  ? widget.trailing
+                  : RotationTransition(
+                      turns: _iconTurns,
+                      child: const Icon(Icons.expand_more),
+                    ),
             ),
           ),
           ClipRect(

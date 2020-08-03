@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:frappe_app/screens/settings.dart';
 import 'package:frappe_app/utils/http.dart';
 import 'package:frappe_app/widgets/user_avatar.dart';
 
@@ -9,14 +12,48 @@ import '../utils/backend_service.dart';
 import '../utils/helpers.dart';
 import './doctype_view.dart';
 
-class ModuleView extends StatelessWidget {
-  static const _supportedModules = ['Support', 'CRM', 'Projects'];
-  final userId = Uri.decodeFull(localStorage.getString('userId'));
-  static const popupOptions = const ["Logout"];
+class ModuleView extends StatefulWidget {
+  @override
+  _ModuleViewState createState() => _ModuleViewState();
+}
 
-  void _choiceAction(String choice, context) {
+class _ModuleViewState extends State<ModuleView> {
+  final userId = Uri.decodeFull(localStorage.getString('userId'));
+  static const popupOptions = const ["Settings", "Logout"];
+
+  @override
+  void initState() {
+    super.initState();
+    if (!localStorage.containsKey("${baseUrl}activeModules")) {
+      localStorage.setString(
+        "${baseUrl}activeModules",
+        json.encode(
+          {
+            'CRM': ['Opportunity'],
+            'Support': ['Issue'],
+            'Projects': ['Task']
+          },
+        ),
+      );
+    }
+  }
+
+  void _choiceAction(String choice, context) async {
     if (choice == "Logout") {
       logout(context);
+    } else if (choice == "Settings") {
+      var nav = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return Settings();
+          },
+        ),
+      );
+
+      if (nav) {
+        setState(() {});
+      }
     }
   }
 
@@ -47,9 +84,15 @@ class ModuleView extends StatelessWidget {
         future: backendService.getDeskSideBarItems(context),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            var activeModules = Map<String, List>.from(
+              json.decode(
+                localStorage.getString("${baseUrl}activeModules"),
+              ),
+            );
             var modules = snapshot.data["message"]["Modules"];
             var modulesWidget = modules.where((m) {
-              return _supportedModules.contains(m["name"]);
+              return activeModules.keys.contains(m["name"]) &&
+                  activeModules[m["name"]].length > 0;
             }).map<Widget>((m) {
               return Padding(
                 padding:

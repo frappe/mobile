@@ -32,7 +32,7 @@ class _MultiSelectState extends State<MultiSelect> {
       valueTransformer: (l) {
         return l
             .map((a) {
-              return a.value;
+              return a["value"];
             })
             .toList()
             .join(',');

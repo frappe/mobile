@@ -42,6 +42,8 @@ class CustomForm extends StatelessWidget {
                 field["fieldtype"] == "Section Break") &&
             field["hidden"] == 0;
       }).toList();
+    } else {
+      filteredFields = fields;
     }
 
     return generateLayout(

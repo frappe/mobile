@@ -42,6 +42,7 @@ Future processData(
   List metaFields = meta["docs"][0]["fields"];
 
   metaFields.forEach((field) {
+    meta["docs"][0]["_field${field["fieldname"]}"] = true;
     if (field["fieldtype"] == "Select") {
       if (field["hidden"] != 1) {
         field["options"] =
@@ -55,47 +56,46 @@ Future processData(
   return meta;
 }
 
+Widget buildDecoratedWidget(Widget fieldWidget, bool withLabel,
+    [String label = ""]) {
+  if (withLabel) {
+    return Padding(
+      padding: Palette.fieldPadding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: Palette.labelPadding,
+            child: Text(
+              label,
+              style: Palette.secondaryTxtStyle,
+            ),
+          ),
+          fieldWidget
+        ],
+      ),
+    );
+  } else {
+    return Padding(
+      padding: Palette.fieldPadding,
+      child: fieldWidget,
+    );
+  }
+}
+
 Widget makeControl(Map field,
     [val, bool withLabel = true, bool editMode = true]) {
   Widget value;
-  const fieldPadding = const EdgeInsets.only(bottom: 24.0);
-  const labelPadding = const EdgeInsets.only(bottom: 6.0);
   List<String Function(dynamic)> validators = [];
 
   if (field["reqd"] == 1) {
     validators.add(FormBuilderValidators.required());
   }
 
-  Widget _buildDecoratedWidget(Widget fieldWidget, bool withLabel) {
-    if (withLabel) {
-      return Padding(
-        padding: fieldPadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: labelPadding,
-              child: Text(
-                field["label"],
-                style: Palette.secondaryTxtStyle,
-              ),
-            ),
-            fieldWidget
-          ],
-        ),
-      );
-    } else {
-      return Padding(
-        padding: fieldPadding,
-        child: fieldWidget,
-      );
-    }
-  }
-
   switch (field["fieldtype"]) {
     case "Link":
       {
-        value = _buildDecoratedWidget(
+        value = buildDecoratedWidget(
             LinkField(
               key: Key(val),
               fillColor: Palette.fieldBgColor,
@@ -107,13 +107,14 @@ Widget makeControl(Map field,
               refDoctype: field["refDoctype"],
               value: val,
             ),
-            withLabel);
+            withLabel,
+            field["label"]);
       }
       break;
 
     case "Select":
       {
-        value = _buildDecoratedWidget(
+        value = buildDecoratedWidget(
             FormBuilderDropdown(
               key: Key(val),
               initialValue: val,
@@ -139,7 +140,8 @@ Widget makeControl(Map field,
                 );
               }).toList(),
             ),
-            withLabel);
+            withLabel,
+            field["label"]);
       }
       break;
 
@@ -154,39 +156,39 @@ Widget makeControl(Map field,
           ];
         }
 
-        value = _buildDecoratedWidget(
-          MultiSelect(
-            attribute: field["fieldname"],
-            hint: field["label"],
-            val: val != null ? val : [],
-          ),
-          withLabel,
-        );
+        value = buildDecoratedWidget(
+            MultiSelect(
+              attribute: field["fieldname"],
+              hint: field["label"],
+              val: val != null ? val : [],
+            ),
+            withLabel,
+            field["label"]);
       }
       break;
 
     case "Small Text":
       {
-        value = _buildDecoratedWidget(
-          FormBuilderTextField(
-            initialValue: val,
-            attribute: field["fieldname"],
-            decoration: Palette.formFieldDecoration(
-              withLabel,
-              field["label"],
+        value = buildDecoratedWidget(
+            FormBuilderTextField(
+              initialValue: val,
+              attribute: field["fieldname"],
+              decoration: Palette.formFieldDecoration(
+                withLabel,
+                field["label"],
+              ),
+              validators: [
+                FormBuilderValidators.required(),
+              ],
             ),
-            validators: [
-              FormBuilderValidators.required(),
-            ],
-          ),
-          withLabel,
-        );
+            withLabel,
+            field["label"]);
       }
       break;
 
     case "Data":
       {
-        value = _buildDecoratedWidget(
+        value = buildDecoratedWidget(
             FormBuilderTextField(
               initialValue: val,
               key: Key(val),
@@ -197,13 +199,14 @@ Widget makeControl(Map field,
               ),
               validators: validators,
             ),
-            withLabel);
+            withLabel,
+            field["label"]);
       }
       break;
 
     case "Check":
       {
-        value = _buildDecoratedWidget(
+        value = buildDecoratedWidget(
             FormBuilderCheckbox(
               leadingInput: true,
               key: Key(val.toString()),
@@ -215,13 +218,13 @@ Widget makeControl(Map field,
               ),
               validators: validators,
             ),
-            withLabel);
+            false);
       }
       break;
 
     case "Text Editor":
       {
-        value = _buildDecoratedWidget(
+        value = buildDecoratedWidget(
             FormBuilderTextField(
                 maxLines: 10,
                 initialValue: val,
@@ -231,13 +234,14 @@ Widget makeControl(Map field,
                   field["label"],
                 ),
                 validators: validators),
-            withLabel);
+            withLabel,
+            field["label"]);
       }
       break;
 
     case "Datetime":
       {
-        value = _buildDecoratedWidget(
+        value = buildDecoratedWidget(
             FormBuilderDateTimePicker(
               key: Key(val),
               valueTransformer: (val) {
@@ -253,13 +257,14 @@ Widget makeControl(Map field,
               ),
               validators: validators,
             ),
-            withLabel);
+            withLabel,
+            field["label"]);
       }
       break;
 
     case "Float":
       {
-        value = _buildDecoratedWidget(
+        value = buildDecoratedWidget(
             FormBuilderTextField(
               key: Key(val.toString()),
               initialValue: val.toString(),
@@ -271,13 +276,14 @@ Widget makeControl(Map field,
               ),
               validators: validators,
             ),
-            withLabel);
+            withLabel,
+            field["label"]);
       }
       break;
 
     case "Time":
       {
-        value = _buildDecoratedWidget(
+        value = buildDecoratedWidget(
             FormBuilderDateTimePicker(
               key: Key(val),
               inputType: InputType.time,
@@ -292,13 +298,14 @@ Widget makeControl(Map field,
               ),
               validators: validators,
             ),
-            withLabel);
+            withLabel,
+            field["label"]);
       }
       break;
 
     case "Date":
       {
-        value = _buildDecoratedWidget(
+        value = buildDecoratedWidget(
             FormBuilderDateTimePicker(
               key: Key(val),
               inputType: InputType.date,
@@ -314,7 +321,8 @@ Widget makeControl(Map field,
               ),
               validators: validators,
             ),
-            withLabel);
+            withLabel,
+            field["label"]);
       }
       break;
 
@@ -412,6 +420,10 @@ List<Widget> generateLayout({
 
   fields.forEach((field) {
     var val = field["_current_val"] ?? field["default"];
+
+    if (val == '__user') {
+      val = Uri.decodeFull(localStorage.getString('userId'));
+    }
 
     if (field["fieldtype"] == "Section Break") {
       if (sections.length > 0) {
@@ -536,9 +548,8 @@ DateTime parseDate(val) {
 }
 
 List generateFieldnames(String doctype, Map meta) {
-  const defaultFields = [
+  var fields = [
     'name',
-    'status',
     'modified',
     '_assign',
     '_seen',
@@ -546,12 +557,19 @@ List generateFieldnames(String doctype, Map meta) {
     '_comments',
   ];
 
-  var transformedFields = defaultFields.map((field) {
+  if (meta["title_field"] != null) {
+    fields.add(meta["title_field"]);
+  }
+
+  if (hasField(meta, 'status')) {
+    fields.add('status');
+  } else {
+    fields.add('docstatus');
+  }
+
+  var transformedFields = fields.map((field) {
     return "`tab$doctype`.`$field`";
   }).toList();
-
-  var titleField = "`tab$doctype`.`${meta["title_field"]}`";
-  transformedFields.insert(2, titleField);
 
   return transformedFields;
 }
@@ -568,4 +586,12 @@ String getInitials(String txt) {
     initials += names[i] != '' ? '${names[i][0].toUpperCase()}' : "";
   }
   return initials;
+}
+
+bool hasField(Map meta, String fieldName) {
+  return meta.containsKey('_field$fieldName');
+}
+
+bool isSubmittable(Map meta) {
+  return meta["is_submittable"] == 1;
 }

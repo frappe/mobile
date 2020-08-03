@@ -11,6 +11,7 @@ class FrappeFlatButton extends StatelessWidget {
   final String icon;
   final double height;
   final double minWidth;
+  final bool fullWidth;
 
   FrappeFlatButton({
     @required this.onPressed,
@@ -19,6 +20,7 @@ class FrappeFlatButton extends StatelessWidget {
     this.icon,
     this.height = 36.0,
     this.minWidth = 88,
+    this.fullWidth = false,
   });
 
   FrappeFlatButton.small({
@@ -28,6 +30,7 @@ class FrappeFlatButton extends StatelessWidget {
     this.icon,
     this.height = 32.0,
     this.minWidth = 88,
+    this.fullWidth = false,
   });
 
   @override
@@ -37,25 +40,22 @@ class FrappeFlatButton extends StatelessWidget {
 
     if (onPressed == null) {
       _buttonColor = Palette.disabledButonColor;
-      _textStyle = TextStyle(
-        color: Colors.white,
-      );
+      _textStyle =
+          TextStyle(color: Colors.white, fontSize: fullWidth ? 18 : null);
     } else if (buttonType == ButtonType.primary) {
       _buttonColor = Palette.primaryButtonColor;
-      _textStyle = TextStyle(
-        color: Colors.white,
-      );
+      _textStyle =
+          TextStyle(color: Colors.white, fontSize: fullWidth ? 18 : null);
     } else if (buttonType == ButtonType.secondary) {
       _buttonColor = Palette.secondaryButtonColor;
-      _textStyle = TextStyle(
-        color: Colors.black,
-      );
+      _textStyle =
+          TextStyle(color: Colors.black, fontSize: fullWidth ? 18 : null);
     }
 
     if (icon != null) {
       return ButtonTheme(
         height: height,
-        minWidth: minWidth,
+        minWidth: fullWidth ? double.infinity : minWidth,
         child: FlatButton.icon(
           label: Text(
             title,
@@ -78,7 +78,7 @@ class FrappeFlatButton extends StatelessWidget {
     } else {
       return ButtonTheme(
         height: height,
-        minWidth: minWidth,
+        minWidth: fullWidth ? double.infinity : minWidth,
         child: FlatButton(
           onPressed: onPressed,
           shape: OutlineInputBorder(

@@ -9,10 +9,12 @@ import 'http.dart';
 
 class BackendService {
   final BuildContext context;
+  final Map meta;
 
   BackendService(
-    this.context,
-  );
+    this.context, {
+    this.meta,
+  });
 
   Future getdoc(doctype, name) async {
     var queryParams = {
@@ -97,7 +99,28 @@ class BackendService {
       }
 
       for (int i = 0; i < l["values"].length; i++) {
-        newL.add([l["keys"], l["values"][i]]);
+        var o = {};
+        for (int j = 0; j < l["keys"].length; j++) {
+          var key = l["keys"][j];
+          var value = l["values"][i][j];
+
+          if (key == "docstatus") {
+            key = "status";
+            if (isSubmittable(meta)) {
+              if (value == 0) {
+                value = "Draft";
+              } else if (value == 1) {
+                value = "Submitted";
+              } else if (value == 2) {
+                value = "Cancelled";
+              }
+            } else {
+              value = value == 0 ? "Enabled" : "Disabled";
+            }
+          }
+          o[key] = value;
+        }
+        newL.add(o);
       }
 
       return newL;

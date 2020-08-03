@@ -23,6 +23,10 @@ class Palette {
 
   static Color secondaryTxtColor = Color(0xFFB9C0C7);
   static Color newIndicatorColor = Color.fromRGBO(255, 252, 231, 1);
+
+  static EdgeInsets fieldPadding = const EdgeInsets.only(bottom: 24.0);
+  static EdgeInsets labelPadding = const EdgeInsets.only(bottom: 6.0);
+
   // TODO: move
 
   static TextStyle secondaryTxtStyle = TextStyle(
@@ -36,8 +40,13 @@ class Palette {
     color: Palette.secondaryTxtColor,
   );
 
-  static InputDecoration formFieldDecoration(bool withLabel, String label) {
+  static InputDecoration formFieldDecoration(
+    bool withLabel,
+    String label, [
+    Widget suffixIcon,
+  ]) {
     return InputDecoration(
+      suffixIcon: suffixIcon,
       hintText: !withLabel ? label : null,
       enabledBorder: InputBorder.none,
       filled: true,
