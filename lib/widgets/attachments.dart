@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/utils/backend_service.dart';
 
+import '../config/frappe_icons.dart';
 import '../config/palette.dart';
+import '../utils/backend_service.dart';
+import '../utils/enums.dart';
 import '../utils/helpers.dart';
-import '../widgets/file_picker.dart';
+import '../widgets/frappe_button.dart';
+import '../screens/file_picker.dart';
 import '../widgets/card_list_tile.dart';
 
 class Attachments extends StatefulWidget {
@@ -15,7 +18,7 @@ class Attachments extends StatefulWidget {
   Attachments({
     @required this.doctype,
     @required this.name,
-    this.docInfo,
+    @required this.docInfo,
     this.callback,
   });
 
@@ -32,7 +35,8 @@ class _AttachmentsState extends State<Attachments> {
     super.initState();
     backendService = BackendService(context);
 
-    _futureVal = Future.delayed(Duration(seconds: 0), () => widget.docInfo);
+    _futureVal =
+        Future.delayed(Duration(seconds: 0), () => {"docinfo": widget.docInfo});
   }
 
   void _refresh() {
@@ -41,76 +45,75 @@ class _AttachmentsState extends State<Attachments> {
     });
   }
 
+  List<Widget> _generateChildren(List l) {
+    var children = l.map<Widget>((attachment) {
+      var file = attachment["file_name"];
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 8.0),
+        child: CardListTile(
+          color: Palette.fieldBgColor,
+          onTap: () {
+            downloadFile(attachment["file_url"]);
+          },
+          title: Text(file),
+          trailing: IconButton(
+            icon: Icon(Icons.close),
+            onPressed: () async {
+              await backendService.removeAttachment(
+                widget.doctype,
+                widget.name,
+                attachment["name"],
+              );
+              _refresh();
+              widget.callback();
+              showSnackBar('Attachment removed', context);
+            },
+          ),
+        ),
+      );
+    }).toList();
+
+    children.add(
+      Align(
+        alignment: Alignment.centerLeft,
+        child: FrappeIconButton(
+          buttonType: ButtonType.secondary,
+          onPressed: () async {
+            var nav = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return CustomFilePicker(
+                    callback: widget.callback,
+                    doctype: widget.doctype,
+                    name: widget.name,
+                  );
+                },
+              ),
+            );
+
+            if (nav == true) {
+              _refresh();
+            }
+          },
+          icon: FrappeIcons.small_add,
+        ),
+      ),
+    );
+
+    return children;
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _futureVal,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          var docInfo = snapshot.data;
-          return Container(
-            padding: const EdgeInsets.all(8.0),
-            color: Palette.bgColor,
-            child: Column(
-              children: <Widget>[
-                docInfo["attachments"].isNotEmpty
-                    ? Flexible(
-                        child: ListView(
-                          shrinkWrap: true,
-                          children:
-                              docInfo["attachments"].map<Widget>((attachment) {
-                            var file = attachment["file_name"];
-                            var ext = file.split('.').last;
-                            var fileName = file.split('.').first;
-                            return Container(
-                              color: Colors.white,
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  child: Text(ext.toUpperCase()),
-                                ),
-                                onTap: () {
-                                  downloadFile(attachment["file_url"]);
-                                },
-                                title: Text(fileName),
-                                trailing: IconButton(
-                                  icon: Icon(Icons.close),
-                                  onPressed: () async {
-                                    await backendService.removeAttachment(
-                                      widget.doctype,
-                                      widget.name,
-                                      attachment["name"],
-                                    );
-                                    _refresh();
-                                    widget.callback();
-                                    showSnackBar('Attachment removed', context);
-                                  },
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      )
-                    : CardListTile(
-                        title: Text(
-                          'No Attachments',
-                          style: Palette.altTextStyle,
-                        ),
-                      ),
-                SizedBox(
-                  height: 20,
-                ),
-                Expanded(
-                  child: CustomFilePicker(
-                    doctype: widget.doctype,
-                    name: widget.name,
-                    callback: () {
-                      _refresh();
-                      widget.callback();
-                    },
-                  ),
-                ),
-              ],
-            ),
+          var docInfo = snapshot.data["docinfo"];
+          return ListView(
+            shrinkWrap: true,
+            children: _generateChildren(docInfo["attachments"]),
           );
         } else if (snapshot.hasError) {
           return Text("${snapshot.error}");

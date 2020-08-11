@@ -48,7 +48,7 @@ void cacheAllUsers(context) async {
 
     var usr = {};
     res.forEach((element) {
-      usr[element[1][0]] = element[1];
+      usr[element["name"]] = element;
     });
     localStorage.setString('${baseUrl}allUsers', json.encode(usr));
   }

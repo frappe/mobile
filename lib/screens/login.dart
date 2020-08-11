@@ -31,51 +31,44 @@ class _LoginState extends State<Login> {
     savedPwd = localStorage.getString('pwd');
   }
 
-  _authenticate() async {
-    {
-      if (_fbKey.currentState.saveAndValidate()) {
-        var formValue = _fbKey.currentState.value;
+  _authenticate(data) async {
+    await setBaseUrl(data["serverURL"]);
 
-        await setBaseUrl(formValue["serverURL"]);
+    Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Logging In'),
+      ),
+    );
 
-        Scaffold.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Logging In'),
-          ),
-        );
+    var response2 =
+        await backendService.login(data["usr"].trimRight(), data["pwd"]);
 
-        var response2 = await backendService.login(
-            formValue["usr"].trimRight(), formValue["pwd"]);
+    if (response2.statusCode == 200) {
+      localStorage.setBool('isLoggedIn', true);
 
-        if (response2.statusCode == 200) {
-          localStorage.setBool('isLoggedIn', true);
+      cookies = await getCookies();
 
-          cookies = await getCookies();
+      var userId =
+          response2.headers.map["set-cookie"][3].split(';')[0].split('=')[1];
+      localStorage.setString('userId', userId);
+      localStorage.setString('user', response2.data["full_name"]);
+      localStorage.setString(
+        'usr',
+        data["usr"].trimRight(),
+      );
+      localStorage.setString(
+        'pwd',
+        data["pwd"],
+      );
 
-          var userId = response2.headers.map["set-cookie"][3]
-              .split(';')[0]
-              .split('=')[1];
-          localStorage.setString('userId', userId);
-          localStorage.setString('user', response2.data["full_name"]);
-          localStorage.setString(
-            'usr',
-            formValue["usr"].trimRight(),
-          );
-          localStorage.setString(
-            'pwd',
-            formValue["pwd"],
-          );
+      await cacheAllUsers(context);
+      Navigator.of(context).pushReplacementNamed('/modules');
+    } else {
+      localStorage.setBool('isLoggedIn', false);
 
-          await cacheAllUsers(context);
-          Navigator.of(context).pushReplacementNamed('/modules');
-        } else {
-          localStorage.setBool('isLoggedIn', false);
-
-          Scaffold.of(context).showSnackBar(SnackBar(
-            content: Text('Login Failed'),
-          ));
-        }
-      }
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text('Login Failed'),
+      ));
     }
   }
 
@@ -176,7 +169,12 @@ class _LoginState extends State<Login> {
                           title: 'Login',
                           fullWidth: true,
                           buttonType: ButtonType.primary,
-                          onPressed: _authenticate,
+                          onPressed: () {
+                            if (_fbKey.currentState.saveAndValidate()) {
+                              var formValue = _fbKey.currentState.value;
+                              _authenticate(formValue);
+                            }
+                          },
                         ),
                       ],
                     ),

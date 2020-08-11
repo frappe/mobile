@@ -8,4 +8,9 @@ class FrappeIcons {
   static const search = '$_basePath/search.svg';
   static const edit = '$_basePath/edit.svg';
   static const small_add = '$_basePath/small_add.svg';
+  static const assign = '$_basePath/assign.svg';
+  static const attachment = '$_basePath/attachment.svg';
+  static const folder_open = '$_basePath/folder_open.svg';
+  static const link_url = '$_basePath/link_url.svg';
+  static const browse = '$_basePath/browse.svg';
 }

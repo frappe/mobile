@@ -15,8 +15,8 @@ class FrappeFlatButton extends StatelessWidget {
 
   FrappeFlatButton({
     @required this.onPressed,
-    @required this.title,
     @required this.buttonType,
+    this.title,
     this.icon,
     this.height = 36.0,
     this.minWidth = 88,
@@ -25,8 +25,8 @@ class FrappeFlatButton extends StatelessWidget {
 
   FrappeFlatButton.small({
     @required this.onPressed,
-    @required this.title,
     @required this.buttonType,
+    this.title,
     this.icon,
     this.height = 32.0,
     this.minWidth = 88,
@@ -57,10 +57,12 @@ class FrappeFlatButton extends StatelessWidget {
         height: height,
         minWidth: fullWidth ? double.infinity : minWidth,
         child: FlatButton.icon(
-          label: Text(
-            title,
-            style: _textStyle,
-          ),
+          label: title != null
+              ? Text(
+                  title,
+                  style: _textStyle,
+                )
+              : Container(),
           icon: FrappeIcon(icon),
           onPressed: onPressed,
           shape: OutlineInputBorder(
@@ -91,7 +93,12 @@ class FrappeFlatButton extends StatelessWidget {
           ),
           color: _buttonColor,
           disabledColor: _buttonColor,
-          child: Text(title, style: _textStyle),
+          child: title != null
+              ? Text(
+                  title,
+                  style: _textStyle,
+                )
+              : Container(),
         ),
       );
     }
@@ -106,6 +113,7 @@ class FrappeRaisedButton extends StatelessWidget {
   final double minWidth;
   final Color color;
   final double iconSize;
+  final bool fullWidth;
 
   FrappeRaisedButton({
     @required this.onPressed,
@@ -115,6 +123,7 @@ class FrappeRaisedButton extends StatelessWidget {
     this.height = 36.0,
     this.color = Colors.white,
     this.minWidth = 88,
+    this.fullWidth = false,
   });
 
   FrappeRaisedButton.small({
@@ -125,6 +134,7 @@ class FrappeRaisedButton extends StatelessWidget {
     this.height = 32.0,
     this.color = Colors.white,
     this.minWidth = 88,
+    this.fullWidth = false,
   });
 
   @override
@@ -132,7 +142,7 @@ class FrappeRaisedButton extends StatelessWidget {
     if (icon != null) {
       return ButtonTheme(
         height: height,
-        minWidth: minWidth,
+        minWidth: fullWidth ? double.infinity : minWidth,
         child: RaisedButton.icon(
           color: color,
           label: Text(
@@ -151,7 +161,7 @@ class FrappeRaisedButton extends StatelessWidget {
     } else {
       return ButtonTheme(
         height: height,
-        minWidth: minWidth,
+        minWidth: fullWidth ? double.infinity : minWidth,
         child: RaisedButton(
           color: color,
           onPressed: onPressed,
@@ -164,5 +174,63 @@ class FrappeRaisedButton extends StatelessWidget {
         ),
       );
     }
+  }
+}
+
+class FrappeIconButton extends StatelessWidget {
+  final Function onPressed;
+  final ButtonType buttonType;
+  final String icon;
+  final double height;
+  final double minWidth;
+  final bool fullWidth;
+
+  FrappeIconButton({
+    @required this.onPressed,
+    @required this.buttonType,
+    @required this.icon,
+    this.height = 36.0,
+    this.minWidth = 88,
+    this.fullWidth = false,
+  });
+
+  FrappeIconButton.small({
+    @required this.onPressed,
+    @required this.buttonType,
+    this.icon,
+    this.height = 32.0,
+    this.minWidth = 88,
+    this.fullWidth = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Color _buttonColor;
+
+    if (onPressed == null) {
+      _buttonColor = Palette.disabledButonColor;
+    } else if (buttonType == ButtonType.primary) {
+      _buttonColor = Palette.primaryButtonColor;
+    } else if (buttonType == ButtonType.secondary) {
+      _buttonColor = Palette.secondaryButtonColor;
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: _buttonColor,
+        borderRadius: BorderRadius.all(
+          Radius.circular(6),
+        ),
+      ),
+      child: ButtonTheme(
+        height: height,
+        minWidth: fullWidth ? double.infinity : minWidth,
+        child: IconButton(
+          icon: FrappeIcon(icon),
+          onPressed: onPressed,
+          disabledColor: _buttonColor,
+        ),
+      ),
+    );
   }
 }

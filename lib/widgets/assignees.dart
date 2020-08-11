@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/utils/backend_service.dart';
-import 'package:frappe_app/widgets/user_avatar.dart';
 
+import './frappe_button.dart';
 import '../config/palette.dart';
+import '../config/frappe_icons.dart';
+import '../widgets/user_avatar.dart';
+import '../widgets/card_list_tile.dart';
+import '../utils/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
-import 'frappe_button.dart';
-import '../widgets/card_list_tile.dart';
-import '../form/controls/link_field.dart';
+import '../screens/add_assignees.dart';
 
 class Assignees extends StatefulWidget {
-  final List assignments;
   final String doctype;
   final String name;
   final Function callback;
+  final Map docInfo;
 
   Assignees({
-    @required this.assignments,
     @required this.doctype,
     @required this.name,
     @required this.callback,
+    @required this.docInfo,
   });
 
   @override
@@ -28,156 +28,106 @@ class Assignees extends StatefulWidget {
 }
 
 class _AssigneesState extends State<Assignees> {
-  var newAssignees = [];
   BackendService backendService;
+  Future _futureVal;
 
   @override
   void initState() {
     super.initState();
     backendService = BackendService(context);
+    _futureVal =
+        Future.delayed(Duration(seconds: 0), () => {"docinfo": widget.docInfo});
   }
 
-  Widget _buildSelectedAssigneesHeader() {
-    return CardListTile(
-      title: Text(
-        'Selected',
-        style: TextStyle(
-          fontSize: 18,
-          color: Palette.secondaryTxtColor,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      trailing: FrappeFlatButton.small(
-        title: 'Assign',
-        buttonType: ButtonType.primary,
-        onPressed: newAssignees.length > 0
-            ? () async {
-                await backendService.addAssignees(
-                  widget.doctype,
-                  widget.name,
-                  newAssignees,
-                );
-                widget.callback();
-                Navigator.of(context).pop();
-              }
-            : null,
-      ),
-    );
-  }
-
-  List<Widget> _generateChildren() {
-    List<Widget> children = [
-      SizedBox(
-        height: 8,
-      ),
-      _buildSelectedAssigneesHeader(),
-      ..._buildNewAssignees(),
-      ..._buildAssignedTo()
-    ];
-
-    if (newAssignees.length == 0 && widget.assignments.length == 0) {
-      children.add(
-        CardListTile(
-          title: Text(
-            'No Users Assigned',
-            style: Palette.altTextStyle,
-          ),
-        ),
+  void _refresh() {
+    setState(() {
+      _futureVal = backendService.getDocinfo(
+        widget.doctype,
+        widget.name,
       );
-    }
-
-    return children;
+    });
   }
 
-  List<Widget> _buildNewAssignees() {
-    return newAssignees.asMap().entries.map<Widget>((entry) {
-      var idx = entry.key;
-      var val = entry.value;
-      return CardListTile(
-        color: Palette.newIndicatorColor,
-        leading: UserAvatar(uid: val),
-        title: Text(val),
-        trailing: IconButton(
-          icon: Icon(Icons.clear),
-          onPressed: () {
-            newAssignees.removeAt(idx);
-            setState(() {});
-          },
-        ),
-      );
-    }).toList();
-  }
-
-  List<Widget> _buildAssignedTo() {
-    return widget.assignments.asMap().entries.map<Widget>(
+  List<Widget> _generateChildren(List assignments) {
+    List<Widget> children = assignments.asMap().entries.map<Widget>(
       (entry) {
         var d = entry.value;
         var i = entry.key;
-        return CardListTile(
-          leading: UserAvatar(uid: d["owner"]),
-          title: Text(
-            d["owner"],
-          ),
-          trailing: IconButton(
-            icon: Icon(Icons.clear),
-            onPressed: () async {
-              // TODO use response of remaining assignees
-              await backendService.removeAssignee(
-                widget.doctype,
-                widget.name,
-                d["owner"],
-              );
-              showSnackBar('Assignee Removed', context);
+        return Padding(
+          padding: EdgeInsets.only(bottom: 8),
+          child: CardListTile(
+            color: Palette.fieldBgColor,
+            leading: UserAvatar(uid: d["owner"]),
+            title: Text(
+              d["owner"],
+            ),
+            trailing: IconButton(
+              icon: Icon(Icons.clear),
+              onPressed: () async {
+                await backendService.removeAssignee(
+                  widget.doctype,
+                  widget.name,
+                  d["owner"],
+                );
+                showSnackBar('Assignee Removed', context);
 
-              setState(() {
-                widget.assignments.removeAt(i);
-              });
-            },
+                _refresh();
+                widget.callback();
+              },
+            ),
           ),
         );
       },
     ).toList();
+
+    children.add(
+      Align(
+        alignment: Alignment.centerLeft,
+        child: FrappeIconButton.small(
+          buttonType: ButtonType.secondary,
+          icon: FrappeIcons.small_add,
+          onPressed: () async {
+            var nav = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return AddAssignees(
+                    doctype: widget.doctype,
+                    name: widget.name,
+                  );
+                },
+              ),
+            );
+
+            if (nav == true) {
+              _refresh();
+              widget.callback();
+            }
+          },
+        ),
+      ),
+    );
+
+    return children;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Palette.bgColor,
-      resizeToAvoidBottomInset: false,
-      body: Builder(
-        builder: (builderContext) {
-          return Padding(
-            padding: EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  child: FormBuilder(
-                    child: LinkField(
-                      prefixIcon: Icon(Icons.search),
-                      fillColor: Colors.white,
-                      doctype: 'User',
-                      refDoctype: 'Issue',
-                      hint: 'Assign To',
-                      onSuggestionSelected: (item) {
-                        if (item != "") {
-                          newAssignees.add(item["value"]);
-                          setState(() {});
-                        }
-                      },
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: ListView(
-                    children: _generateChildren(),
-                  ),
-                )
-              ],
-            ),
+    return FutureBuilder(
+      future: _futureVal,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          var docInfo = snapshot.data["docinfo"];
+          return ListView(
+            shrinkWrap: true,
+            children: _generateChildren(docInfo["assignments"]),
           );
-        },
-      ),
+        } else if (snapshot.hasError) {
+          return Text("${snapshot.error}");
+        }
+
+        return Center(child: CircularProgressIndicator());
+      },
     );
   }
 }

@@ -345,6 +345,7 @@ class CustomSearch extends SearchDelegate {
   Widget buildSuggestions(BuildContext context) {
     return FutureBuilder(
       future: BackendService(context).fetchList(
+          pageLength: 10,
           fieldnames: data.fieldnames,
           doctype: data.doctype,
           filters: [

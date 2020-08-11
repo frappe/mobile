@@ -92,39 +92,6 @@ class _FormViewState extends State<FormView>
     return w;
   }
 
-  List<Widget> _generateChildren(List fields, Map doc, bool editMode) {
-    List filteredFields = fields.where((field) {
-      return (field["read_only"] != 1 ||
-              field["fieldtype"] == "Section Break") &&
-          field["set_only_once"] != 1 &&
-          field["hidden"] == 0 &&
-          [
-            "Select",
-            "Link",
-            "Data",
-            "Date",
-            "Datetime",
-            "Float",
-            "Time",
-            "Section Break",
-            "Text Editor"
-          ].contains(
-            field["fieldtype"],
-          );
-    }).map((field) {
-      return {
-        ...field,
-        "_current_val": doc[field["fieldname"]],
-      };
-    }).toList();
-
-    return generateLayout(
-      fields: filteredFields,
-      viewType: ViewType.form,
-      editMode: editMode,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -148,9 +115,8 @@ class _FormViewState extends State<FormView>
                     child: Row(
                       children: <Widget>[
                         Spacer(),
-                        FrappeFlatButton(
+                        FrappeRaisedButton(
                           minWidth: 120,
-                          buttonType: ButtonType.secondary,
                           title: 'Comment',
                           onPressed: () {
                             Navigator.push(
@@ -171,9 +137,8 @@ class _FormViewState extends State<FormView>
                         SizedBox(
                           width: 10,
                         ),
-                        FrappeFlatButton(
+                        FrappeRaisedButton(
                           minWidth: 120,
-                          buttonType: ButtonType.primary,
                           title: 'New Email',
                           onPressed: () {
                             Navigator.push(
@@ -270,7 +235,6 @@ class _FormViewState extends State<FormView>
                                                     builder: (context) {
                                                       return ViewDocInfo(
                                                         docInfo: docInfo,
-                                                        pageIndex: 1,
                                                         doctype: widget.doctype,
                                                         name: widget.name,
                                                         callback: _refresh,
@@ -292,45 +256,59 @@ class _FormViewState extends State<FormView>
                                 ),
                               ),
                               actions: <Widget>[
-                                if (!editMode)
-                                  LikeDoc(
-                                    doctype: widget.doctype,
-                                    name: widget.name,
-                                    isFav: isLikedByUser,
-                                  ),
+                                // if (!editMode)
+                                //   LikeDoc(
+                                //     doctype: widget.doctype,
+                                //     name: widget.name,
+                                //     isFav: isLikedByUser,
+                                //   ),
                                 if (editMode)
-                                  FlatButton(
-                                    child: Text('Cancel'),
-                                    onPressed: () {
-                                      _fbKey.currentState.reset();
-                                      _refresh();
-                                    },
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12.0,
+                                      horizontal: 4,
+                                    ),
+                                    child: FrappeFlatButton(
+                                      buttonType: ButtonType.secondary,
+                                      title: 'Cancel',
+                                      onPressed: () {
+                                        _fbKey.currentState.reset();
+                                        _refresh();
+                                      },
+                                    ),
                                   ),
-                                FlatButton(
-                                  child: editMode ? Text('Save') : Text('Edit'),
-                                  onPressed: editMode
-                                      ? () async {
-                                          if (_fbKey.currentState
-                                              .saveAndValidate()) {
-                                            var formValue =
-                                                _fbKey.currentState.value;
-                                            await backendService.updateDoc(
-                                              widget.doctype,
-                                              widget.name,
-                                              formValue,
-                                            );
-                                            showSnackBar(
-                                              'Changes Saved',
-                                              builderContext,
-                                            );
-                                            _refresh();
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12.0,
+                                    horizontal: 4,
+                                  ),
+                                  child: FrappeFlatButton(
+                                    buttonType: ButtonType.primary,
+                                    title: editMode ? 'Save' : 'Edit',
+                                    onPressed: editMode
+                                        ? () async {
+                                            if (_fbKey.currentState
+                                                .saveAndValidate()) {
+                                              var formValue =
+                                                  _fbKey.currentState.value;
+                                              await backendService.updateDoc(
+                                                widget.doctype,
+                                                widget.name,
+                                                formValue,
+                                              );
+                                              showSnackBar(
+                                                'Changes Saved',
+                                                builderContext,
+                                              );
+                                              _refresh();
+                                            }
                                           }
-                                        }
-                                      : () {
-                                          setState(() {
-                                            editMode = true;
-                                          });
-                                        },
+                                        : () {
+                                            setState(() {
+                                              editMode = true;
+                                            });
+                                          },
+                                  ),
                                 )
                               ],
                               expandedHeight: editMode ? 0.0 : 180.0,

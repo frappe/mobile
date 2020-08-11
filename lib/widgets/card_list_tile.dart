@@ -18,7 +18,7 @@ class CardListTile extends StatelessWidget {
     this.elevation = 0,
     this.margin = EdgeInsets.zero,
     this.color,
-    this.onTap
+    this.onTap,
   });
 
   @override

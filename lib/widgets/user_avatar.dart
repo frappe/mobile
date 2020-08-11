@@ -52,7 +52,7 @@ class UserAvatar extends StatelessWidget {
     if (localStorage.containsKey('${baseUrl}allUsers')) {
       var allUsers = json.decode(localStorage.getString('${baseUrl}allUsers'));
       var user = allUsers[uid];
-      var imageUrl = user != null ? user[2] : null;
+      var imageUrl = user != null ? user["user_image"] : null;
       if (imageUrl != null) {
         if (!Uri.parse(imageUrl).isAbsolute) {
           imageUrl = getAbsoluteUrl(imageUrl);
@@ -66,7 +66,7 @@ class UserAvatar extends StatelessWidget {
               _renderShape(imageProvider: imageProvider),
           placeholder: (context, url) => _renderShape(
             txt: getInitials(
-              user[1],
+              user["full_name"],
             ),
           ),
           errorWidget: (context, url, error) => _renderShape(txt: ''),
@@ -74,7 +74,7 @@ class UserAvatar extends StatelessWidget {
       } else if (user == null) {
         return _renderShape(txt: uid[0].toUpperCase());
       } else {
-        return _renderShape(txt: getInitials(user[1]));
+        return _renderShape(txt: getInitials(user["full_name"]));
       }
     } else {
       return _renderShape(txt: uid[0].toUpperCase());

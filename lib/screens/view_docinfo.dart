@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../config/frappe_icons.dart';
+import '../utils/frappe_icon.dart';
 import '../widgets/assignees.dart';
 import '../widgets/attachments.dart';
 
@@ -7,7 +9,6 @@ class ViewDocInfo extends StatelessWidget {
   final Map docInfo;
   final String doctype;
   final String name;
-  final int pageIndex;
   final Function callback;
 
   ViewDocInfo({
@@ -15,41 +16,67 @@ class ViewDocInfo extends StatelessWidget {
     @required this.name,
     @required this.docInfo,
     this.callback,
-    this.pageIndex = 0,
   });
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      initialIndex: pageIndex,
-      length: 2,
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          bottom: TabBar(
-            tabs: [
-              Tab(
-                icon: Text('Attachments'),
-              ),
-              Tab(
-                icon: Text('Assignees'),
-              ),
-            ],
-          ),
-        ),
-        body: TabBarView(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
           children: [
-            Attachments(
-              doctype: doctype,
-              name: name,
-              docInfo: docInfo,
-              callback: callback,
+            Row(
+              children: <Widget>[
+                FrappeIcon(FrappeIcons.assign),
+                SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  'Assigned To',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
+              ],
             ),
-            Assignees(
-              doctype: doctype,
-              name: name,
-              assignments: docInfo["assignments"],
-              callback: callback,
+            SizedBox(
+              height: 10,
+            ),
+            Flexible(
+              child: Assignees(
+                doctype: doctype,
+                name: name,
+                callback: callback,
+                docInfo: docInfo,
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Row(
+              children: <Widget>[
+                FrappeIcon(FrappeIcons.attachment),
+                SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  'Attachments',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Flexible(
+              child: Attachments(
+                doctype: doctype,
+                name: name,
+                callback: callback,
+                docInfo: docInfo,
+              ),
             ),
           ],
         ),
