@@ -228,7 +228,6 @@ class FrappeIconButton extends StatelessWidget {
         child: IconButton(
           icon: FrappeIcon(icon),
           onPressed: onPressed,
-          disabledColor: _buttonColor,
         ),
       ),
     );

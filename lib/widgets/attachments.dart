@@ -111,8 +111,7 @@ class _AttachmentsState extends State<Attachments> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           var docInfo = snapshot.data["docinfo"];
-          return ListView(
-            shrinkWrap: true,
+          return Column(
             children: _generateChildren(docInfo["attachments"]),
           );
         } else if (snapshot.hasError) {

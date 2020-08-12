@@ -25,7 +25,7 @@ class ViewDocInfo extends StatelessWidget {
       appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Column(
+        child: ListView(
           children: [
             Row(
               children: <Widget>[
@@ -44,13 +44,11 @@ class ViewDocInfo extends StatelessWidget {
             SizedBox(
               height: 10,
             ),
-            Flexible(
-              child: Assignees(
-                doctype: doctype,
-                name: name,
-                callback: callback,
-                docInfo: docInfo,
-              ),
+            Assignees(
+              doctype: doctype,
+              name: name,
+              callback: callback,
+              docInfo: docInfo,
             ),
             SizedBox(
               height: 20,
@@ -70,13 +68,11 @@ class ViewDocInfo extends StatelessWidget {
             SizedBox(
               height: 10,
             ),
-            Flexible(
-              child: Attachments(
-                doctype: doctype,
-                name: name,
-                callback: callback,
-                docInfo: docInfo,
-              ),
+            Attachments(
+              doctype: doctype,
+              name: name,
+              callback: callback,
+              docInfo: docInfo,
             ),
           ],
         ),

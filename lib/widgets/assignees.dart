@@ -52,9 +52,10 @@ class _AssigneesState extends State<Assignees> {
     List<Widget> children = assignments.asMap().entries.map<Widget>(
       (entry) {
         var d = entry.value;
-        var i = entry.key;
         return Padding(
-          padding: EdgeInsets.only(bottom: 8),
+          padding: EdgeInsets.only(
+            bottom: 8,
+          ),
           child: CardListTile(
             color: Palette.fieldBgColor,
             leading: UserAvatar(uid: d["owner"]),
@@ -62,15 +63,17 @@ class _AssigneesState extends State<Assignees> {
               d["owner"],
             ),
             trailing: IconButton(
-              icon: Icon(Icons.clear),
+              icon: Icon(
+                Icons.clear,
+              ),
               onPressed: () async {
                 await backendService.removeAssignee(
                   widget.doctype,
                   widget.name,
                   d["owner"],
                 );
-                showSnackBar('Assignee Removed', context);
 
+                showSnackBar('Assignee Removed', context);
                 _refresh();
                 widget.callback();
               },
@@ -118,8 +121,7 @@ class _AssigneesState extends State<Assignees> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           var docInfo = snapshot.data["docinfo"];
-          return ListView(
-            shrinkWrap: true,
+          return Column(
             children: _generateChildren(docInfo["assignments"]),
           );
         } else if (snapshot.hasError) {
