@@ -17,6 +17,7 @@ environment:
   sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
+  package_info: ^0.4.1
   collection: ^1.14.12
   cached_network_image: ^2.2.0+1
   google_fonts: ^1.1.0
