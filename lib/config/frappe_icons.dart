@@ -13,4 +13,7 @@ class FrappeIcons {
   static const folder_open = '$_basePath/folder_open.svg';
   static const link_url = '$_basePath/link_url.svg';
   static const browse = '$_basePath/browse.svg';
+  static const tag = '$_basePath/tag.svg';
+  static const review = '$_basePath/review.svg';
+  static const share = '$_basePath/share.svg';
 }

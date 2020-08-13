@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-import './../../config/palette.dart';
 import './../../utils/backend_service.dart';
 
 class LinkField extends StatefulWidget {
@@ -17,14 +16,16 @@ class LinkField extends StatefulWidget {
   final Icon prefixIcon;
   final Color fillColor;
   final key;
+  final ItemBuilder itemBuilder;
+  final SuggestionsCallback suggestionsCallback;
 
   final List<String Function(dynamic)> validators;
 
   LinkField({
     @required this.hint,
-    @required this.doctype,
-    @required this.refDoctype,
     @required this.fillColor,
+    this.doctype,
+    this.refDoctype,
     this.prefixIcon,
     this.key,
     this.allowClear = true,
@@ -34,6 +35,8 @@ class LinkField extends StatefulWidget {
     this.showInputBorder = false,
     this.attribute,
     this.value,
+    this.itemBuilder,
+    this.suggestionsCallback,
   });
 
   @override
@@ -95,24 +98,26 @@ class _LinkFieldState extends State<LinkField> {
             return item;
           },
           attribute: widget.attribute,
-          itemBuilder: (context, item) {
-            return ListTile(
-              title: Text(
-                item["value"],
-              ),
-            );
-          },
+          itemBuilder: widget.itemBuilder ??
+              (context, item) {
+                return ListTile(
+                  title: Text(
+                    item["value"],
+                  ),
+                );
+              },
           initialValue: widget.value,
-          suggestionsCallback: (query) async {
-            var lowercaseQuery = query.toLowerCase();
-            var response = await backendService.searchLink(
-              widget.doctype,
-              widget.refDoctype,
-              lowercaseQuery,
-            );
+          suggestionsCallback: widget.suggestionsCallback ??
+              (query) async {
+                var lowercaseQuery = query.toLowerCase();
+                var response = await backendService.searchLink(
+                  widget.doctype,
+                  widget.refDoctype,
+                  lowercaseQuery,
+                );
 
-            return response["results"];
-          },
+                return response["results"];
+              },
         ),
       ),
     );

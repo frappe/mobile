@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/widgets/reviews.dart';
+import 'package:frappe_app/widgets/tags.dart';
 
 import '../config/frappe_icons.dart';
 import '../utils/frappe_icon.dart';
@@ -69,6 +71,54 @@ class ViewDocInfo extends StatelessWidget {
               height: 10,
             ),
             Attachments(
+              doctype: doctype,
+              name: name,
+              callback: callback,
+              docInfo: docInfo,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Row(
+              children: <Widget>[
+                FrappeIcon(FrappeIcons.tag),
+                SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  'Tags',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Tags(
+              doctype: doctype,
+              name: name,
+              callback: callback,
+              docInfo: docInfo,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Row(
+              children: <Widget>[
+                FrappeIcon(FrappeIcons.review),
+                SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  'Reviews',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Reviews(
               doctype: doctype,
               name: name,
               callback: callback,

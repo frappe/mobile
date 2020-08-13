@@ -471,4 +471,69 @@ class BackendService {
       throw Exception('Something went wrong');
     }
   }
+
+  Future getTags(String doctype, String txt) async {
+    var data = {
+      'doctype': doctype,
+      'txt': txt,
+    };
+
+    final response = await dio.post(
+      '/method/frappe.desk.doctype.tag.tag.get_tags',
+      data: data,
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      throw Exception('Something went wrong');
+    }
+  }
+
+  Future removeTag(String doctype, String name, String tag) async {
+    var data = {
+      'dt': doctype,
+      'dn': name,
+      'tag': tag,
+    };
+
+    final response = await dio.post(
+      '/method/frappe.desk.doctype.tag.tag.remove_tag',
+      data: data,
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      throw Exception('Something went wrong');
+    }
+  }
+
+  Future addTag(String doctype, String name, String tag) async {
+    var data = {
+      'dt': doctype,
+      'dn': name,
+      'tag': tag,
+    };
+
+    final response = await dio.post(
+      '/method/frappe.desk.doctype.tag.tag.add_tag',
+      data: data,
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      throw Exception('Something went wrong');
+    }
+  }
 }
