@@ -50,7 +50,7 @@ dev_dependencies:
 flutter_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/frappe_icon.png"
+  image_path: "assets/frappe_icon.jpg"
 
 
 # For information on the generic Dart part of this file, see the
