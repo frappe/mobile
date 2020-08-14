@@ -536,4 +536,33 @@ class BackendService {
       throw Exception('Something went wrong');
     }
   }
+
+  Future addReview(String doctype, String name, Map reviewData) async {
+    var doc = {
+      "doctype": doctype,
+      "name": name,
+    };
+
+    var data = '''doc=${Uri.encodeComponent(json.encode(doc))}
+              &to_user=${Uri.encodeComponent(reviewData["to_user"])}
+              &points=${int.parse(reviewData["points"])}
+              &review_type=${reviewData["review_type"]}
+              &reason=${reviewData["reason"]}'''
+        .replaceAll(new RegExp(r"\s+"), "");
+    // trim all whitespace
+
+    final response = await dio.post(
+      '/method/frappe.social.doctype.energy_point_log.energy_point_log.review',
+      data: data,
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      throw Exception('Something went wrong');
+    }
+  }
 }

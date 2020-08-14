@@ -263,11 +263,12 @@ Widget makeControl(Map field,
       break;
 
     case "Float":
+    case "Int":
       {
         value = buildDecoratedWidget(
             FormBuilderTextField(
               key: Key(val.toString()),
-              initialValue: val.toString(),
+              initialValue: val != null ? val.toString() : null,
               keyboardType: TextInputType.number,
               attribute: field["fieldname"],
               decoration: Palette.formFieldDecoration(

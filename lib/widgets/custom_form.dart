@@ -40,7 +40,7 @@ class CustomForm extends StatelessWidget {
       filteredFields = fields.where((field) {
         return (field["read_only"] != 1 ||
                 field["fieldtype"] == "Section Break") &&
-            field["hidden"] == 0;
+            field["hidden"] != 1;
       }).toList();
     } else {
       filteredFields = fields;

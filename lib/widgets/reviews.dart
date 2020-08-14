@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/screens/add_review.dart';
 
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
@@ -87,21 +88,24 @@ class _ReviewsState extends State<Reviews> {
         alignment: Alignment.centerLeft,
         child: FrappeIconButton(
           buttonType: ButtonType.secondary,
-          onPressed: () {},
-          // () async {
-          //   var nav = await Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //       builder: (context) {
-          //         // TODO
-          //       },
-          //     ),
-          //   );
+          onPressed: () async {
+            var nav = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return AddReview(
+                    doctype: widget.doctype,
+                    name: widget.name,
+                  );
+                },
+              ),
+            );
 
-          //   if (nav == true) {
-          //     _refresh();
-          //   }
-          // },
+            if (nav == true) {
+              _refresh();
+              widget.callback();
+            }
+          },
           icon: FrappeIcons.small_add,
         ),
       ),
