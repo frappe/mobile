@@ -27,7 +27,7 @@ class CustomForm extends StatelessWidget {
         (field) {
           return (field["read_only"] != 1 ||
                   field["fieldtype"] == "Section Break") &&
-              field["hidden"] == 0 &&
+              field["hidden"] != 1 &&
               field["set_only_once"] != 1;
         },
       ).map((field) {

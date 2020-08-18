@@ -565,4 +565,48 @@ class BackendService {
       throw Exception('Something went wrong');
     }
   }
+
+  Future setPermission(String doctype, String name, Map shareInfo) async {
+    var data = {
+      'doctype': doctype,
+      'name': name,
+      ...shareInfo,
+    };
+
+    final response = await dio.post(
+      '/method/frappe.share.set_permission',
+      data: data,
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      throw Exception('Something went wrong');
+    }
+  }
+
+  Future shareAdd(String doctype, String name, Map shareInfo) async {
+    var data = {
+      'doctype': doctype,
+      'name': name,
+      ...shareInfo,
+    };
+
+    final response = await dio.post(
+      '/method/frappe.share.add',
+      data: data,
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      throw Exception('Something went wrong');
+    }
+  }
 }

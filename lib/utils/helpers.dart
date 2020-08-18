@@ -83,9 +83,14 @@ Widget buildDecoratedWidget(Widget fieldWidget, bool withLabel,
   }
 }
 
-Widget makeControl(Map field,
-    [val, bool withLabel = true, bool editMode = true]) {
-  Widget value;
+Widget makeControl({
+  @required Map field,
+  dynamic value,
+  bool withLabel = true,
+  bool editMode = true,
+  Function onChanged,
+}) {
+  Widget fieldWidget;
   List<String Function(dynamic)> validators = [];
 
   if (field["reqd"] == 1) {
@@ -95,9 +100,9 @@ Widget makeControl(Map field,
   switch (field["fieldtype"]) {
     case "Link":
       {
-        value = buildDecoratedWidget(
+        fieldWidget = buildDecoratedWidget(
             LinkField(
-              key: Key(val),
+              key: Key(value),
               fillColor: Palette.fieldBgColor,
               allowClear: editMode,
               validators: validators,
@@ -105,7 +110,7 @@ Widget makeControl(Map field,
               doctype: field["options"],
               hint: !withLabel ? field["label"] : null,
               refDoctype: field["refDoctype"],
-              value: val,
+              value: value,
             ),
             withLabel,
             field["label"]);
@@ -114,10 +119,10 @@ Widget makeControl(Map field,
 
     case "Select":
       {
-        value = buildDecoratedWidget(
+        fieldWidget = buildDecoratedWidget(
             FormBuilderDropdown(
-              key: Key(val),
-              initialValue: val,
+              key: Key(value),
+              initialValue: value,
               allowClear: editMode,
               attribute: field["fieldname"],
               hint: !withLabel ? Text(field["label"]) : null,
@@ -147,20 +152,20 @@ Widget makeControl(Map field,
 
     case "MultiSelect":
       {
-        if (val != null) {
-          val = [
+        if (value != null) {
+          value = [
             {
-              "value": val,
-              "description": val,
+              "value": value,
+              "description": value,
             }
           ];
         }
 
-        value = buildDecoratedWidget(
+        fieldWidget = buildDecoratedWidget(
             MultiSelect(
               attribute: field["fieldname"],
               hint: field["label"],
-              val: val != null ? val : [],
+              val: value != null ? value : [],
             ),
             withLabel,
             field["label"]);
@@ -169,9 +174,9 @@ Widget makeControl(Map field,
 
     case "Small Text":
       {
-        value = buildDecoratedWidget(
+        fieldWidget = buildDecoratedWidget(
             FormBuilderTextField(
-              initialValue: val,
+              initialValue: value,
               attribute: field["fieldname"],
               decoration: Palette.formFieldDecoration(
                 withLabel,
@@ -188,10 +193,10 @@ Widget makeControl(Map field,
 
     case "Data":
       {
-        value = buildDecoratedWidget(
+        fieldWidget = buildDecoratedWidget(
             FormBuilderTextField(
-              initialValue: val,
-              key: Key(val),
+              initialValue: value,
+              key: Key(value),
               attribute: field["fieldname"],
               decoration: Palette.formFieldDecoration(
                 withLabel,
@@ -206,10 +211,20 @@ Widget makeControl(Map field,
 
     case "Check":
       {
-        value = buildDecoratedWidget(
+        fieldWidget = buildDecoratedWidget(
             FormBuilderCheckbox(
+              valueTransformer: (val) {
+                return val == true ? 1 : 0;
+              },
               leadingInput: true,
-              key: Key(val.toString()),
+              initialValue: value == 1,
+              onChanged: onChanged != null
+                  ? (val) {
+                      val = val == true ? 1 : 0;
+                      onChanged(val);
+                    }
+                  : null,
+              key: UniqueKey(),
               attribute: field["fieldname"],
               label: Text(field["label"]),
               decoration: Palette.formFieldDecoration(
@@ -224,10 +239,10 @@ Widget makeControl(Map field,
 
     case "Text Editor":
       {
-        value = buildDecoratedWidget(
+        fieldWidget = buildDecoratedWidget(
             FormBuilderTextField(
                 maxLines: 10,
-                initialValue: val,
+                initialValue: value,
                 attribute: field["fieldname"],
                 decoration: Palette.formFieldDecoration(
                   withLabel,
@@ -241,15 +256,15 @@ Widget makeControl(Map field,
 
     case "Datetime":
       {
-        value = buildDecoratedWidget(
+        fieldWidget = buildDecoratedWidget(
             FormBuilderDateTimePicker(
-              key: Key(val),
+              key: Key(value),
               valueTransformer: (val) {
                 return val != null ? val.toIso8601String() : null;
               },
               resetIcon: editMode ? Icon(Icons.close) : null,
               initialTime: null,
-              initialValue: parseDate(val),
+              initialValue: parseDate(value),
               attribute: field["fieldname"],
               decoration: Palette.formFieldDecoration(
                 withLabel,
@@ -265,10 +280,10 @@ Widget makeControl(Map field,
     case "Float":
     case "Int":
       {
-        value = buildDecoratedWidget(
+        fieldWidget = buildDecoratedWidget(
             FormBuilderTextField(
-              key: Key(val.toString()),
-              initialValue: val != null ? val.toString() : null,
+              key: Key(value.toString()),
+              initialValue: value != null ? value.toString() : null,
               keyboardType: TextInputType.number,
               attribute: field["fieldname"],
               decoration: Palette.formFieldDecoration(
@@ -284,9 +299,9 @@ Widget makeControl(Map field,
 
     case "Time":
       {
-        value = buildDecoratedWidget(
+        fieldWidget = buildDecoratedWidget(
             FormBuilderDateTimePicker(
-              key: Key(val),
+              key: Key(value),
               inputType: InputType.time,
               valueTransformer: (val) {
                 return val != null ? val.toIso8601String() : null;
@@ -306,14 +321,14 @@ Widget makeControl(Map field,
 
     case "Date":
       {
-        value = buildDecoratedWidget(
+        fieldWidget = buildDecoratedWidget(
             FormBuilderDateTimePicker(
-              key: Key(val),
+              key: Key(value),
               inputType: InputType.date,
               valueTransformer: (val) {
                 return val != null ? val.toIso8601String() : null;
               },
-              initialValue: parseDate(val),
+              initialValue: parseDate(value),
               keyboardType: TextInputType.number,
               attribute: field["fieldname"],
               decoration: Palette.formFieldDecoration(
@@ -328,10 +343,10 @@ Widget makeControl(Map field,
       break;
 
     default:
-      value = Container();
+      fieldWidget = Container();
       break;
   }
-  return value;
+  return fieldWidget;
 }
 
 downloadFile(String fileUrl) async {
@@ -405,6 +420,7 @@ List<Widget> generateLayout({
   @required ViewType viewType,
   bool editMode = true,
   bool withLabel = true,
+  Function onChanged,
 }) {
   List<Widget> collapsibles = [];
   List<Widget> sections = [];
@@ -501,35 +517,77 @@ List<Widget> generateLayout({
       }
     } else if (isCollapsible) {
       if (viewType == ViewType.form) {
-        collapsibles.add(Visibility(
-          visible: editMode ? true : val != null && val != '',
-          child: makeControl(field, val, withLabel, editMode),
-        ));
+        collapsibles.add(
+          Visibility(
+            visible: editMode ? true : val != null && val != '',
+            child: makeControl(
+              field: field,
+              value: val,
+              withLabel: withLabel,
+              editMode: editMode,
+              onChanged: onChanged,
+            ),
+          ),
+        );
       } else {
         collapsibles.add(
-          makeControl(field, val, withLabel, editMode),
+          makeControl(
+            field: field,
+            value: val,
+            withLabel: withLabel,
+            editMode: editMode,
+            onChanged: onChanged,
+          ),
         );
       }
     } else if (isSection) {
       if (viewType == ViewType.form) {
-        sections.add(Visibility(
-          visible: editMode ? true : val != null && val != '',
-          child: makeControl(field, val, withLabel, editMode),
-        ));
+        sections.add(
+          Visibility(
+            visible: editMode ? true : val != null && val != '',
+            child: makeControl(
+              field: field,
+              value: val,
+              withLabel: withLabel,
+              editMode: editMode,
+              onChanged: onChanged,
+            ),
+          ),
+        );
       } else {
         sections.add(
-          makeControl(field, val, withLabel, editMode),
+          makeControl(
+            field: field,
+            value: val,
+            withLabel: withLabel,
+            editMode: editMode,
+            onChanged: onChanged,
+          ),
         );
       }
     } else {
       if (viewType == ViewType.form) {
-        widgets.add(Visibility(
-          visible: editMode ? true : val != null && val != '',
-          child: makeControl(field, val, withLabel, editMode),
-        ));
+        widgets.add(
+          Visibility(
+            visible: editMode ? true : val != null && val != '',
+            child: makeControl(
+              field: field,
+              value: val,
+              withLabel: withLabel,
+              editMode: editMode,
+              onChanged: onChanged,
+            ),
+          ),
+        );
       } else {
         widgets.add(
-          makeControl(field, val, withLabel, editMode),
+          makeControl(
+            field: field,
+            value: val,
+            withLabel: withLabel,
+            editMode: editMode,
+            onChanged: onChanged,
+          ),
         );
       }
     }

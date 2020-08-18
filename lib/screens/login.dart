@@ -92,7 +92,7 @@ class _LoginState extends State<Login> {
                     child: Column(
                       children: <Widget>[
                         Image(
-                          image: AssetImage('assets/icons/frappe_icon.png'),
+                          image: AssetImage('assets/frappe_icon.jpg'),
                           width: 60,
                           height: 60,
                         ),

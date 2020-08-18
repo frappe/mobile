@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/widgets/reviews.dart';
+import 'package:frappe_app/widgets/shared_with.dart';
 import 'package:frappe_app/widgets/tags.dart';
 
 import '../config/frappe_icons.dart';
@@ -103,14 +104,42 @@ class ViewDocInfo extends StatelessWidget {
             SizedBox(
               height: 20,
             ),
+            if (docInfo["energy_point_logs"] != null)
+              Row(
+                children: <Widget>[
+                  FrappeIcon(FrappeIcons.review),
+                  SizedBox(
+                    width: 6,
+                  ),
+                  Text(
+                    'Reviews',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )
+                ],
+              ),
+            if (docInfo["energy_point_logs"] != null)
+              SizedBox(
+                height: 10,
+              ),
+            if (docInfo["energy_point_logs"] != null)
+              Reviews(
+                doctype: doctype,
+                name: name,
+                callback: callback,
+                docInfo: docInfo,
+              ),
+            if (docInfo["energy_point_logs"] != null)
+              SizedBox(
+                height: 20,
+              ),
             Row(
               children: <Widget>[
-                FrappeIcon(FrappeIcons.review),
+                FrappeIcon(FrappeIcons.share),
                 SizedBox(
                   width: 6,
                 ),
                 Text(
-                  'Reviews',
+                  'Shared With',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 )
               ],
@@ -118,7 +147,7 @@ class ViewDocInfo extends StatelessWidget {
             SizedBox(
               height: 10,
             ),
-            Reviews(
+            SharedWith(
               doctype: doctype,
               name: name,
               callback: callback,

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/form/controls/link_field.dart';
-import 'package:frappe_app/utils/backend_service.dart';
-import 'package:frappe_app/utils/enums.dart';
-import 'package:frappe_app/widgets/card_list_tile.dart';
-import 'package:frappe_app/widgets/frappe_button.dart';
-import 'package:frappe_app/widgets/user_avatar.dart';
+
+import '../config/palette.dart';
+import '../form/controls/link_field.dart';
+import '../utils/backend_service.dart';
+import '../utils/enums.dart';
+import '../widgets/card_list_tile.dart';
+import '../widgets/frappe_button.dart';
+import '../widgets/user_avatar.dart';
 
 class AddAssignees extends StatefulWidget {
   final String doctype;
@@ -25,6 +26,7 @@ class AddAssignees extends StatefulWidget {
 class _AddAssigneesState extends State<AddAssignees> {
   var newAssignees = [];
   BackendService backendService;
+  String selectedUser;
 
   @override
   void initState() {
@@ -89,16 +91,16 @@ class _AddAssigneesState extends State<AddAssignees> {
           Container(
             child: FormBuilder(
               child: LinkField(
+                key: UniqueKey(),
                 prefixIcon: Icon(Icons.search),
                 fillColor: Colors.white,
                 doctype: 'User',
                 refDoctype: 'Issue',
                 hint: 'Assign To',
                 onSuggestionSelected: (item) {
-                  if (item != "") {
-                    newAssignees.add(item["value"]);
-                    setState(() {});
-                  }
+                  newAssignees.add(item["value"]);
+                  selectedUser = null;
+                  setState(() {});
                 },
               ),
             ),

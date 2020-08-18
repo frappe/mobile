@@ -17,12 +17,13 @@ environment:
   sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
+  flutter_svg: ^0.18.0
   package_info: ^0.4.1
   collection: ^1.14.12
   cached_network_image: ^2.2.0+1
   google_fonts: ^1.1.0
   file_picker: ^1.12.0
-  flutter_form_builder: ^3.9.0
+  flutter_form_builder: ^3.13.2
   flutter_pagewise: ^1.2.3
   html: ^0.14.0+3
   url_launcher: ^5.4.7
@@ -67,6 +68,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
    - assets/icons/
+   - assets/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -64,7 +64,6 @@ class _LinkFieldState extends State<LinkField> {
           controller: _typeAheadController,
           onSuggestionSelected: (item) {
             if (widget.onSuggestionSelected != null) {
-              _typeAheadController.clear();
               widget.onSuggestionSelected(item);
             }
           },

@@ -103,7 +103,7 @@ class _FilterListState extends State<FilterList> {
         return Column(
           children: <Widget>[
             ListTile(
-              title: makeControl(field, val),
+              title: makeControl(field: field, value: val),
             ),
             Divider(
               height: 10.0,
