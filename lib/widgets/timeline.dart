@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/utils/helpers.dart';
 
 import '../config/palette.dart';
 import '../utils/enums.dart';
@@ -17,23 +18,9 @@ class Timeline extends StatefulWidget {
 class _TimelineState extends State<Timeline> {
   var showAll = false;
 
-  List sortByDate(List data, String orderBy, Order order) {
-    if (order == Order.asc) {
-      data.sort((a, b) {
-        return a[orderBy].compareTo(b[orderBy]);
-      });
-    } else {
-      data.sort((a, b) {
-        return b[orderBy].compareTo(a[orderBy]);
-      });
-    }
-
-    return data;
-  }
-
   @override
   Widget build(BuildContext context) {
-    var sortedEvents = sortByDate(widget.data, "creation", Order.desc);
+    var sortedEvents = sortBy(widget.data, "creation", Order.desc);
     List<Widget> children = [
       SwitchListTile.adaptive(
         title: Text('Show All'),

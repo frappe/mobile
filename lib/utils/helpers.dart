@@ -673,3 +673,17 @@ bool hasField(Map meta, String fieldName) {
 bool isSubmittable(Map meta) {
   return meta["is_submittable"] == 1;
 }
+
+List sortBy(List data, String orderBy, Order order) {
+  if (order == Order.asc) {
+    data.sort((a, b) {
+      return a[orderBy].compareTo(b[orderBy]);
+    });
+  } else {
+    data.sort((a, b) {
+      return b[orderBy].compareTo(a[orderBy]);
+    });
+  }
+
+  return data;
+}

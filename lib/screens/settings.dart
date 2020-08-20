@@ -2,9 +2,14 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
+import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/main.dart';
 import 'package:frappe_app/screens/filter_list.dart';
 import 'package:frappe_app/utils/backend_service.dart';
+import 'package:frappe_app/utils/enums.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
+import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/utils/http.dart';
 import 'package:frappe_app/widgets/custom_expansion_tile.dart';
 
@@ -24,6 +29,8 @@ class _SettingsState extends State<Settings> {
         '${baseUrl}activeModules', json.encode(activeModules));
     Navigator.of(context).pop(true);
   }
+
+  var doctypes = [];
 
   List<Widget> _generateChildren(allModules) {
     List<Widget> w = [];
@@ -68,7 +75,7 @@ class _SettingsState extends State<Settings> {
               tristate: true,
               value: headerVal,
             ),
-            children: value.map<Widget>((e) {
+            children: sortBy(value, "name", Order.asc).map<Widget>((e) {
               return ListTile(
                 title: Text('${e["name"]}'),
                 trailing: Checkbox(
@@ -108,6 +115,27 @@ class _SettingsState extends State<Settings> {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Settings'),
+          actions: [
+            IconButton(
+              icon: FrappeIcon(
+                FrappeIcons.search,
+                color: Palette.iconColor,
+              ),
+              onPressed: () async {
+                var nav = await showSearch(
+                  context: context,
+                  delegate: CustomSearch(
+                    doctypes,
+                    activeModules,
+                  ),
+                );
+
+                if (nav) {
+                  setState(() {});
+                }
+              },
+            ),
+          ],
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back,
@@ -119,17 +147,22 @@ class _SettingsState extends State<Settings> {
         ),
         body: FutureBuilder(
           future: BackendService(context).fetchList(
-              fieldnames: [
-                "`tabDocType`.`name`",
-                "`tabDocType`.`module`",
-              ],
-              doctype: 'DocType',
-              filters: FilterList.generateFilters('DocType', {
+            fieldnames: [
+              "`tabDocType`.`name`",
+              "`tabDocType`.`module`",
+            ],
+            doctype: 'DocType',
+            filters: FilterList.generateFilters(
+              'DocType',
+              {
                 "istable": 0,
                 "issingle": 0,
-              })),
+              },
+            ),
+          ),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
+              doctypes = snapshot.data;
               var newMap = groupBy(snapshot.data, (obj) => obj['module']);
               return ListView(
                 children: _generateChildren(newMap),
@@ -142,6 +175,113 @@ class _SettingsState extends State<Settings> {
           },
         ),
       ),
+    );
+  }
+}
+
+class CustomSearch extends SearchDelegate {
+  final List doctypes;
+  final activeModules;
+
+  CustomSearch(
+    this.doctypes,
+    this.activeModules,
+  );
+
+  @override
+  String get searchFieldLabel => "Search doctypes";
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      )
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, true);
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return Container();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        close(context, true);
+        return false;
+      },
+      child: DoctypeSuggestions(
+        doctypes: doctypes,
+        activeModules: activeModules,
+        query: query,
+      ),
+    );
+  }
+}
+
+class DoctypeSuggestions extends StatefulWidget {
+  final List doctypes;
+  final activeModules;
+  final String query;
+
+  const DoctypeSuggestions({
+    Key key,
+    this.doctypes,
+    this.activeModules,
+    this.query,
+  }) : super(key: key);
+
+  @override
+  _DoctypeSuggestionsState createState() => _DoctypeSuggestionsState();
+}
+
+class _DoctypeSuggestionsState extends State<DoctypeSuggestions> {
+  @override
+  Widget build(BuildContext context) {
+    var filteredDoctypes = widget.doctypes
+        .where((doctype) =>
+            doctype["name"].toLowerCase().contains(widget.query.toLowerCase()))
+        .toList();
+    return ListView(
+      children: sortBy(filteredDoctypes, 'name', Order.asc).map((doctype) {
+        return ListTile(
+          title: Text(doctype["name"]),
+          subtitle: Text(doctype["module"]),
+          trailing: Checkbox(
+            value: widget.activeModules[doctype["module"]] != null
+                ? widget.activeModules[doctype["module"]]
+                    .contains(doctype["name"])
+                : false,
+            onChanged: (b) {
+              if (b) {
+                if (widget.activeModules[doctype["module"]] != null) {
+                  widget.activeModules[doctype["module"]].add(doctype["name"]);
+                } else {
+                  widget.activeModules[doctype["module"]] = [doctype["name"]];
+                }
+              } else {
+                widget.activeModules[doctype["module"]].remove(doctype["name"]);
+              }
+              setState(() {});
+            },
+          ),
+        );
+      }).toList(),
     );
   }
 }
