@@ -13,12 +13,16 @@ class ViewDocInfo extends StatelessWidget {
   final String doctype;
   final String name;
   final Function callback;
+  final Map meta;
+  final Map doc;
 
   ViewDocInfo({
     @required this.doctype,
     @required this.name,
     @required this.docInfo,
     this.callback,
+    @required this.meta,
+    @required this.doc,
   });
 
   @override
@@ -124,6 +128,8 @@ class ViewDocInfo extends StatelessWidget {
             if (docInfo["energy_point_logs"] != null)
               Reviews(
                 doctype: doctype,
+                meta: meta,
+                doc: doc,
                 name: name,
                 callback: callback,
                 docInfo: docInfo,

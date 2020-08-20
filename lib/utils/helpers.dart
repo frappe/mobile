@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/form/controls/autocomplete.dart';
 import 'package:frappe_app/utils/backend_service.dart';
 import 'package:frappe_app/widgets/section.dart';
 import 'package:path_provider/path_provider.dart';
@@ -110,6 +111,24 @@ Widget makeControl({
               doctype: field["options"],
               hint: !withLabel ? field["label"] : null,
               refDoctype: field["refDoctype"],
+              value: value,
+            ),
+            withLabel,
+            field["label"]);
+      }
+      break;
+
+    case "Autocomplete":
+      {
+        fieldWidget = buildDecoratedWidget(
+            AutoComplete(
+              key: Key(value),
+              fillColor: Palette.fieldBgColor,
+              allowClear: editMode,
+              validators: validators,
+              attribute: field["fieldname"],
+              options: field["options"],
+              hint: !withLabel ? field["label"] : null,
               value: value,
             ),
             withLabel,

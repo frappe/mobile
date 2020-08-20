@@ -14,11 +14,15 @@ class Reviews extends StatefulWidget {
   final String name;
   final Map docInfo;
   final Function callback;
+  final Map meta;
+  final Map doc;
 
   Reviews({
     @required this.doctype,
     @required this.name,
     @required this.docInfo,
+    @required this.meta,
+    @required this.doc,
     this.callback,
   });
 
@@ -95,6 +99,9 @@ class _ReviewsState extends State<Reviews> {
                 builder: (context) {
                   return AddReview(
                     doctype: widget.doctype,
+                    docInfo: widget.docInfo,
+                    meta: widget.meta,
+                    doc: widget.doc,
                     name: widget.name,
                   );
                 },

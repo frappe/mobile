@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/form/controls/autocomplete.dart';
 
 import '../form/controls/link_field.dart';
 import '../utils/backend_service.dart';
@@ -83,7 +84,7 @@ class _AddTagsState extends State<AddTags> {
           children: <Widget>[
             Container(
               child: FormBuilder(
-                child: LinkField(
+                child: AutoComplete(
                   prefixIcon: Icon(Icons.search),
                   fillColor: Colors.white,
                   hint: 'Add a tag ...',
@@ -98,11 +99,6 @@ class _AddTagsState extends State<AddTags> {
                         newTags.insert(0, addedTag["message"]);
                       });
                     }
-                  },
-                  itemBuilder: (context, item) {
-                    return ListTile(
-                      title: Text(item),
-                    );
                   },
                   suggestionsCallback: (query) async {
                     var lowercaseQuery = query.toLowerCase();

@@ -3,13 +3,12 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import './../../utils/backend_service.dart';
 
-class LinkField extends StatefulWidget {
+class AutoComplete extends StatefulWidget {
   final String hint;
   final String value;
   final String attribute;
-  final String doctype;
-  final String refDoctype;
   final String txt;
+  final List options;
   final bool showInputBorder;
   final bool allowClear;
   final Function onSuggestionSelected;
@@ -21,16 +20,15 @@ class LinkField extends StatefulWidget {
 
   final List<String Function(dynamic)> validators;
 
-  LinkField({
+  AutoComplete({
     @required this.hint,
     @required this.fillColor,
-    @required this.doctype,
-    this.refDoctype,
     this.prefixIcon,
     this.key,
     this.allowClear = true,
     this.onSuggestionSelected,
     this.txt,
+    this.options,
     this.validators,
     this.showInputBorder = false,
     this.attribute,
@@ -40,10 +38,10 @@ class LinkField extends StatefulWidget {
   });
 
   @override
-  _LinkFieldState createState() => _LinkFieldState();
+  _AutoCompleteState createState() => _AutoCompleteState();
 }
 
-class _LinkFieldState extends State<LinkField> {
+class _AutoCompleteState extends State<AutoComplete> {
   final TextEditingController _typeAheadController = TextEditingController();
   BackendService backendService;
 
@@ -89,11 +87,6 @@ class _LinkFieldState extends State<LinkField> {
             hintText: widget.hint,
           ),
           selectionToTextTransformer: (item) {
-            if (item != null) {
-              if (item is Map) {
-                return item["value"];
-              }
-            }
             return item;
           },
           attribute: widget.attribute,
@@ -101,7 +94,7 @@ class _LinkFieldState extends State<LinkField> {
               (context, item) {
                 return ListTile(
                   title: Text(
-                    item["value"],
+                    item,
                   ),
                 );
               },
@@ -109,13 +102,10 @@ class _LinkFieldState extends State<LinkField> {
           suggestionsCallback: widget.suggestionsCallback ??
               (query) async {
                 var lowercaseQuery = query.toLowerCase();
-                var response = await backendService.searchLink(
-                  widget.doctype,
-                  widget.refDoctype,
-                  lowercaseQuery,
-                );
-
-                return response["results"];
+                return widget.options
+                    .where((option) =>
+                        option.toLowerCase().contains(lowercaseQuery))
+                    .toList();
               },
         ),
       ),

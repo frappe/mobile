@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/main.dart';
 
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
@@ -9,11 +10,17 @@ import '../widgets/frappe_button.dart';
 class AddReview extends StatefulWidget {
   final String doctype;
   final String name;
+  final Map meta;
+  final Map doc;
+  final Map docInfo;
 
   const AddReview({
     Key key,
     @required this.doctype,
     @required this.name,
+    @required this.meta,
+    @required this.doc,
+    @required this.docInfo,
   }) : super(key: key);
 
   @override
@@ -30,10 +37,10 @@ class _AddReviewState extends State<AddReview> {
     wireframe = [
       {
         "fieldname": 'to_user',
-        "fieldtype": 'Link',
+        "fieldtype": 'Autocomplete',
         "label": 'To User',
         "reqd": 1,
-        "options": 'User',
+        "options": getInvolvedUsers(),
         "ignore_validation": 1,
         "description": 'Only users involved in the document are listed'
       },
@@ -58,6 +65,39 @@ class _AddReviewState extends State<AddReview> {
         "label": 'Reason',
       }
     ];
+  }
+
+  getInvolvedUsers() {
+    print(widget);
+    var userFields = widget.meta["fields"]
+        .where((d) => d["fieldtype"] == 'Link' && d["options"] == 'User')
+        .map((d) => d["fieldname"])
+        .toList();
+
+    userFields.add('owner');
+    var involvedUsers = userFields.map((field) => widget.doc[field]).toList();
+
+    var a = widget.docInfo["communications"]
+        .where((d) => d["sender"] != null && d["delivery_status"] == 'sent')
+        .map((d) => d["sender"])
+        .toList();
+    a.addAll(widget.docInfo["comments"].map((d) => d["owner"]).toList());
+    a.addAll(widget.docInfo["versions"].map((d) => d["owner"]).toList());
+    a.addAll(widget.docInfo["assignments"]
+        .map(
+          (d) => d["owner"],
+        )
+        .toList());
+    involvedUsers.addAll(a);
+
+    return involvedUsers
+        .toSet()
+        .toList()
+        .where((user) => ![
+              'Administrator',
+              Uri.decodeFull(localStorage.getString('userId'))
+            ].contains(user))
+        .toList();
   }
 
   @override
