@@ -368,27 +368,28 @@ Widget makeControl({
   return fieldWidget;
 }
 
-downloadFile(String fileUrl) async {
-  await _checkPermission();
-
-  final absoluteUrl = getAbsoluteUrl(fileUrl);
-  var downloadsPath;
-
+getDownloadPath() async {
   // TODO
   if (Platform.isAndroid) {
-    downloadsPath = '/storage/emulated/0/Download/';
+    return '/storage/emulated/0/Download/';
   } else if (Platform.isIOS) {
     final Directory downloadsDirectory =
         await getApplicationDocumentsDirectory();
-    downloadsPath = downloadsDirectory.path;
+    return downloadsDirectory.path;
   }
+}
+
+downloadFile(String fileUrl, String downloadPath) async {
+  await _checkPermission();
+
+  final absoluteUrl = getAbsoluteUrl(fileUrl);
 
   await FlutterDownloader.enqueue(
     headers: {
       HttpHeaders.cookieHeader: await getCookies(),
     },
     url: absoluteUrl,
-    savedDir: downloadsPath,
+    savedDir: downloadPath,
     showNotification:
         true, // show download progress in status bar (for Android)
     openFileFromNotification:

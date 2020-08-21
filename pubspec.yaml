@@ -17,6 +17,7 @@ environment:
   sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
+  open_file: ^3.0.1
   flutter_svg: ^0.18.0
   package_info: ^0.4.1
   collection: ^1.14.12

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:open_file/open_file.dart';
+
+import 'dart:io' as io;
 
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
@@ -52,8 +55,19 @@ class _AttachmentsState extends State<Attachments> {
         padding: const EdgeInsets.only(bottom: 8.0),
         child: CardListTile(
           color: Palette.fieldBgColor,
-          onTap: () {
-            downloadFile(attachment["file_url"]);
+          onTap: () async {
+            var downloadPath = await getDownloadPath();
+            var fileUrlName = attachment["file_url"].split('/').last;
+
+            var filePath = "$downloadPath$fileUrlName";
+
+            var fileExists = await io.File(filePath).exists();
+
+            if (fileExists) {
+              OpenFile.open(filePath);
+            } else {
+              downloadFile(attachment["file_url"], downloadPath);
+            }
           },
           title: Text(file),
           trailing: IconButton(
