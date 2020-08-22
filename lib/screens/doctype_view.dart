@@ -30,6 +30,7 @@ class _DoctypeViewState extends State<DoctypeView> {
     return Scaffold(
       backgroundColor: Palette.bgColor,
       appBar: AppBar(
+        elevation: 0.6,
         title: Text(widget.module),
       ),
       body: FutureBuilder(

@@ -3,6 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/utils/backend_service.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/widgets/custom_form.dart';
+import 'package:frappe_app/widgets/frappe_button.dart';
 
 import '../app.dart';
 
@@ -31,28 +32,35 @@ class _SimpleFormState extends State<SimpleForm> {
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
-          FlatButton(
-            child: Text('Save'),
-            onPressed: () async {
-              if (_fbKey.currentState.saveAndValidate()) {
-                var formValue = _fbKey.currentState.value;
-                var response = await backendService.saveDocs(
-                  widget.meta["name"],
-                  formValue,
-                );
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return Router(
-                          viewType: ViewType.form,
-                          doctype: widget.meta["name"],
-                          name: response.data["docs"][0]["name"]);
-                    },
-                  ),
-                );
-              }
-            },
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 12.0,
+              horizontal: 4,
+            ),
+            child: FrappeFlatButton(
+              buttonType: ButtonType.primary,
+              title: 'Save',
+              onPressed: () async {
+                if (_fbKey.currentState.saveAndValidate()) {
+                  var formValue = _fbKey.currentState.value;
+                  var response = await backendService.saveDocs(
+                    widget.meta["name"],
+                    formValue,
+                  );
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return Router(
+                            viewType: ViewType.form,
+                            doctype: widget.meta["name"],
+                            name: response.data["docs"][0]["name"]);
+                      },
+                    ),
+                  );
+                }
+              },
+            ),
           ),
         ],
       ),

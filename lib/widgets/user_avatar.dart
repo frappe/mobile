@@ -20,9 +20,11 @@ class UserAvatar extends StatelessWidget {
     this.size = 40,
   });
 
-  Widget _renderShape({
+  static Widget renderShape({
     String txt,
     ImageProvider imageProvider,
+    double size = 40,
+    BorderRadius borderRadius = const BorderRadius.all(Radius.circular(20)),
   }) {
     return Container(
       width: size,
@@ -62,22 +64,43 @@ class UserAvatar extends StatelessWidget {
           httpHeaders: {
             HttpHeaders.cookieHeader: cookies,
           },
-          imageBuilder: (context, imageProvider) =>
-              _renderShape(imageProvider: imageProvider),
-          placeholder: (context, url) => _renderShape(
+          imageBuilder: (context, imageProvider) => UserAvatar.renderShape(
+            imageProvider: imageProvider,
+            size: size,
+            borderRadius: borderRadius,
+          ),
+          placeholder: (context, url) => UserAvatar.renderShape(
             txt: getInitials(
               user["full_name"],
             ),
+            size: size,
+            borderRadius: borderRadius,
           ),
-          errorWidget: (context, url, error) => _renderShape(txt: ''),
+          errorWidget: (context, url, error) => UserAvatar.renderShape(
+            txt: '',
+            size: size,
+            borderRadius: borderRadius,
+          ),
         );
       } else if (user == null) {
-        return _renderShape(txt: uid[0].toUpperCase());
+        return UserAvatar.renderShape(
+          txt: uid[0].toUpperCase(),
+          size: size,
+          borderRadius: borderRadius,
+        );
       } else {
-        return _renderShape(txt: getInitials(user["full_name"]));
+        return UserAvatar.renderShape(
+          txt: getInitials(user["full_name"]),
+          size: size,
+          borderRadius: borderRadius,
+        );
       }
     } else {
-      return _renderShape(txt: uid[0].toUpperCase());
+      return UserAvatar.renderShape(
+        txt: uid[0].toUpperCase(),
+        size: size,
+        borderRadius: borderRadius,
+      );
     }
   }
 

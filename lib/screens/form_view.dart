@@ -71,6 +71,7 @@ class _FormViewState extends State<FormView>
           backgroundColor: Palette.bgColor,
           child: Icon(
             Icons.add,
+            color: Colors.black,
           ),
         ),
       ];
@@ -82,10 +83,7 @@ class _FormViewState extends State<FormView>
           UserAvatar(uid: l[i]["owner"]),
         );
       } else {
-        w.add(CircleAvatar(
-          backgroundColor: Palette.bgColor,
-          child: Text('+ ${l.length - size}'),
-        ));
+        w.add(UserAvatar.renderShape(txt: "+ ${l.length - size}"));
         break;
       }
     }
