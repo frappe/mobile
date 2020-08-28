@@ -40,16 +40,13 @@ class Palette {
     color: Palette.secondaryTxtColor,
   );
 
-  static InputDecoration formFieldDecoration(
-    bool withLabel,
-    String label, [
-    Widget suffixIcon,
-  ]) {
+  static InputDecoration formFieldDecoration(bool withLabel, String label,
+      [Widget suffixIcon, bool filled = true]) {
     return InputDecoration(
       suffixIcon: suffixIcon,
       hintText: !withLabel ? label : null,
       enabledBorder: InputBorder.none,
-      filled: true,
+      filled: filled,
       fillColor: Palette.fieldBgColor,
     );
   }

@@ -344,12 +344,12 @@ class CustomSearch extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     return FutureBuilder(
-      future: BackendService(context).fetchList(
+      future: BackendService(context, meta: data.meta).fetchList(
           pageLength: 10,
           fieldnames: data.fieldnames,
           doctype: data.doctype,
           filters: [
-            [data.doctype, 'subject', 'like', '%$query%']
+            [data.doctype, data.meta["title_field"], 'like', '%$query%']
           ]),
       builder: (context, snapshot) {
         if (snapshot.hasData) {

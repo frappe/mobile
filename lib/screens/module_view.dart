@@ -64,7 +64,7 @@ class _ModuleViewState extends State<ModuleView> {
       backgroundColor: Palette.bgColor,
       appBar: AppBar(
         title: Text('Modules'),
-        elevation: 0.6,
+        elevation: 0,
         leading: PopupMenuButton<String>(
           onSelected: (choice) => _choiceAction(choice, context),
           icon: UserAvatar(

@@ -168,6 +168,7 @@ class _LoginState extends State<Login> {
                         FrappeFlatButton(
                           title: 'Login',
                           fullWidth: true,
+                          height: 46,
                           buttonType: ButtonType.primary,
                           onPressed: () {
                             if (_fbKey.currentState.saveAndValidate()) {
