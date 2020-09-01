@@ -234,6 +234,8 @@ class _FormViewState extends State<FormView>
                                                   MaterialPageRoute(
                                                     builder: (context) {
                                                       return ViewDocInfo(
+                                                        doc: docs[0],
+                                                        meta: widget.meta,
                                                         docInfo: docInfo,
                                                         doctype: widget.doctype,
                                                         name: widget.name,

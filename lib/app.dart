@@ -2,10 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import './main.dart';
+
 import './utils/enums.dart';
 import './utils/helpers.dart';
+
+import './services/connectivity_service.dart';
 
 import './screens/filter_list.dart';
 import './screens/form_view.dart';
@@ -41,36 +45,40 @@ class _FrappeAppState extends State<FrappeApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Frappe',
-      theme: new ThemeData(
-        textTheme: GoogleFonts.interTextTheme(
-          Theme.of(context).textTheme.apply(
-              // fontSizeFactor: 0.7,
-              ),
-        ),
-        disabledColor: Colors.black,
-        primaryColor: Colors.white,
-        accentColor: Colors.black54,
-      ),
-      home: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).requestFocus(new FocusNode());
-        },
-        child: Scaffold(
-          body: _isLoaded
-              ? _isLoggedIn ? ModuleView() : Login()
-              : Center(
-                  child: CircularProgressIndicator(),
+    return StreamProvider<ConnectivityStatus>(
+      create: (context) =>
+          ConnectivityService().connectionStatusController.stream,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Frappe',
+        theme: new ThemeData(
+          textTheme: GoogleFonts.interTextTheme(
+            Theme.of(context).textTheme.apply(
+                // fontSizeFactor: 0.7,
                 ),
+          ),
+          disabledColor: Colors.black,
+          primaryColor: Colors.white,
+          accentColor: Colors.black54,
         ),
+        home: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).requestFocus(new FocusNode());
+          },
+          child: Scaffold(
+            body: _isLoaded
+                ? _isLoggedIn ? ModuleView() : Login()
+                : Center(
+                    child: CircularProgressIndicator(),
+                  ),
+          ),
+        ),
+        routes: <String, WidgetBuilder>{
+          // Set routes for using the Navigator.
+          '/login': (BuildContext context) => Login(),
+          '/modules': (BuildContext context) => ModuleView(),
+        },
       ),
-      routes: <String, WidgetBuilder>{
-        // Set routes for using the Navigator.
-        '/login': (BuildContext context) => Login(),
-        '/modules': (BuildContext context) => ModuleView(),
-      },
     );
   }
 }
