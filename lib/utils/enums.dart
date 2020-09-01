@@ -1,22 +1,28 @@
 enum EventType {
   comment,
   email,
-  docVersion
+  docVersion,
 }
 
 enum Order {
   asc,
-  desc
+  desc,
 }
 
 enum ViewType {
   filter,
   list,
   form,
-  newForm
+  newForm,
 }
 
 enum ButtonType {
   primary,
-  secondary
+  secondary,
+}
+
+enum ConnectivityStatus {
+  WiFi,
+  Cellular,
+  Offline,
 }

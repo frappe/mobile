@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flutter/material.dart';
 
 import 'helpers.dart';
@@ -156,10 +157,13 @@ class BackendService {
       data: {
         'page': module,
       },
-      options: Options(
-        validateStatus: (status) {
-          return status < 500;
-        },
+      options: buildCacheOptions(
+        Duration(hours: 1),
+        options: Options(
+          validateStatus: (status) {
+            return status < 500;
+          },
+        ),
       ),
     );
 
@@ -226,10 +230,13 @@ class BackendService {
   Future getDeskSideBarItems(context) async {
     final response = await dio.post(
       '/method/frappe.desk.desktop.get_desk_sidebar_items',
-      options: Options(
-        validateStatus: (status) {
-          return status < 500;
-        },
+      options: buildCacheOptions(
+        Duration(hours: 1),
+        options: Options(
+          validateStatus: (status) {
+            return status < 500;
+          },
+        ),
       ),
     );
 

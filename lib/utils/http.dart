@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:frappe_app/utils/backend_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:cookie_jar/cookie_jar.dart';
@@ -18,10 +19,12 @@ void initConfig() async {
   if (localStorage.containsKey('serverURL')) {
     uri = Uri.parse(localStorage.getString('serverURL'));
     baseUrl = uri.origin;
-    BaseOptions options = new BaseOptions(baseUrl: "$baseUrl/api");
+    BaseOptions options = BaseOptions(baseUrl: "$baseUrl/api");
     dio = Dio(options);
     var cookieJar = await getCookiePath();
     dio.interceptors.add(CookieManager(cookieJar));
+    dio.interceptors
+        .add(DioCacheManager(CacheConfig(baseUrl: baseUrl)).interceptor);
     cookies = await getCookies();
   }
 }
