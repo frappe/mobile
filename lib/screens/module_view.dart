@@ -1,9 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:frappe_app/screens/queue.dart';
 import 'package:frappe_app/screens/settings.dart';
+import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/http.dart';
 import 'package:frappe_app/widgets/user_avatar.dart';
+import 'package:provider/provider.dart';
 
 import '../main.dart';
 import '../config/palette.dart';
@@ -19,11 +22,13 @@ class ModuleView extends StatefulWidget {
 
 class _ModuleViewState extends State<ModuleView> {
   final userId = Uri.decodeFull(localStorage.getString('userId'));
-  static const popupOptions = const ["Settings", "Logout"];
+  static const popupOptions = const ["Settings", "Logout", "Queue"];
+  BackendService backendService;
 
   @override
   void initState() {
-    super.initState();
+    backendService = BackendService(context);
+
     if (!localStorage.containsKey("${baseUrl}activeModules")) {
       localStorage.setString(
         "${baseUrl}activeModules",
@@ -35,6 +40,21 @@ class _ModuleViewState extends State<ModuleView> {
           },
         ),
       );
+    }
+
+    super.initState();
+  }
+
+  Future _getData() {
+    var connectionStatus = Provider.of<ConnectivityStatus>(
+      context,
+    );
+
+    if (connectionStatus == ConnectivityStatus.offline) {
+      return Future.delayed(
+          Duration(seconds: 1), () => getCache('deskSidebarItems')["data"]);
+    } else {
+      return backendService.getDeskSideBarItems(context);
     }
   }
 
@@ -54,12 +74,20 @@ class _ModuleViewState extends State<ModuleView> {
       if (nav) {
         setState(() {});
       }
+    } else if (choice == "Queue") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return QueueList();
+          },
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    var backendService = BackendService(context);
     return Scaffold(
       backgroundColor: Palette.bgColor,
       appBar: AppBar(
@@ -81,7 +109,7 @@ class _ModuleViewState extends State<ModuleView> {
         ),
       ),
       body: FutureBuilder(
-        future: backendService.getDeskSideBarItems(context),
+        future: _getData(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             var activeModules = Map<String, List>.from(
@@ -99,6 +127,13 @@ class _ModuleViewState extends State<ModuleView> {
                     const EdgeInsets.only(left: 10.0, right: 10.0, top: 8.0),
                 child: CardListTile(
                   title: Text(m["label"]),
+                  trailing: IconButton(
+                    icon: Icon(Icons.file_download),
+                    onPressed: () async {
+                      await cacheDoctypes(m["name"], context);
+                      showSnackBar('${m["name"]} is downloaded', context);
+                    },
+                  ),
                   onTap: () {
                     Navigator.push(
                       context,

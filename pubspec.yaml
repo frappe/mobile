@@ -39,7 +39,6 @@ dependencies:
   flutter_html: ^1.0.0
   http: ^0.12.0+4
   dio: 3.0.9
-  dio_http_cache: ^0.2.8
   dio_cookie_manager: 1.0.0
   flutter:
     sdk: flutter

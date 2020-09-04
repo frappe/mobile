@@ -8,6 +8,7 @@ import 'package:frappe_app/widgets/custom_form.dart';
 import 'package:frappe_app/widgets/frappe_button.dart';
 import 'package:frappe_app/widgets/timeline.dart';
 import 'package:frappe_app/widgets/user_avatar.dart';
+import 'package:provider/provider.dart';
 
 import '../main.dart';
 import '../config/palette.dart';
@@ -25,11 +26,15 @@ class FormView extends StatefulWidget {
   final String doctype;
   final String name;
   final Map meta;
+  final bool queued;
+  final Map queuedData;
 
   FormView({
     @required this.doctype,
-    @required this.name,
+    this.name,
     this.meta,
+    this.queued = false,
+    this.queuedData,
   });
 
   @override
@@ -39,7 +44,6 @@ class FormView extends StatefulWidget {
 class _FormViewState extends State<FormView>
     with SingleTickerProviderStateMixin {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-  Future futureIssueDetail;
   bool editMode = false;
   final user = localStorage.getString('user');
   BackendService backendService;
@@ -48,17 +52,31 @@ class _FormViewState extends State<FormView>
   void initState() {
     super.initState();
     backendService = BackendService(context);
-    futureIssueDetail = backendService.getdoc(
-      widget.doctype,
-      widget.name,
-    );
   }
 
   void _refresh() {
     setState(() {
-      futureIssueDetail = backendService.getdoc(widget.doctype, widget.name);
       editMode = false;
     });
+  }
+
+  Future _getData(ConnectivityStatus connectionStatus) {
+    if (widget.queued) {
+      return Future.delayed(
+          Duration(seconds: 1), () => {"docs": widget.queuedData["data"]});
+    } else {
+      if (connectionStatus == ConnectivityStatus.offline) {
+        return Future.delayed(
+          Duration(seconds: 1),
+          () => getCache('${widget.doctype}${widget.name}')["data"],
+        );
+      } else {
+        return backendService.getdoc(
+          widget.doctype,
+          widget.name,
+        );
+      }
+    }
   }
 
   List<Widget> _generateAssignees(List l) {
@@ -92,8 +110,11 @@ class _FormViewState extends State<FormView>
 
   @override
   Widget build(BuildContext context) {
+    var connectionStatus = Provider.of<ConnectivityStatus>(
+      context,
+    );
     return FutureBuilder(
-        future: futureIssueDetail,
+        future: _getData(connectionStatus),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             var docs = snapshot.data["docs"];
@@ -183,23 +204,25 @@ class _FormViewState extends State<FormView>
                                   ),
                                   child: GestureDetector(
                                     behavior: HitTestBehavior.translucent,
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) {
-                                            return ViewDocInfo(
-                                              meta: widget.meta,
-                                              doc: docs[0],
-                                              docInfo: docInfo,
-                                              doctype: widget.doctype,
-                                              name: widget.name,
-                                              callback: _refresh,
+                                    onTap: !widget.queued
+                                        ? () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) {
+                                                  return ViewDocInfo(
+                                                    meta: widget.meta,
+                                                    doc: docs[0],
+                                                    docInfo: docInfo,
+                                                    doctype: widget.doctype,
+                                                    name: widget.name,
+                                                    callback: _refresh,
+                                                  );
+                                                },
+                                              ),
                                             );
-                                          },
-                                        ),
-                                      );
-                                    },
+                                          }
+                                        : null,
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -227,29 +250,31 @@ class _FormViewState extends State<FormView>
                                                 widget.doctype,
                                                 docs[0]['status']),
                                             Spacer(),
-                                            InkWell(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) {
-                                                      return ViewDocInfo(
-                                                        doc: docs[0],
-                                                        meta: widget.meta,
-                                                        docInfo: docInfo,
-                                                        doctype: widget.doctype,
-                                                        name: widget.name,
-                                                        callback: _refresh,
-                                                      );
-                                                    },
-                                                  ),
-                                                );
-                                              },
-                                              child: Row(
-                                                children: _generateAssignees(
-                                                    docInfo["assignments"]),
-                                              ),
-                                            )
+                                            if (!widget.queued)
+                                              InkWell(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) {
+                                                        return ViewDocInfo(
+                                                          doc: docs[0],
+                                                          meta: widget.meta,
+                                                          docInfo: docInfo,
+                                                          doctype:
+                                                              widget.doctype,
+                                                          name: widget.name,
+                                                          callback: _refresh,
+                                                        );
+                                                      },
+                                                    ),
+                                                  );
+                                                },
+                                                child: Row(
+                                                  children: _generateAssignees(
+                                                      docInfo["assignments"]),
+                                                ),
+                                              )
                                           ],
                                         )
                                       ],
@@ -293,16 +318,45 @@ class _FormViewState extends State<FormView>
                                                 .saveAndValidate()) {
                                               var formValue =
                                                   _fbKey.currentState.value;
-                                              await backendService.updateDoc(
-                                                widget.doctype,
-                                                widget.name,
-                                                formValue,
-                                              );
-                                              showSnackBar(
-                                                'Changes Saved',
-                                                builderContext,
-                                              );
-                                              _refresh();
+                                              if (connectionStatus ==
+                                                  ConnectivityStatus.offline) {
+                                                if (widget.queuedData != null) {
+                                                  widget.queuedData["data"] = [
+                                                    formValue
+                                                  ];
+                                                  widget.queuedData["title"] =
+                                                      formValue[widget
+                                                          .meta["title_field"]];
+
+                                                  queue.putAt(
+                                                      widget.queuedData["qIdx"],
+                                                      widget.queuedData);
+                                                } else {
+                                                  queue.add({
+                                                    "type": "update",
+                                                    "name": widget.name,
+                                                    "doctype": widget.doctype,
+                                                    "title": formValue[widget
+                                                        .meta["title_field"]],
+                                                    "data": [formValue],
+                                                  });
+                                                }
+                                                showSnackBar(
+                                                  'Added to queue',
+                                                  builderContext,
+                                                );
+                                              } else {
+                                                await backendService.updateDoc(
+                                                  widget.doctype,
+                                                  widget.name,
+                                                  formValue,
+                                                );
+                                                showSnackBar(
+                                                  'Changes Saved',
+                                                  builderContext,
+                                                );
+                                                _refresh();
+                                              }
                                             }
                                           }
                                         : () {
@@ -355,14 +409,19 @@ class _FormViewState extends State<FormView>
                               ],
                             ),
                           ),
-                          Timeline([
-                            ...docInfo['comments'],
-                            ...docInfo["communications"],
-                            ...docInfo["versions"],
-                            // ...docInfo["views"],TODO
-                          ], () {
-                            _refresh();
-                          }),
+                          !widget.queued
+                              ? Timeline([
+                                  ...docInfo['comments'],
+                                  ...docInfo["communications"],
+                                  ...docInfo["versions"],
+                                  // ...docInfo["views"],TODO
+                                ], () {
+                                  _refresh();
+                                })
+                              : Center(
+                                  child: Text(
+                                      'Activity not available in offline mode'),
+                                ),
                         ]),
                       ),
                     );

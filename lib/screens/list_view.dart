@@ -6,6 +6,8 @@ import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/screens/filter_list.dart';
 import 'package:frappe_app/utils/backend_service.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
+import 'package:frappe_app/utils/helpers.dart';
+import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../main.dart';
@@ -49,28 +51,128 @@ class _CustomListViewState extends State<CustomListView> {
   void initState() {
     super.initState();
     backendService = BackendService(context, meta: widget.meta);
-    _pageLoadController = PagewiseLoadController(
-      pageSize: PAGE_SIZE,
-      pageFuture: (pageIndex) {
-        return backendService.fetchList(
-          doctype: widget.doctype,
-          fieldnames: widget.fieldnames,
-          pageLength: PAGE_SIZE,
-          filters: widget.filters,
-          offset: pageIndex * PAGE_SIZE,
-        );
-      },
-    );
   }
 
   @override
   void dispose() {
     super.dispose();
-    _pageLoadController.dispose();
+    _pageLoadController?.dispose();
+  }
+
+  Widget _generateItem(Map data) {
+    var assignee =
+        data["_assign"] != null ? json.decode(data["_assign"]) : null;
+
+    var likedBy =
+        data["_liked_by"] != null ? json.decode(data["_liked_by"]) : [];
+    var isLikedByUser = likedBy.contains(userId);
+
+    var seenBy = data["_seen"] != null ? json.decode(data["_seen"]) : [];
+    var isSeenByUser = seenBy.contains(userId);
+
+    return ListItem(
+      doctype: widget.doctype,
+      onListTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return Router(
+                viewType: ViewType.form,
+                doctype: widget.doctype,
+                name: data["name"],
+              );
+            },
+          ),
+        );
+      },
+      isFav: isLikedByUser,
+      seen: isSeenByUser,
+      assignee: assignee != null && assignee.length > 0
+          ? ['_assign', assignee[0]]
+          : null,
+      onButtonTap: (filter) {
+        widget.filters.clear();
+        widget.filters.addAll(
+          FilterList.generateFilters(widget.doctype, filter),
+        );
+        _pageLoadController.reset();
+        setState(() {});
+      },
+      title: data[widget.meta["title_field"]] ?? data["name"],
+      modifiedOn: "${timeago.format(
+        DateTime.parse(
+          data['modified'],
+        ),
+      )}",
+      name: data["name"],
+      status: ["status", data["status"]],
+      commentCount: data["_comment_count"],
+    );
+  }
+
+  Widget _noItemsFoundBuilder() {
+    return Container(
+      color: Colors.white,
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height - 100,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text('No Items Found'),
+          if (widget.filters.isNotEmpty)
+            FrappeFlatButton.small(
+              buttonType: ButtonType.secondary,
+              title: 'Clear Filters',
+              onPressed: () {
+                FilterList.clearFilters(widget.doctype);
+                widget.filters.clear();
+                _pageLoadController.reset();
+                setState(() {});
+              },
+            ),
+          FrappeFlatButton.small(
+            buttonType: ButtonType.primary,
+            title: 'Create New',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return Router(
+                      viewType: ViewType.newForm,
+                      doctype: widget.doctype,
+                    );
+                  },
+                ),
+              );
+            },
+          )
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    var connectionStatus = Provider.of<ConnectivityStatus>(
+      context,
+    );
+
+    if (connectionStatus != ConnectivityStatus.offline) {
+      _pageLoadController = PagewiseLoadController(
+        pageSize: PAGE_SIZE,
+        pageFuture: (pageIndex) {
+          return backendService.fetchList(
+            doctype: widget.doctype,
+            fieldnames: widget.fieldnames,
+            pageLength: PAGE_SIZE,
+            filters: widget.filters,
+            offset: pageIndex * PAGE_SIZE,
+          );
+        },
+      );
+    }
     if (FilterList.getFieldFilterIndex(widget.filters, '_liked_by') != null) {
       showLiked = true;
     } else {
@@ -204,104 +306,28 @@ class _CustomListViewState extends State<CustomListView> {
         },
         child: Container(
           color: Palette.bgColor,
-          child: PagewiseListView(
-            noItemsFoundBuilder: (context) {
-              return Container(
-                color: Colors.white,
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height - 100,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text('No Items Found'),
-                    if (widget.filters.isNotEmpty)
-                      FrappeFlatButton.small(
-                        buttonType: ButtonType.secondary,
-                        title: 'Clear Filters',
-                        onPressed: () {
-                          FilterList.clearFilters(widget.doctype);
-                          widget.filters.clear();
-                          _pageLoadController.reset();
-                          setState(() {});
-                        },
-                      ),
-                    FrappeFlatButton.small(
-                      buttonType: ButtonType.primary,
-                      title: 'Create New',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return Router(
-                                viewType: ViewType.newForm,
-                                doctype: widget.doctype,
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    )
-                  ],
-                ),
-              );
-            },
-            pageLoadController: _pageLoadController,
-            itemBuilder: ((buildContext, entry, _) {
-              var assignee = entry["_assign"] != null
-                  ? json.decode(entry["_assign"])
-                  : null;
-
-              var likedBy = entry["_liked_by"] != null
-                  ? json.decode(entry["_liked_by"])
-                  : [];
-              var isLikedByUser = likedBy.contains(userId);
-
-              var seenBy =
-                  entry["_seen"] != null ? json.decode(entry["_seen"]) : [];
-              var isSeenByUser = seenBy.contains(userId);
-
-              return ListItem(
-                doctype: widget.doctype,
-                onListTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return Router(
-                          viewType: ViewType.form,
-                          doctype: widget.doctype,
-                          name: entry["name"],
-                        );
-                      },
-                    ),
+          child: connectionStatus != ConnectivityStatus.offline
+              ? PagewiseListView(
+                  noItemsFoundBuilder: (context) {
+                    return _noItemsFoundBuilder();
+                  },
+                  pageLoadController: _pageLoadController,
+                  itemBuilder: ((buildContext, entry, _) {
+                    return _generateItem(entry);
+                  }),
+                )
+              : Builder(builder: (buildContext) {
+                  var list = getCache('${widget.doctype}List')["data"];
+                  return ListView.builder(
+                    itemCount: list.length,
+                    itemBuilder: (context, index) {
+                      return _generateItem(list[index]);
+                      return ListTile(
+                        title: Text('dummy'),
+                      );
+                    },
                   );
-                },
-                isFav: isLikedByUser,
-                seen: isSeenByUser,
-                assignee: assignee != null && assignee.length > 0
-                    ? ['_assign', assignee[0]]
-                    : null,
-                onButtonTap: (filter) {
-                  widget.filters.clear();
-                  widget.filters.addAll(
-                    FilterList.generateFilters(widget.doctype, filter),
-                  );
-                  _pageLoadController.reset();
-                  setState(() {});
-                },
-                title: entry[widget.meta["title_field"]] ?? entry["name"],
-                modifiedOn: "${timeago.format(
-                  DateTime.parse(
-                    entry['modified'],
-                  ),
-                )}",
-                name: entry["name"],
-                status: ["status", entry["status"]],
-                commentCount: entry["_comment_count"],
-              );
-            }),
-          ),
+                }),
         ),
       ),
     );

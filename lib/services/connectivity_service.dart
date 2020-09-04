@@ -21,13 +21,13 @@ class ConnectivityService {
   ConnectivityStatus _getStatusFromResult(ConnectivityResult result) {
     switch (result) {
       case ConnectivityResult.mobile:
-        return ConnectivityStatus.Cellular;
+        return ConnectivityStatus.cellular;
       case ConnectivityResult.wifi:
-        return ConnectivityStatus.WiFi;
+        return ConnectivityStatus.wiFi;
       case ConnectivityResult.none:
-        return ConnectivityStatus.Offline;
+        return ConnectivityStatus.offline;
       default:
-        return ConnectivityStatus.Offline;
+        return ConnectivityStatus.offline;
     }
   }
 }

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/main.dart';
 import 'package:frappe_app/utils/backend_service.dart';
 import 'package:frappe_app/utils/enums.dart';
+import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/widgets/custom_form.dart';
 import 'package:frappe_app/widgets/frappe_button.dart';
+import 'package:provider/provider.dart';
 
 import '../app.dart';
 
@@ -28,6 +31,9 @@ class _SimpleFormState extends State<SimpleForm> {
   @override
   Widget build(BuildContext context) {
     final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+    var connectionStatus = Provider.of<ConnectivityStatus>(
+      context,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -43,21 +49,34 @@ class _SimpleFormState extends State<SimpleForm> {
               onPressed: () async {
                 if (_fbKey.currentState.saveAndValidate()) {
                   var formValue = _fbKey.currentState.value;
-                  var response = await backendService.saveDocs(
-                    widget.meta["name"],
-                    formValue,
-                  );
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return Router(
-                            viewType: ViewType.form,
-                            doctype: widget.meta["name"],
-                            name: response.data["docs"][0]["name"]);
-                      },
-                    ),
-                  );
+
+                  if (connectionStatus == ConnectivityStatus.offline) {
+                    queue.add({
+                      "type": "create",
+                      "doctype": widget.meta["name"],
+                      "title": formValue[widget.meta["title_field"]],
+                      "data": [formValue],
+                    });
+
+                    print('added to queue');
+                  } else {
+                    var response = await backendService.saveDocs(
+                      widget.meta["name"],
+                      formValue,
+                    );
+
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return Router(
+                              viewType: ViewType.form,
+                              doctype: widget.meta["name"],
+                              name: response.data["docs"][0]["name"]);
+                        },
+                      ),
+                    );
+                  }
                 }
               },
             ),
