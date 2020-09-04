@@ -22,7 +22,7 @@ enum ButtonType {
 }
 
 enum ConnectivityStatus {
-  WiFi,
-  Cellular,
-  Offline,
+  wiFi,
+  cellular,
+  offline,
 }

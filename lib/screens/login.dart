@@ -60,6 +60,8 @@ class _LoginState extends State<Login> {
         'pwd',
         data["pwd"],
       );
+      primaryCacheKey = "$baseUrl$userId";
+      localStorage.setString('primaryCacheKey', primaryCacheKey);
 
       await cacheAllUsers(context);
       Navigator.of(context).pushReplacementNamed('/modules');

@@ -89,6 +89,8 @@ class Router extends StatelessWidget {
   final String name;
   final List filters;
   final Function filterCallback;
+  final Map queuedData;
+  final bool queued;
 
   Router({
     @required this.viewType,
@@ -96,6 +98,8 @@ class Router extends StatelessWidget {
     this.name,
     this.filters,
     this.filterCallback,
+    this.queued,
+    this.queuedData,
   });
 
   @override
@@ -135,6 +139,8 @@ class Router extends StatelessWidget {
               doctype: doctype,
               name: name,
               meta: docMeta,
+              queued: queued ?? false,
+              queuedData: queuedData,
             );
           } else if (viewType == ViewType.filter) {
             var defaultFilters = [

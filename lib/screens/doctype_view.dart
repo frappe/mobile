@@ -5,6 +5,7 @@ import 'package:frappe_app/main.dart';
 import 'package:frappe_app/screens/settings.dart';
 import 'package:frappe_app/utils/http.dart';
 import 'package:frappe_app/widgets/frappe_button.dart';
+import 'package:provider/provider.dart';
 
 import '../app.dart';
 import '../config/palette.dart';
@@ -23,10 +24,33 @@ class DoctypeView extends StatefulWidget {
 }
 
 class _DoctypeViewState extends State<DoctypeView> {
+  BackendService backendService;
+  bool offline = false;
+
+  @override
+  void initState() {
+    backendService = BackendService(context);
+
+    super.initState();
+  }
+
+  Future _getData() {
+    var connectionStatus = Provider.of<ConnectivityStatus>(
+      context,
+    );
+
+    if (connectionStatus == ConnectivityStatus.offline) {
+      offline = true;
+      return Future.delayed(Duration(seconds: 1),
+          () => getCache('${widget.module}Doctypes')["data"]);
+    } else {
+      offline = false;
+      return backendService.getDesktopPage(widget.module, context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    var backendService = BackendService(context);
-
     return Scaffold(
       backgroundColor: Palette.bgColor,
       appBar: AppBar(
@@ -34,24 +58,13 @@ class _DoctypeViewState extends State<DoctypeView> {
         title: Text(widget.module),
       ),
       body: FutureBuilder(
-        future: backendService.getDesktopPage(widget.module, context),
+        future: _getData(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            var activeModules = Map<String, List>.from(
-              json.decode(
-                localStorage.getString("${baseUrl}activeModules"),
-              ),
+            var doctypesWidget = getActivatedDoctypes(
+              snapshot.data,
+              widget.module,
             );
-            var doctypes = [];
-
-            snapshot.data["message"]["cards"]["items"].forEach((item) {
-              doctypes.addAll(item["links"]);
-            });
-            var doctypesWidget = doctypes.where((m) {
-              return activeModules[widget.module].contains(
-                m["name"],
-              );
-            });
 
             if (doctypesWidget.isEmpty) {
               return Container(
@@ -94,7 +107,8 @@ class _DoctypeViewState extends State<DoctypeView> {
                 child: CardListTile(
                   title: Text(m["label"]),
                   onTap: () async {
-                    await processData(m["name"], context);
+                    await processData(
+                        doctype: m["name"], context: context, offline: offline);
                     Navigator.push(
                       context,
                       MaterialPageRoute(

@@ -6,6 +6,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/section.dart';
 import '../widgets/custom_expansion_tile.dart';
@@ -34,22 +35,23 @@ logout(context) async {
       (Route<dynamic> route) => false);
 }
 
-Future processData(
+Future processData({
   String doctype,
   context,
-) async {
-  var meta = await BackendService(context).getDoctype(doctype);
+  bool offline = false,
+}) async {
+  var meta;
+
+  if (offline) {
+    meta = getCache('${doctype}Meta')["data"];
+  } else {
+    meta = await BackendService(context).getDoctype(doctype);
+  }
 
   List metaFields = meta["docs"][0]["fields"];
 
   metaFields.forEach((field) {
     meta["docs"][0]["_field${field["fieldname"]}"] = true;
-    if (field["fieldtype"] == "Select") {
-      if (field["hidden"] != 1) {
-        field["options"] =
-            field["options"] != null ? field["options"].split('\n') : [];
-      }
-    }
   });
 
   localStorage.setString('${doctype}Meta', json.encode(meta));
@@ -138,6 +140,8 @@ Widget makeControl({
 
     case "Select":
       {
+        var options =
+            field["options"] != null ? field["options"].split('\n') : [];
         fieldWidget = buildDecoratedWidget(
             FormBuilderDropdown(
               key: Key(value),
@@ -150,7 +154,7 @@ Widget makeControl({
                 field["label"],
               ),
               validators: validators,
-              items: field["options"].map<DropdownMenuItem>((option) {
+              items: options.map<DropdownMenuItem>((option) {
                 return DropdownMenuItem(
                   value: option,
                   child: option != null
@@ -689,4 +693,69 @@ List sortBy(List data, String orderBy, Order order) {
   }
 
   return data;
+}
+
+getActivatedDoctypes(Map doctypes, String module) {
+  var activeModules = Map<String, List>.from(
+    json.decode(
+      localStorage.getString("${baseUrl}activeModules"),
+    ),
+  );
+  var activeDoctypes = [];
+
+  doctypes["message"]["cards"]["items"].forEach((item) {
+    activeDoctypes.addAll(item["links"]);
+  });
+  activeDoctypes = activeDoctypes.where((m) {
+    return activeModules[module].contains(
+      m["name"],
+    );
+  }).toList();
+
+  return activeDoctypes;
+}
+
+putCache(String secondaryKey, dynamic data) {
+  var k = primaryCacheKey + "#@#" + secondaryKey;
+  var v = {
+    'timestamp': DateTime.now(),
+    'data': data,
+  };
+
+  cache.put(k, v);
+}
+
+getCache(String secondaryKey) {
+  var k = primaryCacheKey + "#@#" + secondaryKey;
+  return cache.get(k);
+}
+
+cacheDoctypes(String module, context) async {
+  var doctypes = await BackendService(context).getDesktopPage(module, context);
+
+  var activeDoctypes = getActivatedDoctypes(doctypes, module);
+
+  for (var doctype in activeDoctypes) {
+    await cacheDocList(doctype["name"], context);
+  }
+}
+
+cacheDocList(String doctype, context) async {
+  var backendService = BackendService(context);
+  var docMeta = await backendService.getDoctype(doctype);
+  docMeta = docMeta["docs"][0];
+  var docList = await BackendService(context, meta: docMeta).fetchList(
+    fieldnames: generateFieldnames(doctype, docMeta),
+    doctype: doctype,
+    pageLength: 50,
+    offset: 0,
+  );
+
+  for (var doc in docList) {
+    await cacheForm(doctype, doc["name"], context);
+  }
+}
+
+cacheForm(String doctype, String name, context) async {
+  await BackendService(context).getdoc(doctype, name);
 }

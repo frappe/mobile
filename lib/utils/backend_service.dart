@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flutter/material.dart';
+import 'package:frappe_app/main.dart';
+import 'package:provider/provider.dart';
 
+import 'enums.dart';
 import 'helpers.dart';
 import 'http.dart';
 
@@ -34,6 +36,7 @@ class BackendService {
     );
 
     if (response.statusCode == 200) {
+      putCache('$doctype$name', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
       logout(context);
@@ -54,7 +57,7 @@ class BackendService {
     );
 
     if (response.statusCode == 200) {
-      return;
+      return response;
     } else if (response.statusCode == 403) {
       logout(context);
     } else {
@@ -124,6 +127,8 @@ class BackendService {
         newL.add(o);
       }
 
+      putCache('${doctype}List', newL);
+
       return newL;
     } else if (response.statusCode == 403) {
       logout(context);
@@ -157,17 +162,15 @@ class BackendService {
       data: {
         'page': module,
       },
-      options: buildCacheOptions(
-        Duration(hours: 1),
-        options: Options(
-          validateStatus: (status) {
-            return status < 500;
-          },
-        ),
+      options: Options(
+        validateStatus: (status) {
+          return status < 500;
+        },
       ),
     );
 
     if (response.statusCode == 200) {
+      putCache('${module}Doctypes', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
       logout(context);
@@ -230,17 +233,15 @@ class BackendService {
   Future getDeskSideBarItems(context) async {
     final response = await dio.post(
       '/method/frappe.desk.desktop.get_desk_sidebar_items',
-      options: buildCacheOptions(
-        Duration(hours: 1),
-        options: Options(
-          validateStatus: (status) {
-            return status < 500;
-          },
-        ),
+      options: Options(
+        validateStatus: (status) {
+          return status < 500;
+        },
       ),
     );
 
     if (response.statusCode == 200) {
+      putCache('deskSidebarItems', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
       logout(context);
@@ -263,6 +264,7 @@ class BackendService {
     );
 
     if (response.statusCode == 200) {
+      putCache('${doctype}Meta', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
       logout(context);
