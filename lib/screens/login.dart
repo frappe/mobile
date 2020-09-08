@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/screens/custom_persistent_bottom_nav_bar.dart';
+import 'package:frappe_app/screens/module_view.dart';
 
 import '../main.dart';
 import '../config/palette.dart';
@@ -64,7 +66,15 @@ class _LoginState extends State<Login> {
       localStorage.setString('primaryCacheKey', primaryCacheKey);
 
       await cacheAllUsers(context);
-      Navigator.of(context).pushReplacementNamed('/modules');
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) {
+          return CustomPersistentBottomNavBar();
+        },
+      ));
+      // pushNewScreen(
+      //   context,
+      //   screen: BottomBar(),
+      // );
     } else {
       localStorage.setBool('isLoggedIn', false);
 

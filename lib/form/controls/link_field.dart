@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/utils/enums.dart';
+import 'package:frappe_app/utils/helpers.dart';
+import 'package:provider/provider.dart';
 
 import './../../utils/backend_service.dart';
 
@@ -55,6 +58,9 @@ class _LinkFieldState extends State<LinkField> {
 
   @override
   Widget build(BuildContext context) {
+    var connectionStatus = Provider.of<ConnectivityStatus>(
+      context,
+    );
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Theme(
@@ -109,13 +115,31 @@ class _LinkFieldState extends State<LinkField> {
           suggestionsCallback: widget.suggestionsCallback ??
               (query) async {
                 var lowercaseQuery = query.toLowerCase();
-                var response = await backendService.searchLink(
-                  widget.doctype,
-                  widget.refDoctype,
-                  lowercaseQuery,
-                );
+                if (connectionStatus == ConnectivityStatus.offline) {
+                  if (getCache('${widget.doctype}LinkFull') != null) {
+                    return getCache('${widget.doctype}LinkFull')["data"]
+                            ["results"]
+                        .where((link) {
+                      return (link["value"] as String)
+                          .toLowerCase()
+                          .contains(lowercaseQuery);
+                    }).toList();
+                  } else if (getCache('$lowercaseQuery${widget.doctype}Link') !=
+                      null) {
+                    return getCache('$lowercaseQuery${widget.doctype}Link')[
+                        "data"]["results"];
+                  } else {
+                    return [];
+                  }
+                } else {
+                  var response = await backendService.searchLink(
+                    doctype: widget.doctype,
+                    refDoctype: widget.refDoctype,
+                    txt: lowercaseQuery,
+                  );
 
-                return response["results"];
+                  return response["results"];
+                }
               },
         ),
       ),

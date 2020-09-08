@@ -34,7 +34,9 @@ class _QueueListState extends State<QueueList> {
 
     return Scaffold(
       backgroundColor: Palette.bgColor,
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text('Queue'),
+      ),
       body: ListView.builder(
         itemCount: queue.length,
         itemBuilder: (context, index) {
@@ -70,12 +72,27 @@ class _QueueListState extends State<QueueList> {
               },
             ),
             title: Text(q['title']),
-            subtitle: Text(q['doctype']),
-            trailing: Text(q["type"]),
+            subtitle: Row(
+              children: [
+                Text(
+                  q['doctype'],
+                ),
+                VerticalDivider(),
+                Text(
+                  q["type"],
+                ),
+              ],
+            ),
+            trailing: IconButton(
+              onPressed: () {
+                queue.deleteAt(index);
+                setState(() {});
+              },
+              icon: Icon(Icons.clear),
+            ),
             onTap: () {
               q["qIdx"] = index;
-              Navigator.push(
-                context,
+              Navigator.of(context, rootNavigator: true).push(
                 MaterialPageRoute(
                   builder: (context) {
                     return Router(

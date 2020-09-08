@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:frappe_app/screens/custom_persistent_bottom_nav_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -67,7 +68,7 @@ class _FrappeAppState extends State<FrappeApp> {
           },
           child: Scaffold(
             body: _isLoaded
-                ? _isLoggedIn ? ModuleView() : Login()
+                ? _isLoggedIn ? CustomPersistentBottomNavBar() : Login()
                 : Center(
                     child: CircularProgressIndicator(),
                   ),
