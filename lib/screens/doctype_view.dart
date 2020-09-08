@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frappe_app/main.dart';
+import 'package:frappe_app/screens/activate_modules.dart';
 import 'package:frappe_app/screens/settings.dart';
 import 'package:frappe_app/utils/http.dart';
 import 'package:frappe_app/widgets/frappe_button.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:provider/provider.dart';
 
 import '../app.dart';
@@ -57,32 +59,37 @@ class _DoctypeViewState extends State<DoctypeView> {
         elevation: 0.6,
         title: Text(widget.module),
       ),
-      body: FutureBuilder(
-        future: _getData(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            var doctypesWidget = getActivatedDoctypes(
-              snapshot.data,
-              widget.module,
-            );
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {});
+        },
+        child: FutureBuilder(
+          future: _getData(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              var doctypesWidget = getActivatedDoctypes(
+                snapshot.data,
+                widget.module,
+              );
 
-            if (doctypesWidget.isEmpty) {
-              return Container(
-                color: Colors.white,
-                height: double.infinity,
-                width: double.infinity,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                        'No Doctypes are yet Activated or you dont have permission'),
-                    FrappeFlatButton(
+              if (doctypesWidget.isEmpty) {
+                return Container(
+                  color: Colors.white,
+                  height: double.infinity,
+                  width: double.infinity,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'No Doctypes are yet Activated or you dont have permission',
+                      ),
+                      FrappeFlatButton(
                         onPressed: () async {
                           var nav = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) {
-                                return Settings();
+                                return ActivateModules();
                               },
                             ),
                           );
@@ -92,50 +99,62 @@ class _DoctypeViewState extends State<DoctypeView> {
                           }
                         },
                         title: 'Activate Doctypes',
-                        buttonType: ButtonType.primary)
-                  ],
-                ),
+                        buttonType: ButtonType.primary,
+                      )
+                    ],
+                  ),
+                );
+              }
+              doctypesWidget = doctypesWidget.map<Widget>((m) {
+                return Padding(
+                  padding: const EdgeInsets.only(
+                    left: 10.0,
+                    right: 10.0,
+                    top: 8.0,
+                  ),
+                  child: CardListTile(
+                    title: Text(m["label"]),
+                    onTap: () async {
+                      await processData(
+                          doctype: m["name"],
+                          context: context,
+                          offline: offline);
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) {
+                      //       return Router(
+                      //         doctype: m["name"],
+                      //         viewType: ViewType.list,
+                      //       );
+                      //     },
+                      //   ),
+                      // );
+                      pushNewScreen(
+                        context,
+                        screen: Router(
+                          doctype: m["name"],
+                          viewType: ViewType.list,
+                        ),
+                        withNavBar: false,
+                      );
+                    },
+                  ),
+                );
+              }).toList();
+              return ListView(
+                children: doctypesWidget,
               );
+            } else if (snapshot.hasError) {
+              return Text("${snapshot.error}");
             }
-            doctypesWidget = doctypesWidget.map<Widget>((m) {
-              return Padding(
-                padding: const EdgeInsets.only(
-                  left: 10.0,
-                  right: 10.0,
-                  top: 8.0,
-                ),
-                child: CardListTile(
-                  title: Text(m["label"]),
-                  onTap: () async {
-                    await processData(
-                        doctype: m["name"], context: context, offline: offline);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return Router(
-                            doctype: m["name"],
-                            viewType: ViewType.list,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                ),
-              );
-            }).toList();
-            return ListView(
-              children: doctypesWidget,
+            return Container(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
             );
-          } else if (snapshot.hasError) {
-            return Text("${snapshot.error}");
-          }
-          return Container(
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        },
+          },
+        ),
       ),
     );
   }

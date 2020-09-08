@@ -6,7 +6,6 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 
 import '../widgets/section.dart';
 import '../widgets/custom_expansion_tile.dart';
@@ -27,12 +26,21 @@ logout(context) async {
 
   localStorage.setBool('isLoggedIn', false);
 
-  Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (context) => FrappeApp(),
-      ),
-      (Route<dynamic> route) => false);
+  Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+    MaterialPageRoute(
+      builder: (BuildContext context) {
+        return FrappeApp();
+      },
+    ),
+    (_) => false,
+  );
+
+  // Navigator.pushAndRemoveUntil(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => FrappeApp(),
+  //     ),
+  //     (Route<dynamic> route) => false);
 }
 
 Future processData({
@@ -730,6 +738,11 @@ getCache(String secondaryKey) {
   return cache.get(k);
 }
 
+cacheModule(String module, context) async {
+  putCache('module$module', module);
+  await cacheDoctypes(module, context);
+}
+
 cacheDoctypes(String module, context) async {
   var doctypes = await BackendService(context).getDesktopPage(module, context);
 
@@ -744,6 +757,7 @@ cacheDocList(String doctype, context) async {
   var backendService = BackendService(context);
   var docMeta = await backendService.getDoctype(doctype);
   docMeta = docMeta["docs"][0];
+  await cacheLinkFields(docMeta, context);
   var docList = await BackendService(context, meta: docMeta).fetchList(
     fieldnames: generateFieldnames(doctype, docMeta),
     doctype: doctype,
@@ -753,6 +767,19 @@ cacheDocList(String doctype, context) async {
 
   for (var doc in docList) {
     await cacheForm(doctype, doc["name"], context);
+  }
+}
+
+cacheLinkFields(Map meta, context) async {
+  var linkFieldDoctypes = meta["fields"]
+      .where((d) => d["fieldtype"] == 'Link')
+      .map((d) => d["options"])
+      .toList();
+  for (var doctype in linkFieldDoctypes) {
+    await BackendService(context).searchLink(
+      doctype: doctype,
+      pageLength: 9999,
+    );
   }
 }
 

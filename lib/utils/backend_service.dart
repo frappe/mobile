@@ -426,18 +426,32 @@ class BackendService {
     }
   }
 
-  Future<Map> searchLink(String doctype, String refDoctype, String txt) async {
+  Future<Map> searchLink({
+    String doctype,
+    String refDoctype,
+    String txt,
+    int pageLength,
+  }) async {
     var queryParams = {
       'txt': txt,
       'doctype': doctype,
       'reference_doctype': refDoctype,
-      'ignore_user_permissions': 0
+      'ignore_user_permissions': 0,
     };
+
+    if (pageLength != null) {
+      queryParams['page_length'] = pageLength;
+    }
 
     final response = await dio.post('/method/frappe.desk.search.search_link',
         data: queryParams,
         options: Options(contentType: Headers.formUrlEncodedContentType));
     if (response.statusCode == 200) {
+      if (pageLength != null && pageLength == 9999) {
+        putCache('${doctype}LinkFull', response.data);
+      } else {
+        putCache('$txt${doctype}Link', response.data);
+      }
       return response.data;
     } else {
       throw Exception('Failed to load album');
