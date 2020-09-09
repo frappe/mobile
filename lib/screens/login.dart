@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/screens/custom_persistent_bottom_nav_bar.dart';
-import 'package:frappe_app/screens/module_view.dart';
 
 import '../main.dart';
 import '../config/palette.dart';
