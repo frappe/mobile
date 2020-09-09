@@ -322,9 +322,6 @@ class _CustomListViewState extends State<CustomListView> {
                     itemCount: list.length,
                     itemBuilder: (context, index) {
                       return _generateItem(list[index]);
-                      return ListTile(
-                        title: Text('dummy'),
-                      );
                     },
                   );
                 }),

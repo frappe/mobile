@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/form/controls/autocomplete.dart';
 
-import '../form/controls/link_field.dart';
 import '../utils/backend_service.dart';
 import '../widgets/card_list_tile.dart';
 

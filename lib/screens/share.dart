@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/form/controls/control.dart';
 
 import '../form/controls/link_field.dart';
 import '../utils/backend_service.dart';
@@ -81,7 +82,6 @@ class _ShareState extends State<Share> {
     shares.asMap().entries.forEach(
       (entry) {
         var share = entry.value;
-        var index = entry.key;
 
         if (share["everyone"] == 1) {
           fields.insert(

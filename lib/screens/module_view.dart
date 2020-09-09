@@ -2,12 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frappe_app/screens/activate_modules.dart';
-import 'package:frappe_app/screens/queue.dart';
-import 'package:frappe_app/screens/settings.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/http.dart';
 import 'package:frappe_app/widgets/frappe_button.dart';
-import 'package:frappe_app/widgets/user_avatar.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -25,7 +22,6 @@ class ModuleView extends StatefulWidget {
 
 class _ModuleViewState extends State<ModuleView> {
   final userId = Uri.decodeFull(localStorage.getString('userId'));
-  static const popupOptions = const ["Settings", "Logout", "Queue"];
   BackendService backendService;
 
   @override
@@ -47,34 +43,6 @@ class _ModuleViewState extends State<ModuleView> {
     }
   }
 
-  void _choiceAction(String choice, context) async {
-    if (choice == "Logout") {
-      logout(context);
-    } else if (choice == "Settings") {
-      // var nav = await Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) {
-      //       return Settings();
-      //     },
-      //   ),
-      // );
-
-      // if (nav) {
-      //   setState(() {});
-      // }
-    } else if (choice == "Queue") {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) {
-            return QueueList();
-          },
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,20 +50,6 @@ class _ModuleViewState extends State<ModuleView> {
       appBar: AppBar(
         title: Text('Modules'),
         elevation: 0,
-        leading: PopupMenuButton<String>(
-          onSelected: (choice) => _choiceAction(choice, context),
-          icon: UserAvatar(
-            uid: userId,
-          ),
-          itemBuilder: (BuildContext context) {
-            return popupOptions.map((String choice) {
-              return PopupMenuItem<String>(
-                value: choice,
-                child: Text(choice),
-              );
-            }).toList();
-          },
-        ),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
