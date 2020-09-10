@@ -116,10 +116,9 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
           SmallText(
             value: value,
+            withLabel: withLabel,
             attribute: field["fieldname"],
-            validators: [
-              FormBuilderValidators.required(),
-            ],
+            validators: validators,
           ),
           withLabel,
           field["label"],
@@ -146,9 +145,9 @@ Widget makeControl({
       {
         fieldWidget = buildDecoratedWidget(
             Check(
+              key: UniqueKey(),
               value: value == 1,
               onChanged: onChanged,
-              key: UniqueKey(),
               attribute: field["fieldname"],
               label: field["label"],
               validators: validators,
