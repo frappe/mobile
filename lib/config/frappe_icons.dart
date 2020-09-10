@@ -16,4 +16,9 @@ class FrappeIcons {
   static const tag = '$_basePath/tag.svg';
   static const review = '$_basePath/review.svg';
   static const share = '$_basePath/share.svg';
+  static const info = '$_basePath/info.svg';
+  static const success = '$_basePath/success.svg';
+  static const warning = '$_basePath/warning.svg';
+  static const question = '$_basePath/question.svg';
+  static const error = '$_basePath/error.svg';
 }
