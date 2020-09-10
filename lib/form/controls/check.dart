@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/config/palette.dart';
+
+import '../../config/frappe_palette.dart';
+import '../../config/palette.dart';
+import '../../widgets/custom_form_builder_checkbox.dart';
 
 class Check extends StatelessWidget {
   final Key key;
@@ -25,10 +27,12 @@ class Check extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FormBuilderCheckbox(
+    return CustomFormBuilderCheckbox(
+      key: key,
       valueTransformer: (val) {
         return val == true ? 1 : 0;
       },
+      activeColor: FrappePalette.blue,
       leadingInput: true,
       initialValue: value == 1,
       onChanged: onChanged != null
@@ -37,7 +41,6 @@ class Check extends StatelessWidget {
               onChanged(val);
             }
           : null,
-      key: UniqueKey(),
       attribute: attribute,
       label: Text(label),
       decoration: Palette.formFieldDecoration(
