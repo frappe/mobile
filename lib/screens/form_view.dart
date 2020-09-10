@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/screens/no_internet.dart';
 import 'package:frappe_app/utils/backend_service.dart';
 import 'package:frappe_app/utils/frappe_alert.dart';
 import 'package:frappe_app/utils/indicator.dart';
@@ -69,7 +70,16 @@ class _FormViewState extends State<FormView>
       if (connectionStatus == ConnectivityStatus.offline) {
         return Future.delayed(
           Duration(seconds: 1),
-          () => getCache('${widget.doctype}${widget.name}')["data"],
+          () {
+            var response = getCache('${widget.doctype}${widget.name}');
+            if (response != null) {
+              return response["data"];
+            } else {
+              return {
+                "success": false,
+              };
+            }
+          },
         );
       } else {
         return backendService.getdoc(
@@ -118,6 +128,9 @@ class _FormViewState extends State<FormView>
         future: _getData(connectionStatus),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            if (snapshot.data["success"] == false) {
+              return NoInternet();
+            }
             var docs = snapshot.data["docs"];
             var docInfo = snapshot.data["docinfo"];
             var builderContext;
