@@ -68,9 +68,9 @@ class FrappeAlert {
   }
 
   static infoAlert({
-    String title,
+    @required String title,
     String subtitle,
-    BuildContext context,
+    @required BuildContext context,
   }) {
     FrappeAlert.showAlert(
       icon: FrappeIcons.info,
@@ -82,9 +82,9 @@ class FrappeAlert {
   }
 
   static warnAlert({
-    String title,
+    @required String title,
     String subtitle,
-    BuildContext context,
+    @required BuildContext context,
   }) {
     FrappeAlert.showAlert(
       icon: FrappeIcons.warning,
@@ -96,9 +96,9 @@ class FrappeAlert {
   }
 
   static errorAlert({
-    String title,
+    @required String title,
     String subtitle,
-    BuildContext context,
+    @required BuildContext context,
   }) {
     FrappeAlert.showAlert(
       icon: FrappeIcons.error,
@@ -110,9 +110,9 @@ class FrappeAlert {
   }
 
   static successAlert({
-    String title,
+    @required String title,
     String subtitle,
-    BuildContext context,
+    @required BuildContext context,
   }) {
     FrappeAlert.showAlert(
       icon: FrappeIcons.success,

@@ -114,24 +114,15 @@ class _DoctypeViewState extends State<DoctypeView> {
                           doctype: m["name"],
                           context: context,
                           offline: offline);
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) {
-                      //       return Router(
-                      //         doctype: m["name"],
-                      //         viewType: ViewType.list,
-                      //       );
-                      //     },
-                      //   ),
-                      // );
-                      pushNewScreen(
-                        context,
-                        screen: Router(
-                          doctype: m["name"],
-                          viewType: ViewType.list,
+                      Navigator.of(context, rootNavigator: true).push(
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return Router(
+                              doctype: m["name"],
+                              viewType: ViewType.list,
+                            );
+                          },
                         ),
-                        withNavBar: false,
                       );
                     },
                   ),
