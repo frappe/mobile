@@ -43,7 +43,13 @@ Future processData({
   var meta;
 
   if (offline) {
-    meta = getCache('${doctype}Meta')["data"];
+    meta = getCache('${doctype}Meta');
+    if (meta == null) {
+      return {
+        "success": false,
+      };
+    }
+    meta = meta["data"];
   } else {
     meta = await BackendService(context).getDoctype(doctype);
   }

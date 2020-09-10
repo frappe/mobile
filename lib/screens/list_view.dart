@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/screens/filter_list.dart';
+import 'package:frappe_app/screens/no_internet.dart';
 import 'package:frappe_app/utils/backend_service.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/utils/helpers.dart';
@@ -316,15 +317,23 @@ class _CustomListViewState extends State<CustomListView> {
                     return _generateItem(entry);
                   }),
                 )
-              : Builder(builder: (buildContext) {
-                  var list = getCache('${widget.doctype}List')["data"];
-                  return ListView.builder(
-                    itemCount: list.length,
-                    itemBuilder: (context, index) {
-                      return _generateItem(list[index]);
-                    },
-                  );
-                }),
+              : Builder(
+                  builder: (buildContext) {
+                    var list = getCache('${widget.doctype}List');
+
+                    if (list != null) {
+                      list = list["data"];
+                      return ListView.builder(
+                        itemCount: list.length,
+                        itemBuilder: (context, index) {
+                          return _generateItem(list[index]);
+                        },
+                      );
+                    } else {
+                      return NoInternet();
+                    }
+                  },
+                ),
         ),
       ),
     );

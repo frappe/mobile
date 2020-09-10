@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/screens/activate_modules.dart';
+import 'package:frappe_app/screens/no_internet.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/http.dart';
 import 'package:frappe_app/widgets/frappe_button.dart';
@@ -38,8 +39,16 @@ class _ModuleViewState extends State<ModuleView> {
     );
 
     if (connectionStatus == ConnectivityStatus.offline) {
-      return Future.delayed(
-          Duration(seconds: 1), () => getCache('deskSidebarItems')["data"]);
+      return Future.delayed(Duration(seconds: 1), () {
+        var response = getCache('deskSidebarItems');
+        if (response != null) {
+          return response["data"];
+        } else {
+          return {
+            "success": false,
+          };
+        }
+      });
     } else {
       return backendService.getDeskSideBarItems(context);
     }
@@ -61,6 +70,9 @@ class _ModuleViewState extends State<ModuleView> {
           future: _getData(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
+              if (snapshot.data["success"] == false) {
+                return NoInternet();
+              }
               var activeModules;
               if (localStorage.containsKey("${baseUrl}activeModules")) {
                 activeModules = Map<String, List>.from(

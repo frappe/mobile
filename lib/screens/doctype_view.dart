@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/screens/activate_modules.dart';
+import 'package:frappe_app/screens/no_internet.dart';
 import 'package:frappe_app/widgets/frappe_button.dart';
-import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:provider/provider.dart';
 
 import '../app.dart';
@@ -110,20 +110,32 @@ class _DoctypeViewState extends State<DoctypeView> {
                   child: CardListTile(
                     title: Text(m["label"]),
                     onTap: () async {
-                      await processData(
-                          doctype: m["name"],
-                          context: context,
-                          offline: offline);
-                      Navigator.of(context, rootNavigator: true).push(
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return Router(
-                              doctype: m["name"],
-                              viewType: ViewType.list,
-                            );
-                          },
-                        ),
+                      var response = await processData(
+                        doctype: m["name"],
+                        context: context,
+                        offline: offline,
                       );
+
+                      if (response["success"] == false) {
+                        Navigator.of(context, rootNavigator: true).push(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return NoInternet();
+                            },
+                          ),
+                        );
+                      } else {
+                        Navigator.of(context, rootNavigator: true).push(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return Router(
+                                doctype: m["name"],
+                                viewType: ViewType.list,
+                              );
+                            },
+                          ),
+                        );
+                      }
                     },
                   ),
                 );
