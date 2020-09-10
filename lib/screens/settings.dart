@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/main.dart';
 
 import '../config/palette.dart';
 import '../screens/activate_modules.dart';
@@ -14,7 +15,16 @@ class SettingsPage extends StatelessWidget {
       ),
       backgroundColor: Palette.bgColor,
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Container(
+          //   child: Text(localStorage.getString('user')),
+          //   color: Palette.bgColor,
+          // ),
+          // Container(
+          //   child: Text(localStorage.getString('serverURL')),
+          //   color: Palette.bgColor,
+          // ),
           CardListTile(
             title: Text('Activate Modules'),
             onTap: () {

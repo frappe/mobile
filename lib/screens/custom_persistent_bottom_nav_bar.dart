@@ -19,7 +19,11 @@ class CustomPersistentBottomNavBar extends StatelessWidget {
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
       PersistentBottomNavBarItem(
-        icon: Icon(Icons.home),
+        activeColor: Colors.black54,
+        icon: Icon(
+          Icons.home,
+          color: Colors.black54,
+        ),
         title: "Home",
       ),
       PersistentBottomNavBarItem(
@@ -31,11 +35,19 @@ class CustomPersistentBottomNavBar extends StatelessWidget {
         //   ),
         // ),
         // TODO
-        icon: Icon(Icons.cloud_queue),
+        activeColor: Colors.black54,
+        icon: Icon(
+          Icons.cloud_queue,
+          color: Colors.black54,
+        ),
         title: "Queue",
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(Icons.settings),
+        activeColor: Colors.black54,
+        icon: Icon(
+          Icons.settings,
+          color: Colors.black54,
+        ),
         title: "Settings",
       ),
     ];

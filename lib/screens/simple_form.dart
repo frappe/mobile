@@ -3,6 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/main.dart';
 import 'package:frappe_app/utils/backend_service.dart';
 import 'package:frappe_app/utils/enums.dart';
+import 'package:frappe_app/utils/frappe_alert.dart';
 import 'package:frappe_app/widgets/custom_form.dart';
 import 'package:frappe_app/widgets/frappe_button.dart';
 import 'package:provider/provider.dart';
@@ -57,7 +58,11 @@ class _SimpleFormState extends State<SimpleForm> {
                       "data": [formValue],
                     });
 
-                    print('added to queue');
+                    FrappeAlert.infoAlert(
+                      title: 'No Internet Connection',
+                      subtitle: 'Added to Queue',
+                      context: context,
+                    );
                   } else {
                     var response = await backendService.saveDocs(
                       widget.meta["name"],

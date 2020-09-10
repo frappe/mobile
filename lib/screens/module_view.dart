@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/screens/activate_modules.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/http.dart';
 import 'package:frappe_app/widgets/frappe_button.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../main.dart';
 import '../config/palette.dart';
@@ -119,38 +121,39 @@ class _ModuleViewState extends State<ModuleView> {
                 return Padding(
                   padding:
                       const EdgeInsets.only(left: 10.0, right: 10.0, top: 8.0),
-                  child: CardListTile(
-                    title: Text(m["label"]),
-                    trailing: IconButton(
-                      padding: EdgeInsets.zero,
-                      icon: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.file_download,
-                          ),
-                          Text(
-                            syncDate,
-                            style: TextStyle(fontSize: 10),
-                          )
-                        ],
+                  child: Slidable(
+                    actionPane: SlidableDrawerActionPane(),
+                    secondaryActions: <Widget>[
+                      IconSlideAction(
+                        caption: syncDate,
+                        color: FrappePalette.blue,
+                        icon: Icons.sync,
                       ),
-                      onPressed: () async {
-                        await cacheModule(m["name"], context);
-                        showSnackBar('${m["name"]} is downloaded', context);
-                        setState(() {});
+                    ],
+                    child: CardListTile(
+                      title: Text(m["label"]),
+                      trailing: IconButton(
+                        padding: EdgeInsets.zero,
+                        icon: Icon(
+                          Icons.file_download,
+                        ),
+                        onPressed: () async {
+                          await cacheModule(m["name"], context);
+                          showSnackBar('${m["name"]} is downloaded', context);
+                          setState(() {});
+                        },
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return DoctypeView(m["name"]);
+                            },
+                          ),
+                        );
                       },
                     ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return DoctypeView(m["name"]);
-                          },
-                        ),
-                      );
-                    },
                   ),
                 );
               }).toList();

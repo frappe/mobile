@@ -17,6 +17,7 @@ environment:
   sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
+  flutter_slidable: ^0.5.7
   fluttertoast: ^7.0.4
   persistent_bottom_nav_bar: ^2.0.5
   hive: ^1.4.4
