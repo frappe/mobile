@@ -26,7 +26,7 @@ class _AddTagsState extends State<AddTags> {
   @override
   void initState() {
     super.initState();
-    backendService = BackendService(context);
+    backendService = BackendService();
   }
 
   List<Widget> _generateChildren() {

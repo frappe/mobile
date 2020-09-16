@@ -394,6 +394,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "7.0.4"
+  get_it:
+    dependency: "direct main"
+    description:
+      name: get_it
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "5.0.0"
   glob:
     dependency: transitive
     description:
@@ -966,6 +973,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.3.22+1"
+  workmanager:
+    dependency: "direct main"
+    description:
+      name: workmanager
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.3"
   xdg_directories:
     dependency: transitive
     description:

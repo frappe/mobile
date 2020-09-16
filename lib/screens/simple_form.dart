@@ -25,7 +25,7 @@ class _SimpleFormState extends State<SimpleForm> {
   @override
   void initState() {
     super.initState();
-    backendService = BackendService(context);
+    backendService = BackendService();
   }
 
   @override

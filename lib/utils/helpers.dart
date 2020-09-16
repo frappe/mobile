@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:frappe_app/form/controls/control.dart';
+import 'package:frappe_app/service_locator.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -18,21 +20,23 @@ import '../main.dart';
 import '../app.dart';
 import './http.dart';
 
-logout(context) async {
+logout() async {
   var cookieJar = await getCookiePath();
 
   cookieJar.delete(uri);
 
   localStorage.setBool('isLoggedIn', false);
 
-  Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-    MaterialPageRoute(
-      builder: (BuildContext context) {
-        return FrappeApp();
-      },
-    ),
-    (_) => false,
-  );
+  // navigatorKey.currentState.pushAndRemoveUntil(
+  //   MaterialPageRoute(
+  //     builder: (BuildContext context) {
+  //       return FrappeApp();
+  //     },
+  //   ),
+  //   (_) => false,
+  // );
+
+  locator<NavigationService>().navigateTo('login');
 }
 
 Future processData({
@@ -51,7 +55,7 @@ Future processData({
     }
     meta = meta["data"];
   } else {
-    meta = await BackendService(context).getDoctype(doctype);
+    meta = await BackendService().getDoctype(doctype);
   }
 
   List metaFields = meta["docs"][0]["fields"];
@@ -420,6 +424,7 @@ getActivatedDoctypes(Map doctypes, String module) {
     ),
   );
   var activeDoctypes = [];
+  // TODO
 
   doctypes["message"]["cards"]["items"].forEach((item) {
     activeDoctypes.addAll(item["links"]);
@@ -454,7 +459,7 @@ cacheModule(String module, context) async {
 }
 
 cacheDoctypes(String module, context) async {
-  var doctypes = await BackendService(context).getDesktopPage(module, context);
+  var doctypes = await BackendService().getDesktopPage(module, context);
 
   var activeDoctypes = getActivatedDoctypes(doctypes, module);
 
@@ -464,11 +469,11 @@ cacheDoctypes(String module, context) async {
 }
 
 cacheDocList(String doctype, context) async {
-  var backendService = BackendService(context);
+  var backendService = BackendService();
   var docMeta = await backendService.getDoctype(doctype);
   docMeta = docMeta["docs"][0];
   await cacheLinkFields(docMeta, context);
-  var docList = await BackendService(context, meta: docMeta).fetchList(
+  var docList = await BackendService(meta: docMeta).fetchList(
     fieldnames: generateFieldnames(doctype, docMeta),
     doctype: doctype,
     pageLength: 50,
@@ -486,7 +491,7 @@ cacheLinkFields(Map meta, context) async {
       .map((d) => d["options"])
       .toList();
   for (var doctype in linkFieldDoctypes) {
-    await BackendService(context).searchLink(
+    await BackendService().searchLink(
       doctype: doctype,
       pageLength: 9999,
     );
@@ -494,5 +499,5 @@ cacheLinkFields(Map meta, context) async {
 }
 
 cacheForm(String doctype, String name, context) async {
-  await BackendService(context).getdoc(doctype, name);
+  await BackendService().getdoc(doctype, name);
 }

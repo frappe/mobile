@@ -124,7 +124,7 @@ class _ActivateModulesState extends State<ActivateModules> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Settings'),
+          title: Text('Activate Modules'),
           actions: [
             IconButton(
               icon: FrappeIcon(
@@ -156,7 +156,7 @@ class _ActivateModulesState extends State<ActivateModules> {
           ),
         ),
         body: FutureBuilder(
-          future: BackendService(context).fetchList(
+          future: BackendService().fetchList(
             fieldnames: [
               "`tabDocType`.`name`",
               "`tabDocType`.`module`",

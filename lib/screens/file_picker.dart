@@ -34,7 +34,7 @@ class _FilePickerState extends State<CustomFilePicker> {
   @override
   void initState() {
     super.initState();
-    backendService = BackendService(context);
+    backendService = BackendService();
   }
 
   void _openFileExplorer() async {

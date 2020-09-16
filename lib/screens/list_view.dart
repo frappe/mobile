@@ -51,7 +51,7 @@ class _CustomListViewState extends State<CustomListView> {
   @override
   void initState() {
     super.initState();
-    backendService = BackendService(context, meta: widget.meta);
+    backendService = BackendService(meta: widget.meta);
   }
 
   @override
@@ -376,7 +376,7 @@ class CustomSearch extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     return FutureBuilder(
-      future: BackendService(context, meta: data.meta).fetchList(
+      future: BackendService(meta: data.meta).fetchList(
           pageLength: 10,
           fieldnames: data.fieldnames,
           doctype: data.doctype,

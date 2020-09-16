@@ -25,7 +25,7 @@ class _LikeDocState extends State<LikeDoc> {
   @override
   void initState() {
     super.initState();
-    backendService = BackendService(context);
+    backendService = BackendService();
   }
 
   _toggleFav() async {

@@ -23,7 +23,7 @@ class _MultiSelectState extends State<MultiSelect> {
   @override
   void initState() {
     super.initState();
-    backendService = BackendService(context);
+    backendService = BackendService();
   }
 
   @override

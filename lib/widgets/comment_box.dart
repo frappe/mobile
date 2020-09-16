@@ -45,7 +45,7 @@ class CommentBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BackendService backendService = BackendService(context);
+    BackendService backendService = BackendService();
     var time = timeago.format(DateTime.parse(data["creation"]));
 
     return Card(

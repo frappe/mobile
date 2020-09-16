@@ -26,7 +26,7 @@ class _DoctypeViewState extends State<DoctypeView> {
 
   @override
   void initState() {
-    backendService = BackendService(context);
+    backendService = BackendService();
 
     super.initState();
   }

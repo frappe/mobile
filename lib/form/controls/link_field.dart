@@ -53,7 +53,7 @@ class _LinkFieldState extends State<LinkField> {
   @override
   void initState() {
     super.initState();
-    backendService = BackendService(context);
+    backendService = BackendService();
   }
 
   @override

@@ -3,19 +3,14 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:frappe_app/main.dart';
-import 'package:provider/provider.dart';
 
-import 'enums.dart';
 import 'helpers.dart';
 import 'http.dart';
 
 class BackendService {
-  final BuildContext context;
   final Map meta;
 
-  BackendService(
-    this.context, {
+  BackendService({
     this.meta,
   });
 
@@ -39,7 +34,7 @@ class BackendService {
       putCache('$doctype$name', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
-      logout(context);
+      logout();
     } else {
       throw Exception('Failed to load album');
     }
@@ -59,7 +54,7 @@ class BackendService {
     if (response.statusCode == 200) {
       return response;
     } else if (response.statusCode == 403) {
-      logout(context);
+      logout();
     } else {
       throw Exception('Failed to load album');
     }
@@ -131,7 +126,7 @@ class BackendService {
 
       return newL;
     } else if (response.statusCode == 403) {
-      logout(context);
+      logout();
     } else {
       throw Exception('Failed to load album');
     }
@@ -173,7 +168,7 @@ class BackendService {
       putCache('${module}Doctypes', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
-      logout(context);
+      logout();
     } else {
       throw Exception('Failed to load album');
     }
@@ -244,7 +239,7 @@ class BackendService {
       putCache('deskSidebarItems', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
-      logout(context);
+      logout();
     } else {
       throw Exception('Failed to load album');
     }
@@ -267,7 +262,7 @@ class BackendService {
       putCache('${doctype}Meta', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
-      logout(context);
+      logout();
     } else {
       throw Exception('Failed to load album');
     }
