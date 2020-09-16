@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frappe_app/screens/custom_persistent_bottom_nav_bar.dart';
+import 'package:frappe_app/service_locator.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -52,6 +54,15 @@ class _FrappeAppState extends State<FrappeApp> {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Frappe',
+        navigatorKey: locator<NavigationService>().navigatorKey,
+        onGenerateRoute: (routeSettings) {
+          switch (routeSettings.name) {
+            case 'login':
+              return MaterialPageRoute(builder: (context) => Login());
+            default:
+              return MaterialPageRoute(builder: (context) => FrappeApp());
+          }
+        },
         theme: new ThemeData(
           textTheme: GoogleFonts.interTextTheme(
             Theme.of(context).textTheme.apply(

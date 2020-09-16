@@ -5,11 +5,13 @@ import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/screens/activate_modules.dart';
 import 'package:frappe_app/screens/no_internet.dart';
 import 'package:frappe_app/utils/enums.dart';
+import 'package:frappe_app/utils/frappe_alert.dart';
 import 'package:frappe_app/utils/http.dart';
 import 'package:frappe_app/widgets/frappe_button.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:workmanager/workmanager.dart';
 
 import '../main.dart';
 import '../config/palette.dart';
@@ -29,7 +31,7 @@ class _ModuleViewState extends State<ModuleView> {
 
   @override
   void initState() {
-    backendService = BackendService(context);
+    backendService = BackendService();
     super.initState();
   }
 
@@ -61,6 +63,23 @@ class _ModuleViewState extends State<ModuleView> {
       appBar: AppBar(
         title: Text('Modules'),
         elevation: 0,
+        // actions: [
+        //   FlatButton(
+        //       child: Text("1"),
+        //       onPressed: () {
+        //         Workmanager.registerOneOffTask(
+        //           "1",
+        //           simpleTaskKey,
+        //           inputData: <String, dynamic>{
+        //             'int': 1,
+        //             'bool': true,
+        //             'double': 1.0,
+        //             'string': 'string',
+        //             'array': [1, 2, 3],
+        //           },
+        //         );
+        //       }),
+        // ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -151,7 +170,10 @@ class _ModuleViewState extends State<ModuleView> {
                         ),
                         onPressed: () async {
                           await cacheModule(m["name"], context);
-                          showSnackBar('${m["name"]} is downloaded', context);
+                          FrappeAlert.infoAlert(
+                            title: '${m["name"]} is Downloaded',
+                            context: context,
+                          );
                           setState(() {});
                         },
                       ),

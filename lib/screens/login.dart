@@ -26,7 +26,7 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    backendService = BackendService(context);
+    backendService = BackendService();
     serverURL = localStorage.getString('serverURL');
     savedUsr = localStorage.getString('usr');
     savedPwd = localStorage.getString('pwd');
@@ -35,11 +35,11 @@ class _LoginState extends State<Login> {
   _authenticate(data) async {
     await setBaseUrl(data["serverURL"]);
 
-    Scaffold.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Logging In'),
-      ),
-    );
+    // Scaffold.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text('Logging In'),
+    //   ),
+    // );
 
     var response2 =
         await backendService.login(data["usr"].trimRight(), data["pwd"]);

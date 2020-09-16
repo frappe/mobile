@@ -48,7 +48,7 @@ class _AutoCompleteState extends State<AutoComplete> {
   @override
   void initState() {
     super.initState();
-    backendService = BackendService(context);
+    backendService = BackendService();
   }
 
   @override

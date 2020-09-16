@@ -17,7 +17,7 @@ class CommentInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var backendService = BackendService(context);
+    var backendService = BackendService();
     TextEditingController _input = TextEditingController();
     return Scaffold(
       appBar: AppBar(

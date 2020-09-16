@@ -34,7 +34,7 @@ class _AssigneesState extends State<Assignees> {
   @override
   void initState() {
     super.initState();
-    backendService = BackendService(context);
+    backendService = BackendService();
     _futureVal =
         Future.delayed(Duration(seconds: 0), () => {"docinfo": widget.docInfo});
   }

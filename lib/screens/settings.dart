@@ -41,7 +41,7 @@ class SettingsPage extends StatelessWidget {
           CardListTile(
             title: Text('Logout'),
             onTap: () {
-              logout(context);
+              logout();
             },
           ),
         ],

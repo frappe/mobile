@@ -31,7 +31,7 @@ class _EmailFormState extends State<EmailForm> {
   @override
   void initState() {
     super.initState();
-    backendService = BackendService(context);
+    backendService = BackendService();
     wireframe = {
       "doctype": "communication",
       "fields": [

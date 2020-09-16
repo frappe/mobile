@@ -41,7 +41,7 @@ void cacheAllUsers(context) async {
       ["User", "enabled", "=", 1]
     ];
 
-    var res = await BackendService(context).fetchList(
+    var res = await BackendService().fetchList(
       fieldnames: fieldNames,
       doctype: 'User',
       filters: filters,

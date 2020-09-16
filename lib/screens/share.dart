@@ -37,7 +37,7 @@ class _ShareState extends State<Share> {
   @override
   void initState() {
     super.initState();
-    backendService = BackendService(context);
+    backendService = BackendService();
     _futureVal = Future.delayed(
       Duration(seconds: 0),
       () => {

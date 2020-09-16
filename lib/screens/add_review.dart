@@ -33,7 +33,7 @@ class _AddReviewState extends State<AddReview> {
 
   void initState() {
     super.initState();
-    backendService = BackendService(context);
+    backendService = BackendService();
     wireframe = [
       {
         "fieldname": 'to_user',
