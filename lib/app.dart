@@ -1,25 +1,25 @@
-import 'dart:convert';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:frappe_app/screens/custom_persistent_bottom_nav_bar.dart';
-import 'package:frappe_app/service_locator.dart';
-import 'package:frappe_app/services/navigation_service.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import './main.dart';
+import 'utils/cache_helper.dart';
+import 'utils/config_helper.dart';
+import 'utils/enums.dart';
+import 'utils/helpers.dart';
 
-import './utils/enums.dart';
-import './utils/helpers.dart';
+import 'service_locator.dart';
+import 'services/connectivity_service.dart';
+import 'services/navigation_service.dart';
 
-import './services/connectivity_service.dart';
-
-import './screens/filter_list.dart';
-import './screens/form_view.dart';
-import './screens/list_view.dart';
-import './screens/simple_form.dart';
-import './screens/login.dart';
-import './screens/module_view.dart';
+import 'screens/custom_persistent_bottom_nav_bar.dart';
+import 'screens/filter_list.dart';
+import 'screens/form_view.dart';
+import 'screens/list_view.dart';
+import 'screens/simple_form.dart';
+import 'screens/login.dart';
+import 'screens/module_view.dart';
 
 class FrappeApp extends StatefulWidget {
   @override
@@ -37,12 +37,10 @@ class _FrappeAppState extends State<FrappeApp> {
   }
 
   void _checkIfLoggedIn() {
-    if (localStorage.containsKey('isLoggedIn')) {
-      bool loggedIn = localStorage.getBool('isLoggedIn');
-      setState(() {
-        _isLoggedIn = loggedIn;
-      });
-    }
+    setState(() {
+      _isLoggedIn = ConfigHelper().isLoggedIn;
+    });
+
     _isLoaded = true;
   }
 
@@ -119,23 +117,21 @@ class Router extends StatelessWidget {
     return Scaffold(
       body: Builder(
         builder: (context) {
-          var docMeta = json.decode(localStorage.getString('${doctype}Meta'));
+          var docMeta = CacheHelper.getCache('${doctype}Meta')["data"];
           docMeta = docMeta["docs"][0];
 
           if (viewType == ViewType.list) {
             var defaultFilters = [];
             if (filters == null) {
               // cached filters
-              if (localStorage.containsKey('${doctype}Filter')) {
+              // TODO
+              if (CacheHelper.getCache('${doctype}Filter')["data"] != null) {
                 defaultFilters =
-                    json.decode(localStorage.getString('${doctype}Filter'));
-              } else if (localStorage.containsKey('userId')) {
-                defaultFilters.add([
-                  doctype,
-                  "_assign",
-                  "like",
-                  "%${Uri.decodeFull(localStorage.getString('userId'))}%"
-                ]);
+                    CacheHelper.getCache('${doctype}Filter')["data"];
+              } else if (ConfigHelper().userId != null) {
+                defaultFilters.add(
+                  [doctype, "_assign", "like", "%${ConfigHelper().userId}%"],
+                );
               }
             }
 

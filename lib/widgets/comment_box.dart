@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:frappe_app/main.dart';
-import 'package:frappe_app/utils/backend_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
+
+import '../utils/backend_service.dart';
+import '../utils/config_helper.dart';
 
 class CommentBox extends StatelessWidget {
   final Map data;
@@ -55,7 +56,7 @@ class CommentBox extends StatelessWidget {
           ListTile(
             title: Text('${data["owner"]}'),
             subtitle: Text(time),
-            trailing: localStorage.getString('user') == data["owner"]
+            trailing: ConfigHelper().user == data["owner"]
                 ? PopupMenuButton(
                     onSelected: (choice) {
                       _choiceAction(context, backendService, choice);

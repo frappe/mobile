@@ -2,19 +2,23 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
-import 'package:frappe_app/config/frappe_icons.dart';
-import 'package:frappe_app/screens/filter_list.dart';
-import 'package:frappe_app/screens/no_internet.dart';
-import 'package:frappe_app/utils/backend_service.dart';
-import 'package:frappe_app/utils/frappe_icon.dart';
-import 'package:frappe_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../main.dart';
 import '../app.dart';
+
 import '../config/palette.dart';
+import '../config/frappe_icons.dart';
+
+import '../screens/filter_list.dart';
+import '../screens/no_internet.dart';
+
+import '../utils/backend_service.dart';
+import '../utils/config_helper.dart';
+import '../utils/frappe_icon.dart';
+import '../utils/helpers.dart';
 import '../utils/enums.dart';
+
 import '../widgets/frappe_button.dart';
 import '../widgets/list_item.dart';
 
@@ -43,7 +47,7 @@ class CustomListView extends StatefulWidget {
 
 class _CustomListViewState extends State<CustomListView> {
   static const int PAGE_SIZE = 10;
-  final userId = Uri.decodeFull(localStorage.getString('userId'));
+  final userId = ConfigHelper().userId;
   var _pageLoadController;
   BackendService backendService;
   bool showLiked;
@@ -319,10 +323,10 @@ class _CustomListViewState extends State<CustomListView> {
                 )
               : Builder(
                   builder: (buildContext) {
-                    var list = getCache('${widget.doctype}List');
+                    var list = getCache('${widget.doctype}List')["data"];
 
                     if (list != null) {
-                      list = list["data"];
+                      list = list;
                       return ListView.builder(
                         itemCount: list.length,
                         itemBuilder: (context, index) {

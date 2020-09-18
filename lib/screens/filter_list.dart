@@ -1,11 +1,12 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/form/controls/control.dart';
-import 'package:frappe_app/main.dart';
-import 'package:frappe_app/utils/enums.dart';
-import 'package:frappe_app/widgets/frappe_button.dart';
+
+import '../form/controls/control.dart';
+
+import '../widgets/frappe_button.dart';
+
+import '../utils/cache_helper.dart';
+import '../utils/enums.dart';
 
 class FilterList extends StatefulWidget {
   final Function filterCallback;
@@ -33,7 +34,7 @@ class FilterList extends StatefulWidget {
   }
 
   static clearFilters(String doctype) {
-    localStorage.remove(
+    CacheHelper.remove(
       "${doctype}Filter",
     );
   }
@@ -42,8 +43,8 @@ class FilterList extends StatefulWidget {
     var transformedFilters;
     var kIdx;
     var cacheKey = '${doctype}Filter';
-    if (localStorage.containsKey(cacheKey)) {
-      transformedFilters = json.decode(localStorage.getString(cacheKey));
+    if (CacheHelper.getCache(cacheKey)["data"] != null) {
+      transformedFilters = CacheHelper.getCache(cacheKey)["data"];
     } else {
       transformedFilters = [];
     }
@@ -68,9 +69,9 @@ class FilterList extends StatefulWidget {
       }
     });
 
-    localStorage.setString(
+    CacheHelper.putCache(
       cacheKey,
-      json.encode(transformedFilters),
+      transformedFilters,
     );
 
     return transformedFilters;

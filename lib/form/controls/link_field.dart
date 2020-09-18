@@ -116,7 +116,7 @@ class _LinkFieldState extends State<LinkField> {
               (query) async {
                 var lowercaseQuery = query.toLowerCase();
                 if (connectionStatus == ConnectivityStatus.offline) {
-                  if (getCache('${widget.doctype}LinkFull') != null) {
+                  if (getCache('${widget.doctype}LinkFull')["data"] != null) {
                     return getCache('${widget.doctype}LinkFull')["data"]
                             ["results"]
                         .where((link) {
@@ -124,7 +124,8 @@ class _LinkFieldState extends State<LinkField> {
                           .toLowerCase()
                           .contains(lowercaseQuery);
                     }).toList();
-                  } else if (getCache('$lowercaseQuery${widget.doctype}Link') !=
+                  } else if (getCache(
+                          '$lowercaseQuery${widget.doctype}Link')["data"] !=
                       null) {
                     return getCache('$lowercaseQuery${widget.doctype}Link')[
                         "data"]["results"];

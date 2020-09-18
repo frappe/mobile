@@ -7,4 +7,11 @@ class NavigationService {
   Future<dynamic> navigateTo(String routeName) {
     return navigatorKey.currentState.pushNamed(routeName);
   }
+
+  Future<dynamic> clearAllAndNavigateTo(String routeName) {
+    return navigatorKey.currentState.pushNamedAndRemoveUntil(
+      routeName,
+      (_) => false,
+    );
+  }
 }

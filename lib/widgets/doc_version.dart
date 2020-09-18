@@ -8,6 +8,8 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../config/palette.dart';
+
+import '../utils/dio_helper.dart';
 import '../utils/helpers.dart';
 import '../utils/http.dart';
 
@@ -80,7 +82,7 @@ class DocVersion extends StatelessWidget {
           if (await canLaunch(absoluteUrl)) {
             await launch(
               absoluteUrl,
-              headers: {HttpHeaders.cookieHeader: await getCookies()},
+              headers: {HttpHeaders.cookieHeader: await DioHelper.getCookies()},
             );
           } else {
             throw 'Could not launch $url';

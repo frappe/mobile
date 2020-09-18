@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/screens/activate_modules.dart';
-import 'package:frappe_app/screens/no_internet.dart';
-import 'package:frappe_app/widgets/frappe_button.dart';
 import 'package:provider/provider.dart';
 
 import '../app.dart';
+
 import '../config/palette.dart';
+
+import '../screens/activate_modules.dart';
+import '../screens/no_internet.dart';
+
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
+
 import '../widgets/card_list_tile.dart';
+import '../widgets/frappe_button.dart';
 
 class DoctypeView extends StatefulWidget {
   final String module;
@@ -42,7 +46,7 @@ class _DoctypeViewState extends State<DoctypeView> {
           () => getCache('${widget.module}Doctypes')["data"]);
     } else {
       offline = false;
-      return backendService.getDesktopPage(widget.module, context);
+      return backendService.getDesktopPage(widget.module);
     }
   }
 

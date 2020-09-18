@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/app.dart';
-import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/main.dart';
-import 'package:frappe_app/utils/backend_service.dart';
-import 'package:frappe_app/utils/enums.dart';
-import 'package:frappe_app/utils/helpers.dart';
-import 'package:frappe_app/widgets/card_list_tile.dart';
 import 'package:provider/provider.dart';
+
+import '../app.dart';
+
+import '../config/palette.dart';
+
+import '../widgets/card_list_tile.dart';
+
+import '../utils/backend_service.dart';
+import '../utils/enums.dart';
+import '../utils/helpers.dart';
+import '../utils/queue_helper.dart';
 
 class QueueList extends StatefulWidget {
   @override
@@ -42,9 +46,9 @@ class _QueueListState extends State<QueueList> {
           _refresh();
         },
         child: ListView.builder(
-          itemCount: queue.length,
+          itemCount: QueueHelper.queueLength,
           itemBuilder: (context, index) {
-            var q = queue.getAt(index);
+            var q = QueueHelper.getAt(index);
             return CardListTile(
               leading: IconButton(
                 icon: Icon(Icons.cloud_upload),
@@ -58,7 +62,7 @@ class _QueueListState extends State<QueueList> {
                         q["doctype"], q["data"][0]);
 
                     if (response.statusCode == 200) {
-                      queue.deleteAt(index);
+                      QueueHelper.deleteAt(index);
                       _refresh();
                     }
                   } else if (q["type"] == "update") {
@@ -69,7 +73,7 @@ class _QueueListState extends State<QueueList> {
                     );
 
                     if (response.statusCode == 200) {
-                      queue.deleteAt(index);
+                      QueueHelper.deleteAt(index);
                       _refresh();
                     }
                   }
@@ -89,7 +93,7 @@ class _QueueListState extends State<QueueList> {
               ),
               trailing: IconButton(
                 onPressed: () {
-                  queue.deleteAt(index);
+                  QueueHelper.deleteAt(index);
                   setState(() {});
                 },
                 icon: Icon(Icons.clear),

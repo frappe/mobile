@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/main.dart';
 
+import '../utils/config_helper.dart';
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
+
 import '../widgets/custom_form.dart';
 import '../widgets/frappe_button.dart';
 
@@ -93,10 +94,8 @@ class _AddReviewState extends State<AddReview> {
     return involvedUsers
         .toSet()
         .toList()
-        .where((user) => ![
-              'Administrator',
-              Uri.decodeFull(localStorage.getString('userId'))
-            ].contains(user))
+        .where(
+            (user) => !['Administrator', ConfigHelper().userId].contains(user))
         .toList();
   }
 

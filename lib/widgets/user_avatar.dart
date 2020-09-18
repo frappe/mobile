@@ -1,11 +1,12 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../main.dart';
 import '../config/palette.dart';
+
+import '../utils/cache_helper.dart';
+import '../utils/dio_helper.dart';
 import '../utils/helpers.dart';
 import '../utils/http.dart';
 
@@ -51,8 +52,8 @@ class UserAvatar extends StatelessWidget {
     if (uid == null) {
       return Container();
     }
-    if (localStorage.containsKey('${baseUrl}allUsers')) {
-      var allUsers = json.decode(localStorage.getString('${baseUrl}allUsers'));
+    if (CacheHelper.getCache('allUsers')["data"] != null) {
+      var allUsers = CacheHelper.getCache('allUsers')["data"];
       var user = allUsers[uid];
       var imageUrl = user != null ? user["user_image"] : null;
       if (imageUrl != null) {
@@ -62,7 +63,7 @@ class UserAvatar extends StatelessWidget {
         return CachedNetworkImage(
           imageUrl: imageUrl,
           httpHeaders: {
-            HttpHeaders.cookieHeader: cookies,
+            HttpHeaders.cookieHeader: DioHelper.cookies,
           },
           imageBuilder: (context, imageProvider) => UserAvatar.renderShape(
             imageProvider: imageProvider,
