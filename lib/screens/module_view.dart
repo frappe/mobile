@@ -42,7 +42,7 @@ class _ModuleViewState extends State<ModuleView> {
 
     if (connectionStatus == ConnectivityStatus.offline) {
       return Future.delayed(Duration(seconds: 1), () {
-        var response = getCache('deskSidebarItems')["data"];
+        var response = CacheHelper.getCache('deskSidebarItems')["data"];
         if (response != null) {
           return response;
         } else {
@@ -148,7 +148,7 @@ class _ModuleViewState extends State<ModuleView> {
                           Icons.file_download,
                         ),
                         onPressed: () async {
-                          await cacheModule(m["name"]);
+                          await CacheHelper.cacheModule(m["name"]);
                           FrappeAlert.infoAlert(
                             title: '${m["name"]} is Downloaded',
                             context: context,

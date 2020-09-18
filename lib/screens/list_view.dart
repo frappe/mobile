@@ -13,10 +13,10 @@ import '../config/frappe_icons.dart';
 import '../screens/filter_list.dart';
 import '../screens/no_internet.dart';
 
+import '../utils/cache_helper.dart';
 import '../utils/backend_service.dart';
 import '../utils/config_helper.dart';
 import '../utils/frappe_icon.dart';
-import '../utils/helpers.dart';
 import '../utils/enums.dart';
 
 import '../widgets/frappe_button.dart';
@@ -323,7 +323,8 @@ class _CustomListViewState extends State<CustomListView> {
                 )
               : Builder(
                   builder: (buildContext) {
-                    var list = getCache('${widget.doctype}List')["data"];
+                    var list =
+                        CacheHelper.getCache('${widget.doctype}List')["data"];
 
                     if (list != null) {
                       list = list;
