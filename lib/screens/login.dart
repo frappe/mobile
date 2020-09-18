@@ -7,6 +7,7 @@ import '../config/palette.dart';
 
 import '../widgets/frappe_button.dart';
 
+import '../utils/frappe_alert.dart';
 import '../utils/cache_helper.dart';
 import '../utils/config_helper.dart';
 import '../utils/backend_service.dart';
@@ -39,17 +40,13 @@ class _LoginState extends State<Login> {
   _authenticate(data) async {
     await setBaseUrl(data["serverURL"]);
 
-    // Scaffold.of(context).showSnackBar(
-    //   SnackBar(
-    //     content: Text('Logging In'),
-    //   ),
-    // );
-
     var response2 =
         await backendService.login(data["usr"].trimRight(), data["pwd"]);
 
     if (response2.statusCode == 200) {
       ConfigHelper.set('isLoggedIn', true);
+
+      FrappeAlert.successAlert(title: 'Success', context: context);
 
       var userId =
           response2.headers.map["set-cookie"][3].split(';')[0].split('=')[1];
@@ -64,24 +61,18 @@ class _LoginState extends State<Login> {
         data["pwd"],
       );
 
-      ConfigHelper.set('primaryCacheKey', "${ConfigHelper().baseUrl}$userId");
-
-      await cacheAllUsers(context);
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) {
-          return CustomPersistentBottomNavBar();
-        },
-      ));
-      // pushNewScreen(
-      //   context,
-      //   screen: BottomBar(),
-      // );
+      await cacheAllUsers();
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) {
+            return CustomPersistentBottomNavBar();
+          },
+        ),
+      );
     } else {
       ConfigHelper.set('isLoggedIn', false);
 
-      Scaffold.of(context).showSnackBar(SnackBar(
-        content: Text('Login Failed'),
-      ));
+      FrappeAlert.errorAlert(title: 'Login Failed', context: context);
     }
   }
 

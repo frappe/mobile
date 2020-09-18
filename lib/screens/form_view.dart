@@ -6,13 +6,13 @@ import 'package:provider/provider.dart';
 
 import '../config/palette.dart';
 
+import '../utils/cache_helper.dart';
 import '../utils/config_helper.dart';
 import '../utils/queue_helper.dart';
 import '../utils/backend_service.dart';
 import '../utils/frappe_alert.dart';
 import '../utils/indicator.dart';
 import '../utils/enums.dart';
-import '../utils/helpers.dart';
 
 import '../widgets/custom_form.dart';
 import '../widgets/frappe_button.dart';
@@ -73,7 +73,8 @@ class _FormViewState extends State<FormView>
         return Future.delayed(
           Duration(seconds: 1),
           () {
-            var response = getCache('${widget.doctype}${widget.name}')["data"];
+            var response =
+                CacheHelper.getCache('${widget.doctype}${widget.name}')["data"];
             if (response != null) {
               return response;
             } else {

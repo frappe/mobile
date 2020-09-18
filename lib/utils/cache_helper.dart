@@ -1,3 +1,4 @@
+import '../utils/config_helper.dart';
 import '../utils/backend_service.dart';
 import '../utils/helpers.dart';
 
@@ -9,7 +10,7 @@ class CacheHelper {
   static var cacheContainer = locator<StorageService>().getBox('cache');
 
   static putCache(String secondaryKey, dynamic data) {
-    var k = "sumit@erpnext.com" + "#@#" + secondaryKey;
+    var k = ConfigHelper().primaryCacheKey + "#@#" + secondaryKey;
     var v = {
       'timestamp': DateTime.now(),
       'data': data,
@@ -19,7 +20,7 @@ class CacheHelper {
   }
 
   static getCache(String secondaryKey) {
-    var k = "sumit@erpnext.com" + "#@#" + secondaryKey;
+    var k = ConfigHelper().primaryCacheKey + "#@#" + secondaryKey;
 
     if (cacheContainer.get(k) == null) {
       return {"data": null};

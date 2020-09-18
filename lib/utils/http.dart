@@ -6,14 +6,11 @@ import '../utils/backend_service.dart';
 
 void initConfig() async {
   if (ConfigHelper().baseUrl != null) {
-    var uri = Uri.parse(ConfigHelper().baseUrl);
-    var baseUrl = uri.origin;
-    await ConfigHelper.set('baseUrl', baseUrl);
-    await DioHelper.init(baseUrl);
+    await DioHelper.init(ConfigHelper().baseUrl);
   }
 }
 
-void cacheAllUsers(context) async {
+void cacheAllUsers() async {
   if (CacheHelper.getCache('allUsers')["data"] != null) {
     return;
   } else {

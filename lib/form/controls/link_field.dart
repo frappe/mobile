@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/utils/enums.dart';
-import 'package:frappe_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
 
-import './../../utils/backend_service.dart';
+import '../../utils/cache_helper.dart';
+import '../../utils/enums.dart';
+import '../../utils/backend_service.dart';
 
 class LinkField extends StatefulWidget {
   final String hint;
@@ -116,19 +116,22 @@ class _LinkFieldState extends State<LinkField> {
               (query) async {
                 var lowercaseQuery = query.toLowerCase();
                 if (connectionStatus == ConnectivityStatus.offline) {
-                  if (getCache('${widget.doctype}LinkFull')["data"] != null) {
-                    return getCache('${widget.doctype}LinkFull')["data"]
-                            ["results"]
+                  if (CacheHelper.getCache(
+                          '${widget.doctype}LinkFull')["data"] !=
+                      null) {
+                    return CacheHelper.getCache(
+                            '${widget.doctype}LinkFull')["data"]["results"]
                         .where((link) {
                       return (link["value"] as String)
                           .toLowerCase()
                           .contains(lowercaseQuery);
                     }).toList();
-                  } else if (getCache(
+                  } else if (CacheHelper.getCache(
                           '$lowercaseQuery${widget.doctype}Link')["data"] !=
                       null) {
-                    return getCache('$lowercaseQuery${widget.doctype}Link')[
-                        "data"]["results"];
+                    return CacheHelper.getCache(
+                            '$lowercaseQuery${widget.doctype}Link')["data"]
+                        ["results"];
                   } else {
                     return [];
                   }
