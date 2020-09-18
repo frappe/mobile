@@ -22,9 +22,7 @@ class ConfigHelper {
         'user',
       );
 
-  String get primaryCacheKey => configContainer.get(
-        'primaryCacheKey',
-      );
+  String get primaryCacheKey => "$baseUrl$userId";
 
   String get version => configContainer.get(
         'version',

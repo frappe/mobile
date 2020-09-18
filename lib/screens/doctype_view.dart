@@ -8,6 +8,7 @@ import '../config/palette.dart';
 import '../screens/activate_modules.dart';
 import '../screens/no_internet.dart';
 
+import '../utils/cache_helper.dart';
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
@@ -43,7 +44,7 @@ class _DoctypeViewState extends State<DoctypeView> {
     if (connectionStatus == ConnectivityStatus.offline) {
       offline = true;
       return Future.delayed(Duration(seconds: 1),
-          () => getCache('${widget.module}Doctypes')["data"]);
+          () => CacheHelper.getCache('${widget.module}Doctypes')["data"]);
     } else {
       offline = false;
       return backendService.getDesktopPage(widget.module);
