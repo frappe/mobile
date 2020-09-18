@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../utils/dio_helper.dart';
 
+import 'cache_helper.dart';
 import 'helpers.dart';
 
 class BackendService {
@@ -32,7 +33,7 @@ class BackendService {
     );
 
     if (response.statusCode == 200) {
-      putCache('$doctype$name', response.data);
+      CacheHelper.putCache('$doctype$name', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
       logout();
@@ -123,7 +124,7 @@ class BackendService {
         newL.add(o);
       }
 
-      putCache('${doctype}List', newL);
+      CacheHelper.putCache('${doctype}List', newL);
 
       return newL;
     } else if (response.statusCode == 403) {
@@ -166,7 +167,7 @@ class BackendService {
     );
 
     if (response.statusCode == 200) {
-      putCache('${module}Doctypes', response.data);
+      CacheHelper.putCache('${module}Doctypes', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
       logout();
@@ -237,7 +238,7 @@ class BackendService {
     );
 
     if (response.statusCode == 200) {
-      putCache('deskSidebarItems', response.data);
+      CacheHelper.putCache('deskSidebarItems', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
       logout();
@@ -260,7 +261,7 @@ class BackendService {
     );
 
     if (response.statusCode == 200) {
-      putCache('${doctype}Meta', response.data);
+      CacheHelper.putCache('${doctype}Meta', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
       logout();
@@ -446,9 +447,9 @@ class BackendService {
         options: Options(contentType: Headers.formUrlEncodedContentType));
     if (response.statusCode == 200) {
       if (pageLength != null && pageLength == 9999) {
-        putCache('${doctype}LinkFull', response.data);
+        CacheHelper.putCache('${doctype}LinkFull', response.data);
       } else {
-        putCache('$txt${doctype}Link', response.data);
+        CacheHelper.putCache('$txt${doctype}Link', response.data);
       }
       return response.data;
     } else {
