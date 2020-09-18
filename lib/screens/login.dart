@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/screens/custom_persistent_bottom_nav_bar.dart';
 
-import '../main.dart';
+import '../screens/custom_persistent_bottom_nav_bar.dart';
+
 import '../config/palette.dart';
+
+import '../widgets/frappe_button.dart';
+
+import '../utils/cache_helper.dart';
+import '../utils/config_helper.dart';
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
 import '../utils/http.dart';
-import '../widgets/frappe_button.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -27,9 +31,9 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
     backendService = BackendService();
-    serverURL = localStorage.getString('serverURL');
-    savedUsr = localStorage.getString('usr');
-    savedPwd = localStorage.getString('pwd');
+    serverURL = ConfigHelper().baseUrl;
+    savedUsr = CacheHelper.getCache('usr')["data"];
+    savedPwd = CacheHelper.getCache('pwd')["data"];
   }
 
   _authenticate(data) async {
@@ -45,24 +49,22 @@ class _LoginState extends State<Login> {
         await backendService.login(data["usr"].trimRight(), data["pwd"]);
 
     if (response2.statusCode == 200) {
-      localStorage.setBool('isLoggedIn', true);
-
-      cookies = await getCookies();
+      ConfigHelper.set('isLoggedIn', true);
 
       var userId =
           response2.headers.map["set-cookie"][3].split(';')[0].split('=')[1];
-      localStorage.setString('userId', userId);
-      localStorage.setString('user', response2.data["full_name"]);
-      localStorage.setString(
+      ConfigHelper.set('userId', userId);
+      ConfigHelper.set('user', response2.data["full_name"]);
+      CacheHelper.putCache(
         'usr',
         data["usr"].trimRight(),
       );
-      localStorage.setString(
+      CacheHelper.putCache(
         'pwd',
         data["pwd"],
       );
-      primaryCacheKey = "$baseUrl$userId";
-      localStorage.setString('primaryCacheKey', primaryCacheKey);
+
+      ConfigHelper.set('primaryCacheKey', "${ConfigHelper().baseUrl}$userId");
 
       await cacheAllUsers(context);
       Navigator.of(context).pushReplacement(MaterialPageRoute(
@@ -75,7 +77,7 @@ class _LoginState extends State<Login> {
       //   screen: BottomBar(),
       // );
     } else {
-      localStorage.setBool('isLoggedIn', false);
+      ConfigHelper.set('isLoggedIn', false);
 
       Scaffold.of(context).showSnackBar(SnackBar(
         content: Text('Login Failed'),

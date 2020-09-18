@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 
-import '../main.dart';
 import '../config/palette.dart';
 
+import '../utils/config_helper.dart';
+import '../utils/queue_helper.dart';
 import '../utils/backend_service.dart';
 import '../utils/frappe_alert.dart';
 import '../utils/indicator.dart';
@@ -49,7 +50,7 @@ class _FormViewState extends State<FormView>
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
 
   bool editMode = false;
-  final user = localStorage.getString('user');
+  final user = ConfigHelper().user;
 
   @override
   void initState() {
@@ -72,9 +73,9 @@ class _FormViewState extends State<FormView>
         return Future.delayed(
           Duration(seconds: 1),
           () {
-            var response = getCache('${widget.doctype}${widget.name}');
+            var response = getCache('${widget.doctype}${widget.name}')["data"];
             if (response != null) {
-              return response["data"];
+              return response;
             } else {
               return {
                 "success": false,
@@ -136,10 +137,11 @@ class _FormViewState extends State<FormView>
                   context,
                   MaterialPageRoute(
                     builder: (context) {
+                      // TODO
                       return CommentInput(
                         doctype: widget.doctype,
                         name: widget.name,
-                        authorEmail: localStorage.getString('user'),
+                        authorEmail: ConfigHelper().user,
                         callback: _refresh,
                       );
                     },
@@ -186,12 +188,12 @@ class _FormViewState extends State<FormView>
           widget.queuedData["data"] = [formValue];
           widget.queuedData["title"] = formValue[widget.meta["title_field"]];
 
-          queue.putAt(
+          QueueHelper.putAt(
             widget.queuedData["qIdx"],
             widget.queuedData,
           );
         } else {
-          queue.add({
+          QueueHelper.add({
             "type": "update",
             "name": widget.name,
             "doctype": widget.doctype,

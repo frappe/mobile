@@ -1,18 +1,18 @@
-import 'dart:convert';
-
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
+import '../screens/filter_list.dart';
+
+import '../widgets/custom_expansion_tile.dart';
+
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
-import '../main.dart';
-import '../screens/filter_list.dart';
+
+import '../utils/config_helper.dart';
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/frappe_icon.dart';
 import '../utils/helpers.dart';
-import '../utils/http.dart';
-import '../widgets/custom_expansion_tile.dart';
 
 class ActivateModules extends StatefulWidget {
   @override
@@ -25,18 +25,18 @@ class _ActivateModulesState extends State<ActivateModules> {
   @override
   void initState() {
     super.initState();
-    if (localStorage.containsKey("${baseUrl}activeModules")) {
-      activeModules = Map<String, List>.from(
-        json.decode(
-          localStorage.getString("${baseUrl}activeModules"),
-        ),
-      );
+
+    if (ConfigHelper().activeModules != null) {
+      activeModules = ConfigHelper().activeModules;
     }
   }
 
-  _handleBack() {
-    localStorage.setString(
-        '${baseUrl}activeModules', json.encode(activeModules));
+  _handleBack() async {
+    await ConfigHelper.set(
+      '${ConfigHelper().baseUrl}activeModules',
+      activeModules,
+    );
+
     Navigator.of(context).pop(true);
   }
 

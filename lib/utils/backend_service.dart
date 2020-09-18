@@ -4,8 +4,9 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/dio_helper.dart';
+
 import 'helpers.dart';
-import 'http.dart';
 
 class BackendService {
   final Map meta;
@@ -20,7 +21,7 @@ class BackendService {
       'name': name,
     };
 
-    final response = await dio.get(
+    final response = await DioHelper.dio.get(
       '/method/frappe.desk.form.load.getdoc',
       queryParameters: queryParams,
       options: Options(
@@ -41,7 +42,7 @@ class BackendService {
   }
 
   updateDoc(String doctype, String name, Map updateObj) async {
-    var response = await dio.put(
+    var response = await DioHelper.dio.put(
       '/resource/$doctype/$name',
       data: updateObj,
       options: Options(
@@ -80,7 +81,7 @@ class BackendService {
       queryParams['filters'] = jsonEncode(filters);
     }
 
-    final response = await dio.get(
+    final response = await DioHelper.dio.get(
       '/method/frappe.desk.reportview.get',
       queryParameters: queryParams,
       options: Options(
@@ -141,7 +142,7 @@ class BackendService {
       'comment_by': email
     };
 
-    final response = await dio.post(
+    final response = await DioHelper.dio.post(
         '/method/frappe.desk.form.utils.add_comment',
         data: queryParams,
         options: Options(contentType: Headers.formUrlEncodedContentType));
@@ -151,8 +152,8 @@ class BackendService {
     }
   }
 
-  Future getDesktopPage(module, context) async {
-    final response = await dio.post(
+  Future getDesktopPage(module) async {
+    final response = await DioHelper.dio.post(
       '/method/frappe.desk.desktop.get_desktop_page',
       data: {
         'page': module,
@@ -199,7 +200,7 @@ class BackendService {
       'send_email': 1
     };
 
-    final response = await dio.post(
+    final response = await DioHelper.dio.post(
         '/method/frappe.core.doctype.communication.email.make',
         data: queryParams,
         options: Options(contentType: Headers.formUrlEncodedContentType));
@@ -210,7 +211,7 @@ class BackendService {
   }
 
   Future login(usr, pwd) async {
-    final response = await dio.post(
+    final response = await DioHelper.dio.post(
       '/method/login',
       data: {
         'usr': usr,
@@ -225,8 +226,8 @@ class BackendService {
     return response;
   }
 
-  Future getDeskSideBarItems(context) async {
-    final response = await dio.post(
+  Future getDeskSideBarItems() async {
+    final response = await DioHelper.dio.post(
       '/method/frappe.desk.desktop.get_desk_sidebar_items',
       options: Options(
         validateStatus: (status) {
@@ -248,7 +249,7 @@ class BackendService {
   getDoctype(doctype) async {
     var queryParams = {'doctype': doctype};
 
-    final response = await dio.get(
+    final response = await DioHelper.dio.get(
       '/method/frappe.desk.form.load.getdoctype',
       queryParameters: queryParams,
       options: Options(
@@ -278,7 +279,7 @@ class BackendService {
       're_assign': false
     };
 
-    var response = await dio.post(
+    var response = await DioHelper.dio.post(
       '/method/frappe.desk.form.assign_to.add',
       data: data,
       options: Options(
@@ -300,7 +301,7 @@ class BackendService {
       'assign_to': assignTo,
     };
 
-    var response = await dio.post(
+    var response = await DioHelper.dio.post(
       '/method/frappe.desk.form.assign_to.remove',
       data: data,
       options: Options(
@@ -321,7 +322,7 @@ class BackendService {
       "name": name,
     };
 
-    var response = await dio.post(
+    var response = await DioHelper.dio.post(
       '/method/frappe.desk.form.load.get_docinfo',
       data: data,
       options: Options(
@@ -347,7 +348,7 @@ class BackendService {
       "dn": name,
     };
 
-    var response = await dio.post(
+    var response = await DioHelper.dio.post(
       '/method/frappe.desk.form.utils.remove_attach',
       data: data,
       options: Options(
@@ -368,7 +369,7 @@ class BackendService {
       'name': name,
     };
 
-    final response = await dio.post('/method/frappe.client.delete',
+    final response = await DioHelper.dio.post('/method/frappe.client.delete',
         data: queryParams,
         options: Options(
           contentType: Headers.formUrlEncodedContentType,
@@ -394,7 +395,8 @@ class BackendService {
         "folder": "Home/Attachments"
       });
 
-      var response = await dio.post("/method/upload_file", data: formData);
+      var response =
+          await DioHelper.dio.post("/method/upload_file", data: formData);
       if (response.statusCode != 200) {
         throw Exception('Failed to load album');
       }
@@ -407,7 +409,7 @@ class BackendService {
       ...formValue,
     };
 
-    final response = await dio.post(
+    final response = await DioHelper.dio.post(
       '/method/frappe.desk.form.save.savedocs',
       data: "doc=${Uri.encodeFull(json.encode(data))}&action=Save",
       options: Options(
@@ -438,7 +440,8 @@ class BackendService {
       queryParams['page_length'] = pageLength;
     }
 
-    final response = await dio.post('/method/frappe.desk.search.search_link',
+    final response = await DioHelper.dio.post(
+        '/method/frappe.desk.search.search_link',
         data: queryParams,
         options: Options(contentType: Headers.formUrlEncodedContentType));
     if (response.statusCode == 200) {
@@ -458,7 +461,8 @@ class BackendService {
       "txt": query,
     };
 
-    final response = await dio.post('/method/frappe.email.get_contact_list',
+    final response = await DioHelper.dio.post(
+        '/method/frappe.email.get_contact_list',
         data: data,
         options: Options(contentType: Headers.formUrlEncodedContentType));
     if (response.statusCode == 200) {
@@ -475,7 +479,7 @@ class BackendService {
       'add': isFav ? 'Yes' : 'No',
     };
 
-    final response = await dio.post(
+    final response = await DioHelper.dio.post(
       '/method/frappe.desk.like.toggle_like',
       data: data,
       options: Options(
@@ -496,7 +500,7 @@ class BackendService {
       'txt': txt,
     };
 
-    final response = await dio.post(
+    final response = await DioHelper.dio.post(
       '/method/frappe.desk.doctype.tag.tag.get_tags',
       data: data,
       options: Options(
@@ -518,7 +522,7 @@ class BackendService {
       'tag': tag,
     };
 
-    final response = await dio.post(
+    final response = await DioHelper.dio.post(
       '/method/frappe.desk.doctype.tag.tag.remove_tag',
       data: data,
       options: Options(
@@ -540,7 +544,7 @@ class BackendService {
       'tag': tag,
     };
 
-    final response = await dio.post(
+    final response = await DioHelper.dio.post(
       '/method/frappe.desk.doctype.tag.tag.add_tag',
       data: data,
       options: Options(
@@ -569,7 +573,7 @@ class BackendService {
         .replaceAll(new RegExp(r"\s+"), "");
     // trim all whitespace
 
-    final response = await dio.post(
+    final response = await DioHelper.dio.post(
       '/method/frappe.social.doctype.energy_point_log.energy_point_log.review',
       data: data,
       options: Options(
@@ -591,7 +595,7 @@ class BackendService {
       ...shareInfo,
     };
 
-    final response = await dio.post(
+    final response = await DioHelper.dio.post(
       '/method/frappe.share.set_permission',
       data: data,
       options: Options(
@@ -613,7 +617,7 @@ class BackendService {
       ...shareInfo,
     };
 
-    final response = await dio.post(
+    final response = await DioHelper.dio.post(
       '/method/frappe.share.add',
       data: data,
       options: Options(

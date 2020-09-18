@@ -1,34 +1,20 @@
-import 'dart:convert';
-import 'dart:io';
+import 'package:frappe_app/utils/dio_helper.dart';
 
-import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:cookie_jar/cookie_jar.dart';
-
+import '../utils/cache_helper.dart';
+import '../utils/config_helper.dart';
 import '../utils/backend_service.dart';
-import '../main.dart';
-
-Dio dio;
-Uri uri;
-var baseUrl;
-String cookies;
 
 void initConfig() async {
-  if (localStorage.containsKey('serverURL')) {
-    uri = Uri.parse(localStorage.getString('serverURL'));
-    baseUrl = uri.origin;
-    BaseOptions options = BaseOptions(baseUrl: "$baseUrl/api");
-    dio = Dio(options);
-    var cookieJar = await getCookiePath();
-    dio.interceptors.add(CookieManager(cookieJar));
-    cookies = await getCookies();
-    primaryCacheKey = localStorage.getString('primaryCacheKey');
+  if (ConfigHelper().baseUrl != null) {
+    var uri = Uri.parse(ConfigHelper().baseUrl);
+    var baseUrl = uri.origin;
+    await ConfigHelper.set('baseUrl', baseUrl);
+    await DioHelper.init(baseUrl);
   }
 }
 
 void cacheAllUsers(context) async {
-  if (localStorage.containsKey('${baseUrl}allUsers')) {
+  if (CacheHelper.getCache('allUsers')["data"] != null) {
     return;
   } else {
     var fieldNames = [
@@ -51,7 +37,7 @@ void cacheAllUsers(context) async {
     res.forEach((element) {
       usr[element["name"]] = element;
     });
-    localStorage.setString('${baseUrl}allUsers', json.encode(usr));
+    CacheHelper.putCache('allUsers', usr);
   }
 }
 
@@ -59,38 +45,10 @@ void setBaseUrl(url) async {
   if (!url.startsWith('https://')) {
     url = "https://$url";
   }
-  baseUrl = url;
-  BaseOptions options = new BaseOptions(baseUrl: "$url/api");
-  dio = Dio(options);
-
-  var cookieJar = await getCookiePath();
-  dio.interceptors.add(CookieManager(cookieJar));
-
-  uri = Uri.parse(url);
-
-  localStorage.setString('serverURL', url);
-}
-
-Future getCookiePath() async {
-  Directory appDocDir = await getApplicationSupportDirectory();
-  String appDocPath = appDocDir.path;
-
-  return PersistCookieJar(
-    dir: appDocPath,
-    ignoreExpires: true,
-  );
-}
-
-Future<String> getCookies() async {
-  var cookieJar = await getCookiePath();
-
-  var cookies = cookieJar.loadForRequest(uri);
-
-  var cookie = CookieManager.getCookies(cookies);
-
-  return cookie;
+  await ConfigHelper.set('baseUrl', url);
+  await DioHelper.init(url);
 }
 
 String getAbsoluteUrl(String url) {
-  return Uri.encodeFull("$baseUrl$url");
+  return Uri.encodeFull("${ConfigHelper().baseUrl}$url");
 }

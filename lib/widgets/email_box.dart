@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:frappe_app/widgets/user_avatar.dart';
+
 import 'package:html/parser.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:url_launcher/url_launcher.dart';
 
-import '../utils/http.dart';
 import '../config/palette.dart';
+
+import '../utils/config_helper.dart';
+
+import '../widgets/user_avatar.dart';
 
 class EmailBox extends StatelessWidget {
   final Map data;
@@ -98,7 +100,8 @@ class ViewEmail extends StatelessWidget {
 
     imgs.forEach((img) {
       if (Uri.parse(img.attributes["src"]).hasAbsolutePath) {
-        img.attributes["src"] = "$baseUrl${img.attributes["src"]}";
+        img.attributes["src"] =
+            "${ConfigHelper().baseUrl}${img.attributes["src"]}";
       }
     });
 

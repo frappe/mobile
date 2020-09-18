@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/main.dart';
-import 'package:frappe_app/utils/backend_service.dart';
-import 'package:frappe_app/utils/enums.dart';
-import 'package:frappe_app/utils/frappe_alert.dart';
-import 'package:frappe_app/widgets/custom_form.dart';
-import 'package:frappe_app/widgets/frappe_button.dart';
 import 'package:provider/provider.dart';
 
 import '../app.dart';
+
+import '../utils/backend_service.dart';
+import '../utils/enums.dart';
+import '../utils/frappe_alert.dart';
+import '../utils/queue_helper.dart';
+
+import '../widgets/custom_form.dart';
+import '../widgets/frappe_button.dart';
 
 class SimpleForm extends StatefulWidget {
   final Map meta;
@@ -51,7 +53,7 @@ class _SimpleFormState extends State<SimpleForm> {
                   var formValue = _fbKey.currentState.value;
 
                   if (connectionStatus == ConnectivityStatus.offline) {
-                    queue.add({
+                    QueueHelper.add({
                       "type": "create",
                       "doctype": widget.meta["name"],
                       "title": formValue[widget.meta["title_field"]],

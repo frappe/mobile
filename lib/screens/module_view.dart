@@ -1,24 +1,25 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:frappe_app/config/frappe_palette.dart';
-import 'package:frappe_app/screens/activate_modules.dart';
-import 'package:frappe_app/screens/no_internet.dart';
-import 'package:frappe_app/utils/enums.dart';
-import 'package:frappe_app/utils/frappe_alert.dart';
-import 'package:frappe_app/utils/http.dart';
-import 'package:frappe_app/widgets/frappe_button.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:workmanager/workmanager.dart';
 
-import '../main.dart';
-import '../config/palette.dart';
+import 'doctype_view.dart';
+
+import '../screens/activate_modules.dart';
+import '../screens/no_internet.dart';
+
+import '../widgets/frappe_button.dart';
 import '../widgets/card_list_tile.dart';
+
+import '../config/frappe_palette.dart';
+import '../config/palette.dart';
+
+import '../utils/cache_helper.dart';
+import '../utils/config_helper.dart';
+import '../utils/enums.dart';
+import '../utils/frappe_alert.dart';
 import '../utils/backend_service.dart';
 import '../utils/helpers.dart';
-import './doctype_view.dart';
 
 class ModuleView extends StatefulWidget {
   @override
@@ -26,7 +27,6 @@ class ModuleView extends StatefulWidget {
 }
 
 class _ModuleViewState extends State<ModuleView> {
-  final userId = Uri.decodeFull(localStorage.getString('userId'));
   BackendService backendService;
 
   @override
@@ -42,9 +42,9 @@ class _ModuleViewState extends State<ModuleView> {
 
     if (connectionStatus == ConnectivityStatus.offline) {
       return Future.delayed(Duration(seconds: 1), () {
-        var response = getCache('deskSidebarItems');
+        var response = getCache('deskSidebarItems')["data"];
         if (response != null) {
-          return response["data"];
+          return response;
         } else {
           return {
             "success": false,
@@ -52,7 +52,7 @@ class _ModuleViewState extends State<ModuleView> {
         }
       });
     } else {
-      return backendService.getDeskSideBarItems(context);
+      return backendService.getDeskSideBarItems();
     }
   }
 
@@ -63,23 +63,6 @@ class _ModuleViewState extends State<ModuleView> {
       appBar: AppBar(
         title: Text('Modules'),
         elevation: 0,
-        // actions: [
-        //   FlatButton(
-        //       child: Text("1"),
-        //       onPressed: () {
-        //         Workmanager.registerOneOffTask(
-        //           "1",
-        //           simpleTaskKey,
-        //           inputData: <String, dynamic>{
-        //             'int': 1,
-        //             'bool': true,
-        //             'double': 1.0,
-        //             'string': 'string',
-        //             'array': [1, 2, 3],
-        //           },
-        //         );
-        //       }),
-        // ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -93,12 +76,8 @@ class _ModuleViewState extends State<ModuleView> {
                 return NoInternet();
               }
               var activeModules;
-              if (localStorage.containsKey("${baseUrl}activeModules")) {
-                activeModules = Map<String, List>.from(
-                  json.decode(
-                    localStorage.getString("${baseUrl}activeModules"),
-                  ),
-                );
+              if (ConfigHelper().activeModules != null) {
+                activeModules = ConfigHelper().activeModules;
               } else {
                 activeModules = {};
               }
@@ -140,9 +119,9 @@ class _ModuleViewState extends State<ModuleView> {
                     activeModules[m["name"]].length > 0;
               }).map<Widget>((m) {
                 var syncDate;
-                var c = getCache('module${m["name"]}');
+                var c = CacheHelper.getCache('module${m["name"]}');
 
-                if (c == null) {
+                if (c["data"] == null) {
                   syncDate = "Not Synced";
                 } else {
                   syncDate = timeago.format(
@@ -169,7 +148,7 @@ class _ModuleViewState extends State<ModuleView> {
                           Icons.file_download,
                         ),
                         onPressed: () async {
-                          await cacheModule(m["name"], context);
+                          await cacheModule(m["name"]);
                           FrappeAlert.infoAlert(
                             title: '${m["name"]} is Downloaded',
                             context: context,

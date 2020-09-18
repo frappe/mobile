@@ -1,42 +1,38 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:frappe_app/form/controls/control.dart';
-import 'package:frappe_app/service_locator.dart';
-import 'package:frappe_app/services/navigation_service.dart';
-
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../widgets/section.dart';
-import '../widgets/custom_expansion_tile.dart';
-import '../utils/backend_service.dart';
+import '../form/controls/control.dart';
+
+import '../service_locator.dart';
+
 import '../config/palette.dart';
 
+import 'http.dart';
+
+import '../services/navigation_service.dart';
+import '../services/storage_service.dart';
+
+import '../utils/cache_helper.dart';
+import '../utils/config_helper.dart';
+import '../utils/dio_helper.dart';
 import '../utils/enums.dart';
-import '../main.dart';
-import '../app.dart';
-import './http.dart';
+import '../utils/backend_service.dart';
+
+import '../widgets/section.dart';
+import '../widgets/custom_expansion_tile.dart';
 
 logout() async {
-  var cookieJar = await getCookiePath();
+  var cookieJar = await DioHelper.getCookiePath();
 
-  cookieJar.delete(uri);
+  cookieJar.delete(ConfigHelper().uri);
 
-  localStorage.setBool('isLoggedIn', false);
+  ConfigHelper.set('isLoggedIn', false);
 
-  // navigatorKey.currentState.pushAndRemoveUntil(
-  //   MaterialPageRoute(
-  //     builder: (BuildContext context) {
-  //       return FrappeApp();
-  //     },
-  //   ),
-  //   (_) => false,
-  // );
-
-  locator<NavigationService>().navigateTo('login');
+  locator<NavigationService>().clearAllAndNavigateTo('login');
 }
 
 Future processData({
@@ -47,13 +43,12 @@ Future processData({
   var meta;
 
   if (offline) {
-    meta = getCache('${doctype}Meta');
+    meta = CacheHelper.getCache('${doctype}Meta')["data"];
     if (meta == null) {
       return {
         "success": false,
       };
     }
-    meta = meta["data"];
   } else {
     meta = await BackendService().getDoctype(doctype);
   }
@@ -64,7 +59,7 @@ Future processData({
     meta["docs"][0]["_field${field["fieldname"]}"] = true;
   });
 
-  localStorage.setString('${doctype}Meta', json.encode(meta));
+  CacheHelper.putCache('${doctype}Meta', meta);
 
   return meta;
 }
@@ -114,7 +109,7 @@ downloadFile(String fileUrl, String downloadPath) async {
 
   await FlutterDownloader.enqueue(
     headers: {
-      HttpHeaders.cookieHeader: await getCookies(),
+      HttpHeaders.cookieHeader: await DioHelper.getCookies(),
     },
     url: absoluteUrl,
     savedDir: downloadPath,
@@ -187,7 +182,7 @@ List<Widget> generateLayout({
     var val = field["_current_val"] ?? field["default"];
 
     if (val == '__user') {
-      val = Uri.decodeFull(localStorage.getString('userId'));
+      val = ConfigHelper().userId;
     }
 
     if (field["fieldtype"] == "Section Break") {
@@ -418,61 +413,59 @@ List sortBy(List data, String orderBy, Order order) {
 }
 
 getActivatedDoctypes(Map doctypes, String module) {
-  var activeModules = Map<String, List>.from(
-    json.decode(
-      localStorage.getString("${baseUrl}activeModules"),
-    ),
-  );
-  var activeDoctypes = [];
-  // TODO
+  if (ConfigHelper().activeModules != null) {
+    var activeModules = ConfigHelper().activeModules;
+    var activeDoctypes = [];
 
-  doctypes["message"]["cards"]["items"].forEach((item) {
-    activeDoctypes.addAll(item["links"]);
-  });
-  activeDoctypes = activeDoctypes.where((m) {
-    return activeModules[module].contains(
-      m["name"],
-    );
-  }).toList();
+    doctypes["message"]["cards"]["items"].forEach((item) {
+      activeDoctypes.addAll(item["links"]);
+    });
+    activeDoctypes = activeDoctypes.where((m) {
+      return activeModules[module].contains(
+        m["name"],
+      );
+    }).toList();
 
-  return activeDoctypes;
+    return activeDoctypes;
+  }
 }
 
 putCache(String secondaryKey, dynamic data) {
-  var k = primaryCacheKey + "#@#" + secondaryKey;
+  var k = "sumit@erpnext.com" + "#@#" + secondaryKey;
   var v = {
     'timestamp': DateTime.now(),
     'data': data,
   };
-
+  var cache = locator<StorageService>().getBox('cache');
   cache.put(k, v);
 }
 
 getCache(String secondaryKey) {
-  var k = primaryCacheKey + "#@#" + secondaryKey;
+  var k = "sumit@erpnext.com" + "#@#" + secondaryKey;
+  var cache = locator<StorageService>().getBox('cache');
   return cache.get(k);
 }
 
-cacheModule(String module, context) async {
+cacheModule(String module) async {
   putCache('module$module', module);
-  await cacheDoctypes(module, context);
+  await cacheDoctypes(module);
 }
 
-cacheDoctypes(String module, context) async {
-  var doctypes = await BackendService().getDesktopPage(module, context);
+cacheDoctypes(String module) async {
+  var doctypes = await BackendService().getDesktopPage(module);
 
   var activeDoctypes = getActivatedDoctypes(doctypes, module);
 
   for (var doctype in activeDoctypes) {
-    await cacheDocList(doctype["name"], context);
+    await cacheDocList(doctype["name"]);
   }
 }
 
-cacheDocList(String doctype, context) async {
+cacheDocList(String doctype) async {
   var backendService = BackendService();
   var docMeta = await backendService.getDoctype(doctype);
   docMeta = docMeta["docs"][0];
-  await cacheLinkFields(docMeta, context);
+  await cacheLinkFields(docMeta);
   var docList = await BackendService(meta: docMeta).fetchList(
     fieldnames: generateFieldnames(doctype, docMeta),
     doctype: doctype,
@@ -481,11 +474,11 @@ cacheDocList(String doctype, context) async {
   );
 
   for (var doc in docList) {
-    await cacheForm(doctype, doc["name"], context);
+    await cacheForm(doctype, doc["name"]);
   }
 }
 
-cacheLinkFields(Map meta, context) async {
+cacheLinkFields(Map meta) async {
   var linkFieldDoctypes = meta["fields"]
       .where((d) => d["fieldtype"] == 'Link')
       .map((d) => d["options"])
@@ -498,6 +491,6 @@ cacheLinkFields(Map meta, context) async {
   }
 }
 
-cacheForm(String doctype, String name, context) async {
+cacheForm(String doctype, String name) async {
   await BackendService().getdoc(doctype, name);
 }
