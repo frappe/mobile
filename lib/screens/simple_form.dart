@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
 
 import '../app.dart';
@@ -22,14 +23,6 @@ class SimpleForm extends StatefulWidget {
 }
 
 class _SimpleFormState extends State<SimpleForm> {
-  BackendService backendService;
-
-  @override
-  void initState() {
-    super.initState();
-    backendService = BackendService();
-  }
-
   @override
   Widget build(BuildContext context) {
     final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
@@ -53,12 +46,16 @@ class _SimpleFormState extends State<SimpleForm> {
                   var formValue = _fbKey.currentState.value;
 
                   if (connectionStatus == ConnectivityStatus.offline) {
-                    QueueHelper.add({
+                    var qObj = {
                       "type": "create",
                       "doctype": widget.meta["name"],
-                      "title": formValue[widget.meta["title_field"]],
+                      "title": hasTitle(widget.meta)
+                          ? formValue[widget.meta["title_field"]] ??
+                              "${widget.meta["name"]} ${QueueHelper.queueContainer.length + 1}"
+                          : "${widget.meta["name"]} ${QueueHelper.queueContainer.length + 1}",
                       "data": [formValue],
-                    });
+                    };
+                    QueueHelper.add(qObj);
 
                     FrappeAlert.infoAlert(
                       title: 'No Internet Connection',
@@ -66,7 +63,7 @@ class _SimpleFormState extends State<SimpleForm> {
                       context: context,
                     );
                   } else {
-                    var response = await backendService.saveDocs(
+                    var response = await BackendService.saveDocs(
                       widget.meta["name"],
                       formValue,
                     );

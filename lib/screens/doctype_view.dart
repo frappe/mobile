@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../app.dart';
 
@@ -8,7 +7,6 @@ import '../config/palette.dart';
 import '../screens/activate_modules.dart';
 import '../screens/no_internet.dart';
 
-import '../utils/cache_helper.dart';
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
@@ -26,29 +24,8 @@ class DoctypeView extends StatefulWidget {
 }
 
 class _DoctypeViewState extends State<DoctypeView> {
-  BackendService backendService;
-  bool offline = false;
-
-  @override
-  void initState() {
-    backendService = BackendService();
-
-    super.initState();
-  }
-
   Future _getData() {
-    var connectionStatus = Provider.of<ConnectivityStatus>(
-      context,
-    );
-
-    if (connectionStatus == ConnectivityStatus.offline) {
-      offline = true;
-      return Future.delayed(Duration(seconds: 1),
-          () => CacheHelper.getCache('${widget.module}Doctypes')["data"]);
-    } else {
-      offline = false;
-      return backendService.getDesktopPage(widget.module);
-    }
+    return BackendService.getDesktopPage(widget.module);
   }
 
   @override
@@ -117,8 +94,6 @@ class _DoctypeViewState extends State<DoctypeView> {
                     onTap: () async {
                       var response = await processData(
                         doctype: m["name"],
-                        context: context,
-                        offline: offline,
                       );
 
                       if (response["success"] == false) {

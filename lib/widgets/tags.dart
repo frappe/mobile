@@ -28,20 +28,19 @@ class Tags extends StatefulWidget {
 
 class _TagsState extends State<Tags> {
   Future _futureVal;
-  BackendService backendService;
 
   @override
   void initState() {
     super.initState();
-    backendService = BackendService();
 
-    _futureVal =
-        Future.delayed(Duration(seconds: 0), () => {"docinfo": widget.docInfo});
+    _futureVal = Future.value({
+      "docinfo": widget.docInfo,
+    });
   }
 
   void _refresh() {
     setState(() {
-      _futureVal = backendService.getDocinfo(widget.doctype, widget.name);
+      _futureVal = BackendService.getDocinfo(widget.doctype, widget.name);
     });
   }
 
@@ -55,7 +54,7 @@ class _TagsState extends State<Tags> {
           trailing: IconButton(
             icon: Icon(Icons.close),
             onPressed: () async {
-              await backendService.removeTag(
+              await BackendService.removeTag(
                 widget.doctype,
                 widget.name,
                 tag,

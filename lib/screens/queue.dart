@@ -46,40 +46,23 @@ class _QueueListState extends State<QueueList> {
           _refresh();
         },
         child: ListView.builder(
-          itemCount: QueueHelper.queueLength,
+          itemCount: QueueHelper.queueContainer.length,
           itemBuilder: (context, index) {
             var q = QueueHelper.getAt(index);
             return CardListTile(
               leading: IconButton(
-                icon: Icon(Icons.cloud_upload),
+                icon: Icon(Icons.sync),
                 onPressed: () async {
                   if (connectionStatus == ConnectivityStatus.offline) {
                     showSnackBar('Cant Sync, App is offline', context);
                     return;
                   }
-                  if (q["type"] == "create") {
-                    var response = await backendService.saveDocs(
-                        q["doctype"], q["data"][0]);
 
-                    if (response.statusCode == 200) {
-                      QueueHelper.deleteAt(index);
-                      _refresh();
-                    }
-                  } else if (q["type"] == "update") {
-                    var response = await backendService.updateDoc(
-                      q["doctype"],
-                      q["name"],
-                      q["data"][0],
-                    );
-
-                    if (response.statusCode == 200) {
-                      QueueHelper.deleteAt(index);
-                      _refresh();
-                    }
-                  }
+                  await QueueHelper.processQueueItem(q, index);
+                  _refresh();
                 },
               ),
-              title: Text(q['title']),
+              title: Text(q['title'] ?? ""),
               subtitle: Row(
                 children: [
                   Text(

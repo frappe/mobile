@@ -26,12 +26,10 @@ class EmailForm extends StatefulWidget {
 class _EmailFormState extends State<EmailForm> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   Map wireframe;
-  BackendService backendService;
 
   @override
   void initState() {
     super.initState();
-    backendService = BackendService();
     wireframe = {
       "doctype": "communication",
       "fields": [
@@ -114,7 +112,7 @@ class _EmailFormState extends State<EmailForm> {
               if (_fbKey.currentState.saveAndValidate()) {
                 var formValue = _fbKey.currentState.value;
 
-                await backendService.sendEmail(
+                await BackendService.sendEmail(
                   recipients: formValue["recipients"],
                   subject: formValue["subject"],
                   content: formValue["content"],

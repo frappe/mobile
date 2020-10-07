@@ -28,6 +28,6 @@ void main() async {
   //   ConfigHelper.clear();
   // }
   // ConfigHelper.set('version', packageInfo.version);
-  // await initAutoSync(kReleaseMode == true ? false : true);
+  await initAutoSync(kReleaseMode == true ? false : true);
   runApp(FrappeApp());
 }

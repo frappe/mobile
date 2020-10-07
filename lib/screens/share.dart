@@ -28,7 +28,6 @@ class Share extends StatefulWidget {
 
 class _ShareState extends State<Share> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-  BackendService backendService;
   var wireframe;
   var selectedUser;
   Future _futureVal;
@@ -37,10 +36,8 @@ class _ShareState extends State<Share> {
   @override
   void initState() {
     super.initState();
-    backendService = BackendService();
-    _futureVal = Future.delayed(
-      Duration(seconds: 0),
-      () => {
+    _futureVal = Future.value(
+      {
         "docinfo": widget.docInfo,
       },
     );
@@ -101,7 +98,7 @@ class _ShareState extends State<Share> {
                       field: w,
                       value: share[w["fieldname"]],
                       onChanged: (val) async {
-                        await backendService.setPermission(
+                        await BackendService.setPermission(
                           widget.doctype,
                           widget.name,
                           {
@@ -132,7 +129,7 @@ class _ShareState extends State<Share> {
                       field: w,
                       value: share[w["fieldname"]],
                       onChanged: (val) async {
-                        await backendService.setPermission(
+                        await BackendService.setPermission(
                           widget.doctype,
                           widget.name,
                           {
@@ -159,7 +156,7 @@ class _ShareState extends State<Share> {
 
   void _refresh() {
     setState(() {
-      _futureVal = backendService.getDocinfo(widget.doctype, widget.name);
+      _futureVal = BackendService.getDocinfo(widget.doctype, widget.name);
     });
   }
 
@@ -223,7 +220,7 @@ class _ShareState extends State<Share> {
                                         ...formValue,
                                       };
 
-                                      await backendService.shareAdd(
+                                      await BackendService.shareAdd(
                                         widget.doctype,
                                         widget.name,
                                         req,

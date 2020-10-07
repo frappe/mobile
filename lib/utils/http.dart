@@ -24,10 +24,13 @@ void cacheAllUsers() async {
       ["User", "enabled", "=", 1]
     ];
 
-    var res = await BackendService().fetchList(
+    var meta = await BackendService.getDoctype('User');
+
+    var res = await BackendService.fetchList(
       fieldnames: fieldNames,
       doctype: 'User',
       filters: filters,
+      meta: meta,
     );
 
     var usr = {};

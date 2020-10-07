@@ -1,4 +1,5 @@
 import 'package:frappe_app/utils/config_helper.dart';
+import 'package:frappe_app/utils/queue_helper.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'utils/cache_helper.dart';
@@ -7,20 +8,38 @@ import 'service_locator.dart';
 import 'services/storage_service.dart';
 
 const String TASK_SYNC_DATA = 'downloadModules';
+const String TASK_PROCESS_QUEUE = 'processQueue';
 const String SYNC_DATA_TASK_UNIQUE_NAME = '101';
-const String SYNC_DATA_TASK_TAG = 'sync_data_task_tag';
+const String PROCESS_QUEUE_UNIQUE_NAME = '102';
 
 void callbackDispatcher() {
   Workmanager.executeTask((task, inputData) async {
-    switch (task) {
-      case TASK_SYNC_DATA:
-        print("$task was executed. inputData = $inputData");
-        await syncnow();
-        print('Sync complete');
+    setupLocator();
+    await locator<StorageService>().initStorage();
+    await locator<StorageService>().initBox('queue');
+    await locator<StorageService>().initBox('cache');
+    await locator<StorageService>().initBox('config');
+    await initConfig();
 
-        break;
+    if (ConfigHelper().isLoggedIn) {
+      switch (task) {
+        case TASK_SYNC_DATA:
+          print("$task was executed. inputData = $inputData");
+          await syncnow();
+          print('Sync complete');
+
+          break;
+
+        case TASK_PROCESS_QUEUE:
+          print('process queue started');
+          await QueueHelper.processQueue();
+          break;
+      }
+      return Future.value(true);
+    } else {
+      print('not logged in');
+      return Future.value(true);
     }
-    return Future.value(true);
   });
 }
 
@@ -36,7 +55,17 @@ void registerPeriodicTask() {
   Workmanager.registerPeriodicTask(
     SYNC_DATA_TASK_UNIQUE_NAME,
     TASK_SYNC_DATA,
-    tag: SYNC_DATA_TASK_TAG,
+    frequency: Duration(minutes: 15),
+    constraints: Constraints(
+      networkType: NetworkType.connected,
+      requiresBatteryNotLow: false,
+    ),
+    existingWorkPolicy: ExistingWorkPolicy.replace,
+  );
+
+  Workmanager.registerPeriodicTask(
+    PROCESS_QUEUE_UNIQUE_NAME,
+    TASK_PROCESS_QUEUE,
     frequency: Duration(minutes: 15),
     constraints: Constraints(
       networkType: NetworkType.connected,
@@ -47,25 +76,15 @@ void registerPeriodicTask() {
 }
 
 Future syncnow() async {
-  if (ConfigHelper().isLoggedIn) {
-    print("downloading modules2");
-    setupLocator();
-    await locator<StorageService>().initStorage();
-    await locator<StorageService>().initBox('queue');
-    await locator<StorageService>().initBox('cache');
-    await locator<StorageService>().initBox('config');
-    await initConfig();
+  print("downloading modules2");
 
-    if (ConfigHelper().activeModules != null) {
-      var activeModules = ConfigHelper().activeModules;
+  if (ConfigHelper().activeModules != null) {
+    var activeModules = ConfigHelper().activeModules;
 
-      for (var module in activeModules.keys) {
-        await CacheHelper.cacheModule(module);
-      }
-      return Future.value(true);
+    for (var module in activeModules.keys) {
+      await CacheHelper.cacheModule(module);
     }
-  } else {
-    print('not logged in');
+
     return Future.value(true);
   }
 }

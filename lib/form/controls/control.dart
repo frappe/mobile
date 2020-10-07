@@ -72,8 +72,15 @@ Widget makeControl({
 
     case "Select":
       {
-        var options =
-            field["options"] != null ? field["options"].split('\n') : [];
+        var options = [];
+        if (field["options"] != null) {
+          if (field["options"] is String) {
+            options = field["options"].split('\n');
+          } else {
+            options = field["options"];
+          }
+        }
+
         fieldWidget = buildDecoratedWidget(
             Select(
               key: Key(value),

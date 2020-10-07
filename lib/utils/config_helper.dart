@@ -22,7 +22,13 @@ class ConfigHelper {
         'user',
       );
 
-  String get primaryCacheKey => "$baseUrl$userId";
+  String get primaryCacheKey {
+    if (baseUrl != null && userId != null) {
+      return "$baseUrl$userId";
+    } else {
+      return null;
+    }
+  }
 
   String get version => configContainer.get(
         'version',

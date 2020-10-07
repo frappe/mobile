@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:timeago/timeago.dart' as timeago;
-import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'doctype_view.dart';
 
@@ -11,15 +8,11 @@ import '../screens/no_internet.dart';
 import '../widgets/frappe_button.dart';
 import '../widgets/card_list_tile.dart';
 
-import '../config/frappe_palette.dart';
 import '../config/palette.dart';
 
-import '../utils/cache_helper.dart';
 import '../utils/config_helper.dart';
 import '../utils/enums.dart';
-import '../utils/frappe_alert.dart';
 import '../utils/backend_service.dart';
-import '../utils/helpers.dart';
 
 class ModuleView extends StatefulWidget {
   @override
@@ -27,33 +20,8 @@ class ModuleView extends StatefulWidget {
 }
 
 class _ModuleViewState extends State<ModuleView> {
-  BackendService backendService;
-
-  @override
-  void initState() {
-    backendService = BackendService();
-    super.initState();
-  }
-
   Future _getData() {
-    var connectionStatus = Provider.of<ConnectivityStatus>(
-      context,
-    );
-
-    if (connectionStatus == ConnectivityStatus.offline) {
-      return Future.delayed(Duration(seconds: 1), () {
-        var response = CacheHelper.getCache('deskSidebarItems')["data"];
-        if (response != null) {
-          return response;
-        } else {
-          return {
-            "success": false,
-          };
-        }
-      });
-    } else {
-      return backendService.getDeskSideBarItems();
-    }
+    return BackendService.getDeskSideBarItems();
   }
 
   @override
@@ -118,55 +86,35 @@ class _ModuleViewState extends State<ModuleView> {
                 return activeModules.keys.contains(m["name"]) &&
                     activeModules[m["name"]].length > 0;
               }).map<Widget>((m) {
-                var syncDate;
-                var c = CacheHelper.getCache('module${m["name"]}');
-
-                if (c["data"] == null) {
-                  syncDate = "Not Synced";
-                } else {
-                  syncDate = timeago.format(
-                    c["timestamp"],
-                  );
-                }
                 return Padding(
                   padding:
                       const EdgeInsets.only(left: 10.0, right: 10.0, top: 8.0),
-                  child: Slidable(
-                    actionPane: SlidableDrawerActionPane(),
-                    secondaryActions: <Widget>[
-                      IconSlideAction(
-                        caption: syncDate,
-                        color: FrappePalette.blue,
-                        icon: Icons.sync,
-                      ),
-                    ],
-                    child: CardListTile(
-                      title: Text(m["label"]),
-                      trailing: IconButton(
-                        padding: EdgeInsets.zero,
-                        icon: Icon(
-                          Icons.file_download,
+                  child: CardListTile(
+                    title: Text(m["label"]),
+                    // trailing: IconButton(
+                    //   padding: EdgeInsets.zero,
+                    //   icon: Icon(
+                    //     Icons.file_download,
+                    //   ),
+                    //   onPressed: () async {
+                    //     await CacheHelper.cacheModule(m["name"]);
+                    //     FrappeAlert.infoAlert(
+                    //       title: '${m["name"]} is Downloaded',
+                    //       context: context,
+                    //     );
+                    //     setState(() {});
+                    //   },
+                    // ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return DoctypeView(m["name"]);
+                          },
                         ),
-                        onPressed: () async {
-                          await CacheHelper.cacheModule(m["name"]);
-                          FrappeAlert.infoAlert(
-                            title: '${m["name"]} is Downloaded',
-                            context: context,
-                          );
-                          setState(() {});
-                        },
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return DoctypeView(m["name"]);
-                            },
-                          ),
-                        );
-                      },
-                    ),
+                      );
+                    },
                   ),
                 );
               }).toList();

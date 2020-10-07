@@ -18,14 +18,6 @@ class MultiSelect extends StatefulWidget {
 }
 
 class _MultiSelectState extends State<MultiSelect> {
-  BackendService backendService;
-
-  @override
-  void initState() {
-    super.initState();
-    backendService = BackendService();
-  }
-
   @override
   Widget build(BuildContext context) {
     return FormBuilderChipsInput(
@@ -48,7 +40,7 @@ class _MultiSelectState extends State<MultiSelect> {
       findSuggestions: (String query) async {
         if (query.length != 0) {
           var lowercaseQuery = query.toLowerCase();
-          var response = await backendService.getContactList(lowercaseQuery);
+          var response = await BackendService.getContactList(lowercaseQuery);
           var val = response["message"];
           if (val.length == 0) {
             val = [

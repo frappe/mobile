@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/widgets/reviews.dart';
 import 'package:frappe_app/widgets/shared_with.dart';
 import 'package:frappe_app/widgets/tags.dart';
@@ -29,7 +30,9 @@ class ViewDocInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(getTitle(meta, doc)),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: ListView(

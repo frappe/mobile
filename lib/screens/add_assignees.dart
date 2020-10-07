@@ -25,14 +25,7 @@ class AddAssignees extends StatefulWidget {
 
 class _AddAssigneesState extends State<AddAssignees> {
   var newAssignees = [];
-  BackendService backendService;
   String selectedUser;
-
-  @override
-  void initState() {
-    super.initState();
-    backendService = BackendService();
-  }
 
   List<Widget> _generateChildren() {
     List<Widget> children = [];
@@ -71,7 +64,7 @@ class _AddAssigneesState extends State<AddAssignees> {
             child: FrappeFlatButton(
               onPressed: newAssignees.length > 0
                   ? () async {
-                      await backendService.addAssignees(
+                      await BackendService.addAssignees(
                         widget.doctype,
                         widget.name,
                         newAssignees,

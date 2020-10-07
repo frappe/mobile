@@ -28,20 +28,19 @@ class Assignees extends StatefulWidget {
 }
 
 class _AssigneesState extends State<Assignees> {
-  BackendService backendService;
   Future _futureVal;
 
   @override
   void initState() {
     super.initState();
-    backendService = BackendService();
-    _futureVal =
-        Future.delayed(Duration(seconds: 0), () => {"docinfo": widget.docInfo});
+    _futureVal = Future.value({
+      "docinfo": widget.docInfo,
+    });
   }
 
   void _refresh() {
     setState(() {
-      _futureVal = backendService.getDocinfo(
+      _futureVal = BackendService.getDocinfo(
         widget.doctype,
         widget.name,
       );
@@ -67,7 +66,7 @@ class _AssigneesState extends State<Assignees> {
                 Icons.clear,
               ),
               onPressed: () async {
-                await backendService.removeAssignee(
+                await BackendService.removeAssignee(
                   widget.doctype,
                   widget.name,
                   d["owner"],

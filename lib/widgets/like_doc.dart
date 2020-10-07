@@ -20,20 +20,12 @@ class LikeDoc extends StatefulWidget {
 }
 
 class _LikeDocState extends State<LikeDoc> {
-  BackendService backendService;
-
-  @override
-  void initState() {
-    super.initState();
-    backendService = BackendService();
-  }
-
   _toggleFav() async {
     setState(() {
       widget.isFav = !widget.isFav;
     });
 
-    var response = await backendService.toggleLike(
+    var response = await BackendService.toggleLike(
       widget.doctype,
       widget.name,
       widget.isFav,

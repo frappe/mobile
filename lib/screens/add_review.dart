@@ -29,12 +29,10 @@ class AddReview extends StatefulWidget {
 }
 
 class _AddReviewState extends State<AddReview> {
-  BackendService backendService;
   var wireframe;
 
   void initState() {
     super.initState();
-    backendService = BackendService();
     wireframe = [
       {
         "fieldname": 'to_user',
@@ -69,7 +67,6 @@ class _AddReviewState extends State<AddReview> {
   }
 
   getInvolvedUsers() {
-    print(widget);
     var userFields = widget.meta["fields"]
         .where((d) => d["fieldtype"] == 'Link' && d["options"] == 'User')
         .map((d) => d["fieldname"])
@@ -114,7 +111,7 @@ class _AddReviewState extends State<AddReview> {
               onPressed: () async {
                 if (_fbKey.currentState.saveAndValidate()) {
                   var formValue = _fbKey.currentState.value;
-                  await backendService.addReview(
+                  await BackendService.addReview(
                     widget.doctype,
                     widget.name,
                     formValue,

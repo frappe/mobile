@@ -7,17 +7,17 @@ class CommentInput extends StatelessWidget {
   final String authorEmail;
   final Function callback;
 
-  CommentInput(
-      {@required this.doctype,
-      @required this.name,
-      @required this.authorEmail,
-      @required this.callback});
+  CommentInput({
+    @required this.doctype,
+    @required this.name,
+    @required this.authorEmail,
+    @required this.callback,
+  });
 
   final TextEditingController input = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    var backendService = BackendService();
     TextEditingController _input = TextEditingController();
     return Scaffold(
       appBar: AppBar(
@@ -28,7 +28,7 @@ class CommentInput extends StatelessWidget {
               if (_input.text.isEmpty) {
                 return;
               }
-              await backendService.postComment(
+              await BackendService.postComment(
                 doctype,
                 name,
                 _input.text,
