@@ -13,6 +13,7 @@ import 'service_locator.dart';
 import 'services/connectivity_service.dart';
 import 'services/navigation_service.dart';
 
+import 'screens/session_expired.dart';
 import 'screens/custom_persistent_bottom_nav_bar.dart';
 import 'screens/filter_list.dart';
 import 'screens/form_view.dart';
@@ -57,6 +58,8 @@ class _FrappeAppState extends State<FrappeApp> {
           switch (routeSettings.name) {
             case 'login':
               return MaterialPageRoute(builder: (context) => Login());
+            case 'session_expired':
+              return MaterialPageRoute(builder: (context) => SessionExpired());
             default:
               return MaterialPageRoute(builder: (context) => FrappeApp());
           }

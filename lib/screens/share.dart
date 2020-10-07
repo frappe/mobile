@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/form/controls/control.dart';
@@ -253,7 +254,12 @@ class _ShareState extends State<Share> {
                 ],
               );
             } else if (snapshot.hasError) {
-              return Text(snapshot.error);
+              var error = (snapshot.error as Response);
+              if (error.statusCode == 403) {
+                handle403();
+              } else {
+                return Text("${snapshot.error}");
+              }
             }
             return Center(
               child: CircularProgressIndicator(),

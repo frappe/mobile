@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:frappe_app/utils/helpers.dart';
@@ -390,6 +391,13 @@ class CustomSearch extends SearchDelegate {
               );
             },
           );
+        } else if (snapshot.hasError) {
+          var error = (snapshot.error as Response);
+          if (error.statusCode == 403) {
+            handle403();
+          } else {
+            return Text("${snapshot.error}");
+          }
         } else {
           return Center(child: CircularProgressIndicator());
         }

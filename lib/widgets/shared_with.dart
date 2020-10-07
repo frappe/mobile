@@ -1,13 +1,18 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:frappe_app/screens/share.dart';
-import 'package:frappe_app/widgets/user_avatar.dart';
+
+import '../screens/share.dart';
 
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
+
+import '../utils/helpers.dart';
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
+
 import '../widgets/frappe_button.dart';
 import '../widgets/card_list_tile.dart';
+import '../widgets/user_avatar.dart';
 
 class SharedWith extends StatefulWidget {
   final String doctype;
@@ -125,7 +130,12 @@ class _SharedWithState extends State<SharedWith> {
             children: _generateChildren(docInfo["shared"]),
           );
         } else if (snapshot.hasError) {
-          return Text("${snapshot.error}");
+          var error = (snapshot.error as Response);
+          if (error.statusCode == 403) {
+            handle403();
+          } else {
+            return Text("${snapshot.error}");
+          }
         }
 
         return Center(child: CircularProgressIndicator());

@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 
 import '../utils/dio_helper.dart';
 
-import 'cache_helper.dart';
 import 'helpers.dart';
 
 class BackendService {
@@ -34,9 +33,9 @@ class BackendService {
     if (response.statusCode == 200) {
       return response.data;
     } else if (response.statusCode == 403) {
-      logout();
+      throw response;
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -54,9 +53,9 @@ class BackendService {
     if (response.statusCode == 200) {
       return response;
     } else if (response.statusCode == 403) {
-      logout();
+      throw response;
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -129,9 +128,9 @@ class BackendService {
 
       return newL;
     } else if (response.statusCode == 403) {
-      logout();
+      throw response;
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -150,7 +149,7 @@ class BackendService {
         options: Options(contentType: Headers.formUrlEncodedContentType));
     if (response.statusCode == 200) {
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -174,9 +173,9 @@ class BackendService {
     if (response.statusCode == 200) {
       return response.data;
     } else if (response.statusCode == 403) {
-      logout();
+      throw response;
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -211,7 +210,7 @@ class BackendService {
         options: Options(contentType: Headers.formUrlEncodedContentType));
     if (response.statusCode == 200) {
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -248,9 +247,9 @@ class BackendService {
     if (response.statusCode == 200) {
       return response.data;
     } else if (response.statusCode == 403) {
-      logout();
+      throw response;
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -274,9 +273,9 @@ class BackendService {
     if (response.statusCode == 200) {
       return response.data;
     } else if (response.statusCode == 403) {
-      logout();
+      throw response;
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -301,7 +300,7 @@ class BackendService {
     if (response.statusCode == 200) {
       return;
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -323,7 +322,7 @@ class BackendService {
     if (response.statusCode == 200) {
       return;
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -344,7 +343,7 @@ class BackendService {
     if (response.statusCode == 200) {
       return response.data;
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -370,7 +369,7 @@ class BackendService {
     if (response.statusCode == 200) {
       return;
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -388,7 +387,7 @@ class BackendService {
     if (response.statusCode == 200) {
       return;
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -410,7 +409,7 @@ class BackendService {
       var response =
           await DioHelper.dio.post("/method/upload_file", data: formData);
       if (response.statusCode != 200) {
-        throw Exception('Failed to load album');
+        throw Exception('Something went wrong');
       }
     }
   }
@@ -431,7 +430,7 @@ class BackendService {
     if (response.statusCode == 200) {
       return response;
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -469,7 +468,7 @@ class BackendService {
     if (response.statusCode == 200) {
       return response.data;
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -485,7 +484,7 @@ class BackendService {
     if (response.statusCode == 200) {
       return response.data;
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Something went wrong');
     }
   }
 

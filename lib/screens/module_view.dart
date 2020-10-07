@@ -1,4 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:frappe_app/utils/dio_helper.dart';
+import 'package:frappe_app/utils/helpers.dart';
 
 import 'doctype_view.dart';
 
@@ -122,7 +125,12 @@ class _ModuleViewState extends State<ModuleView> {
                 children: modulesWidget,
               );
             } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
+              var error = (snapshot.error as Response);
+              if (error.statusCode == 403) {
+                handle403();
+              } else {
+                return Text("${snapshot.error}");
+              }
             }
             return Center(child: CircularProgressIndicator());
           },

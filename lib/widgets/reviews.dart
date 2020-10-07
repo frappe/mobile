@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import '../screens/add_review.dart';
@@ -6,6 +7,7 @@ import '../config/frappe_palette.dart';
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
 
+import '../utils/helpers.dart';
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
 
@@ -137,7 +139,12 @@ class _ReviewsState extends State<Reviews> {
             children: _generateChildren(reviews),
           );
         } else if (snapshot.hasError) {
-          return Text("${snapshot.error}");
+          var error = (snapshot.error as Response);
+          if (error.statusCode == 403) {
+            handle403();
+          } else {
+            return Text("${snapshot.error}");
+          }
         }
 
         return Center(child: CircularProgressIndicator());
