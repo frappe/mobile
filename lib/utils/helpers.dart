@@ -36,21 +36,8 @@ logout() async {
 
 Future processData({
   String doctype,
-  context,
-  bool offline = false,
 }) async {
-  var meta;
-
-  if (offline) {
-    meta = CacheHelper.getCache('${doctype}Meta')["data"];
-    if (meta == null) {
-      return {
-        "success": false,
-      };
-    }
-  } else {
-    meta = await BackendService().getDoctype(doctype);
-  }
+  var meta = await BackendService.getDoctype(doctype);
 
   List metaFields = meta["docs"][0]["fields"];
 
@@ -358,7 +345,7 @@ List generateFieldnames(String doctype, Map meta) {
     '_comments',
   ];
 
-  if (meta["title_field"] != null) {
+  if (hasTitle(meta)) {
     fields.add(meta["title_field"]);
   }
 
@@ -426,5 +413,17 @@ getActivatedDoctypes(Map doctypes, String module) {
     }).toList();
 
     return activeDoctypes;
+  }
+}
+
+bool hasTitle(Map meta) {
+  return meta["title_field"] != null && meta["title_field"] != '';
+}
+
+getTitle(Map meta, Map doc) {
+  if (hasTitle(meta)) {
+    return doc[meta["title_field"]];
+  } else {
+    return doc["name"];
   }
 }

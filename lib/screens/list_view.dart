@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
-import 'package:provider/provider.dart';
+import 'package:frappe_app/utils/helpers.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../app.dart';
@@ -13,7 +13,6 @@ import '../config/frappe_icons.dart';
 import '../screens/filter_list.dart';
 import '../screens/no_internet.dart';
 
-import '../utils/cache_helper.dart';
 import '../utils/backend_service.dart';
 import '../utils/config_helper.dart';
 import '../utils/frappe_icon.dart';
@@ -49,14 +48,7 @@ class _CustomListViewState extends State<CustomListView> {
   static const int PAGE_SIZE = 10;
   final userId = ConfigHelper().userId;
   var _pageLoadController;
-  BackendService backendService;
   bool showLiked;
-
-  @override
-  void initState() {
-    super.initState();
-    backendService = BackendService(meta: widget.meta);
-  }
 
   @override
   void dispose() {
@@ -104,7 +96,7 @@ class _CustomListViewState extends State<CustomListView> {
         _pageLoadController.reset();
         setState(() {});
       },
-      title: data[widget.meta["title_field"]] ?? data["name"],
+      title: getTitle(widget.meta, data),
       modifiedOn: "${timeago.format(
         DateTime.parse(
           data['modified'],
@@ -160,24 +152,20 @@ class _CustomListViewState extends State<CustomListView> {
 
   @override
   Widget build(BuildContext context) {
-    var connectionStatus = Provider.of<ConnectivityStatus>(
-      context,
+    _pageLoadController = PagewiseLoadController(
+      pageSize: PAGE_SIZE,
+      pageFuture: (pageIndex) {
+        return BackendService.fetchList(
+          doctype: widget.doctype,
+          fieldnames: widget.fieldnames,
+          pageLength: PAGE_SIZE,
+          filters: widget.filters,
+          offset: pageIndex * PAGE_SIZE,
+          meta: widget.meta,
+        );
+      },
     );
 
-    if (connectionStatus != ConnectivityStatus.offline) {
-      _pageLoadController = PagewiseLoadController(
-        pageSize: PAGE_SIZE,
-        pageFuture: (pageIndex) {
-          return backendService.fetchList(
-            doctype: widget.doctype,
-            fieldnames: widget.fieldnames,
-            pageLength: PAGE_SIZE,
-            filters: widget.filters,
-            offset: pageIndex * PAGE_SIZE,
-          );
-        },
-      );
-    }
     if (FilterList.getFieldFilterIndex(widget.filters, '_liked_by') != null) {
       showLiked = true;
     } else {
@@ -311,34 +299,15 @@ class _CustomListViewState extends State<CustomListView> {
         },
         child: Container(
           color: Palette.bgColor,
-          child: connectionStatus != ConnectivityStatus.offline
-              ? PagewiseListView(
-                  noItemsFoundBuilder: (context) {
-                    return _noItemsFoundBuilder();
-                  },
-                  pageLoadController: _pageLoadController,
-                  itemBuilder: ((buildContext, entry, _) {
-                    return _generateItem(entry);
-                  }),
-                )
-              : Builder(
-                  builder: (buildContext) {
-                    var list =
-                        CacheHelper.getCache('${widget.doctype}List')["data"];
-
-                    if (list != null) {
-                      list = list;
-                      return ListView.builder(
-                        itemCount: list.length,
-                        itemBuilder: (context, index) {
-                          return _generateItem(list[index]);
-                        },
-                      );
-                    } else {
-                      return NoInternet();
-                    }
-                  },
-                ),
+          child: PagewiseListView(
+            noItemsFoundBuilder: (context) {
+              return _noItemsFoundBuilder();
+            },
+            pageLoadController: _pageLoadController,
+            itemBuilder: ((buildContext, entry, _) {
+              return _generateItem(entry);
+            }),
+          ),
         ),
       ),
     );
@@ -380,13 +349,20 @@ class CustomSearch extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    var titleField;
+    if (hasTitle(data.meta)) {
+      titleField = data.meta["title_field"];
+    } else {
+      titleField = "name";
+    }
     return FutureBuilder(
-      future: BackendService(meta: data.meta).fetchList(
+      future: BackendService.fetchList(
           pageLength: 10,
           fieldnames: data.fieldnames,
           doctype: data.doctype,
+          meta: data.meta,
           filters: [
-            [data.doctype, data.meta["title_field"], 'like', '%$query%']
+            [data.doctype, titleField, 'like', '%$query%']
           ]),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
@@ -395,7 +371,7 @@ class CustomSearch extends SearchDelegate {
             itemBuilder: (_, index) {
               return ListTile(
                 title: Text(
-                  snapshot.data[index][data.meta["title_field"]],
+                  snapshot.data[index][titleField],
                 ),
                 onTap: () {
                   Navigator.push(

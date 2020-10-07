@@ -28,21 +28,20 @@ class SharedWith extends StatefulWidget {
 
 class _SharedWithState extends State<SharedWith> {
   Future _futureVal;
-  BackendService backendService;
   var docInfo;
 
   @override
   void initState() {
     super.initState();
-    backendService = BackendService();
 
-    _futureVal =
-        Future.delayed(Duration(seconds: 0), () => {"docinfo": widget.docInfo});
+    _futureVal = Future.value({
+      "docinfo": widget.docInfo,
+    });
   }
 
   void _refresh() {
     setState(() {
-      _futureVal = backendService.getDocinfo(widget.doctype, widget.name);
+      _futureVal = BackendService.getDocinfo(widget.doctype, widget.name);
     });
   }
 

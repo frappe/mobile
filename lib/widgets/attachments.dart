@@ -31,20 +31,19 @@ class Attachments extends StatefulWidget {
 
 class _AttachmentsState extends State<Attachments> {
   Future _futureVal;
-  BackendService backendService;
 
   @override
   void initState() {
     super.initState();
-    backendService = BackendService();
 
-    _futureVal =
-        Future.delayed(Duration(seconds: 0), () => {"docinfo": widget.docInfo});
+    _futureVal = Future.value({
+      "docinfo": widget.docInfo,
+    });
   }
 
   void _refresh() {
     setState(() {
-      _futureVal = backendService.getDocinfo(widget.doctype, widget.name);
+      _futureVal = BackendService.getDocinfo(widget.doctype, widget.name);
     });
   }
 
@@ -73,7 +72,7 @@ class _AttachmentsState extends State<Attachments> {
           trailing: IconButton(
             icon: Icon(Icons.close),
             onPressed: () async {
-              await backendService.removeAttachment(
+              await BackendService.removeAttachment(
                 widget.doctype,
                 widget.name,
                 attachment["name"],

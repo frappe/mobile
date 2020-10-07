@@ -31,6 +31,25 @@ class _ActivateModulesState extends State<ActivateModules> {
     }
   }
 
+  Future _getData() async {
+    var meta = await BackendService.getDoctype('Doctype');
+    return BackendService.fetchList(
+      fieldnames: [
+        "`tabDocType`.`name`",
+        "`tabDocType`.`module`",
+      ],
+      doctype: 'DocType',
+      meta: meta,
+      filters: FilterList.generateFilters(
+        'DocType',
+        {
+          "istable": 0,
+          "issingle": 0,
+        },
+      ),
+    );
+  }
+
   _handleBack() async {
     await ConfigHelper.set(
       '${ConfigHelper().baseUrl}activeModules',
@@ -156,20 +175,7 @@ class _ActivateModulesState extends State<ActivateModules> {
           ),
         ),
         body: FutureBuilder(
-          future: BackendService().fetchList(
-            fieldnames: [
-              "`tabDocType`.`name`",
-              "`tabDocType`.`module`",
-            ],
-            doctype: 'DocType',
-            filters: FilterList.generateFilters(
-              'DocType',
-              {
-                "istable": 0,
-                "issingle": 0,
-              },
-            ),
-          ),
+          future: _getData(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               doctypes = snapshot.data;

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/config/frappe_palette.dart';
-import 'package:frappe_app/screens/add_review.dart';
 
+import '../screens/add_review.dart';
+
+import '../config/frappe_palette.dart';
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
+
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
+
 import '../widgets/frappe_button.dart';
 import '../widgets/card_list_tile.dart';
 
@@ -32,20 +35,19 @@ class Reviews extends StatefulWidget {
 
 class _ReviewsState extends State<Reviews> {
   Future _futureVal;
-  BackendService backendService;
 
   @override
   void initState() {
     super.initState();
-    backendService = BackendService();
 
-    _futureVal =
-        Future.delayed(Duration(seconds: 0), () => {"docinfo": widget.docInfo});
+    _futureVal = Future.value({
+      "docinfo": widget.docInfo,
+    });
   }
 
   void _refresh() {
     setState(() {
-      _futureVal = backendService.getDocinfo(widget.doctype, widget.name);
+      _futureVal = BackendService.getDocinfo(widget.doctype, widget.name);
     });
   }
 

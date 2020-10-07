@@ -9,17 +9,24 @@ import '../service_locator.dart';
 class CacheHelper {
   static var cacheContainer = locator<StorageService>().getBox('cache');
 
-  static putCache(String secondaryKey, dynamic data) {
+  static putCache(String secondaryKey, dynamic data) async {
+    if (ConfigHelper().primaryCacheKey == null) {
+      return;
+    }
+
     var k = ConfigHelper().primaryCacheKey + "#@#" + secondaryKey;
     var v = {
       'timestamp': DateTime.now(),
       'data': data,
     };
 
-    cacheContainer.put(k, v);
+    await cacheContainer.put(k, v);
   }
 
   static getCache(String secondaryKey) {
+    if (ConfigHelper().primaryCacheKey == null) {
+      return {"data": null};
+    }
     var k = ConfigHelper().primaryCacheKey + "#@#" + secondaryKey;
 
     if (cacheContainer.get(k) == null) {
@@ -34,12 +41,11 @@ class CacheHelper {
   }
 
   static cacheModule(String module) async {
-    putCache('module$module', module);
     await cacheDoctypes(module);
   }
 
   static cacheDoctypes(String module) async {
-    var doctypes = await BackendService().getDesktopPage(module);
+    var doctypes = await BackendService.getDesktopPage(module);
 
     var activeDoctypes = getActivatedDoctypes(doctypes, module);
 
@@ -49,12 +55,12 @@ class CacheHelper {
   }
 
   static cacheDocList(String doctype) async {
-    var backendService = BackendService();
-    var docMeta = await backendService.getDoctype(doctype);
+    var docMeta = await BackendService.getDoctype(doctype);
     docMeta = docMeta["docs"][0];
     await cacheLinkFields(docMeta);
-    var docList = await BackendService(meta: docMeta).fetchList(
+    var docList = await BackendService.fetchList(
       fieldnames: generateFieldnames(doctype, docMeta),
+      meta: docMeta,
       doctype: doctype,
       pageLength: 50,
       offset: 0,
@@ -71,7 +77,7 @@ class CacheHelper {
         .map((d) => d["options"])
         .toList();
     for (var doctype in linkFieldDoctypes) {
-      await BackendService().searchLink(
+      await BackendService.searchLink(
         doctype: doctype,
         pageLength: 9999,
       );
@@ -79,6 +85,6 @@ class CacheHelper {
   }
 
   static cacheForm(String doctype, String name) async {
-    await BackendService().getdoc(doctype, name);
+    await BackendService.getdoc(doctype, name);
   }
 }

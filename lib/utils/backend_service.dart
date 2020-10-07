@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/dio_helper.dart';
@@ -10,13 +11,7 @@ import 'cache_helper.dart';
 import 'helpers.dart';
 
 class BackendService {
-  final Map meta;
-
-  BackendService({
-    this.meta,
-  });
-
-  Future getdoc(doctype, name) async {
+  static Future getdoc(doctype, name) async {
     var queryParams = {
       'doctype': doctype,
       'name': name,
@@ -25,15 +20,18 @@ class BackendService {
     final response = await DioHelper.dio.get(
       '/method/frappe.desk.form.load.getdoc',
       queryParameters: queryParams,
-      options: Options(
-        validateStatus: (status) {
-          return status < 500;
-        },
+      options: buildCacheOptions(
+        Duration(days: 7),
+        forceRefresh: true,
+        options: Options(
+          validateStatus: (status) {
+            return status < 500;
+          },
+        ),
       ),
     );
 
     if (response.statusCode == 200) {
-      CacheHelper.putCache('$doctype$name', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
       logout();
@@ -42,7 +40,7 @@ class BackendService {
     }
   }
 
-  updateDoc(String doctype, String name, Map updateObj) async {
+  static updateDoc(String doctype, String name, Map updateObj) async {
     var response = await DioHelper.dio.put(
       '/resource/$doctype/$name',
       data: updateObj,
@@ -62,12 +60,13 @@ class BackendService {
     }
   }
 
-  Future<List> fetchList({
+  static Future<List> fetchList({
     @required List fieldnames,
     @required String doctype,
     List filters,
     pageLength,
     offset,
+    @required Map meta,
   }) async {
     var queryParams = {
       'doctype': doctype,
@@ -85,10 +84,14 @@ class BackendService {
     final response = await DioHelper.dio.get(
       '/method/frappe.desk.reportview.get',
       queryParameters: queryParams,
-      options: Options(
-        validateStatus: (status) {
-          return status < 500;
-        },
+      options: buildCacheOptions(
+        Duration(days: 7),
+        forceRefresh: true,
+        options: Options(
+          validateStatus: (status) {
+            return status < 500;
+          },
+        ),
       ),
     );
     if (response.statusCode == 200) {
@@ -124,8 +127,6 @@ class BackendService {
         newL.add(o);
       }
 
-      CacheHelper.putCache('${doctype}List', newL);
-
       return newL;
     } else if (response.statusCode == 403) {
       logout();
@@ -134,7 +135,7 @@ class BackendService {
     }
   }
 
-  Future postComment(refDocType, refName, content, email) async {
+  static Future postComment(refDocType, refName, content, email) async {
     var queryParams = {
       'reference_doctype': refDocType,
       'reference_name': refName,
@@ -153,21 +154,24 @@ class BackendService {
     }
   }
 
-  Future getDesktopPage(module) async {
+  static Future getDesktopPage(module) async {
     final response = await DioHelper.dio.post(
       '/method/frappe.desk.desktop.get_desktop_page',
       data: {
         'page': module,
       },
-      options: Options(
-        validateStatus: (status) {
-          return status < 500;
-        },
+      options: buildCacheOptions(
+        Duration(days: 7),
+        forceRefresh: true,
+        options: Options(
+          validateStatus: (status) {
+            return status < 500;
+          },
+        ),
       ),
     );
 
     if (response.statusCode == 200) {
-      CacheHelper.putCache('${module}Doctypes', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
       logout();
@@ -176,7 +180,7 @@ class BackendService {
     }
   }
 
-  Future sendEmail(
+  static Future sendEmail(
       {@required recipients,
       cc,
       bcc,
@@ -211,7 +215,7 @@ class BackendService {
     }
   }
 
-  Future login(usr, pwd) async {
+  static Future login(usr, pwd) async {
     final response = await DioHelper.dio.post(
       '/method/login',
       data: {
@@ -227,18 +231,21 @@ class BackendService {
     return response;
   }
 
-  Future getDeskSideBarItems() async {
+  static Future getDeskSideBarItems() async {
     final response = await DioHelper.dio.post(
       '/method/frappe.desk.desktop.get_desk_sidebar_items',
-      options: Options(
-        validateStatus: (status) {
-          return status < 500;
-        },
+      options: buildCacheOptions(
+        Duration(days: 7),
+        forceRefresh: true,
+        options: Options(
+          validateStatus: (status) {
+            return status < 500;
+          },
+        ),
       ),
     );
 
     if (response.statusCode == 200) {
-      CacheHelper.putCache('deskSidebarItems', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
       logout();
@@ -247,21 +254,24 @@ class BackendService {
     }
   }
 
-  getDoctype(doctype) async {
+  static getDoctype(doctype) async {
     var queryParams = {'doctype': doctype};
 
     final response = await DioHelper.dio.get(
       '/method/frappe.desk.form.load.getdoctype',
       queryParameters: queryParams,
-      options: Options(
-        validateStatus: (status) {
-          return status < 500;
-        },
+      options: buildCacheOptions(
+        Duration(days: 7),
+        forceRefresh: true,
+        options: Options(
+          validateStatus: (status) {
+            return status < 500;
+          },
+        ),
       ),
     );
 
     if (response.statusCode == 200) {
-      CacheHelper.putCache('${doctype}Meta', response.data);
       return response.data;
     } else if (response.statusCode == 403) {
       logout();
@@ -270,7 +280,7 @@ class BackendService {
     }
   }
 
-  void addAssignees(String doctype, String name, List assignees) async {
+  static void addAssignees(String doctype, String name, List assignees) async {
     var data = {
       'assign_to': json.encode(assignees),
       'assign_to_me': 0,
@@ -295,7 +305,7 @@ class BackendService {
     }
   }
 
-  removeAssignee(String doctype, String name, String assignTo) async {
+  static removeAssignee(String doctype, String name, String assignTo) async {
     var data = {
       'doctype': doctype,
       'name': name,
@@ -317,7 +327,7 @@ class BackendService {
     }
   }
 
-  Future getDocinfo(String doctype, String name) async {
+  static Future getDocinfo(String doctype, String name) async {
     var data = {
       "doctype": doctype,
       "name": name,
@@ -338,7 +348,7 @@ class BackendService {
     }
   }
 
-  void removeAttachment(
+  static void removeAttachment(
     String doctype,
     String name,
     String attachmentName,
@@ -364,7 +374,7 @@ class BackendService {
     }
   }
 
-  Future deleteComment(name) async {
+  static Future deleteComment(name) async {
     var queryParams = {
       'doctype': 'Comment',
       'name': name,
@@ -382,7 +392,8 @@ class BackendService {
     }
   }
 
-  Future uploadFile(String doctype, String name, List<File> files) async {
+  static Future uploadFile(
+      String doctype, String name, List<File> files) async {
     for (File file in files) {
       String fileName = file.path.split('/').last;
       FormData formData = FormData.fromMap({
@@ -404,7 +415,7 @@ class BackendService {
     }
   }
 
-  Future saveDocs(doctype, formValue) async {
+  static Future saveDocs(doctype, formValue) async {
     var data = {
       "doctype": doctype,
       ...formValue,
@@ -424,7 +435,7 @@ class BackendService {
     }
   }
 
-  Future<Map> searchLink({
+  static Future<Map> searchLink({
     String doctype,
     String refDoctype,
     String txt,
@@ -442,22 +453,27 @@ class BackendService {
     }
 
     final response = await DioHelper.dio.post(
-        '/method/frappe.desk.search.search_link',
-        data: queryParams,
-        options: Options(contentType: Headers.formUrlEncodedContentType));
+      '/method/frappe.desk.search.search_link',
+      data: queryParams,
+      options: buildCacheOptions(
+        Duration(days: 7),
+        forceRefresh: true,
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+          validateStatus: (status) {
+            return status < 500;
+          },
+        ),
+      ),
+    );
     if (response.statusCode == 200) {
-      if (pageLength != null && pageLength == 9999) {
-        CacheHelper.putCache('${doctype}LinkFull', response.data);
-      } else {
-        CacheHelper.putCache('$txt${doctype}Link', response.data);
-      }
       return response.data;
     } else {
       throw Exception('Failed to load album');
     }
   }
 
-  Future<Map> getContactList(query) async {
+  static Future<Map> getContactList(query) async {
     var data = {
       "txt": query,
     };
@@ -473,7 +489,7 @@ class BackendService {
     }
   }
 
-  Future toggleLike(String doctype, String name, bool isFav) async {
+  static Future toggleLike(String doctype, String name, bool isFav) async {
     var data = {
       'doctype': doctype,
       'name': name,
@@ -495,7 +511,7 @@ class BackendService {
     }
   }
 
-  Future getTags(String doctype, String txt) async {
+  static Future getTags(String doctype, String txt) async {
     var data = {
       'doctype': doctype,
       'txt': txt,
@@ -516,7 +532,7 @@ class BackendService {
     }
   }
 
-  Future removeTag(String doctype, String name, String tag) async {
+  static Future removeTag(String doctype, String name, String tag) async {
     var data = {
       'dt': doctype,
       'dn': name,
@@ -538,7 +554,7 @@ class BackendService {
     }
   }
 
-  Future addTag(String doctype, String name, String tag) async {
+  static Future addTag(String doctype, String name, String tag) async {
     var data = {
       'dt': doctype,
       'dn': name,
@@ -560,7 +576,7 @@ class BackendService {
     }
   }
 
-  Future addReview(String doctype, String name, Map reviewData) async {
+  static Future addReview(String doctype, String name, Map reviewData) async {
     var doc = {
       "doctype": doctype,
       "name": name,
@@ -589,7 +605,8 @@ class BackendService {
     }
   }
 
-  Future setPermission(String doctype, String name, Map shareInfo) async {
+  static Future setPermission(
+      String doctype, String name, Map shareInfo) async {
     var data = {
       'doctype': doctype,
       'name': name,
@@ -611,7 +628,7 @@ class BackendService {
     }
   }
 
-  Future shareAdd(String doctype, String name, Map shareInfo) async {
+  static Future shareAdd(String doctype, String name, Map shareInfo) async {
     var data = {
       'doctype': doctype,
       'name': name,

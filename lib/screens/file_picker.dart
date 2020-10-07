@@ -28,17 +28,8 @@ class CustomFilePicker extends StatefulWidget {
 
 class _FilePickerState extends State<CustomFilePicker> {
   List<File> _files = [];
-  bool _loadingPath = false;
-  BackendService backendService;
-
-  @override
-  void initState() {
-    super.initState();
-    backendService = BackendService();
-  }
 
   void _openFileExplorer() async {
-    setState(() => _loadingPath = true);
     try {
       _files = await FilePicker.getMultiFile(
             type: FileType.any,
@@ -48,9 +39,6 @@ class _FilePickerState extends State<CustomFilePicker> {
       print("Unsupported operation" + e.toString());
     }
     if (!mounted) return;
-    setState(() {
-      _loadingPath = false;
-    });
   }
 
   @override
@@ -73,7 +61,7 @@ class _FilePickerState extends State<CustomFilePicker> {
                 buttonType: ButtonType.primary,
                 onPressed: _files != null && _files.isNotEmpty
                     ? () async {
-                        await backendService.uploadFile(
+                        await BackendService.uploadFile(
                           widget.doctype,
                           widget.name,
                           _files,

@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
 
 import '../config/palette.dart';
 
-import '../utils/cache_helper.dart';
 import '../utils/config_helper.dart';
 import '../utils/queue_helper.dart';
 import '../utils/backend_service.dart';
@@ -52,44 +52,21 @@ class _FormViewState extends State<FormView>
   bool editMode = false;
   final user = ConfigHelper().user;
 
-  @override
-  void initState() {
-    super.initState();
-    backendService = BackendService();
-  }
-
   void _refresh() {
     setState(() {
       editMode = false;
     });
   }
 
-  Future _getData(ConnectivityStatus connectionStatus) {
+  Future _getData() {
     if (widget.queued) {
       return Future.delayed(
           Duration(seconds: 1), () => {"docs": widget.queuedData["data"]});
     } else {
-      if (connectionStatus == ConnectivityStatus.offline) {
-        return Future.delayed(
-          Duration(seconds: 1),
-          () {
-            var response =
-                CacheHelper.getCache('${widget.doctype}${widget.name}')["data"];
-            if (response != null) {
-              return response;
-            } else {
-              return {
-                "success": false,
-              };
-            }
-          },
-        );
-      } else {
-        return backendService.getdoc(
-          widget.doctype,
-          widget.name,
-        );
-      }
+      return BackendService.getdoc(
+        widget.doctype,
+        widget.name,
+      );
     }
   }
 
@@ -163,8 +140,8 @@ class _FormViewState extends State<FormView>
                     builder: (context) {
                       return EmailForm(
                         callback: _refresh,
-                        subjectField: doc[widget.meta["subject_field"] ??
-                            widget.meta["title_field"]],
+                        subjectField: doc[widget.meta["subject_field"]] ??
+                            getTitle(widget.meta, doc),
                         senderField: doc[widget.meta["sender_field"]],
                         doctype: widget.doctype,
                         doc: widget.name,
@@ -187,7 +164,7 @@ class _FormViewState extends State<FormView>
       if (connectionStatus == ConnectivityStatus.offline) {
         if (widget.queuedData != null) {
           widget.queuedData["data"] = [formValue];
-          widget.queuedData["title"] = formValue[widget.meta["title_field"]];
+          widget.queuedData["title"] = getTitle(widget.meta, formValue);
 
           QueueHelper.putAt(
             widget.queuedData["qIdx"],
@@ -198,7 +175,7 @@ class _FormViewState extends State<FormView>
             "type": "update",
             "name": widget.name,
             "doctype": widget.doctype,
-            "title": formValue[widget.meta["title_field"]],
+            "title": getTitle(widget.meta, formValue),
             "data": [formValue],
           });
         }
@@ -208,7 +185,7 @@ class _FormViewState extends State<FormView>
           context: context,
         );
       } else {
-        await backendService.updateDoc(
+        await BackendService.updateDoc(
           widget.doctype,
           widget.name,
           formValue,
@@ -228,7 +205,12 @@ class _FormViewState extends State<FormView>
     BuildContext context,
     ConnectivityStatus connectionStatus,
   }) {
-    var title = doc[widget.meta["title_field"]] ?? doc["name"];
+    String title;
+    if (widget.queuedData != null) {
+      title = widget.queuedData["title"];
+    } else {
+      title = getTitle(widget.meta, doc) ?? "";
+    }
 
     return SliverAppBar(
       elevation: 0,
@@ -384,7 +366,7 @@ class _FormViewState extends State<FormView>
       context,
     );
     return FutureBuilder(
-        future: _getData(connectionStatus),
+        future: _getData(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data["success"] == false) {

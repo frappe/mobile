@@ -26,12 +26,10 @@ class _LoginState extends State<Login> {
   var serverURL;
   var savedUsr;
   var savedPwd;
-  BackendService backendService;
 
   @override
   void initState() {
     super.initState();
-    backendService = BackendService();
     serverURL = ConfigHelper().baseUrl;
     savedUsr = CacheHelper.getCache('usr')["data"];
     savedPwd = CacheHelper.getCache('pwd')["data"];
@@ -41,7 +39,7 @@ class _LoginState extends State<Login> {
     await setBaseUrl(data["serverURL"]);
 
     var response2 =
-        await backendService.login(data["usr"].trimRight(), data["pwd"]);
+        await BackendService.login(data["usr"].trimRight(), data["pwd"]);
 
     if (response2.statusCode == 200) {
       ConfigHelper.set('isLoggedIn', true);

@@ -13,7 +13,6 @@ class CommentBox extends StatelessWidget {
 
   void _choiceAction(
     BuildContext context,
-    BackendService backendService,
     String choice,
   ) {
     if (choice == 'Delete') {
@@ -27,7 +26,7 @@ class CommentBox extends StatelessWidget {
                 child: Text('Yes'),
                 onPressed: () async {
                   Navigator.of(context).pop();
-                  backendService.deleteComment(data["name"]);
+                  BackendService.deleteComment(data["name"]);
                   callback();
                 },
               ),
@@ -46,7 +45,6 @@ class CommentBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BackendService backendService = BackendService();
     var time = timeago.format(DateTime.parse(data["creation"]));
 
     return Card(
@@ -59,7 +57,7 @@ class CommentBox extends StatelessWidget {
             trailing: ConfigHelper().user == data["owner"]
                 ? PopupMenuButton(
                     onSelected: (choice) {
-                      _choiceAction(context, backendService, choice);
+                      _choiceAction(context, choice);
                     },
                     itemBuilder: (context) {
                       return [
