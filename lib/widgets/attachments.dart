@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 
@@ -128,7 +129,12 @@ class _AttachmentsState extends State<Attachments> {
             children: _generateChildren(docInfo["attachments"]),
           );
         } else if (snapshot.hasError) {
-          return Text("${snapshot.error}");
+          var error = (snapshot.error as Response);
+          if (error.statusCode == 403) {
+            handle403();
+          } else {
+            return Text("${snapshot.error}");
+          }
         }
 
         return Center(child: CircularProgressIndicator());

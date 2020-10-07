@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import '../app.dart';
@@ -124,7 +125,12 @@ class _DoctypeViewState extends State<DoctypeView> {
                 children: doctypesWidget,
               );
             } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
+              var error = (snapshot.error as Response);
+              if (error.statusCode == 403) {
+                handle403();
+              } else {
+                return Text("${snapshot.error}");
+              }
             }
             return Container(
               child: Center(

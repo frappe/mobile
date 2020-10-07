@@ -24,16 +24,6 @@ import '../utils/backend_service.dart';
 import '../widgets/section.dart';
 import '../widgets/custom_expansion_tile.dart';
 
-logout() async {
-  var cookieJar = await DioHelper.getCookiePath();
-
-  cookieJar.delete(ConfigHelper().uri);
-
-  ConfigHelper.set('isLoggedIn', false);
-
-  locator<NavigationService>().clearAllAndNavigateTo('login');
-}
-
 Future processData({
   String doctype,
 }) async {
@@ -426,4 +416,17 @@ getTitle(Map meta, Map doc) {
   } else {
     return doc["name"];
   }
+}
+
+clearLoginInfo() async {
+  await DioHelper.getCookiePath()
+    ..delete(
+      ConfigHelper().uri,
+    );
+  ConfigHelper.set('isLoggedIn', false);
+}
+
+handle403() async {
+  await clearLoginInfo();
+  locator<NavigationService>().clearAllAndNavigateTo('session_expired');
 }

@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import '../screens/filter_list.dart';
@@ -184,7 +185,12 @@ class _ActivateModulesState extends State<ActivateModules> {
                 children: _generateChildren(newMap),
               );
             } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
+              var error = (snapshot.error as Response);
+              if (error.statusCode == 403) {
+                handle403();
+              } else {
+                return Text("${snapshot.error}");
+              }
             } else {
               return Center(child: CircularProgressIndicator());
             }

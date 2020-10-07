@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/main.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 
 import '../config/palette.dart';
 import '../screens/activate_modules.dart';
+import '../service_locator.dart';
 import '../utils/helpers.dart';
 import '../widgets/card_list_tile.dart';
 
@@ -17,14 +18,6 @@ class SettingsPage extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Container(
-          //   child: Text(localStorage.getString('user')),
-          //   color: Palette.bgColor,
-          // ),
-          // Container(
-          //   child: Text(localStorage.getString('serverURL')),
-          //   color: Palette.bgColor,
-          // ),
           CardListTile(
             title: Text('Activate Modules'),
             onTap: () {
@@ -40,8 +33,9 @@ class SettingsPage extends StatelessWidget {
           ),
           CardListTile(
             title: Text('Logout'),
-            onTap: () {
-              logout();
+            onTap: () async {
+              await clearLoginInfo();
+              locator<NavigationService>().clearAllAndNavigateTo('login');
             },
           ),
         ],

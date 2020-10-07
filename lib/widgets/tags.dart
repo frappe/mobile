@@ -1,11 +1,15 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:frappe_app/screens/add_tags.dart';
+
+import '../screens/add_tags.dart';
 
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
+
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
+
 import '../widgets/frappe_button.dart';
 import '../widgets/card_list_tile.dart';
 
@@ -111,7 +115,12 @@ class _TagsState extends State<Tags> {
             children: _generateChildren(tags),
           );
         } else if (snapshot.hasError) {
-          return Text("${snapshot.error}");
+          var error = (snapshot.error as Response);
+          if (error.statusCode == 403) {
+            handle403();
+          } else {
+            return Text("${snapshot.error}");
+          }
         }
 
         return Center(child: CircularProgressIndicator());

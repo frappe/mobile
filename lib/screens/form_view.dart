@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/utils/helpers.dart';
@@ -443,7 +444,12 @@ class _FormViewState extends State<FormView>
               ),
             );
           } else if (snapshot.hasError) {
-            return Text("${snapshot.error}");
+            var error = (snapshot.error as Response);
+            if (error.statusCode == 403) {
+              handle403();
+            } else {
+              return Text("${snapshot.error}");
+            }
           }
 
           return Center(child: CircularProgressIndicator());

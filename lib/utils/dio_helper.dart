@@ -34,7 +34,7 @@ class DioHelper {
     return _manager;
   }
 
-  static Future getCookiePath() async {
+  static Future<PersistCookieJar> getCookiePath() async {
     Directory appDocDir = await getApplicationSupportDirectory();
     String appDocPath = appDocDir.path;
 
