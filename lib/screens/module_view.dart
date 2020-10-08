@@ -26,7 +26,6 @@ class _ModuleViewState extends State<ModuleView> {
 
   @override
   Widget build(BuildContext context) {
-    // DioHelper.getCacheManager(ConfigHelper().baseUrl).clearAll();
     return Scaffold(
       backgroundColor: Palette.bgColor,
       appBar: AppBar(

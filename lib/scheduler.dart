@@ -1,4 +1,6 @@
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frappe_app/utils/config_helper.dart';
+import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/utils/queue_helper.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -20,19 +22,56 @@ void callbackDispatcher() {
     await locator<StorageService>().initBox('cache');
     await locator<StorageService>().initBox('config');
     await initConfig();
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('app_icon');
+
+    final IOSInitializationSettings initializationSettingsIOS =
+        IOSInitializationSettings();
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+      iOS: initializationSettingsIOS,
+      android: initializationSettingsAndroid,
+    );
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+    );
+
+    var notificationCount = await getActiveNotifications();
 
     if (ConfigHelper().isLoggedIn) {
       switch (task) {
         case TASK_SYNC_DATA:
-          print("$task was executed. inputData = $inputData");
+          await showNotification(
+            title: "Sync",
+            subtitle: "Downloading Modules",
+            index: notificationCount,
+          );
+          print("$task was executed");
           await syncnow();
           print('Sync complete');
+          await showNotification(
+            title: "Sync",
+            subtitle: "Downloading Modules completed",
+            index: notificationCount,
+          );
 
           break;
 
         case TASK_PROCESS_QUEUE:
           print('process queue started');
+          await showNotification(
+            title: "Queue",
+            subtitle: "Processing Queue",
+            index: notificationCount,
+          );
           await QueueHelper.processQueue();
+          await showNotification(
+            title: "Queue",
+            subtitle: "Processing Queue Completed",
+            index: notificationCount,
+          );
           break;
       }
       return Future.value(true);
