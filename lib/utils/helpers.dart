@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:frappe_app/screens/no_internet.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -429,4 +431,14 @@ clearLoginInfo() async {
 handle403() async {
   await clearLoginInfo();
   locator<NavigationService>().clearAllAndNavigateTo('session_expired');
+}
+
+handleError(Response error) {
+  if (error.statusCode == HttpStatus.forbidden) {
+    handle403();
+  } else if (error.statusCode == HttpStatus.serviceUnavailable) {
+    return NoInternet();
+  } else {
+    return Text("${error.statusMessage}");
+  }
 }

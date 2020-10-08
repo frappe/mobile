@@ -16,26 +16,38 @@ class BackendService {
       'name': name,
     };
 
-    final response = await DioHelper.dio.get(
-      '/method/frappe.desk.form.load.getdoc',
-      queryParameters: queryParams,
-      options: buildCacheOptions(
-        Duration(days: 7),
-        forceRefresh: true,
-        options: Options(
-          validateStatus: (status) {
-            return status < 500;
-          },
+    try {
+      final response = await DioHelper.dio.get(
+        '/method/frappe.desk.form.load.getdoc',
+        queryParameters: queryParams,
+        options: buildCacheOptions(
+          Duration(days: 7),
+          forceRefresh: true,
+          options: Options(
+            validateStatus: (status) {
+              return status < 500;
+            },
+          ),
         ),
-      ),
-    );
+      );
 
-    if (response.statusCode == 200) {
-      return response.data;
-    } else if (response.statusCode == 403) {
-      throw response;
-    } else {
-      throw Exception('Something went wrong');
+      if (response.statusCode == 200) {
+        return response.data;
+      } else if (response.statusCode == 403) {
+        throw response;
+      } else {
+        throw Response(statusMessage: 'Something went wrong');
+      }
+    } catch (e) {
+      var error = (e as DioError).error;
+      if (error is SocketException) {
+        throw Response(
+          statusCode: HttpStatus.serviceUnavailable,
+          statusMessage: error.message,
+        );
+      } else {
+        throw Response(statusMessage: error.message);
+      }
     }
   }
 
@@ -76,61 +88,76 @@ class BackendService {
 
     queryParams['limit_start'] = offset.toString();
 
+    var subK = queryParams.toString();
+
     if (filters != null && filters.length != 0) {
       queryParams['filters'] = jsonEncode(filters);
     }
 
-    final response = await DioHelper.dio.get(
-      '/method/frappe.desk.reportview.get',
-      queryParameters: queryParams,
-      options: buildCacheOptions(
-        Duration(days: 7),
-        forceRefresh: true,
-        options: Options(
-          validateStatus: (status) {
-            return status < 500;
-          },
+    try {
+      final response = await DioHelper.dio.get(
+        '/method/frappe.desk.reportview.get',
+        queryParameters: queryParams,
+        options: buildCacheOptions(
+          Duration(days: 7),
+          subKey: subK,
+          forceRefresh: true,
+          options: Options(
+            validateStatus: (status) {
+              return status < 500;
+            },
+          ),
         ),
-      ),
-    );
-    if (response.statusCode == 200) {
-      var l = response.data["message"];
-      var newL = [];
+      );
+      if (response.statusCode == HttpStatus.ok) {
+        var l = response.data["message"];
+        var newL = [];
 
-      if (l.length == 0) {
-        return newL;
-      }
-
-      for (int i = 0; i < l["values"].length; i++) {
-        var o = {};
-        for (int j = 0; j < l["keys"].length; j++) {
-          var key = l["keys"][j];
-          var value = l["values"][i][j];
-
-          if (key == "docstatus") {
-            key = "status";
-            if (isSubmittable(meta)) {
-              if (value == 0) {
-                value = "Draft";
-              } else if (value == 1) {
-                value = "Submitted";
-              } else if (value == 2) {
-                value = "Cancelled";
-              }
-            } else {
-              value = value == 0 ? "Enabled" : "Disabled";
-            }
-          }
-          o[key] = value;
+        if (l.length == 0) {
+          return newL;
         }
-        newL.add(o);
-      }
 
-      return newL;
-    } else if (response.statusCode == 403) {
-      throw response;
-    } else {
-      throw Exception('Something went wrong');
+        for (int i = 0; i < l["values"].length; i++) {
+          var o = {};
+          for (int j = 0; j < l["keys"].length; j++) {
+            var key = l["keys"][j];
+            var value = l["values"][i][j];
+
+            if (key == "docstatus") {
+              key = "status";
+              if (isSubmittable(meta)) {
+                if (value == 0) {
+                  value = "Draft";
+                } else if (value == 1) {
+                  value = "Submitted";
+                } else if (value == 2) {
+                  value = "Cancelled";
+                }
+              } else {
+                value = value == 0 ? "Enabled" : "Disabled";
+              }
+            }
+            o[key] = value;
+          }
+          newL.add(o);
+        }
+
+        return newL;
+      } else if (response.statusCode == HttpStatus.forbidden) {
+        throw response;
+      } else {
+        throw Response(statusMessage: 'Something went wrong');
+      }
+    } catch (e) {
+      var error = (e as DioError).error;
+      if (error is SocketException) {
+        throw Response(
+          statusCode: HttpStatus.serviceUnavailable,
+          statusMessage: error.message,
+        );
+      } else {
+        throw Response(statusMessage: error.message);
+      }
     }
   }
 
@@ -154,28 +181,40 @@ class BackendService {
   }
 
   static Future getDesktopPage(module) async {
-    final response = await DioHelper.dio.post(
-      '/method/frappe.desk.desktop.get_desktop_page',
-      data: {
-        'page': module,
-      },
-      options: buildCacheOptions(
-        Duration(days: 7),
-        forceRefresh: true,
-        options: Options(
-          validateStatus: (status) {
-            return status < 500;
-          },
+    try {
+      final response = await DioHelper.dio.post(
+        '/method/frappe.desk.desktop.get_desktop_page',
+        data: {
+          'page': module,
+        },
+        options: buildCacheOptions(
+          Duration(days: 7),
+          forceRefresh: true,
+          options: Options(
+            validateStatus: (status) {
+              return status < 500;
+            },
+          ),
         ),
-      ),
-    );
+      );
 
-    if (response.statusCode == 200) {
-      return response.data;
-    } else if (response.statusCode == 403) {
-      throw response;
-    } else {
-      throw Exception('Something went wrong');
+      if (response.statusCode == 200) {
+        return response.data;
+      } else if (response.statusCode == 403) {
+        throw response;
+      } else {
+        throw Response(statusMessage: 'Something went wrong');
+      }
+    } catch (e) {
+      var error = (e as DioError).error;
+      if (error is SocketException) {
+        throw Response(
+          statusCode: HttpStatus.serviceUnavailable,
+          statusMessage: error.message,
+        );
+      } else {
+        throw Response(statusMessage: error.message);
+      }
     }
   }
 
@@ -231,51 +270,75 @@ class BackendService {
   }
 
   static Future getDeskSideBarItems() async {
-    final response = await DioHelper.dio.post(
-      '/method/frappe.desk.desktop.get_desk_sidebar_items',
-      options: buildCacheOptions(
-        Duration(days: 7),
-        forceRefresh: true,
-        options: Options(
-          validateStatus: (status) {
-            return status < 500;
-          },
+    try {
+      final response = await DioHelper.dio.post(
+        '/method/frappe.desk.desktop.get_desk_sidebar_items',
+        options: buildCacheOptions(
+          Duration(days: 7),
+          forceRefresh: true,
+          options: Options(
+            validateStatus: (status) {
+              return status < 500;
+            },
+          ),
         ),
-      ),
-    );
+      );
 
-    if (response.statusCode == 200) {
-      return response.data;
-    } else if (response.statusCode == 403) {
-      throw response;
-    } else {
-      throw Exception('Something went wrong');
+      if (response.statusCode == HttpStatus.ok) {
+        return response.data;
+      } else if (response.statusCode == HttpStatus.forbidden) {
+        throw response;
+      } else {
+        throw Response(statusMessage: 'Something went wrong');
+      }
+    } catch (e) {
+      var error = (e as DioError).error;
+      if (error is SocketException) {
+        throw Response(
+          statusCode: HttpStatus.serviceUnavailable,
+          statusMessage: error.message,
+        );
+      } else {
+        throw Response(statusMessage: error.message);
+      }
     }
   }
 
   static getDoctype(doctype) async {
     var queryParams = {'doctype': doctype};
 
-    final response = await DioHelper.dio.get(
-      '/method/frappe.desk.form.load.getdoctype',
-      queryParameters: queryParams,
-      options: buildCacheOptions(
-        Duration(days: 7),
-        forceRefresh: true,
-        options: Options(
-          validateStatus: (status) {
-            return status < 500;
-          },
+    try {
+      final response = await DioHelper.dio.get(
+        '/method/frappe.desk.form.load.getdoctype',
+        queryParameters: queryParams,
+        options: buildCacheOptions(
+          Duration(days: 7),
+          forceRefresh: true,
+          options: Options(
+            validateStatus: (status) {
+              return status < 500;
+            },
+          ),
         ),
-      ),
-    );
+      );
 
-    if (response.statusCode == 200) {
-      return response.data;
-    } else if (response.statusCode == 403) {
-      throw response;
-    } else {
-      throw Exception('Something went wrong');
+      if (response.statusCode == 200) {
+        return response.data;
+      } else if (response.statusCode == 403) {
+        throw response;
+      } else {
+        throw Response(statusMessage: 'Something went wrong');
+      }
+    } catch (e) {
+      var error = (e as DioError).error;
+      if (error is SocketException) {
+        throw Response(
+          statusCode: HttpStatus.serviceUnavailable,
+          statusMessage: error.message,
+        );
+      } else {
+        throw Response(statusMessage: error.message);
+      }
     }
   }
 
@@ -451,24 +514,38 @@ class BackendService {
       queryParams['page_length'] = pageLength;
     }
 
-    final response = await DioHelper.dio.post(
-      '/method/frappe.desk.search.search_link',
-      data: queryParams,
-      options: buildCacheOptions(
-        Duration(days: 7),
-        forceRefresh: true,
-        options: Options(
-          contentType: Headers.formUrlEncodedContentType,
-          validateStatus: (status) {
-            return status < 500;
-          },
+    try {
+      final response = await DioHelper.dio.post(
+        '/method/frappe.desk.search.search_link',
+        data: queryParams,
+        options: buildCacheOptions(
+          Duration(days: 7),
+          forceRefresh: true,
+          options: Options(
+            contentType: Headers.formUrlEncodedContentType,
+            validateStatus: (status) {
+              return status < 500;
+            },
+          ),
         ),
-      ),
-    );
-    if (response.statusCode == 200) {
-      return response.data;
-    } else {
-      throw Exception('Something went wrong');
+      );
+      if (response.statusCode == 200) {
+        return response.data;
+      } else if (response.statusCode == HttpStatus.forbidden) {
+        throw response;
+      } else {
+        throw Response(statusMessage: 'Something went wrong');
+      }
+    } catch (e) {
+      var error = (e as DioError).error;
+      if (error is SocketException) {
+        throw Response(
+          statusCode: HttpStatus.serviceUnavailable,
+          statusMessage: error.message,
+        );
+      } else {
+        throw Response(statusMessage: error.message);
+      }
     }
   }
 

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:frappe_app/utils/helpers.dart';
@@ -12,7 +11,6 @@ import '../config/palette.dart';
 import '../config/frappe_icons.dart';
 
 import '../screens/filter_list.dart';
-import '../screens/no_internet.dart';
 
 import '../utils/backend_service.dart';
 import '../utils/config_helper.dart';
@@ -392,14 +390,11 @@ class CustomSearch extends SearchDelegate {
             },
           );
         } else if (snapshot.hasError) {
-          var error = (snapshot.error as Response);
-          if (error.statusCode == 403) {
-            handle403();
-          } else {
-            return Text("${snapshot.error}");
-          }
+          return handleError(snapshot.error);
         } else {
-          return Center(child: CircularProgressIndicator());
+          return Center(
+            child: CircularProgressIndicator(),
+          );
         }
       },
     );
