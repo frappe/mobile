@@ -8,6 +8,10 @@ class NavigationService {
     return navigatorKey.currentState.pushNamed(routeName);
   }
 
+  Future<dynamic> pushReplacement(String routeName) {
+    return navigatorKey.currentState.pushReplacementNamed(routeName);
+  }
+
   Future<dynamic> clearAllAndNavigateTo(String routeName) {
     return navigatorKey.currentState.pushNamedAndRemoveUntil(
       routeName,

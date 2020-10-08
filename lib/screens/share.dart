@@ -1,12 +1,13 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/form/controls/control.dart';
 
+import '../form/controls/control.dart';
 import '../form/controls/link_field.dart';
+
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
+
 import '../widgets/custom_expansion_tile.dart';
 import '../widgets/custom_form.dart';
 import '../widgets/frappe_button.dart';
@@ -254,16 +255,12 @@ class _ShareState extends State<Share> {
                 ],
               );
             } else if (snapshot.hasError) {
-              var error = (snapshot.error as Response);
-              if (error.statusCode == 403) {
-                handle403();
-              } else {
-                return Text("${snapshot.error}");
-              }
+              return handleError(snapshot.error);
+            } else {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
             }
-            return Center(
-              child: CircularProgressIndicator(),
-            );
           },
         ),
       ),

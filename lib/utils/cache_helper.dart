@@ -55,19 +55,22 @@ class CacheHelper {
   }
 
   static cacheDocList(String doctype) async {
-    var docMeta = await BackendService.getDoctype(doctype);
+    var docMeta = await processData(doctype: doctype);
     docMeta = docMeta["docs"][0];
     await cacheLinkFields(docMeta);
-    var docList = await BackendService.fetchList(
-      fieldnames: generateFieldnames(doctype, docMeta),
-      meta: docMeta,
-      doctype: doctype,
-      pageLength: 50,
-      offset: 0,
-    );
 
-    for (var doc in docList) {
-      await cacheForm(doctype, doc["name"]);
+    for (var i in List.generate(5, (index) => index)) {
+      var docList = await BackendService.fetchList(
+        doctype: doctype,
+        fieldnames: generateFieldnames(doctype, docMeta),
+        pageLength: 10,
+        offset: i * 10,
+        meta: docMeta,
+      );
+
+      for (var doc in docList) {
+        await cacheForm(doctype, doc["name"]);
+      }
     }
   }
 

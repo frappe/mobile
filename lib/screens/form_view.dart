@@ -444,15 +444,12 @@ class _FormViewState extends State<FormView>
               ),
             );
           } else if (snapshot.hasError) {
-            var error = (snapshot.error as Response);
-            if (error.statusCode == 403) {
-              handle403();
-            } else {
-              return Text("${snapshot.error}");
-            }
+            return handleError(snapshot.error);
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
           }
-
-          return Center(child: CircularProgressIndicator());
         });
   }
 }

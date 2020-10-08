@@ -1,14 +1,17 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import './frappe_button.dart';
+
 import '../config/palette.dart';
 import '../config/frappe_icons.dart';
+
 import '../widgets/user_avatar.dart';
 import '../widgets/card_list_tile.dart';
+
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
+
 import '../screens/add_assignees.dart';
 
 class Assignees extends StatefulWidget {
@@ -125,15 +128,12 @@ class _AssigneesState extends State<Assignees> {
             children: _generateChildren(docInfo["assignments"]),
           );
         } else if (snapshot.hasError) {
-          var error = (snapshot.error as Response);
-          if (error.statusCode == 403) {
-            handle403();
-          } else {
-            return Text("${snapshot.error}");
-          }
+          return handleError(snapshot.error);
+        } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
         }
-
-        return Center(child: CircularProgressIndicator());
       },
     );
   }

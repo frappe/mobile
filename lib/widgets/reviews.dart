@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import '../screens/add_review.dart';
@@ -139,15 +138,10 @@ class _ReviewsState extends State<Reviews> {
             children: _generateChildren(reviews),
           );
         } else if (snapshot.hasError) {
-          var error = (snapshot.error as Response);
-          if (error.statusCode == 403) {
-            handle403();
-          } else {
-            return Text("${snapshot.error}");
-          }
+          return handleError(snapshot.error);
+        } else {
+          return Center(child: CircularProgressIndicator());
         }
-
-        return Center(child: CircularProgressIndicator());
       },
     );
   }

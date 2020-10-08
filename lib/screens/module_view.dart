@@ -1,12 +1,9 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:frappe_app/utils/dio_helper.dart';
 import 'package:frappe_app/utils/helpers.dart';
 
 import 'doctype_view.dart';
 
 import '../screens/activate_modules.dart';
-import '../screens/no_internet.dart';
 
 import '../widgets/frappe_button.dart';
 import '../widgets/card_list_tile.dart';
@@ -29,6 +26,7 @@ class _ModuleViewState extends State<ModuleView> {
 
   @override
   Widget build(BuildContext context) {
+    // DioHelper.getCacheManager(ConfigHelper().baseUrl).clearAll();
     return Scaffold(
       backgroundColor: Palette.bgColor,
       appBar: AppBar(
@@ -43,9 +41,6 @@ class _ModuleViewState extends State<ModuleView> {
           future: _getData(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              if (snapshot.data["success"] == false) {
-                return NoInternet();
-              }
               var activeModules;
               if (ConfigHelper().activeModules != null) {
                 activeModules = ConfigHelper().activeModules;
@@ -125,14 +120,12 @@ class _ModuleViewState extends State<ModuleView> {
                 children: modulesWidget,
               );
             } else if (snapshot.hasError) {
-              var error = (snapshot.error as Response);
-              if (error.statusCode == 403) {
-                handle403();
-              } else {
-                return Text("${snapshot.error}");
-              }
+              return handleError(snapshot.error);
+            } else {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
             }
-            return Center(child: CircularProgressIndicator());
           },
         ),
       ),
