@@ -17,6 +17,8 @@ environment:
   sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
+  device_info: ^0.4.2+4
+  flutter_local_notifications: ^2.0.0
   dio_http_cache: ^0.2.11
   workmanager: ^0.2.3
   get_it: ^5.0.0

@@ -63,22 +63,40 @@ class _SimpleFormState extends State<SimpleForm> {
                       context: context,
                     );
                   } else {
-                    var response = await BackendService.saveDocs(
-                      widget.meta["name"],
-                      formValue,
-                    );
-
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
+                    try {
+                      var response = await BackendService.saveDocs(
+                        widget.meta["name"],
+                        formValue,
+                      );
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return Router(
+                                viewType: ViewType.form,
+                                doctype: widget.meta["name"],
+                                name: response.data["docs"][0]["name"]);
+                          },
+                        ),
+                      );
+                    } catch (e) {
+                      showDialog(
+                        context: context,
                         builder: (context) {
-                          return Router(
-                              viewType: ViewType.form,
-                              doctype: widget.meta["name"],
-                              name: response.data["docs"][0]["name"]);
+                          return AlertDialog(
+                            title: Text(e.error),
+                            actions: <Widget>[
+                              FlatButton(
+                                child: Text('Ok'),
+                                onPressed: () async {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
                         },
-                      ),
-                    );
+                      );
+                    }
                   }
                 }
               },

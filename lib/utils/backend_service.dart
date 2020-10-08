@@ -67,7 +67,7 @@ class BackendService {
     } else if (response.statusCode == 403) {
       throw response;
     } else {
-      throw Exception('Something went wrong');
+      throw Response(statusMessage: 'Something went wrong');
     }
   }
 
@@ -493,7 +493,7 @@ class BackendService {
     if (response.statusCode == 200) {
       return response;
     } else {
-      throw Exception('Something went wrong');
+      throw Response(statusMessage: 'Something went wrong');
     }
   }
 

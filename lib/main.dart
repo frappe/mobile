@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'scheduler.dart';
@@ -11,6 +12,8 @@ import 'services/storage_service.dart';
 import 'app.dart';
 import 'utils/http.dart';
 
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupLocator();
@@ -24,6 +27,19 @@ void main() async {
           : true // optional: set false to disable printing logs to console
       );
   await initConfig();
+
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('app_icon');
+
+  final IOSInitializationSettings initializationSettingsIOS =
+      IOSInitializationSettings();
+  final InitializationSettings initializationSettings = InitializationSettings(
+    iOS: initializationSettingsIOS,
+    android: initializationSettingsAndroid,
+  );
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+  );
   // var packageInfo = await PackageInfo.fromPlatform();
   // var currentVersion = ConfigHelper().version;
   // if (currentVersion == null || packageInfo.version != currentVersion) {
