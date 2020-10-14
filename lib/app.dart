@@ -83,7 +83,9 @@ class _FrappeAppState extends State<FrappeApp> {
           },
           child: Scaffold(
             body: _isLoaded
-                ? _isLoggedIn ? CustomPersistentBottomNavBar() : Login()
+                ? _isLoggedIn
+                    ? CustomPersistentBottomNavBar()
+                    : Login()
                 : Center(
                     child: CircularProgressIndicator(),
                   ),
@@ -99,7 +101,7 @@ class _FrappeAppState extends State<FrappeApp> {
   }
 }
 
-class Router extends StatelessWidget {
+class CustomRouter extends StatelessWidget {
   final ViewType viewType;
   final String doctype;
   final String name;
@@ -108,7 +110,7 @@ class Router extends StatelessWidget {
   final Map queuedData;
   final bool queued;
 
-  Router({
+  CustomRouter({
     @required this.viewType,
     @required this.doctype,
     this.name,

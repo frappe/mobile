@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
@@ -38,39 +40,48 @@ class _LoginState extends State<Login> {
   _authenticate(data) async {
     await setBaseUrl(data["serverURL"]);
 
-    var response2 =
-        await BackendService.login(data["usr"].trimRight(), data["pwd"]);
+    try {
+      var response =
+          await BackendService.login(data["usr"].trimRight(), data["pwd"]);
 
-    if (response2.statusCode == 200) {
-      ConfigHelper.set('isLoggedIn', true);
+      if (response.statusCode == 200) {
+        ConfigHelper.set('isLoggedIn', true);
 
-      FrappeAlert.successAlert(title: 'Success', context: context);
+        FrappeAlert.successAlert(title: 'Success', context: context);
 
-      var userId =
-          response2.headers.map["set-cookie"][3].split(';')[0].split('=')[1];
-      ConfigHelper.set('userId', userId);
-      ConfigHelper.set('user', response2.data["full_name"]);
-      CacheHelper.putCache(
-        'usr',
-        data["usr"].trimRight(),
-      );
-      CacheHelper.putCache(
-        'pwd',
-        data["pwd"],
-      );
+        var userId =
+            response.headers.map["set-cookie"][3].split(';')[0].split('=')[1];
+        ConfigHelper.set('userId', userId);
+        ConfigHelper.set('user', response.data["full_name"]);
+        CacheHelper.putCache(
+          'usr',
+          data["usr"].trimRight(),
+        );
+        CacheHelper.putCache(
+          'pwd',
+          data["pwd"],
+        );
 
-      await cacheAllUsers();
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) {
-            return CustomPersistentBottomNavBar();
-          },
-        ),
-      );
-    } else {
+        await cacheAllUsers();
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) {
+              return CustomPersistentBottomNavBar();
+            },
+          ),
+        );
+      } else if (response.statusCode == HttpStatus.unauthorized) {
+        ConfigHelper.set('isLoggedIn', false);
+
+        FrappeAlert.errorAlert(
+            title: "Not Authorized",
+            subtitle: 'Invalid Username or Password',
+            context: context);
+      }
+    } catch (e) {
       ConfigHelper.set('isLoggedIn', false);
-
-      FrappeAlert.errorAlert(title: 'Login Failed', context: context);
+      FrappeAlert.errorAlert(
+          title: "Error", subtitle: e.message, context: context);
     }
   }
 

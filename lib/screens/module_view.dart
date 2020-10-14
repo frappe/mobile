@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/utils/cache_helper.dart';
+import 'package:frappe_app/utils/frappe_alert.dart';
 import 'package:frappe_app/utils/helpers.dart';
+import 'package:provider/provider.dart';
 
 import 'doctype_view.dart';
 
@@ -26,6 +29,10 @@ class _ModuleViewState extends State<ModuleView> {
 
   @override
   Widget build(BuildContext context) {
+    var connectionStatus = Provider.of<ConnectivityStatus>(
+      context,
+    );
+
     return Scaffold(
       backgroundColor: Palette.bgColor,
       appBar: AppBar(
@@ -88,20 +95,31 @@ class _ModuleViewState extends State<ModuleView> {
                       const EdgeInsets.only(left: 10.0, right: 10.0, top: 8.0),
                   child: CardListTile(
                     title: Text(m["label"]),
-                    // trailing: IconButton(
-                    //   padding: EdgeInsets.zero,
-                    //   icon: Icon(
-                    //     Icons.file_download,
-                    //   ),
-                    //   onPressed: () async {
-                    //     await CacheHelper.cacheModule(m["name"]);
-                    //     FrappeAlert.infoAlert(
-                    //       title: '${m["name"]} is Downloaded',
-                    //       context: context,
-                    //     );
-                    //     setState(() {});
-                    //   },
-                    // ),
+                    trailing: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: Icon(
+                        Icons.cloud_download,
+                      ),
+                      onPressed: () async {
+                        if (connectionStatus == null ||
+                            connectionStatus == ConnectivityStatus.offline) {
+                          FrappeAlert.errorAlert(
+                              title: "Unable to Download, App is Offline",
+                              context: context);
+                        } else {
+                          FrappeAlert.infoAlert(
+                            title: 'Downloading ${m["name"]}...',
+                            context: context,
+                          );
+                          await CacheHelper.cacheModule(m["name"]);
+                          FrappeAlert.infoAlert(
+                            title: '${m["name"]} is Downloaded',
+                            context: context,
+                          );
+                          setState(() {});
+                        }
+                      },
+                    ),
                     onTap: () {
                       Navigator.push(
                         context,

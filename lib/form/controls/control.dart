@@ -122,9 +122,10 @@ Widget makeControl({
       {
         fieldWidget = buildDecoratedWidget(
           SmallText(
+            key: Key(value),
             value: value,
-            withLabel: withLabel,
             attribute: field["fieldname"],
+            withLabel: withLabel,
             validators: validators,
           ),
           withLabel,
@@ -137,11 +138,11 @@ Widget makeControl({
       {
         fieldWidget = buildDecoratedWidget(
             Data(
-              value: value,
               key: Key(value),
+              value: value,
               attribute: field["fieldname"],
-              validators: validators,
               withLabel: withLabel,
+              validators: validators,
             ),
             withLabel,
             field["label"]);

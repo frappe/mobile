@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:frappe_app/screens/session_expired.dart';
 
 import '../app.dart';
 
@@ -93,29 +96,41 @@ class _DoctypeViewState extends State<DoctypeView> {
                   child: CardListTile(
                     title: Text(m["label"]),
                     onTap: () async {
-                      var response = await processData(
-                        doctype: m["name"],
-                      );
-
-                      if (response["success"] == false) {
-                        Navigator.of(context, rootNavigator: true).push(
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return NoInternet();
-                            },
-                          ),
+                      try {
+                        await processData(
+                          doctype: m["name"],
                         );
-                      } else {
+
                         Navigator.of(context, rootNavigator: true).push(
                           MaterialPageRoute(
                             builder: (context) {
-                              return Router(
+                              return CustomRouter(
                                 doctype: m["name"],
                                 viewType: ViewType.list,
                               );
                             },
                           ),
                         );
+                      } catch (e) {
+                        if (e.statusCode == HttpStatus.serviceUnavailable) {
+                          Navigator.of(context, rootNavigator: true).push(
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return NoInternet();
+                              },
+                            ),
+                          );
+                        } else if (e.statusCode == HttpStatus.forbidden) {
+                          Navigator.of(context, rootNavigator: true).push(
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return SessionExpired();
+                              },
+                            ),
+                          );
+                        } else {
+                          showErrorDialog(e, context);
+                        }
                       }
                     },
                   ),
@@ -125,7 +140,7 @@ class _DoctypeViewState extends State<DoctypeView> {
                 children: doctypesWidget,
               );
             } else if (snapshot.hasError) {
-              return handleError(snapshot.error);
+              return handleError(snapshot.error, true);
             } else {
               return Container(
                 child: Center(

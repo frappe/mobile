@@ -31,22 +31,32 @@ class QueueHelper {
   }
 
   static Future processQueueItem(var q, int index) async {
-    if (q["type"] == "create") {
-      var response = await BackendService.saveDocs(q["doctype"], q["data"][0]);
-
-      if (response.statusCode == 200) {
-        QueueHelper.deleteAt(index);
-      }
-    } else if (q["type"] == "update") {
-      var response = await BackendService.updateDoc(
+    try {
+      var response = await BackendService.saveDocs(
         q["doctype"],
-        q["name"],
         q["data"][0],
       );
 
       if (response.statusCode == 200) {
         QueueHelper.deleteAt(index);
+      } else {
+        QueueHelper.putAt(
+          index,
+          {
+            ...q,
+            "error": response.statusMessage,
+          },
+        );
       }
+    } catch (e) {
+      print(e);
+      QueueHelper.putAt(
+        index,
+        {
+          ...q,
+          "error": e.statusMessage,
+        },
+      );
     }
   }
 }

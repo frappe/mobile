@@ -14,13 +14,14 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.2.2 <3.0.0"
+    sdk: ">=2.8.0 <3.0.0"
+
 
 dependencies:
   device_info: ^0.4.2+4
-  flutter_local_notifications: ^2.0.0
+  # flutter_local_notifications: ^2.0.0
   dio_http_cache: ^0.2.11
-  workmanager: ^0.2.3
+  # workmanager: ^0.2.3
   get_it: ^5.0.0
   flutter_slidable: ^0.5.7
   fluttertoast: ^7.0.4
@@ -36,7 +37,7 @@ dependencies:
   cached_network_image: ^2.2.0+1
   google_fonts: ^1.1.0
   file_picker: ^1.12.0
-  flutter_form_builder: ^3.13.2
+  flutter_form_builder: ^3.14.0
   flutter_pagewise: ^1.2.3
   html: ^0.14.0+3
   url_launcher: ^5.4.7

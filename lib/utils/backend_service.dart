@@ -39,14 +39,18 @@ class BackendService {
         throw Response(statusMessage: 'Something went wrong');
       }
     } catch (e) {
-      var error = (e as DioError).error;
-      if (error is SocketException) {
-        throw Response(
-          statusCode: HttpStatus.serviceUnavailable,
-          statusMessage: error.message,
-        );
+      if (e is DioError) {
+        var error = e.error;
+        if (error is SocketException) {
+          throw Response(
+            statusCode: HttpStatus.serviceUnavailable,
+            statusMessage: error.message,
+          );
+        } else {
+          throw Response(statusMessage: error.message);
+        }
       } else {
-        throw Response(statusMessage: error.message);
+        throw e;
       }
     }
   }
@@ -149,14 +153,18 @@ class BackendService {
         throw Response(statusMessage: 'Something went wrong');
       }
     } catch (e) {
-      var error = (e as DioError).error;
-      if (error is SocketException) {
-        throw Response(
-          statusCode: HttpStatus.serviceUnavailable,
-          statusMessage: error.message,
-        );
+      if (e is DioError) {
+        var error = e.error;
+        if (error is SocketException) {
+          throw Response(
+            statusCode: HttpStatus.serviceUnavailable,
+            statusMessage: error.message,
+          );
+        } else {
+          throw Response(statusMessage: error.message);
+        }
       } else {
-        throw Response(statusMessage: error.message);
+        throw e;
       }
     }
   }
@@ -206,14 +214,18 @@ class BackendService {
         throw Response(statusMessage: 'Something went wrong');
       }
     } catch (e) {
-      var error = (e as DioError).error;
-      if (error is SocketException) {
-        throw Response(
-          statusCode: HttpStatus.serviceUnavailable,
-          statusMessage: error.message,
-        );
+      if (e is DioError) {
+        var error = e.error;
+        if (error is SocketException) {
+          throw Response(
+            statusCode: HttpStatus.serviceUnavailable,
+            statusMessage: error.message,
+          );
+        } else {
+          throw Response(statusMessage: error.message);
+        }
       } else {
-        throw Response(statusMessage: error.message);
+        throw e;
       }
     }
   }
@@ -292,14 +304,18 @@ class BackendService {
         throw Response(statusMessage: 'Something went wrong');
       }
     } catch (e) {
-      var error = (e as DioError).error;
-      if (error is SocketException) {
-        throw Response(
-          statusCode: HttpStatus.serviceUnavailable,
-          statusMessage: error.message,
-        );
+      if (e is DioError) {
+        var error = e.error;
+        if (error is SocketException) {
+          throw Response(
+            statusCode: HttpStatus.serviceUnavailable,
+            statusMessage: error.message,
+          );
+        } else {
+          throw Response(statusMessage: error.message);
+        }
       } else {
-        throw Response(statusMessage: error.message);
+        throw e;
       }
     }
   }
@@ -330,14 +346,18 @@ class BackendService {
         throw Response(statusMessage: 'Something went wrong');
       }
     } catch (e) {
-      var error = (e as DioError).error;
-      if (error is SocketException) {
-        throw Response(
-          statusCode: HttpStatus.serviceUnavailable,
-          statusMessage: error.message,
-        );
+      if (e is DioError) {
+        var error = e.error;
+        if (error is SocketException) {
+          throw Response(
+            statusCode: HttpStatus.serviceUnavailable,
+            statusMessage: error.message,
+          );
+        } else {
+          throw Response(statusMessage: error.message);
+        }
       } else {
-        throw Response(statusMessage: error.message);
+        throw e;
       }
     }
   }
@@ -483,17 +503,42 @@ class BackendService {
       ...formValue,
     };
 
-    final response = await DioHelper.dio.post(
-      '/method/frappe.desk.form.save.savedocs',
-      data: "doc=${Uri.encodeFull(json.encode(data))}&action=Save",
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
-    );
-    if (response.statusCode == 200) {
-      return response;
-    } else {
-      throw Response(statusMessage: 'Something went wrong');
+    try {
+      final response = await DioHelper.dio.post(
+        '/method/frappe.desk.form.save.savedocs',
+        data: "doc=${Uri.encodeFull(json.encode(data))}&action=Save",
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+        ),
+      );
+      if (response.statusCode == 200) {
+        return response;
+      } else {
+        throw Response(statusMessage: 'Something went wrong');
+      }
+    } catch (e) {
+      if (e is DioError) {
+        var error;
+        if (e.response != null) {
+          error = e.response;
+        } else {
+          error = e.error;
+        }
+
+        if (error is SocketException) {
+          throw Response(
+            statusCode: HttpStatus.serviceUnavailable,
+            statusMessage: error.message,
+          );
+        } else {
+          throw Response(
+            statusCode: error.statusCode,
+            statusMessage: error.statusMessage,
+          );
+        }
+      } else {
+        throw e;
+      }
     }
   }
 
@@ -537,14 +582,18 @@ class BackendService {
         throw Response(statusMessage: 'Something went wrong');
       }
     } catch (e) {
-      var error = (e as DioError).error;
-      if (error is SocketException) {
-        throw Response(
-          statusCode: HttpStatus.serviceUnavailable,
-          statusMessage: error.message,
-        );
+      if (e is DioError) {
+        var error = e.error;
+        if (error is SocketException) {
+          throw Response(
+            statusCode: HttpStatus.serviceUnavailable,
+            statusMessage: error.message,
+          );
+        } else {
+          throw Response(statusMessage: error.message);
+        }
       } else {
-        throw Response(statusMessage: error.message);
+        throw e;
       }
     }
   }
