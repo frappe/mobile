@@ -73,7 +73,7 @@ class _CustomListViewState extends State<CustomListView> {
           context,
           MaterialPageRoute(
             builder: (context) {
-              return Router(
+              return CustomRouter(
                 viewType: ViewType.form,
                 doctype: widget.doctype,
                 name: data["name"],
@@ -135,7 +135,7 @@ class _CustomListViewState extends State<CustomListView> {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return Router(
+                    return CustomRouter(
                       viewType: ViewType.newForm,
                       doctype: widget.doctype,
                     );
@@ -187,7 +187,7 @@ class _CustomListViewState extends State<CustomListView> {
                     builder: (BuildContext context) {
                       return FractionallySizedBox(
                         heightFactor: 0.96,
-                        child: Router(
+                        child: CustomRouter(
                           viewType: ViewType.filter,
                           doctype: widget.doctype,
                           filters: widget.filters,
@@ -279,7 +279,7 @@ class _CustomListViewState extends State<CustomListView> {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return Router(
+                        return CustomRouter(
                           viewType: ViewType.newForm,
                           doctype: widget.doctype,
                         );
@@ -377,7 +377,7 @@ class CustomSearch extends SearchDelegate {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return Router(
+                        return CustomRouter(
                           viewType: ViewType.form,
                           doctype: data.doctype,
                           name: snapshot.data[index]["name"],

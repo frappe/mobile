@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
+import 'package:frappe_app/utils/frappe_alert.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:provider/provider.dart';
 
 import '../app.dart';
@@ -53,8 +56,18 @@ class _QueueListState extends State<QueueList> {
               leading: IconButton(
                 icon: Icon(Icons.sync),
                 onPressed: () async {
-                  if (connectionStatus == ConnectivityStatus.offline) {
-                    showSnackBar('Cant Sync, App is offline', context);
+                  if (connectionStatus == null ||
+                      connectionStatus == ConnectivityStatus.offline) {
+                    FrappeAlert.errorAlert(
+                      title: 'Cant Sync, App is offline',
+                      context: context,
+                    );
+                    return;
+                  } else if (q["error"] != null) {
+                    FrappeAlert.errorAlert(
+                      title: "There was some error while processing this item",
+                      context: context,
+                    );
                     return;
                   }
 
@@ -72,6 +85,12 @@ class _QueueListState extends State<QueueList> {
                   Text(
                     q["type"],
                   ),
+                  VerticalDivider(),
+                  if (q["error"] != null)
+                    FrappeIcon(
+                      FrappeIcons.error,
+                      size: 20,
+                    ),
                 ],
               ),
               trailing: IconButton(
@@ -86,7 +105,7 @@ class _QueueListState extends State<QueueList> {
                 Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(
                     builder: (context) {
-                      return Router(
+                      return CustomRouter(
                         viewType: ViewType.form,
                         doctype: q['doctype'],
                         queued: true,

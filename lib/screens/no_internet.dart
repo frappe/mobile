@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 
 class NoInternet extends StatelessWidget {
+  final bool hideAppBar;
+
+  const NoInternet([
+    this.hideAppBar = false,
+  ]);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-      ),
+      appBar: hideAppBar
+          ? null
+          : AppBar(
+              elevation: 0,
+            ),
       body: Container(
         color: Colors.white,
         width: double.infinity,

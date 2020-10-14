@@ -25,6 +25,9 @@ class Int extends StatelessWidget {
   Widget build(BuildContext context) {
     return FormBuilderTextField(
       key: key,
+      valueTransformer: (val) {
+        return int.parse(val);
+      },
       initialValue: value != null ? value.toString() : null,
       keyboardType: TextInputType.number,
       attribute: attribute,

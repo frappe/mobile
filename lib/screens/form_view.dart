@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
+import 'package:frappe_app/screens/queue_error.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
 
@@ -61,8 +64,11 @@ class _FormViewState extends State<FormView>
 
   Future _getData() {
     if (widget.queued) {
-      return Future.delayed(
-          Duration(seconds: 1), () => {"docs": widget.queuedData["data"]});
+      return Future.value(
+        {
+          "docs": widget.queuedData["data"],
+        },
+      );
     } else {
       return BackendService.getdoc(
         widget.doctype,
@@ -159,13 +165,29 @@ class _FormViewState extends State<FormView>
     );
   }
 
-  _handleUpdate(ConnectivityStatus connectionStatus) async {
+  _handleUpdate(Map doc, ConnectivityStatus connectionStatus) async {
     if (_fbKey.currentState.saveAndValidate()) {
       var formValue = _fbKey.currentState.value;
-      if (connectionStatus == ConnectivityStatus.offline) {
+      if (connectionStatus == null ||
+          connectionStatus == ConnectivityStatus.offline) {
         if (widget.queuedData != null) {
-          widget.queuedData["data"] = [formValue];
-          widget.queuedData["title"] = getTitle(widget.meta, formValue);
+          widget.queuedData["data"] = [
+            {
+              ...doc,
+              ...formValue,
+            }
+          ];
+          widget.queuedData["updated_keys"] = {
+            ...widget.queuedData["updated_keys"],
+            ...extractChangedValues(
+              doc,
+              formValue,
+            )
+          };
+          widget.queuedData["title"] = getTitle(
+            widget.meta,
+            formValue,
+          );
 
           QueueHelper.putAt(
             widget.queuedData["qIdx"],
@@ -173,11 +195,17 @@ class _FormViewState extends State<FormView>
           );
         } else {
           QueueHelper.add({
-            "type": "update",
+            "type": "Update",
             "name": widget.name,
             "doctype": widget.doctype,
             "title": getTitle(widget.meta, formValue),
-            "data": [formValue],
+            "updated_keys": extractChangedValues(doc, formValue),
+            "data": [
+              {
+                ...doc,
+                ...formValue,
+              }
+            ],
           });
         }
         FrappeAlert.infoAlert(
@@ -186,16 +214,27 @@ class _FormViewState extends State<FormView>
           context: context,
         );
       } else {
-        await BackendService.updateDoc(
-          widget.doctype,
-          widget.name,
-          formValue,
-        );
-        FrappeAlert.infoAlert(
-          title: 'Changes Saved',
-          context: context,
-        );
-        _refresh();
+        formValue = {
+          ...doc,
+          ...formValue,
+        };
+
+        try {
+          var response = await BackendService.saveDocs(
+            widget.doctype,
+            formValue,
+          );
+
+          if (response.statusCode == HttpStatus.ok) {
+            FrappeAlert.infoAlert(
+              title: 'Changes Saved',
+              context: context,
+            );
+            _refresh();
+          }
+        } catch (e) {
+          showErrorDialog(e, context);
+        }
       }
     }
   }
@@ -264,6 +303,27 @@ class _FormViewState extends State<FormView>
                 Row(
                   children: <Widget>[
                     Indicator.buildStatusButton(widget.doctype, doc['status']),
+                    VerticalDivider(),
+                    if (widget.queued && widget.queuedData["error"] != null)
+                      FrappeFlatButton.small(
+                        height: 24,
+                        title: "Show Error",
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return QueueError(
+                                  error: widget.queuedData["error"],
+                                  dataToUpdate:
+                                      widget.queuedData["updated_keys"],
+                                );
+                              },
+                            ),
+                          );
+                        },
+                        buttonType: ButtonType.secondary,
+                      ),
                     Spacer(),
                     if (!widget.queued)
                       InkWell(
@@ -326,7 +386,7 @@ class _FormViewState extends State<FormView>
             buttonType: ButtonType.primary,
             title: editMode ? 'Save' : 'Edit',
             onPressed: editMode
-                ? () => _handleUpdate(connectionStatus)
+                ? () => _handleUpdate(doc, connectionStatus)
                 : () {
                     setState(() {
                       editMode = true;

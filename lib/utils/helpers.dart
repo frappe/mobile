@@ -4,7 +4,7 @@ import 'package:device_info/device_info.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frappe_app/screens/no_internet.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -436,52 +436,81 @@ handle403() async {
   locator<NavigationService>().clearAllAndNavigateTo('session_expired');
 }
 
-handleError(Response error) {
+handleError(Response error, [bool hideAppBar = false]) {
   if (error.statusCode == HttpStatus.forbidden) {
     handle403();
   } else if (error.statusCode == HttpStatus.serviceUnavailable) {
-    return NoInternet();
+    return NoInternet(hideAppBar);
   } else {
     return Text("${error.statusMessage}");
   }
 }
 
-Future<void> showNotification({
-  @required String title,
-  @required String subtitle,
-  int index = 0,
-}) async {
-  const AndroidNotificationDetails androidPlatformChannelSpecifics =
-      AndroidNotificationDetails(
-    'FrappeChannelId',
-    'FrappeChannelName',
-    'FrappeChannelDescription',
-    // importance: Importance.max,
-    // priority: Priority.high,
-    ticker: 'ticker',
-  );
-  const NotificationDetails platformChannelSpecifics =
-      NotificationDetails(android: androidPlatformChannelSpecifics);
-  await flutterLocalNotificationsPlugin.show(
-    index,
-    title,
-    subtitle,
-    platformChannelSpecifics,
+// Future<void> showNotification({
+//   @required String title,
+//   @required String subtitle,
+//   int index = 0,
+// }) async {
+//   const AndroidNotificationDetails androidPlatformChannelSpecifics =
+//       AndroidNotificationDetails(
+//     'FrappeChannelId',
+//     'FrappeChannelName',
+//     'FrappeChannelDescription',
+//     // importance: Importance.max,
+//     // priority: Priority.high,
+//     ticker: 'ticker',
+//   );
+//   const NotificationDetails platformChannelSpecifics =
+//       NotificationDetails(android: androidPlatformChannelSpecifics);
+//   await flutterLocalNotificationsPlugin.show(
+//     index,
+//     title,
+//     subtitle,
+//     platformChannelSpecifics,
+//   );
+// }
+
+// Future<int> getActiveNotifications() async {
+//   final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+//   final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+//   if (!(androidInfo.version.sdkInt >= 23)) {
+//     return 0;
+//   }
+
+//   final List<ActiveNotification> activeNotifications =
+//       await flutterLocalNotificationsPlugin
+//           .resolvePlatformSpecificImplementation<
+//               AndroidFlutterLocalNotificationsPlugin>()
+//           ?.getActiveNotifications();
+
+//   return activeNotifications.length;
+// }
+
+showErrorDialog(e, BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(e.statusMessage),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Ok'),
+            onPressed: () async {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
   );
 }
 
-Future<int> getActiveNotifications() async {
-  final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-  final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-  if (!(androidInfo.version.sdkInt >= 23)) {
-    return 0;
+Map extractChangedValues(Map original, Map updated) {
+  var changedValues = {};
+  for (var key in updated.keys) {
+    if (original[key] != updated[key]) {
+      changedValues[key] = updated[key];
+    }
   }
-
-  final List<ActiveNotification> activeNotifications =
-      await flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
-          ?.getActiveNotifications();
-
-  return activeNotifications.length;
+  return changedValues;
 }

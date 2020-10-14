@@ -45,9 +45,10 @@ class _SimpleFormState extends State<SimpleForm> {
                 if (_fbKey.currentState.saveAndValidate()) {
                   var formValue = _fbKey.currentState.value;
 
-                  if (connectionStatus == ConnectivityStatus.offline) {
+                  if (connectionStatus == null ||
+                      connectionStatus == ConnectivityStatus.offline) {
                     var qObj = {
-                      "type": "create",
+                      "type": "Create",
                       "doctype": widget.meta["name"],
                       "title": hasTitle(widget.meta)
                           ? formValue[widget.meta["title_field"]] ??
@@ -72,7 +73,7 @@ class _SimpleFormState extends State<SimpleForm> {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return Router(
+                            return CustomRouter(
                                 viewType: ViewType.form,
                                 doctype: widget.meta["name"],
                                 name: response.data["docs"][0]["name"]);
@@ -80,22 +81,7 @@ class _SimpleFormState extends State<SimpleForm> {
                         ),
                       );
                     } catch (e) {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text(e.error),
-                            actions: <Widget>[
-                              FlatButton(
-                                child: Text('Ok'),
-                                onPressed: () async {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                      showErrorDialog(e, context);
                     }
                   }
                 }

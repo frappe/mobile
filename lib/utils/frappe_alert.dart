@@ -16,47 +16,49 @@ class FrappeAlert {
     FToast fToast = FToast(context);
 
     var toast = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6.0),
         color: color[100],
       ),
-      width: double.infinity,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          FrappeIcon(
-            icon,
-            color: color,
-          ),
-          SizedBox(
-            width: 12.0,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
+      child: ListTile(
+        title: Row(
+          children: [
+            FrappeIcon(
+              icon,
+              color: color,
+            ),
+            SizedBox(
+              width: 12.0,
+            ),
+            Flexible(
+              child: Text(
                 title,
                 style: TextStyle(
                   color: color[600],
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              if (subtitle != null)
-                SizedBox(
-                  height: 4.0,
-                ),
-              if (subtitle != null)
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: color[600],
+            ),
+          ],
+        ),
+        subtitle: subtitle != null
+            ? Row(
+                children: [
+                  SizedBox(
+                    width: 36.0,
                   ),
-                ),
-            ],
-          )
-        ],
+                  Flexible(
+                    child: Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: color[600],
+                      ),
+                    ),
+                  )
+                ],
+              )
+            : null,
       ),
     );
 
