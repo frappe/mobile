@@ -1,4 +1,9 @@
 PODS:
+  - connectivity (0.0.1):
+    - Flutter
+    - Reachability
+  - device_info (0.0.1):
+    - Flutter
   - DKImagePickerController/Core (4.2.2):
     - DKImagePickerController/ImageDataManager
     - DKImagePickerController/Resource
@@ -39,6 +44,8 @@ PODS:
     - Flutter
   - flutter_keyboard_visibility (0.0.1):
     - Flutter
+  - fluttertoast (0.0.2):
+    - Flutter
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
@@ -56,6 +63,7 @@ PODS:
     - Flutter
     - PhoneNumberKit/PhoneNumberKitCore (~> 3.2.0)
   - PhoneNumberKit/PhoneNumberKitCore (3.2.0)
+  - Reachability (3.2)
   - screen (0.0.1):
     - Flutter
   - SDWebImage (5.8.0):
@@ -64,8 +72,6 @@ PODS:
   - SDWebImageFLPlugin (0.4.0):
     - FLAnimatedImage (>= 1.0.11)
     - SDWebImage/Core (~> 5.6)
-  - shared_preferences (0.0.1):
-    - Flutter
   - sqflite (0.0.1):
     - Flutter
     - FMDB (~> 2.7.2)
@@ -79,10 +85,13 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - connectivity (from `.symlinks/plugins/connectivity/ios`)
+  - device_info (from `.symlinks/plugins/device_info/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `Flutter`)
   - flutter_downloader (from `.symlinks/plugins/flutter_downloader/ios`)
   - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
+  - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
   - open_file (from `.symlinks/plugins/open_file/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
@@ -90,7 +99,6 @@ DEPENDENCIES:
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
   - phone_number (from `.symlinks/plugins/phone_number/ios`)
   - screen (from `.symlinks/plugins/screen/ios`)
-  - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
   - video_player (from `.symlinks/plugins/video_player/ios`)
@@ -104,10 +112,15 @@ SPEC REPOS:
     - FLAnimatedImage
     - FMDB
     - PhoneNumberKit
+    - Reachability
     - SDWebImage
     - SDWebImageFLPlugin
 
 EXTERNAL SOURCES:
+  connectivity:
+    :path: ".symlinks/plugins/connectivity/ios"
+  device_info:
+    :path: ".symlinks/plugins/device_info/ios"
   file_picker:
     :path: ".symlinks/plugins/file_picker/ios"
   Flutter:
@@ -116,6 +129,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_downloader/ios"
   flutter_keyboard_visibility:
     :path: ".symlinks/plugins/flutter_keyboard_visibility/ios"
+  fluttertoast:
+    :path: ".symlinks/plugins/fluttertoast/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
   open_file:
@@ -130,8 +145,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/phone_number/ios"
   screen:
     :path: ".symlinks/plugins/screen/ios"
-  shared_preferences:
-    :path: ".symlinks/plugins/shared_preferences/ios"
   sqflite:
     :path: ".symlinks/plugins/sqflite/ios"
   url_launcher:
@@ -144,6 +157,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter/ios"
 
 SPEC CHECKSUMS:
+  connectivity: c4130b2985d4ef6fd26f9702e886bd5260681467
+  device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
   DKImagePickerController: 4a3e7948a848c4348e600b3fe5ce41478835fa10
   DKPhotoGallery: 0290d32343574f06eaa4c26f8f2f8a1035e916be
   file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
@@ -151,6 +166,7 @@ SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_downloader: 058b9c41564a90500f67f3e432e3524613a7fd83
   flutter_keyboard_visibility: 0339d06371254c3eb25eeb90ba8d17dca8f9c069
+  fluttertoast: b644586ef3b16f67fae9a1f8754cef6b2d6b634b
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   image_picker: 9c3312491f862b28d21ecd8fdf0ee14e601b3f09
   open_file: 02eb5cb6b21264bd3a696876f5afbfb7ca4f4b7d
@@ -159,10 +175,10 @@ SPEC CHECKSUMS:
   permission_handler: 8278954f2382902f63f00dd8828769c0bd6d511b
   phone_number: b545f5b7d9711bec0f020c7df43ae5a82119f4ad
   PhoneNumberKit: df411d46177d1492da84e10b6c093846dd861452
+  Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   screen: abd91ca7bf3426e1cc3646d27e9b2358d6bf07b0
   SDWebImage: 84000f962cbfa70c07f19d2234cbfcf5d779b5dc
   SDWebImageFLPlugin: 6c2295fb1242d44467c6c87dc5db6b0a13228fd8
-  shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   sqflite: 4001a31ff81d210346b500c55b17f4d6c7589dd0
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
   video_player: 9cc823b1d9da7e8427ee591e8438bfbcde500e6e

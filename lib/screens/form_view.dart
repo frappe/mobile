@@ -168,8 +168,10 @@ class _FormViewState extends State<FormView>
   _handleUpdate(Map doc, ConnectivityStatus connectionStatus) async {
     if (_fbKey.currentState.saveAndValidate()) {
       var formValue = _fbKey.currentState.value;
-      if (connectionStatus == null ||
-          connectionStatus == ConnectivityStatus.offline) {
+      var isOnline = await verifyOnline();
+      if ((connectionStatus == null ||
+              connectionStatus == ConnectivityStatus.offline) &&
+          !isOnline) {
         if (widget.queuedData != null) {
           widget.queuedData["data"] = [
             {

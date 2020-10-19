@@ -1,15 +1,15 @@
 import 'dart:io';
 
-import 'package:device_info/device_info.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 // import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frappe_app/screens/no_internet.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../main.dart';
 import 'http.dart';
 
 import '../form/controls/control.dart';
@@ -513,4 +513,40 @@ Map extractChangedValues(Map original, Map updated) {
     }
   }
   return changedValues;
+}
+
+requestIOSLocationAuthorization(connectivity) async {
+  try {
+    if (Platform.isIOS) {
+      LocationAuthorizationStatus status =
+          await connectivity.getLocationServiceAuthorization();
+      if (status == LocationAuthorizationStatus.notDetermined) {
+        status = await connectivity.requestLocationServiceAuthorization();
+      } else {
+        return {
+          "access": true,
+        };
+      }
+    }
+  } on PlatformException catch (e) {
+    print(e.toString());
+    return {
+      "access": false,
+    };
+  }
+}
+
+Future<bool> verifyOnline() async {
+  bool isOnline = false;
+  try {
+    final result = await InternetAddress.lookup('google.com');
+    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+      isOnline = true;
+    } else
+      isOnline = false;
+  } on SocketException catch (_) {
+    isOnline = false;
+  }
+
+  return isOnline;
 }
