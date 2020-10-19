@@ -45,8 +45,10 @@ class _SimpleFormState extends State<SimpleForm> {
                 if (_fbKey.currentState.saveAndValidate()) {
                   var formValue = _fbKey.currentState.value;
 
-                  if (connectionStatus == null ||
-                      connectionStatus == ConnectivityStatus.offline) {
+                  var isOnline = await verifyOnline();
+                  if ((connectionStatus == null ||
+                          connectionStatus == ConnectivityStatus.offline) &&
+                      !isOnline) {
                     var qObj = {
                       "type": "Create",
                       "doctype": widget.meta["name"],

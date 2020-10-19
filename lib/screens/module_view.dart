@@ -101,8 +101,11 @@ class _ModuleViewState extends State<ModuleView> {
                         Icons.cloud_download,
                       ),
                       onPressed: () async {
-                        if (connectionStatus == null ||
-                            connectionStatus == ConnectivityStatus.offline) {
+                        var isOnline = await verifyOnline();
+                        if ((connectionStatus == null ||
+                                connectionStatus ==
+                                    ConnectivityStatus.offline) &&
+                            !isOnline) {
                           FrappeAlert.errorAlert(
                               title: "Unable to Download, App is Offline",
                               context: context);

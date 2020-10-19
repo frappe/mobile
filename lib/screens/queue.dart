@@ -56,8 +56,10 @@ class _QueueListState extends State<QueueList> {
               leading: IconButton(
                 icon: Icon(Icons.sync),
                 onPressed: () async {
-                  if (connectionStatus == null ||
-                      connectionStatus == ConnectivityStatus.offline) {
+                  var isOnline = await verifyOnline();
+                  if ((connectionStatus == null ||
+                          connectionStatus == ConnectivityStatus.offline) &&
+                      !isOnline) {
                     FrappeAlert.errorAlert(
                       title: 'Cant Sync, App is offline',
                       context: context,
