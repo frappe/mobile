@@ -48,76 +48,105 @@ class _QueueListState extends State<QueueList> {
         onRefresh: () async {
           _refresh();
         },
-        child: ListView.builder(
-          itemCount: QueueHelper.queueContainer.length,
-          itemBuilder: (context, index) {
-            var q = QueueHelper.getAt(index);
-            return CardListTile(
-              leading: IconButton(
-                icon: Icon(Icons.sync),
-                onPressed: () async {
-                  var isOnline = await verifyOnline();
-                  if ((connectionStatus == null ||
-                          connectionStatus == ConnectivityStatus.offline) &&
-                      !isOnline) {
-                    FrappeAlert.errorAlert(
-                      title: 'Cant Sync, App is offline',
-                      context: context,
-                    );
-                    return;
-                  } else if (q["error"] != null) {
-                    FrappeAlert.errorAlert(
-                      title: "There was some error while processing this item",
-                      context: context,
-                    );
-                    return;
-                  }
-
-                  await QueueHelper.processQueueItem(q, index);
-                  _refresh();
-                },
-              ),
-              title: Text(q['title'] ?? ""),
-              subtitle: Row(
-                children: [
-                  Text(
-                    q['doctype'],
-                  ),
-                  VerticalDivider(),
-                  Text(
-                    q["type"],
-                  ),
-                  VerticalDivider(),
-                  if (q["error"] != null)
-                    FrappeIcon(
-                      FrappeIcons.error,
-                      size: 20,
+        child: FutureBuilder(
+          future: QueueHelper.getQueueContainer(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData &&
+                snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.data.length < 1) {
+                return Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text(
+                    "Queue is Empty",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Palette.secondaryTxtColor,
+                      fontWeight: FontWeight.bold,
                     ),
-                ],
-              ),
-              trailing: IconButton(
-                onPressed: () {
-                  QueueHelper.deleteAt(index);
-                  setState(() {});
-                },
-                icon: Icon(Icons.clear),
-              ),
-              onTap: () {
-                q["qIdx"] = index;
-                Navigator.of(context, rootNavigator: true).push(
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return CustomRouter(
-                        viewType: ViewType.form,
-                        doctype: q['doctype'],
-                        queued: true,
-                        queuedData: q,
-                      );
-                    },
                   ),
                 );
-              },
-            );
+              }
+              return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder: (context, index) {
+                  var q = snapshot.data.getAt(index);
+                  return CardListTile(
+                    leading: IconButton(
+                      icon: Icon(Icons.sync),
+                      onPressed: () async {
+                        var isOnline = await verifyOnline();
+                        if ((connectionStatus == null ||
+                                connectionStatus ==
+                                    ConnectivityStatus.offline) &&
+                            !isOnline) {
+                          FrappeAlert.errorAlert(
+                            title: 'Cant Sync, App is offline',
+                            context: context,
+                          );
+                          return;
+                        } else if (q["error"] != null) {
+                          FrappeAlert.errorAlert(
+                            title:
+                                "There was some error while processing this item",
+                            context: context,
+                          );
+                          return;
+                        }
+
+                        await QueueHelper.processQueueItem(q, index);
+                        _refresh();
+                      },
+                    ),
+                    title: Text(q['title'] ?? ""),
+                    subtitle: Row(
+                      children: [
+                        Text(
+                          q['doctype'],
+                        ),
+                        VerticalDivider(),
+                        Text(
+                          q["type"],
+                        ),
+                        VerticalDivider(),
+                        if (q["error"] != null)
+                          FrappeIcon(
+                            FrappeIcons.error,
+                            size: 20,
+                          ),
+                      ],
+                    ),
+                    trailing: IconButton(
+                      onPressed: () {
+                        QueueHelper.deleteAt(index);
+                        setState(() {});
+                      },
+                      icon: Icon(Icons.clear),
+                    ),
+                    onTap: () {
+                      q["qIdx"] = index;
+                      Navigator.of(context, rootNavigator: true).push(
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return CustomRouter(
+                              viewType: ViewType.form,
+                              doctype: q['doctype'],
+                              queued: true,
+                              queuedData: q,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            } else if (snapshot.hasError) {
+              return Text(snapshot.error);
+            } else {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
           },
         ),
       ),

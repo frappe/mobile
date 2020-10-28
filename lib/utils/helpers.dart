@@ -1,15 +1,18 @@
 import 'dart:io';
 
 import 'package:connectivity/connectivity.dart';
+import 'package:device_info/device_info.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 // import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frappe_app/screens/no_internet.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../main.dart';
 import 'http.dart';
 
 import '../form/controls/control.dart';
@@ -29,19 +32,32 @@ import '../utils/backend_service.dart';
 import '../widgets/section.dart';
 import '../widgets/custom_expansion_tile.dart';
 
-Future processData({
+Future processData2({
   String doctype,
+  bool offline = false,
 }) async {
-  var meta = await BackendService.getDoctype(doctype);
+  var meta;
+  // TODO: move to backend service
 
-  List metaFields = meta["docs"][0]["fields"];
+  if (offline) {
+    meta = await CacheHelper.getCache('${doctype}Meta');
+    meta = meta["data"];
+    if (meta == null) {
+      return {
+        "success": false,
+      };
+    }
+  } else {
+    meta = await BackendService.getDoctype(doctype);
 
-  metaFields.forEach((field) {
-    meta["docs"][0]["_field${field["fieldname"]}"] = true;
-  });
+    List metaFields = meta["docs"][0]["fields"];
 
-  CacheHelper.putCache('${doctype}Meta', meta);
+    metaFields.forEach((field) {
+      meta["docs"][0]["_field${field["fieldname"]}"] = true;
+    });
 
+    await CacheHelper.putCache('${doctype}Meta', meta);
+  }
   return meta;
 }
 
@@ -446,45 +462,45 @@ handleError(Response error, [bool hideAppBar = false]) {
   }
 }
 
-// Future<void> showNotification({
-//   @required String title,
-//   @required String subtitle,
-//   int index = 0,
-// }) async {
-//   const AndroidNotificationDetails androidPlatformChannelSpecifics =
-//       AndroidNotificationDetails(
-//     'FrappeChannelId',
-//     'FrappeChannelName',
-//     'FrappeChannelDescription',
-//     // importance: Importance.max,
-//     // priority: Priority.high,
-//     ticker: 'ticker',
-//   );
-//   const NotificationDetails platformChannelSpecifics =
-//       NotificationDetails(android: androidPlatformChannelSpecifics);
-//   await flutterLocalNotificationsPlugin.show(
-//     index,
-//     title,
-//     subtitle,
-//     platformChannelSpecifics,
-//   );
-// }
+Future<void> showNotification({
+  @required String title,
+  @required String subtitle,
+  int index = 0,
+}) async {
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+    'FrappeChannelId',
+    'FrappeChannelName',
+    'FrappeChannelDescription',
+    // importance: Importance.max,
+    // priority: Priority.high,
+    ticker: 'ticker',
+  );
+  const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+  await flutterLocalNotificationsPlugin.show(
+    index,
+    title,
+    subtitle,
+    platformChannelSpecifics,
+  );
+}
 
-// Future<int> getActiveNotifications() async {
-//   final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-//   final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-//   if (!(androidInfo.version.sdkInt >= 23)) {
-//     return 0;
-//   }
+Future<int> getActiveNotifications() async {
+  final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+  if (!(androidInfo.version.sdkInt >= 23)) {
+    return 0;
+  }
 
-//   final List<ActiveNotification> activeNotifications =
-//       await flutterLocalNotificationsPlugin
-//           .resolvePlatformSpecificImplementation<
-//               AndroidFlutterLocalNotificationsPlugin>()
-//           ?.getActiveNotifications();
+  final List<ActiveNotification> activeNotifications =
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.getActiveNotifications();
 
-//   return activeNotifications.length;
-// }
+  return activeNotifications.length;
+}
 
 showErrorDialog(e, BuildContext context) {
   showDialog(
@@ -549,4 +565,17 @@ Future<bool> verifyOnline() async {
   }
 
   return isOnline;
+}
+
+getLinkFields(String doctype) async {
+  var docMeta = await BackendService.getDoctype(
+    doctype,
+  );
+  docMeta = docMeta["docs"][0];
+  var linkFieldDoctypes = docMeta["fields"]
+      .where((d) => d["fieldtype"] == 'Link')
+      .map((d) => d["options"])
+      .toList();
+
+  return linkFieldDoctypes;
 }

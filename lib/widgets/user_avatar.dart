@@ -48,12 +48,13 @@ class UserAvatar extends StatelessWidget {
     );
   }
 
-  Widget getAvatar(String uid) {
+  Future<Widget> getAvatar(String uid) async {
     if (uid == null) {
       return Container();
     }
-    if (CacheHelper.getCache('allUsers')["data"] != null) {
-      var allUsers = CacheHelper.getCache('allUsers')["data"];
+    var allUsers = await CacheHelper.getCache('allUsers');
+    allUsers = allUsers["data"];
+    if (allUsers != null) {
       var user = allUsers[uid];
       var imageUrl = user != null ? user["user_image"] : null;
       if (imageUrl != null) {
@@ -107,6 +108,17 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return getAvatar(uid);
+    return FutureBuilder(
+      future: getAvatar(uid),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return snapshot.data;
+        } else if (snapshot.hasError) {
+          return Text(snapshot.error);
+        } else {
+          return Container();
+        }
+      },
+    );
   }
 }

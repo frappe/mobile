@@ -11,7 +11,9 @@ void initConfig() async {
 }
 
 void cacheAllUsers() async {
-  if (CacheHelper.getCache('allUsers')["data"] != null) {
+  var allUsers = await CacheHelper.getCache('allUsers');
+  allUsers = allUsers["data"];
+  if (allUsers != null) {
     return;
   } else {
     var fieldNames = [

@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:frappe_app/utils/cache_helper.dart';
 import 'package:frappe_app/utils/helpers.dart';
+import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../app.dart';
@@ -19,6 +21,7 @@ import '../utils/enums.dart';
 
 import '../widgets/frappe_button.dart';
 import '../widgets/list_item.dart';
+import 'no_internet.dart';
 
 class CustomListView extends StatefulWidget {
   final String doctype;
@@ -87,10 +90,10 @@ class _CustomListViewState extends State<CustomListView> {
       assignee: assignee != null && assignee.length > 0
           ? ['_assign', assignee[0]]
           : null,
-      onButtonTap: (filter) {
+      onButtonTap: (filter) async {
         widget.filters.clear();
         widget.filters.addAll(
-          FilterList.generateFilters(widget.doctype, filter),
+          await FilterList.generateFilters(widget.doctype, filter),
         );
         _pageLoadController.reset();
         setState(() {});
@@ -151,19 +154,40 @@ class _CustomListViewState extends State<CustomListView> {
 
   @override
   Widget build(BuildContext context) {
+    var connectionStatus = Provider.of<ConnectivityStatus>(
+      context,
+    );
+
+    // if (connectionStatus == ConnectivityStatus.offline ||
+    //     connectionStatus == null) {
     _pageLoadController = PagewiseLoadController(
       pageSize: PAGE_SIZE,
       pageFuture: (pageIndex) {
         return BackendService.fetchList(
+          meta: widget.meta,
           doctype: widget.doctype,
           fieldnames: widget.fieldnames,
           pageLength: PAGE_SIZE,
           filters: widget.filters,
           offset: pageIndex * PAGE_SIZE,
-          meta: widget.meta,
         );
       },
     );
+    // }
+
+    // _pageLoadController = PagewiseLoadController(
+    //   pageSize: PAGE_SIZE,
+    //   pageFuture: (pageIndex) {
+    //     return BackendService.fetchList(
+    //       doctype: widget.doctype,
+    //       fieldnames: widget.fieldnames,
+    //       pageLength: PAGE_SIZE,
+    //       filters: widget.filters,
+    //       offset: pageIndex * PAGE_SIZE,
+    //       meta: widget.meta,
+    //     );
+    //   },
+    // );
 
     if (FilterList.getFieldFilterIndex(widget.filters, '_liked_by') != null) {
       showLiked = true;
@@ -296,17 +320,59 @@ class _CustomListViewState extends State<CustomListView> {
         onRefresh: () async {
           await _pageLoadController.reset();
         },
-        child: Container(
-          color: Palette.bgColor,
-          child: PagewiseListView(
-            noItemsFoundBuilder: (context) {
-              return _noItemsFoundBuilder();
-            },
-            pageLoadController: _pageLoadController,
-            itemBuilder: ((buildContext, entry, _) {
-              return _generateItem(entry);
-            }),
-          ),
+        child: FutureBuilder(
+          future: verifyOnline(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData &&
+                snapshot.connectionState == ConnectionState.done) {
+              bool isOnline = snapshot.data;
+              return Container(
+                color: Palette.bgColor,
+                child: isOnline
+                    ? PagewiseListView(
+                        noItemsFoundBuilder: (context) {
+                          return _noItemsFoundBuilder();
+                        },
+                        pageLoadController: _pageLoadController,
+                        itemBuilder: ((buildContext, entry, _) {
+                          return _generateItem(entry);
+                        }),
+                      )
+                    : FutureBuilder(
+                        future: CacheHelper.getCache('${widget.doctype}List'),
+                        builder: (buildContext, snapshot) {
+                          if (snapshot.hasData &&
+                              snapshot.connectionState ==
+                                  ConnectionState.done) {
+                            var list = snapshot.data["data"];
+
+                            if (list != null) {
+                              list = list;
+                              return ListView.builder(
+                                itemCount: list.length,
+                                itemBuilder: (context, index) {
+                                  return _generateItem(list[index]);
+                                },
+                              );
+                            } else {
+                              return NoInternet(true);
+                            }
+                          } else if (snapshot.hasError) {
+                            return Text(snapshot.error);
+                          } else {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                        },
+                      ),
+              );
+            } else if (snapshot.hasError) {
+              return handleError(snapshot.error);
+            } else {
+              return CircularProgressIndicator();
+            }
+          },
         ),
       ),
     );

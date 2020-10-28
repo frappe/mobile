@@ -1,8 +1,13 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:frappe_app/utils/cache_helper.dart';
 import 'package:frappe_app/utils/frappe_alert.dart';
 import 'package:frappe_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 import 'doctype_view.dart';
 
@@ -23,8 +28,42 @@ class ModuleView extends StatefulWidget {
 }
 
 class _ModuleViewState extends State<ModuleView> {
-  Future _getData() {
-    return BackendService.getDeskSideBarItems();
+  Future _getData() async {
+    var connectionStatus = Provider.of<ConnectivityStatus>(
+      context,
+    );
+    var cachedModules = {};
+    var modules;
+
+    var isOnline = await verifyOnline();
+
+    if ((connectionStatus == null ||
+            connectionStatus == ConnectivityStatus.offline) &&
+        !isOnline) {
+      var response = await CacheHelper.getCache('deskSidebarItems');
+      response = response["data"];
+      if (response != null) {
+        modules = response;
+      } else {
+        throw Response(statusCode: HttpStatus.serviceUnavailable);
+      }
+    } else {
+      modules = await BackendService.getDeskSideBarItems();
+    }
+    var activeModules;
+    if (ConfigHelper().activeModules != null) {
+      activeModules = ConfigHelper().activeModules;
+    } else {
+      activeModules = {};
+    }
+    for (var module in activeModules.keys) {
+      cachedModules[module] = await CacheHelper.getCache("${module}Doctypes");
+    }
+
+    return {
+      "cachedModules": cachedModules,
+      "modules": modules,
+    };
   }
 
   @override
@@ -32,7 +71,6 @@ class _ModuleViewState extends State<ModuleView> {
     var connectionStatus = Provider.of<ConnectivityStatus>(
       context,
     );
-
     return Scaffold(
       backgroundColor: Palette.bgColor,
       appBar: AppBar(
@@ -46,7 +84,8 @@ class _ModuleViewState extends State<ModuleView> {
         child: FutureBuilder(
           future: _getData(),
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
+            if (snapshot.hasData &&
+                snapshot.connectionState == ConnectionState.done) {
               var activeModules;
               if (ConfigHelper().activeModules != null) {
                 activeModules = ConfigHelper().activeModules;
@@ -85,23 +124,38 @@ class _ModuleViewState extends State<ModuleView> {
                   ),
                 );
               }
-              var modules = snapshot.data["message"]["Modules"];
+              var modules = snapshot.data["modules"]["message"]["Modules"];
               var modulesWidget = modules.where((m) {
                 return activeModules.keys.contains(m["name"]) &&
                     activeModules[m["name"]].length > 0;
               }).map<Widget>((m) {
-                return Padding(
-                  padding:
-                      const EdgeInsets.only(left: 10.0, right: 10.0, top: 8.0),
-                  child: CardListTile(
-                    title: Text(m["label"]),
-                    trailing: IconButton(
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                        Icons.cloud_download,
-                      ),
-                      onPressed: () async {
+                var syncDate;
+                var c = snapshot.data["cachedModules"][m["name"]];
+                if (c["data"] == null) {
+                  syncDate = "Not Synced";
+                } else {
+                  syncDate = timeago.format(
+                    c["timestamp"],
+                  );
+                }
+                return Slidable(
+                  actionPane: SlidableDrawerActionPane(),
+                  secondaryActions: <Widget>[
+                    IconSlideAction(
+                      caption: 'Download',
+                      color: Palette.primaryButtonColor,
+                      icon: Icons.cloud_download,
+                      onTap: () async {
                         var isOnline = await verifyOnline();
+                        var shouldCache = await CacheHelper.shouldCacheApi();
+                        if (!shouldCache) {
+                          FrappeAlert.warnAlert(
+                            title:
+                                'Please wait until Background Syncing is finished',
+                            context: context,
+                          );
+                          return;
+                        }
                         if ((connectionStatus == null ||
                                 connectionStatus ==
                                     ConnectivityStatus.offline) &&
@@ -114,25 +168,44 @@ class _ModuleViewState extends State<ModuleView> {
                             title: 'Downloading ${m["name"]}...',
                             context: context,
                           );
-                          await CacheHelper.cacheModule(m["name"]);
-                          FrappeAlert.infoAlert(
-                            title: '${m["name"]} is Downloaded',
-                            context: context,
-                          );
+                          try {
+                            await CacheHelper.cacheModule(m["name"]);
+                            FrappeAlert.infoAlert(
+                              title: '${m["name"]} is Downloaded',
+                              context: context,
+                            );
+                          } catch (e) {
+                            FrappeAlert.errorAlert(
+                              title: '${m["name"]} Downloading Failed',
+                              context: context,
+                            );
+                          }
                           setState(() {});
                         }
                       },
                     ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return DoctypeView(m["name"]);
-                          },
-                        ),
-                      );
-                    },
+                    IconSlideAction(
+                      caption: syncDate,
+                      color: Colors.white,
+                      icon: Icons.sync,
+                    ),
+                  ],
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        left: 10.0, right: 10.0, top: 8.0),
+                    child: CardListTile(
+                      title: Text(m["label"]),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return DoctypeView(m["name"]);
+                            },
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 );
               }).toList();

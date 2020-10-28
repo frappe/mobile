@@ -49,22 +49,25 @@ class _SimpleFormState extends State<SimpleForm> {
                   if ((connectionStatus == null ||
                           connectionStatus == ConnectivityStatus.offline) &&
                       !isOnline) {
+                    var qc = await QueueHelper.getQueueContainer();
+                    var queueLength = qc.length;
                     var qObj = {
                       "type": "Create",
                       "doctype": widget.meta["name"],
                       "title": hasTitle(widget.meta)
                           ? formValue[widget.meta["title_field"]] ??
-                              "${widget.meta["name"]} ${QueueHelper.queueContainer.length + 1}"
-                          : "${widget.meta["name"]} ${QueueHelper.queueContainer.length + 1}",
+                              "${widget.meta["name"]} ${queueLength + 1}"
+                          : "${widget.meta["name"]} ${queueLength + 1}",
                       "data": [formValue],
                     };
-                    QueueHelper.add(qObj);
+                    await QueueHelper.add(qObj);
 
                     FrappeAlert.infoAlert(
                       title: 'No Internet Connection',
                       subtitle: 'Added to Queue',
                       context: context,
                     );
+                    Navigator.of(context).pop();
                   } else {
                     try {
                       var response = await BackendService.saveDocs(

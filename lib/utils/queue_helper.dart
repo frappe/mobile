@@ -4,28 +4,43 @@ import '../services/storage_service.dart';
 import '../service_locator.dart';
 
 class QueueHelper {
-  static var queueContainer = locator<StorageService>().getBox('queue');
+  static getQueueContainer() async {
+    await locator<StorageService>().initStorage();
+    var queueContainer = await locator<StorageService>().initBox('queue');
+    return queueContainer;
+  }
 
   static Future putAt(int index, dynamic value) async {
+    await locator<StorageService>().initStorage();
+    var queueContainer = await locator<StorageService>().initBox('queue');
     queueContainer.putAt(index, value);
   }
 
   static Future add(dynamic value) async {
+    await locator<StorageService>().initStorage();
+    var queueContainer = await locator<StorageService>().initBox('queue');
     queueContainer.add(value);
   }
 
-  static getAt(int index) {
+  static getAt(int index) async {
+    await locator<StorageService>().initStorage();
+    var queueContainer = await locator<StorageService>().initBox('queue');
     return queueContainer.getAt(index);
   }
 
   static Future deleteAt(int index) async {
+    await locator<StorageService>().initStorage();
+    var queueContainer = await locator<StorageService>().initBox('queue');
     queueContainer.deleteAt(index);
   }
 
   static Future processQueue() async {
-    for (var i
-        in List.generate(QueueHelper.queueContainer.length, (index) => index)) {
-      var q = getAt(i);
+    var qc = await QueueHelper.getQueueContainer();
+    var queueLength = qc.length;
+    var l = List.generate(queueLength, (index) => 0);
+
+    for (var i in l) {
+      var q = await getAt(i);
       await processQueueItem(q, i);
     }
   }
@@ -38,9 +53,9 @@ class QueueHelper {
       );
 
       if (response.statusCode == 200) {
-        QueueHelper.deleteAt(index);
+        await QueueHelper.deleteAt(index);
       } else {
-        QueueHelper.putAt(
+        await QueueHelper.putAt(
           index,
           {
             ...q,

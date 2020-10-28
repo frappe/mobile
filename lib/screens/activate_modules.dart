@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../screens/filter_list.dart';
 
@@ -9,6 +12,7 @@ import '../widgets/custom_expansion_tile.dart';
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
 
+import '../utils/cache_helper.dart';
 import '../utils/config_helper.dart';
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
@@ -33,27 +37,55 @@ class _ActivateModulesState extends State<ActivateModules> {
   }
 
   Future _getData() async {
-    var meta = await BackendService.getDoctype('Doctype');
-    return BackendService.fetchList(
-      fieldnames: [
-        "`tabDocType`.`name`",
-        "`tabDocType`.`module`",
-      ],
-      doctype: 'DocType',
-      meta: meta,
-      filters: FilterList.generateFilters(
-        'DocType',
-        {
-          "istable": 0,
-          "issingle": 0,
-        },
-      ),
+    var connectionStatus = Provider.of<ConnectivityStatus>(
+      context,
     );
+    var isOnline = await verifyOnline();
+    if ((connectionStatus == null ||
+            connectionStatus == ConnectivityStatus.offline) &&
+        !isOnline) {
+      var response = await CacheHelper.getCache('DocTypeList');
+      response = response["data"];
+      if (response == null) {
+        throw Response(statusCode: HttpStatus.serviceUnavailable);
+      }
+      return response;
+    } else {
+      var meta = await BackendService.getDoctype('Doctype');
+      var deskSideBarItems = await BackendService.getDeskSideBarItems();
+      List modules = deskSideBarItems["message"]["Modules"];
+
+      var doctypes = await BackendService.fetchList(
+        fieldnames: [
+          "`tabDocType`.`name`",
+          "`tabDocType`.`module`",
+        ],
+        doctype: 'DocType',
+        meta: meta,
+        filters: await FilterList.generateFilters(
+          'DocType',
+          {
+            "istable": 0,
+            "issingle": 0,
+          },
+        ),
+      );
+
+      doctypes.forEach((doctype) {
+        var doctypeModule = modules.firstWhere(
+            (module) => doctype["module"] == module["module"],
+            orElse: () => {});
+
+        doctype["module_label"] = doctypeModule["label"] ?? doctype["module"];
+      });
+
+      return doctypes;
+    }
   }
 
   _handleBack() async {
     await ConfigHelper.set(
-      '${ConfigHelper().baseUrl}activeModules',
+      '${ConfigHelper().primaryCacheKey}activeModules',
       activeModules,
     );
 
@@ -180,7 +212,7 @@ class _ActivateModulesState extends State<ActivateModules> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               doctypes = snapshot.data;
-              var newMap = groupBy(snapshot.data, (obj) => obj['module']);
+              var newMap = groupBy(snapshot.data, (obj) => obj['module_label']);
               return ListView(
                 children: _generateChildren(newMap),
               );
