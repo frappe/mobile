@@ -11,7 +11,7 @@ class ConfigHelper {
       );
 
   Map get activeModules => configContainer.get(
-        "${baseUrl}activeModules",
+        "${primaryCacheKey}activeModules",
       );
 
   String get userId => Uri.decodeFull(configContainer.get(

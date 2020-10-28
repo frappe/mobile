@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/screens/queue_error.dart';
+import 'package:frappe_app/utils/cache_helper.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
@@ -62,7 +64,7 @@ class _FormViewState extends State<FormView>
     });
   }
 
-  Future _getData() {
+  Future _getData() async {
     if (widget.queued) {
       return Future.value(
         {
@@ -70,10 +72,29 @@ class _FormViewState extends State<FormView>
         },
       );
     } else {
-      return BackendService.getdoc(
-        widget.doctype,
-        widget.name,
+      var connectionStatus = Provider.of<ConnectivityStatus>(
+        context,
       );
+
+      var isOnline = await verifyOnline();
+
+      if ((connectionStatus == null ||
+              connectionStatus == ConnectivityStatus.offline) &&
+          !isOnline) {
+        var response =
+            await CacheHelper.getCache('${widget.doctype}${widget.name}');
+        response = response["data"];
+        if (response != null) {
+          return response;
+        } else {
+          throw Response(statusCode: HttpStatus.serviceUnavailable);
+        }
+      } else {
+        return BackendService.getdoc(
+          widget.doctype,
+          widget.name,
+        );
+      }
     }
   }
 
@@ -215,6 +236,7 @@ class _FormViewState extends State<FormView>
           subtitle: 'Added to Queue',
           context: context,
         );
+        Navigator.of(context).pop();
       } else {
         formValue = {
           ...doc,
@@ -432,9 +454,6 @@ class _FormViewState extends State<FormView>
         future: _getData(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            if (snapshot.data["success"] == false) {
-              return NoInternet();
-            }
             var docs = snapshot.data["docs"];
             var docInfo = snapshot.data["docinfo"];
             var builderContext;

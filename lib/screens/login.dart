@@ -24,17 +24,23 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-  bool _hidePassword = true;
   var serverURL;
-  var savedUsr;
-  var savedPwd;
 
   @override
   void initState() {
     super.initState();
     serverURL = ConfigHelper().baseUrl;
-    savedUsr = CacheHelper.getCache('usr')["data"];
-    savedPwd = CacheHelper.getCache('pwd')["data"];
+  }
+
+  _getData() async {
+    var savedUsr = await CacheHelper.getCache('usr');
+    var savedPwd = await CacheHelper.getCache('pwd');
+    savedUsr = savedUsr["data"];
+    savedPwd = savedPwd["data"];
+    return Future.value({
+      "savedUsr": savedUsr,
+      "savedPwd": savedPwd,
+    });
   }
 
   _authenticate(data) async {
@@ -93,112 +99,145 @@ class _LoginState extends State<Login> {
         elevation: 0,
         backgroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(20.0),
+      body: FutureBuilder(
+        future: _getData(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData &&
+              snapshot.connectionState == ConnectionState.done) {
+            return SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                  FormBuilder(
-                    key: _fbKey,
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
                     child: Column(
                       children: <Widget>[
-                        Image(
-                          image: AssetImage('assets/frappe_icon.jpg'),
-                          width: 60,
-                          height: 60,
-                        ),
-                        SizedBox(
-                          height: 24,
-                        ),
-                        Text(
-                          'Login to Frappe',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 24,
-                        ),
-                        buildDecoratedWidget(
-                          FormBuilderTextField(
-                            attribute: 'serverURL',
-                            initialValue: serverURL,
-                            validators: [
-                              FormBuilderValidators.required(),
-                              FormBuilderValidators.url()
+                        FormBuilder(
+                          key: _fbKey,
+                          child: Column(
+                            children: <Widget>[
+                              Image(
+                                image: AssetImage('assets/frappe_icon.jpg'),
+                                width: 60,
+                                height: 60,
+                              ),
+                              SizedBox(
+                                height: 24,
+                              ),
+                              Text(
+                                'Login to Frappe',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 24,
+                              ),
+                              buildDecoratedWidget(
+                                FormBuilderTextField(
+                                  attribute: 'serverURL',
+                                  initialValue: serverURL,
+                                  validators: [
+                                    FormBuilderValidators.required(),
+                                    FormBuilderValidators.url()
+                                  ],
+                                  decoration: Palette.formFieldDecoration(
+                                    true,
+                                    "Server URL",
+                                  ),
+                                ),
+                                true,
+                                "Server URL",
+                              ),
+                              buildDecoratedWidget(
+                                  FormBuilderTextField(
+                                    attribute: 'usr',
+                                    initialValue: snapshot.data["savedUsr"],
+                                    validators: [
+                                      FormBuilderValidators.required(),
+                                    ],
+                                    decoration: Palette.formFieldDecoration(
+                                      true,
+                                      "Email Address",
+                                    ),
+                                  ),
+                                  true,
+                                  "Email Address"),
+                              PasswordField(
+                                savedPassword: snapshot.data["savedPwd"],
+                              ),
+                              FrappeFlatButton(
+                                title: 'Login',
+                                fullWidth: true,
+                                height: 46,
+                                buttonType: ButtonType.primary,
+                                onPressed: () {
+                                  if (_fbKey.currentState.saveAndValidate()) {
+                                    var formValue = _fbKey.currentState.value;
+                                    _authenticate(formValue);
+                                  }
+                                },
+                              ),
                             ],
-                            decoration: Palette.formFieldDecoration(
-                              true,
-                              "Server URL",
-                            ),
                           ),
-                          true,
-                          "Server URL",
-                        ),
-                        buildDecoratedWidget(
-                            FormBuilderTextField(
-                              attribute: 'usr',
-                              initialValue: savedUsr,
-                              validators: [
-                                FormBuilderValidators.required(),
-                              ],
-                              decoration: Palette.formFieldDecoration(
-                                true,
-                                "Email Address",
-                              ),
-                            ),
-                            true,
-                            "Email Address"),
-                        buildDecoratedWidget(
-                            FormBuilderTextField(
-                              maxLines: 1,
-                              attribute: 'pwd',
-                              initialValue: savedPwd,
-                              validators: [
-                                FormBuilderValidators.required(),
-                              ],
-                              obscureText: _hidePassword,
-                              decoration: Palette.formFieldDecoration(
-                                true,
-                                "Password",
-                                FlatButton(
-                                    splashColor: Colors.transparent,
-                                    highlightColor: Colors.transparent,
-                                    child:
-                                        Text(_hidePassword ? "Show" : "Hide"),
-                                    onPressed: () {
-                                      setState(() {
-                                        _hidePassword = !_hidePassword;
-                                      });
-                                    }),
-                              ),
-                            ),
-                            true,
-                            "Password"),
-                        FrappeFlatButton(
-                          title: 'Login',
-                          fullWidth: true,
-                          height: 46,
-                          buttonType: ButtonType.primary,
-                          onPressed: () {
-                            if (_fbKey.currentState.saveAndValidate()) {
-                              var formValue = _fbKey.currentState.value;
-                              _authenticate(formValue);
-                            }
-                          },
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
+            );
+          } else if (snapshot.hasError) {
+            return Text(snapshot.error);
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
       ),
     );
+  }
+}
+
+class PasswordField extends StatefulWidget {
+  final String savedPassword;
+
+  const PasswordField({
+    Key key,
+    this.savedPassword,
+  }) : super(key: key);
+
+  @override
+  _PasswordFieldState createState() => _PasswordFieldState();
+}
+
+class _PasswordFieldState extends State<PasswordField> {
+  bool _hidePassword = true;
+  @override
+  Widget build(BuildContext context) {
+    return buildDecoratedWidget(
+        FormBuilderTextField(
+          maxLines: 1,
+          attribute: 'pwd',
+          initialValue: widget.savedPassword,
+          validators: [
+            FormBuilderValidators.required(),
+          ],
+          obscureText: _hidePassword,
+          decoration: Palette.formFieldDecoration(
+            true,
+            "Password",
+            FlatButton(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                child: Text(_hidePassword ? "Show" : "Hide"),
+                onPressed: () {
+                  setState(() {
+                    _hidePassword = !_hidePassword;
+                  });
+                }),
+          ),
+        ),
+        true,
+        "Password");
   }
 }

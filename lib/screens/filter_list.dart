@@ -39,12 +39,14 @@ class FilterList extends StatefulWidget {
     );
   }
 
-  static List generateFilters(String doctype, Map filters) {
+  static Future<List> generateFilters(String doctype, Map filters) async {
     var transformedFilters;
     var kIdx;
     var cacheKey = '${doctype}Filter';
-    if (CacheHelper.getCache(cacheKey)["data"] != null) {
-      transformedFilters = CacheHelper.getCache(cacheKey)["data"];
+    var cachedFilters = await CacheHelper.getCache(cacheKey);
+    cachedFilters = cachedFilters["data"];
+    if (cachedFilters != null) {
+      transformedFilters = cachedFilters;
     } else {
       transformedFilters = [];
     }
@@ -69,7 +71,7 @@ class FilterList extends StatefulWidget {
       }
     });
 
-    CacheHelper.putCache(
+    await CacheHelper.putCache(
       cacheKey,
       transformedFilters,
     );
@@ -142,10 +144,10 @@ class _FilterListState extends State<FilterList> {
               FrappeFlatButton(
                 minWidth: 120.0,
                 buttonType: ButtonType.primary,
-                onPressed: () {
+                onPressed: () async {
                   _fbKey.currentState.save();
 
-                  var filters = FilterList.generateFilters(
+                  var filters = await FilterList.generateFilters(
                     widget.wireframe["name"],
                     _fbKey.currentState.value,
                   );

@@ -26,6 +26,9 @@ class Int extends StatelessWidget {
     return FormBuilderTextField(
       key: key,
       valueTransformer: (val) {
+        if (val == "") {
+          return val;
+        }
         return int.parse(val);
       },
       initialValue: value != null ? value.toString() : null,

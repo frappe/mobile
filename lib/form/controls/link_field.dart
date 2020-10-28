@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/utils/helpers.dart';
+import 'package:provider/provider.dart';
 
+import '../../utils/cache_helper.dart';
+import '../../utils/enums.dart';
 import '../../utils/backend_service.dart';
 
 class LinkField extends StatefulWidget {
@@ -48,6 +52,9 @@ class _LinkFieldState extends State<LinkField> {
 
   @override
   Widget build(BuildContext context) {
+    var connectionStatus = Provider.of<ConnectivityStatus>(
+      context,
+    );
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Theme(
@@ -102,14 +109,42 @@ class _LinkFieldState extends State<LinkField> {
           suggestionsCallback: widget.suggestionsCallback ??
               (query) async {
                 var lowercaseQuery = query.toLowerCase();
+                var isOnline = await verifyOnline();
+                if ((connectionStatus == null ||
+                        connectionStatus == ConnectivityStatus.offline) &&
+                    !isOnline) {
+                  var linkFull =
+                      await CacheHelper.getCache('${widget.doctype}LinkFull');
+                  linkFull = linkFull["data"];
 
-                var response = await BackendService.searchLink(
-                  doctype: widget.doctype,
-                  refDoctype: widget.refDoctype,
-                  txt: lowercaseQuery,
-                );
+                  if (linkFull != null) {
+                    return linkFull["results"].where(
+                      (link) {
+                        return (link["value"] as String)
+                            .toLowerCase()
+                            .contains(lowercaseQuery);
+                      },
+                    ).toList();
+                  } else {
+                    var queryLink = await CacheHelper.getCache(
+                        '$lowercaseQuery${widget.doctype}Link');
+                    queryLink = queryLink["data"];
 
-                return response["results"];
+                    if (queryLink != null) {
+                      return queryLink["results"];
+                    } else {
+                      return [];
+                    }
+                  }
+                } else {
+                  var response = await BackendService.searchLink(
+                    doctype: widget.doctype,
+                    refDoctype: widget.refDoctype,
+                    txt: lowercaseQuery,
+                  );
+
+                  return response["results"];
+                }
               },
         ),
       ),

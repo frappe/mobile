@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/dio_helper.dart';
 
+import 'cache_helper.dart';
 import 'helpers.dart';
 
 class BackendService {
@@ -20,18 +20,17 @@ class BackendService {
       final response = await DioHelper.dio.get(
         '/method/frappe.desk.form.load.getdoc',
         queryParameters: queryParams,
-        options: buildCacheOptions(
-          Duration(days: 7),
-          forceRefresh: true,
-          options: Options(
-            validateStatus: (status) {
-              return status < 500;
-            },
-          ),
+        options: Options(
+          validateStatus: (status) {
+            return status < 500;
+          },
         ),
       );
 
       if (response.statusCode == 200) {
+        if (await CacheHelper.shouldCacheApi()) {
+          await CacheHelper.putCache('$doctype$name', response.data);
+        }
         return response.data;
       } else if (response.statusCode == 403) {
         throw response;
@@ -92,8 +91,6 @@ class BackendService {
 
     queryParams['limit_start'] = offset.toString();
 
-    var subK = queryParams.toString();
-
     if (filters != null && filters.length != 0) {
       queryParams['filters'] = jsonEncode(filters);
     }
@@ -102,15 +99,10 @@ class BackendService {
       final response = await DioHelper.dio.get(
         '/method/frappe.desk.reportview.get',
         queryParameters: queryParams,
-        options: buildCacheOptions(
-          Duration(days: 7),
-          subKey: subK,
-          forceRefresh: true,
-          options: Options(
-            validateStatus: (status) {
-              return status < 500;
-            },
-          ),
+        options: Options(
+          validateStatus: (status) {
+            return status < 500;
+          },
         ),
       );
       if (response.statusCode == HttpStatus.ok) {
@@ -144,6 +136,10 @@ class BackendService {
             o[key] = value;
           }
           newL.add(o);
+        }
+
+        if (await CacheHelper.shouldCacheApi()) {
+          await CacheHelper.putCache('${doctype}List', newL);
         }
 
         return newL;
@@ -195,18 +191,18 @@ class BackendService {
         data: {
           'page': module,
         },
-        options: buildCacheOptions(
-          Duration(days: 7),
-          forceRefresh: true,
-          options: Options(
-            validateStatus: (status) {
-              return status < 500;
-            },
-          ),
+        options: Options(
+          validateStatus: (status) {
+            return status < 500;
+          },
         ),
       );
 
       if (response.statusCode == 200) {
+        if (await CacheHelper.shouldCacheApi()) {
+          await CacheHelper.putCache('${module}Doctypes', response.data);
+        }
+
         return response.data;
       } else if (response.statusCode == 403) {
         throw response;
@@ -285,18 +281,19 @@ class BackendService {
     try {
       final response = await DioHelper.dio.post(
         '/method/frappe.desk.desktop.get_desk_sidebar_items',
-        options: buildCacheOptions(
-          Duration(days: 7),
-          forceRefresh: true,
-          options: Options(
-            validateStatus: (status) {
-              return status < 500;
-            },
-          ),
+        options: Options(
+          validateStatus: (status) {
+            return status < 500;
+          },
         ),
       );
 
       if (response.statusCode == HttpStatus.ok) {
+        var a = await CacheHelper.shouldCacheApi();
+        if (a) {
+          await CacheHelper.putCache('deskSidebarItems', response.data);
+        }
+
         return response.data;
       } else if (response.statusCode == HttpStatus.forbidden) {
         throw response;
@@ -327,20 +324,24 @@ class BackendService {
       final response = await DioHelper.dio.get(
         '/method/frappe.desk.form.load.getdoctype',
         queryParameters: queryParams,
-        options: buildCacheOptions(
-          Duration(days: 7),
-          forceRefresh: true,
-          options: Options(
-            validateStatus: (status) {
-              return status < 500;
-            },
-          ),
+        options: Options(
+          validateStatus: (status) {
+            return status < 500;
+          },
         ),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == HttpStatus.ok) {
+        List metaFields = response.data["docs"][0]["fields"];
+
+        metaFields.forEach((field) {
+          response.data["docs"][0]["_field${field["fieldname"]}"] = true;
+        });
+        if (await CacheHelper.shouldCacheApi()) {
+          await CacheHelper.putCache('${doctype}Meta', response.data);
+        }
         return response.data;
-      } else if (response.statusCode == 403) {
+      } else if (response.statusCode == HttpStatus.forbidden) {
         throw response;
       } else {
         throw Response(statusMessage: 'Something went wrong');
@@ -563,18 +564,21 @@ class BackendService {
       final response = await DioHelper.dio.post(
         '/method/frappe.desk.search.search_link',
         data: queryParams,
-        options: buildCacheOptions(
-          Duration(days: 7),
-          forceRefresh: true,
-          options: Options(
-            contentType: Headers.formUrlEncodedContentType,
-            validateStatus: (status) {
-              return status < 500;
-            },
-          ),
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+          validateStatus: (status) {
+            return status < 500;
+          },
         ),
       );
       if (response.statusCode == 200) {
+        if (await CacheHelper.shouldCacheApi()) {
+          if (pageLength != null && pageLength == 9999) {
+            await CacheHelper.putCache('${doctype}LinkFull', response.data);
+          } else {
+            await CacheHelper.putCache('$txt${doctype}Link', response.data);
+          }
+        }
         return response.data;
       } else if (response.statusCode == HttpStatus.forbidden) {
         throw response;

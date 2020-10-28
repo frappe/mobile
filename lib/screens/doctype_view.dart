@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:frappe_app/screens/session_expired.dart';
+import 'package:frappe_app/utils/cache_helper.dart';
+import 'package:provider/provider.dart';
 
 import '../app.dart';
 
 import '../config/palette.dart';
 
 import '../screens/activate_modules.dart';
-import '../screens/no_internet.dart';
 
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
@@ -28,8 +28,29 @@ class DoctypeView extends StatefulWidget {
 }
 
 class _DoctypeViewState extends State<DoctypeView> {
-  Future _getData() {
-    return BackendService.getDesktopPage(widget.module);
+  bool offline = false;
+
+  Future _getData() async {
+    var connectionStatus = Provider.of<ConnectivityStatus>(
+      context,
+    );
+
+    var isOnline = await verifyOnline();
+
+    if ((connectionStatus == null ||
+            connectionStatus == ConnectivityStatus.offline) &&
+        !isOnline) {
+      offline = true;
+      var docTypes = await CacheHelper.getCache('${widget.module}Doctypes');
+      docTypes = docTypes["data"];
+      if (docTypes == null) {
+        throw Response(statusCode: HttpStatus.serviceUnavailable);
+      }
+      return docTypes;
+    } else {
+      offline = false;
+      return BackendService.getDesktopPage(widget.module);
+    }
   }
 
   @override
@@ -95,43 +116,17 @@ class _DoctypeViewState extends State<DoctypeView> {
                   ),
                   child: CardListTile(
                     title: Text(m["label"]),
-                    onTap: () async {
-                      try {
-                        await processData(
-                          doctype: m["name"],
-                        );
-
-                        Navigator.of(context, rootNavigator: true).push(
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return CustomRouter(
-                                doctype: m["name"],
-                                viewType: ViewType.list,
-                              );
-                            },
-                          ),
-                        );
-                      } catch (e) {
-                        if (e.statusCode == HttpStatus.serviceUnavailable) {
-                          Navigator.of(context, rootNavigator: true).push(
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return NoInternet();
-                              },
-                            ),
-                          );
-                        } else if (e.statusCode == HttpStatus.forbidden) {
-                          Navigator.of(context, rootNavigator: true).push(
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return SessionExpired();
-                              },
-                            ),
-                          );
-                        } else {
-                          showErrorDialog(e, context);
-                        }
-                      }
+                    onTap: () {
+                      Navigator.of(context, rootNavigator: true).push(
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return CustomRouter(
+                              doctype: m["name"],
+                              viewType: ViewType.list,
+                            );
+                          },
+                        ),
+                      );
                     },
                   ),
                 );
