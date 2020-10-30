@@ -10,7 +10,7 @@ class QueueHelper {
     return locator<StorageService>().getBox('queue');
   }
 
-  static Future putAt(int index, dynamic value) async {
+  static putAt(int index, dynamic value) {
     List l = getQueueItems();
     l.remove(index);
     l.insert(index, value);
@@ -20,7 +20,7 @@ class QueueHelper {
     );
   }
 
-  static Future add(dynamic value) async {
+  static add(dynamic value) {
     List l = getQueueItems();
 
     l.add(value);
@@ -38,7 +38,7 @@ class QueueHelper {
     );
   }
 
-  static getAt(int index) async {
+  static getAt(int index) {
     List l = getQueueItems();
     return l[index];
   }
