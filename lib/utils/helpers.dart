@@ -32,35 +32,6 @@ import '../utils/backend_service.dart';
 import '../widgets/section.dart';
 import '../widgets/custom_expansion_tile.dart';
 
-Future processData2({
-  String doctype,
-  bool offline = false,
-}) async {
-  var meta;
-  // TODO: move to backend service
-
-  if (offline) {
-    meta = await CacheHelper.getCache('${doctype}Meta');
-    meta = meta["data"];
-    if (meta == null) {
-      return {
-        "success": false,
-      };
-    }
-  } else {
-    meta = await BackendService.getDoctype(doctype);
-
-    List metaFields = meta["docs"][0]["fields"];
-
-    metaFields.forEach((field) {
-      meta["docs"][0]["_field${field["fieldname"]}"] = true;
-    });
-
-    await CacheHelper.putCache('${doctype}Meta', meta);
-  }
-  return meta;
-}
-
 Widget buildDecoratedWidget(Widget fieldWidget, bool withLabel,
     [String label = ""]) {
   if (withLabel) {
