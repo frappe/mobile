@@ -20,9 +20,6 @@ class CacheHelper {
       return;
     }
 
-    await locator<StorageService>().initStorage();
-    var cacheContainer = await locator<StorageService>().initBox('cache');
-
     var k = ConfigHelper().primaryCacheKey + "#@#" + secondaryKey;
     var kHash = generateKeyHash(k);
 
@@ -31,16 +28,13 @@ class CacheHelper {
       'data': data,
     };
 
-    await cacheContainer.put(kHash, v);
+    await locator<StorageService>().getBox('cache').put(kHash, v);
   }
 
-  static putAllCache(Map data) async {
+  static putAllCache(Map data, [bool isIsolate = false]) async {
     if (ConfigHelper().primaryCacheKey == null) {
       return;
     }
-
-    await locator<StorageService>().initStorage();
-    var cacheContainer = await locator<StorageService>().initBox('cache');
 
     var v = {};
 
@@ -53,7 +47,14 @@ class CacheHelper {
       },
     );
 
-    await cacheContainer.putAll(v);
+    if (isIsolate) {
+      var runBackgroundTask = await getSharedPrefValue("backgroundTask");
+      if (runBackgroundTask) {
+        await locator<StorageService>().getBox('cache').putAll(v);
+      }
+    } else {
+      await locator<StorageService>().getBox('cache').putAll(v);
+    }
   }
 
   static getCache(String secondaryKey) async {
@@ -63,28 +64,21 @@ class CacheHelper {
     var k = ConfigHelper().primaryCacheKey + "#@#" + secondaryKey;
     var keyHash = generateKeyHash(k);
 
-    await locator<StorageService>().initStorage();
-    var cacheContainer = await locator<StorageService>().initBox('cache');
-
-    if (cacheContainer.get(keyHash) == null) {
+    if (locator<StorageService>().getBox('cache').get(keyHash) == null) {
       return {"data": null};
     }
 
-    return cacheContainer.get(keyHash);
+    return locator<StorageService>().getBox('cache').get(keyHash);
   }
 
   static Future remove(String secondaryKey) async {
-    await locator<StorageService>().initStorage();
-    var cacheContainer = await locator<StorageService>().initBox('cache');
     var k = ConfigHelper().primaryCacheKey + "#@#" + secondaryKey;
     var keyHash = generateKeyHash(k);
-    cacheContainer.delete(keyHash);
+    locator<StorageService>().getBox('cache').delete(keyHash);
   }
 
-  static cacheModule(String module) async {
-    var syncContainer = await locator<StorageService>().initBox('sync');
+  static cacheModule(String module, [bool isIsolate = false]) async {
     try {
-      await syncContainer.put("cacheApi", false);
       var cache = {};
       var deskSideBarItems = await BackendService.getDeskSideBarItems();
       var doctypes = await BackendService.getDesktopPage(module);
@@ -118,10 +112,8 @@ class CacheHelper {
           };
         },
       );
-      await putAllCache(cache);
-      await syncContainer.put("cacheApi", true);
+      await putAllCache(cache, isIsolate);
     } catch (e) {
-      await syncContainer.put("cacheApi", true);
       print(e);
     }
   }
@@ -236,10 +228,9 @@ class CacheHelper {
   }
 
   static Future<bool> shouldCacheApi() async {
-    await locator<StorageService>().initStorage();
-    var syncContainer = await locator<StorageService>().initBox('sync');
-    var shouldCacheApi = syncContainer.get("cacheApi", defaultValue: true);
-
-    return shouldCacheApi;
+    var cacheApi = await getSharedPrefValue(
+      "cacheApi",
+    );
+    return cacheApi ?? true;
   }
 }

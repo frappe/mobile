@@ -289,8 +289,7 @@ class BackendService {
       );
 
       if (response.statusCode == HttpStatus.ok) {
-        var a = await CacheHelper.shouldCacheApi();
-        if (a) {
+        if (await CacheHelper.shouldCacheApi()) {
           await CacheHelper.putCache('deskSidebarItems', response.data);
         }
 

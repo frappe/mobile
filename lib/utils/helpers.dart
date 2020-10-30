@@ -7,10 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frappe_app/screens/no_internet.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
 import 'http.dart';
@@ -578,4 +578,15 @@ getLinkFields(String doctype) async {
       .toList();
 
   return linkFieldDoctypes;
+}
+
+putSharedPrefValue(String key, bool value) async {
+  var _prefs = await SharedPreferences.getInstance();
+  await _prefs.setBool(key, value);
+}
+
+Future<bool> getSharedPrefValue(String key) async {
+  var _prefs = await SharedPreferences.getInstance();
+  await _prefs.reload();
+  return _prefs.getBool(key);
 }

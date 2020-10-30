@@ -124,7 +124,11 @@ class _ModuleViewState extends State<ModuleView> {
                   ),
                 );
               }
-              var modules = snapshot.data["modules"]["message"]["Modules"];
+              var modules = [
+                ...snapshot.data["modules"]["message"]["Modules"],
+                ...snapshot.data["modules"]["message"]["Administration"],
+                ...snapshot.data["modules"]["message"]["Domains"]
+              ];
               var modulesWidget = modules.where((m) {
                 return activeModules.keys.contains(m["name"]) &&
                     activeModules[m["name"]].length > 0;
@@ -147,15 +151,15 @@ class _ModuleViewState extends State<ModuleView> {
                       icon: Icons.cloud_download,
                       onTap: () async {
                         var isOnline = await verifyOnline();
-                        var shouldCache = await CacheHelper.shouldCacheApi();
-                        if (!shouldCache) {
-                          FrappeAlert.warnAlert(
-                            title:
-                                'Please wait until Background Syncing is finished',
-                            context: context,
-                          );
-                          return;
-                        }
+                        // var shouldCache = await CacheHelper.shouldCacheApi();
+                        // if (!shouldCache) {
+                        //   FrappeAlert.warnAlert(
+                        //     title:
+                        //         'Please wait until Background Syncing is finished',
+                        //     context: context,
+                        //   );
+                        //   return;
+                        // }
                         if ((connectionStatus == null ||
                                 connectionStatus ==
                                     ConnectivityStatus.offline) &&
@@ -169,12 +173,24 @@ class _ModuleViewState extends State<ModuleView> {
                             context: context,
                           );
                           try {
+                            await putSharedPrefValue(
+                              "cacheApi",
+                              false,
+                            );
                             await CacheHelper.cacheModule(m["name"]);
+                            await putSharedPrefValue(
+                              "cacheApi",
+                              true,
+                            );
                             FrappeAlert.infoAlert(
                               title: '${m["name"]} is Downloaded',
                               context: context,
                             );
                           } catch (e) {
+                            await putSharedPrefValue(
+                              "cacheApi",
+                              true,
+                            );
                             FrappeAlert.errorAlert(
                               title: '${m["name"]} Downloading Failed',
                               context: context,

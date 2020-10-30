@@ -1,41 +1,59 @@
 import 'package:frappe_app/utils/backend_service.dart';
+import 'package:frappe_app/utils/config_helper.dart';
+import 'package:hive/hive.dart';
 
 import '../services/storage_service.dart';
 import '../service_locator.dart';
 
 class QueueHelper {
-  static getQueueContainer() async {
-    await locator<StorageService>().initStorage();
-    var queueContainer = await locator<StorageService>().initBox('queue');
-    return queueContainer;
+  static Box getQueueContainer() {
+    return locator<StorageService>().getBox('queue');
   }
 
   static Future putAt(int index, dynamic value) async {
-    await locator<StorageService>().initStorage();
-    var queueContainer = await locator<StorageService>().initBox('queue');
-    queueContainer.putAt(index, value);
+    List l = getQueueItems();
+    l.remove(index);
+    l.insert(index, value);
+    getQueueContainer().put(
+      ConfigHelper().primaryCacheKey,
+      l,
+    );
   }
 
   static Future add(dynamic value) async {
-    await locator<StorageService>().initStorage();
-    var queueContainer = await locator<StorageService>().initBox('queue');
-    queueContainer.add(value);
+    List l = getQueueItems();
+
+    l.add(value);
+
+    getQueueContainer().put(
+      ConfigHelper().primaryCacheKey,
+      l,
+    );
+  }
+
+  static List getQueueItems() {
+    return getQueueContainer().get(
+      ConfigHelper().primaryCacheKey,
+      defaultValue: [],
+    );
   }
 
   static getAt(int index) async {
-    await locator<StorageService>().initStorage();
-    var queueContainer = await locator<StorageService>().initBox('queue');
-    return queueContainer.getAt(index);
+    List l = getQueueItems();
+    return l[index];
   }
 
   static Future deleteAt(int index) async {
-    await locator<StorageService>().initStorage();
-    var queueContainer = await locator<StorageService>().initBox('queue');
-    queueContainer.deleteAt(index);
+    List l = getQueueItems();
+    l.removeAt(index);
+    await getQueueContainer().put(
+      ConfigHelper().primaryCacheKey,
+      l,
+    );
   }
 
   static Future processQueue() async {
-    var qc = await QueueHelper.getQueueContainer();
+    var qc = QueueHelper.getQueueContainer();
     var queueLength = qc.length;
     var l = List.generate(queueLength, (index) => 0);
 

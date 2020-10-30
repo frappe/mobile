@@ -49,7 +49,7 @@ class _SimpleFormState extends State<SimpleForm> {
                   if ((connectionStatus == null ||
                           connectionStatus == ConnectivityStatus.offline) &&
                       !isOnline) {
-                    var qc = await QueueHelper.getQueueContainer();
+                    var qc = QueueHelper.getQueueContainer();
                     var queueLength = qc.length;
                     var qObj = {
                       "type": "Create",

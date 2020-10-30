@@ -18,6 +18,7 @@ environment:
 
 
 dependencies:
+  shared_preferences: ^0.5.12+2
   crypto: ^2.1.5
   device_info: ^0.4.2+9
   flutter_slidable: ^0.5.7
