@@ -19,6 +19,8 @@ void callbackDispatcher() {
     setupLocator();
     await locator<StorageService>().initStorage();
     await locator<StorageService>().initBox('config');
+    await locator<StorageService>().initBox('queue');
+    await locator<StorageService>().initBox('cache');
 
     await initConfig();
 
@@ -39,19 +41,16 @@ void callbackDispatcher() {
     );
 
     var notificationCount = await getActiveNotifications();
+    var runBackgroundTask = await getSharedPrefValue("backgroundTask");
 
-    if (ConfigHelper().isLoggedIn) {
+    if (ConfigHelper().isLoggedIn && runBackgroundTask) {
       switch (task) {
         case TASK_SYNC_DATA:
-          var shouldCache = await CacheHelper.shouldCacheApi();
-          if (!shouldCache) {
-            await showNotification(
-              title: "Sync",
-              subtitle: "Already in Progress",
-              index: notificationCount,
-            );
-            break;
-          }
+          await putSharedPrefValue(
+            "cacheApi",
+            false,
+          );
+
           await showNotification(
             title: "Sync",
             subtitle: "Downloading Modules",
@@ -61,12 +60,20 @@ void callbackDispatcher() {
           try {
             await syncnow();
             print('Sync complete');
+            await putSharedPrefValue(
+              "cacheApi",
+              true,
+            );
             await showNotification(
               title: "Sync",
               subtitle: "Downloading Modules Completed",
               index: notificationCount,
             );
           } catch (e) {
+            await putSharedPrefValue(
+              "cacheApi",
+              true,
+            );
             await showNotification(
               title: "Sync",
               subtitle: "Downloading Modules Failed",
@@ -148,6 +155,7 @@ void registerPeriodicTask() {
       requiresBatteryNotLow: false,
     ),
     existingWorkPolicy: ExistingWorkPolicy.keep,
+    backoffPolicy: BackoffPolicy.linear,
   );
 
   Workmanager.registerPeriodicTask(
@@ -159,6 +167,7 @@ void registerPeriodicTask() {
       requiresBatteryNotLow: false,
     ),
     existingWorkPolicy: ExistingWorkPolicy.keep,
+    backoffPolicy: BackoffPolicy.linear,
   );
 }
 
@@ -169,9 +178,10 @@ Future syncnow() async {
     var activeModules = ConfigHelper().activeModules;
 
     for (var module in activeModules.keys) {
-      if (activeModules[module].isNotEmpty) {
+      var runBackgroundTask = await getSharedPrefValue("backgroundTask");
+      if (activeModules[module].isNotEmpty && runBackgroundTask) {
         try {
-          await CacheHelper.cacheModule(module);
+          await CacheHelper.cacheModule(module, true);
         } catch (e) {
           throw e;
         }

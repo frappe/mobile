@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/config/frappe_icons.dart';
-import 'package:frappe_app/utils/frappe_alert.dart';
-import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:provider/provider.dart';
 
 import '../app.dart';
 
+import '../config/frappe_icons.dart';
 import '../config/palette.dart';
 
 import '../widgets/card_list_tile.dart';
 
+import '../utils/frappe_alert.dart';
+import '../utils/frappe_icon.dart';
 import '../utils/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
@@ -48,105 +48,97 @@ class _QueueListState extends State<QueueList> {
         onRefresh: () async {
           _refresh();
         },
-        child: FutureBuilder(
-          future: QueueHelper.getQueueContainer(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData &&
-                snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.data.length < 1) {
-                return Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Text(
-                    "Queue is Empty",
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Palette.secondaryTxtColor,
-                      fontWeight: FontWeight.bold,
-                    ),
+        child: Builder(
+          builder: (
+            context,
+          ) {
+            var l = QueueHelper.getQueueItems();
+            if (l.length < 1) {
+              return Padding(
+                padding: EdgeInsets.all(8),
+                child: Text(
+                  "Queue is Empty",
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Palette.secondaryTxtColor,
+                    fontWeight: FontWeight.bold,
                   ),
-                );
-              }
-              return ListView.builder(
-                itemCount: snapshot.data.length,
-                itemBuilder: (context, index) {
-                  var q = snapshot.data.getAt(index);
-                  return CardListTile(
-                    leading: IconButton(
-                      icon: Icon(Icons.sync),
-                      onPressed: () async {
-                        var isOnline = await verifyOnline();
-                        if ((connectionStatus == null ||
-                                connectionStatus ==
-                                    ConnectivityStatus.offline) &&
-                            !isOnline) {
-                          FrappeAlert.errorAlert(
-                            title: 'Cant Sync, App is offline',
-                            context: context,
-                          );
-                          return;
-                        } else if (q["error"] != null) {
-                          FrappeAlert.errorAlert(
-                            title:
-                                "There was some error while processing this item",
-                            context: context,
-                          );
-                          return;
-                        }
-
-                        await QueueHelper.processQueueItem(q, index);
-                        _refresh();
-                      },
-                    ),
-                    title: Text(q['title'] ?? ""),
-                    subtitle: Row(
-                      children: [
-                        Text(
-                          q['doctype'],
-                        ),
-                        VerticalDivider(),
-                        Text(
-                          q["type"],
-                        ),
-                        VerticalDivider(),
-                        if (q["error"] != null)
-                          FrappeIcon(
-                            FrappeIcons.error,
-                            size: 20,
-                          ),
-                      ],
-                    ),
-                    trailing: IconButton(
-                      onPressed: () {
-                        QueueHelper.deleteAt(index);
-                        setState(() {});
-                      },
-                      icon: Icon(Icons.clear),
-                    ),
-                    onTap: () {
-                      q["qIdx"] = index;
-                      Navigator.of(context, rootNavigator: true).push(
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return CustomRouter(
-                              viewType: ViewType.form,
-                              doctype: q['doctype'],
-                              queued: true,
-                              queuedData: q,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  );
-                },
-              );
-            } else if (snapshot.hasError) {
-              return Text(snapshot.error);
-            } else {
-              return Center(
-                child: CircularProgressIndicator(),
+                ),
               );
             }
+            return ListView.builder(
+              itemCount: l.length,
+              itemBuilder: (context, index) {
+                var q = l[index];
+                return CardListTile(
+                  leading: IconButton(
+                    icon: Icon(Icons.sync),
+                    onPressed: () async {
+                      var isOnline = await verifyOnline();
+                      if ((connectionStatus == null ||
+                              connectionStatus == ConnectivityStatus.offline) &&
+                          !isOnline) {
+                        FrappeAlert.errorAlert(
+                          title: 'Cant Sync, App is offline',
+                          context: context,
+                        );
+                        return;
+                      } else if (q["error"] != null) {
+                        FrappeAlert.errorAlert(
+                          title:
+                              "There was some error while processing this item",
+                          context: context,
+                        );
+                        return;
+                      }
+
+                      await QueueHelper.processQueueItem(q, index);
+                      _refresh();
+                    },
+                  ),
+                  title: Text(q['title'] ?? ""),
+                  subtitle: Row(
+                    children: [
+                      Text(
+                        q['doctype'],
+                      ),
+                      VerticalDivider(),
+                      Text(
+                        q["type"],
+                      ),
+                      VerticalDivider(),
+                      if (q["error"] != null)
+                        FrappeIcon(
+                          FrappeIcons.error,
+                          size: 20,
+                        ),
+                    ],
+                  ),
+                  trailing: IconButton(
+                    onPressed: () {
+                      QueueHelper.deleteAt(index);
+                      setState(() {});
+                    },
+                    icon: Icon(Icons.clear),
+                  ),
+                  onTap: () {
+                    q["qIdx"] = index;
+                    Navigator.of(context, rootNavigator: true).push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return CustomRouter(
+                            viewType: ViewType.form,
+                            doctype: q['doctype'],
+                            queued: true,
+                            queuedData: q,
+                          );
+                        },
+                      ),
+                    );
+                  },
+                );
+              },
+            );
           },
         ),
       ),

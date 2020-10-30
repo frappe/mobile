@@ -8,6 +8,7 @@ import 'package:frappe_app/utils/backend_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import 'lifecycle_manager.dart';
 import 'utils/cache_helper.dart';
 import 'utils/config_helper.dart';
 import 'utils/enums.dart';
@@ -52,54 +53,57 @@ class _FrappeAppState extends State<FrappeApp> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamProvider<ConnectivityStatus>(
-      create: (context) =>
-          ConnectivityService().connectionStatusController.stream,
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Frappe',
-        navigatorKey: locator<NavigationService>().navigatorKey,
-        onGenerateRoute: (routeSettings) {
-          switch (routeSettings.name) {
-            case 'login':
-              return MaterialPageRoute(builder: (context) => Login());
-            case 'session_expired':
-              return MaterialPageRoute(builder: (context) => SessionExpired());
-            case 'no_internet':
-              return MaterialPageRoute(builder: (context) => NoInternet());
-            default:
-              return MaterialPageRoute(builder: (context) => FrappeApp());
-          }
-        },
-        theme: new ThemeData(
-          textTheme: GoogleFonts.interTextTheme(
-            Theme.of(context).textTheme.apply(
-                // fontSizeFactor: 0.7,
-                ),
-          ),
-          disabledColor: Colors.black,
-          primaryColor: Colors.white,
-          accentColor: Colors.black54,
-        ),
-        home: GestureDetector(
-          onTap: () {
-            FocusScope.of(context).requestFocus(new FocusNode());
+    return LifeCycleManager(
+      child: StreamProvider<ConnectivityStatus>(
+        create: (context) =>
+            ConnectivityService().connectionStatusController.stream,
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Frappe',
+          navigatorKey: locator<NavigationService>().navigatorKey,
+          onGenerateRoute: (routeSettings) {
+            switch (routeSettings.name) {
+              case 'login':
+                return MaterialPageRoute(builder: (context) => Login());
+              case 'session_expired':
+                return MaterialPageRoute(
+                    builder: (context) => SessionExpired());
+              case 'no_internet':
+                return MaterialPageRoute(builder: (context) => NoInternet());
+              default:
+                return MaterialPageRoute(builder: (context) => FrappeApp());
+            }
           },
-          child: Scaffold(
-            body: _isLoaded
-                ? _isLoggedIn
-                    ? CustomPersistentBottomNavBar()
-                    : Login()
-                : Center(
-                    child: CircularProgressIndicator(),
+          theme: new ThemeData(
+            textTheme: GoogleFonts.interTextTheme(
+              Theme.of(context).textTheme.apply(
+                  // fontSizeFactor: 0.7,
                   ),
+            ),
+            disabledColor: Colors.black,
+            primaryColor: Colors.white,
+            accentColor: Colors.black54,
           ),
+          home: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(new FocusNode());
+            },
+            child: Scaffold(
+              body: _isLoaded
+                  ? _isLoggedIn
+                      ? CustomPersistentBottomNavBar()
+                      : Login()
+                  : Center(
+                      child: CircularProgressIndicator(),
+                    ),
+            ),
+          ),
+          routes: <String, WidgetBuilder>{
+            // Set routes for using the Navigator.
+            '/login': (BuildContext context) => Login(),
+            '/modules': (BuildContext context) => ModuleView(),
+          },
         ),
-        routes: <String, WidgetBuilder>{
-          // Set routes for using the Navigator.
-          '/login': (BuildContext context) => Login(),
-          '/modules': (BuildContext context) => ModuleView(),
-        },
       ),
     );
   }
