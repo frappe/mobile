@@ -13,7 +13,8 @@ class FrappeAlert {
     @required MaterialColor color,
     Duration aleartDuration = const Duration(seconds: 5),
   }) {
-    FToast fToast = FToast(context);
+    FToast fToast = FToast();
+    fToast.init(context);
 
     var toast = Container(
       padding: const EdgeInsets.symmetric(vertical: 8.0),

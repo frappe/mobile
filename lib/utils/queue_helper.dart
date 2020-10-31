@@ -53,7 +53,7 @@ class QueueHelper {
   }
 
   static Future processQueue() async {
-    var qc = QueueHelper.getQueueContainer();
+    var qc = QueueHelper.getQueueItems();
     var queueLength = qc.length;
     var l = List.generate(queueLength, (index) => 0);
 
