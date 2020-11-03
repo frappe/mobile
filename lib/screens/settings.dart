@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/services/navigation_service.dart';
 
+import '../services/navigation_service.dart';
 import '../config/palette.dart';
+import '../screens/queue.dart';
 import '../screens/activate_modules.dart';
 import '../service_locator.dart';
 import '../utils/helpers.dart';
@@ -26,6 +27,19 @@ class SettingsPage extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) {
                     return ActivateModules();
+                  },
+                ),
+              );
+            },
+          ),
+          CardListTile(
+            title: Text('Queue'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return QueueList();
                   },
                 ),
               );

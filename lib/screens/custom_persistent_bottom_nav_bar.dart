@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/screens/module_view.dart';
-import 'package:frappe_app/screens/queue.dart';
-import 'package:frappe_app/screens/settings.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
+import 'package:frappe_app/screens/awesome_bar.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
+
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+
+import '../screens/module_view.dart';
+import '../screens/settings.dart';
 
 class CustomPersistentBottomNavBar extends StatelessWidget {
   final PersistentTabController _persistentTabController =
@@ -11,7 +15,7 @@ class CustomPersistentBottomNavBar extends StatelessWidget {
   List<Widget> _buildScreens() {
     return [
       ModuleView(),
-      QueueList(),
+      AwesomeBar(),
       SettingsPage(),
     ];
   }
@@ -27,20 +31,11 @@ class CustomPersistentBottomNavBar extends StatelessWidget {
         title: "Home",
       ),
       PersistentBottomNavBarItem(
-        // icon: Badge(
-        //   badgeColor: Colors.white,
-        //   badgeContent: Text(queue.length.toString()),
-        //   child: Icon(
-        //     Icons.cloud_queue,
-        //   ),
-        // ),
-        // TODO
         activeColor: Colors.black54,
-        icon: Icon(
-          Icons.cloud_queue,
-          color: Colors.black54,
+        icon: FrappeIcon(
+          FrappeIcons.search,
         ),
-        title: "Queue",
+        title: "Search",
       ),
       PersistentBottomNavBarItem(
         activeColor: Colors.black54,

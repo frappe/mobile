@@ -32,6 +32,7 @@ class _SimpleFormState extends State<SimpleForm> {
 
     return Scaffold(
       appBar: AppBar(
+        title: Text("New ${widget.meta["name"]}"),
         actions: <Widget>[
           Padding(
             padding: const EdgeInsets.symmetric(

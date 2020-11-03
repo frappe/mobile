@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-import './../../utils/backend_service.dart';
+typedef String SelectionToTextTransformer<T>(T selection);
 
 class AutoComplete extends StatefulWidget {
   final String hint;
@@ -17,6 +18,7 @@ class AutoComplete extends StatefulWidget {
   final key;
   final ItemBuilder itemBuilder;
   final SuggestionsCallback suggestionsCallback;
+  final SelectionToTextTransformer selectionToTextTransformer;
 
   final List<String Function(dynamic)> validators;
 
@@ -35,6 +37,7 @@ class AutoComplete extends StatefulWidget {
     this.value,
     this.itemBuilder,
     this.suggestionsCallback,
+    this.selectionToTextTransformer,
   });
 
   @override
@@ -43,13 +46,6 @@ class AutoComplete extends StatefulWidget {
 
 class _AutoCompleteState extends State<AutoComplete> {
   final TextEditingController _typeAheadController = TextEditingController();
-  BackendService backendService;
-
-  @override
-  void initState() {
-    super.initState();
-    backendService = BackendService();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,9 +82,10 @@ class _AutoCompleteState extends State<AutoComplete> {
             enabledBorder: !widget.showInputBorder ? InputBorder.none : null,
             hintText: widget.hint,
           ),
-          selectionToTextTransformer: (item) {
-            return item;
-          },
+          selectionToTextTransformer: widget.selectionToTextTransformer ??
+              (item) {
+                return item.toString();
+              },
           attribute: widget.attribute,
           itemBuilder: widget.itemBuilder ??
               (context, item) {
@@ -103,8 +100,9 @@ class _AutoCompleteState extends State<AutoComplete> {
               (query) async {
                 var lowercaseQuery = query.toLowerCase();
                 return widget.options
-                    .where((option) =>
-                        option.toLowerCase().contains(lowercaseQuery))
+                    .where(
+                      (option) => option.toLowerCase().contains(lowercaseQuery),
+                    )
                     .toList();
               },
         ),
