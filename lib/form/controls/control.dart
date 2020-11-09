@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/config/palette.dart';
 
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+
+import '../../config/palette.dart';
 import '../../utils/helpers.dart';
 
+import './custom_table.dart';
 import './check.dart';
 import './data.dart';
 import './date.dart';
@@ -64,6 +66,18 @@ Widget makeControl({
               options: field["options"],
               hint: !withLabel ? field["label"] : null,
               value: value,
+            ),
+            withLabel,
+            field["label"]);
+      }
+      break;
+
+    case "Table":
+      {
+        fieldWidget = buildDecoratedWidget(
+            CustomTable(
+              doctype: field["options"],
+              items: value,
             ),
             withLabel,
             field["label"]);
