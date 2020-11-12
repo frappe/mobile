@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../app.dart';
 
-import '../utils/backend_service.dart';
+import '../services/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/frappe_alert.dart';
 import '../utils/queue_helper.dart';

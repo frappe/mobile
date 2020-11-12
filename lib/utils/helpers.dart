@@ -17,7 +17,7 @@ import 'http.dart';
 
 import '../form/controls/control.dart';
 
-import '../service_locator.dart';
+import '../app/locator.dart';
 
 import '../config/palette.dart';
 
@@ -27,7 +27,7 @@ import '../utils/cache_helper.dart';
 import '../utils/config_helper.dart';
 import '../utils/dio_helper.dart';
 import '../utils/enums.dart';
-import '../utils/backend_service.dart';
+import '../services/backend_service.dart';
 
 import '../widgets/section.dart';
 import '../widgets/custom_expansion_tile.dart';

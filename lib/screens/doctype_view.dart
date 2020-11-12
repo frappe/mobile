@@ -11,7 +11,7 @@ import '../config/palette.dart';
 
 import '../screens/activate_modules.dart';
 
-import '../utils/backend_service.dart';
+import '../services/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
 

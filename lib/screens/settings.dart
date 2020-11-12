@@ -4,7 +4,7 @@ import '../services/navigation_service.dart';
 import '../config/palette.dart';
 import '../screens/queue.dart';
 import '../screens/activate_modules.dart';
-import '../service_locator.dart';
+import '../app/locator.dart';
 import '../utils/helpers.dart';
 import '../widgets/card_list_tile.dart';
 

@@ -3,12 +3,14 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:injectable/injectable.dart';
 
 import '../utils/dio_helper.dart';
 
-import 'cache_helper.dart';
-import 'helpers.dart';
+import '../utils/cache_helper.dart';
+import '../utils/helpers.dart';
 
+@lazySingleton
 class BackendService {
   static Future getdoc(doctype, name) async {
     var queryParams = {

@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/services/api/api.dart';
 
 import '../screens/custom_persistent_bottom_nav_bar.dart';
 
@@ -12,7 +14,7 @@ import '../widgets/frappe_button.dart';
 import '../utils/frappe_alert.dart';
 import '../utils/cache_helper.dart';
 import '../utils/config_helper.dart';
-import '../utils/backend_service.dart';
+import '../services/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
 import '../utils/http.dart';
@@ -48,7 +50,7 @@ class _LoginState extends State<Login> {
 
     try {
       var response =
-          await BackendService.login(data["usr"].trimRight(), data["pwd"]);
+          await locator<Api>().login(data["usr"].trimRight(), data["pwd"]);
 
       if (response.statusCode == 200) {
         ConfigHelper.set('isLoggedIn', true);

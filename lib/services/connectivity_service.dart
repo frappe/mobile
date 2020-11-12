@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:connectivity/connectivity.dart';
-import 'package:frappe_app/utils/enums.dart';
+import 'package:injectable/injectable.dart';
 
+import '../utils/enums.dart';
+
+@lazySingleton
 class ConnectivityService {
   // Create our public controller
   StreamController<ConnectivityStatus> connectionStatusController =

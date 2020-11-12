@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../utils/cache_helper.dart';
 import '../../utils/enums.dart';
-import '../../utils/backend_service.dart';
+import '../../services/backend_service.dart';
 
 class LinkField extends StatefulWidget {
   final String hint;

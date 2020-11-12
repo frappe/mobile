@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../utils/backend_service.dart';
+import '../services/backend_service.dart';
 import '../utils/config_helper.dart';
 
 class CommentBox extends StatelessWidget {

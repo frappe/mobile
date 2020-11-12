@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/utils/backend_service.dart';
+import 'package:frappe_app/services/backend_service.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 
 class LikeDoc extends StatefulWidget {

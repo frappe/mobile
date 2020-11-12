@@ -3,18 +3,19 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:frappe_app/utils/backend_service.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import 'lifecycle_manager.dart';
+import 'app/locator.dart';
+
 import 'utils/cache_helper.dart';
 import 'utils/config_helper.dart';
 import 'utils/enums.dart';
 import 'utils/helpers.dart';
 
-import 'service_locator.dart';
+import 'services/backend_service.dart';
 import 'services/connectivity_service.dart';
 import 'services/navigation_service.dart';
 

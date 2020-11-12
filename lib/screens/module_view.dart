@@ -20,7 +20,7 @@ import '../config/palette.dart';
 
 import '../utils/config_helper.dart';
 import '../utils/enums.dart';
-import '../utils/backend_service.dart';
+import '../services/backend_service.dart';
 
 class ModuleView extends StatefulWidget {
   @override

@@ -6,7 +6,7 @@ import 'package:workmanager/workmanager.dart';
 
 import 'utils/cache_helper.dart';
 import 'utils/http.dart';
-import 'service_locator.dart';
+import 'app/locator.dart';
 import 'services/storage_service.dart';
 
 const String TASK_SYNC_DATA = 'downloadModules';

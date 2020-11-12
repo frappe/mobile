@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/utils/backend_service.dart';
+import 'package:frappe_app/services/backend_service.dart';
 
 class MultiSelect extends StatefulWidget {
   final String hint;

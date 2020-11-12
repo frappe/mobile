@@ -1,9 +1,9 @@
-import 'package:frappe_app/utils/backend_service.dart';
+import 'package:frappe_app/services/backend_service.dart';
 import 'package:frappe_app/utils/config_helper.dart';
 import 'package:hive/hive.dart';
 
 import '../services/storage_service.dart';
-import '../service_locator.dart';
+import '../app/locator.dart';
 
 class QueueHelper {
   static Box getQueueContainer() {

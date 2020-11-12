@@ -2,7 +2,7 @@ import 'package:frappe_app/utils/dio_helper.dart';
 
 import '../utils/cache_helper.dart';
 import '../utils/config_helper.dart';
-import '../utils/backend_service.dart';
+import '../services/backend_service.dart';
 
 void initConfig() async {
   if (ConfigHelper().baseUrl != null) {

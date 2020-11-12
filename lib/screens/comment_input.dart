@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/utils/backend_service.dart';
+import 'package:frappe_app/services/backend_service.dart';
 
 class CommentInput extends StatelessWidget {
   final String doctype;

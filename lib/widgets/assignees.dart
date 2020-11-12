@@ -8,7 +8,7 @@ import '../config/frappe_icons.dart';
 import '../widgets/user_avatar.dart';
 import '../widgets/card_list_tile.dart';
 
-import '../utils/backend_service.dart';
+import '../services/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
 

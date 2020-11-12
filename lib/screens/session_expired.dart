@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../service_locator.dart';
+import '../app/locator.dart';
 import '../services/navigation_service.dart';
 import '../utils/enums.dart';
 import '../widgets/frappe_button.dart';

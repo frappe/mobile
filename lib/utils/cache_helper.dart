@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
 import '../utils/config_helper.dart';
-import '../utils/backend_service.dart';
+import '../services/backend_service.dart';
 import '../utils/helpers.dart';
 
 import '../services/storage_service.dart';
 
-import '../service_locator.dart';
+import '../app/locator.dart';
 
 class CacheHelper {
   static String generateKeyHash(String key) {

@@ -10,7 +10,7 @@ import 'utils/helpers.dart';
 import 'utils/http.dart';
 
 import 'scheduler.dart';
-import 'service_locator.dart';
+import 'app/locator.dart';
 import 'services/storage_service.dart';
 import 'app.dart';
 
