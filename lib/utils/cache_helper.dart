@@ -91,15 +91,13 @@ class CacheHelper {
 
       for (var doctype in activeDoctypes) {
         f.add(
-          cacheDocListAndDoc(
-            doctype["name"],
-          ),
+          cacheDocListAndDoc(doctype.name),
         );
         f.add(
-          cacheLinkFields(doctype["name"]),
+          cacheLinkFields(doctype.name),
         );
         f.add(
-          cacheDoctypeMeta(doctype["name"]),
+          cacheDoctypeMeta(doctype.name),
         );
       }
 

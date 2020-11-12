@@ -49,47 +49,57 @@ class _LoginState extends State<Login> {
     await setBaseUrl(data["serverURL"]);
 
     try {
-      var response =
-          await locator<Api>().login(data["usr"].trimRight(), data["pwd"]);
+      var response = await locator<Api>().login(
+        data["usr"].trimRight(),
+        data["pwd"],
+      );
 
-      if (response.statusCode == 200) {
-        ConfigHelper.set('isLoggedIn', true);
+      ConfigHelper.set('isLoggedIn', true);
 
-        FrappeAlert.successAlert(title: 'Success', context: context);
+      FrappeAlert.successAlert(
+        title: 'Success',
+        context: context,
+      );
 
-        var userId =
-            response.headers.map["set-cookie"][3].split(';')[0].split('=')[1];
-        ConfigHelper.set('userId', userId);
-        ConfigHelper.set('user', response.data["full_name"]);
-        CacheHelper.putCache(
-          'usr',
-          data["usr"].trimRight(),
-        );
-        CacheHelper.putCache(
-          'pwd',
-          data["pwd"],
-        );
+      ConfigHelper.set(
+        'userId',
+        response.userId,
+      );
+      ConfigHelper.set(
+        'user',
+        response.fullName,
+      );
+      CacheHelper.putCache(
+        'usr',
+        data["usr"].trimRight(),
+      );
+      CacheHelper.putCache(
+        'pwd',
+        data["pwd"],
+      );
 
-        await cacheAllUsers();
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) {
-              return CustomPersistentBottomNavBar();
-            },
-          ),
-        );
-      } else if (response.statusCode == HttpStatus.unauthorized) {
-        ConfigHelper.set('isLoggedIn', false);
-
+      await cacheAllUsers();
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) {
+            return CustomPersistentBottomNavBar();
+          },
+        ),
+      );
+    } catch (e) {
+      ConfigHelper.set('isLoggedIn', false);
+      if (e.statusCode == HttpStatus.unauthorized) {
         FrappeAlert.errorAlert(
             title: "Not Authorized",
             subtitle: 'Invalid Username or Password',
             context: context);
+      } else {
+        FrappeAlert.errorAlert(
+          title: "Error",
+          subtitle: e.message,
+          context: context,
+        );
       }
-    } catch (e) {
-      ConfigHelper.set('isLoggedIn', false);
-      FrappeAlert.errorAlert(
-          title: "Error", subtitle: e.message, context: context);
     }
   }
 

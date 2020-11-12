@@ -10,7 +10,7 @@ void initConfig() async {
   }
 }
 
-void cacheAllUsers() async {
+Future<void> cacheAllUsers() async {
   var allUsers = await CacheHelper.getCache('allUsers');
   allUsers = allUsers["data"];
   if (allUsers != null) {
@@ -43,7 +43,7 @@ void cacheAllUsers() async {
   }
 }
 
-void setBaseUrl(url) async {
+Future<void> setBaseUrl(url) async {
   if (!url.startsWith('https://')) {
     url = "https://$url";
   }

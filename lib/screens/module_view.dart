@@ -3,24 +3,27 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:frappe_app/utils/cache_helper.dart';
-import 'package:frappe_app/utils/frappe_alert.dart';
-import 'package:frappe_app/utils/helpers.dart';
+
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import 'doctype_view.dart';
-
-import '../screens/activate_modules.dart';
-
-import '../widgets/frappe_button.dart';
-import '../widgets/card_list_tile.dart';
+import '../utils/cache_helper.dart';
+import '../utils/frappe_alert.dart';
+import '../utils/helpers.dart';
+import '../utils/config_helper.dart';
+import '../utils/enums.dart';
 
 import '../config/palette.dart';
 
-import '../utils/config_helper.dart';
-import '../utils/enums.dart';
-import '../services/backend_service.dart';
+import 'doctype_view.dart';
+import 'activate_modules.dart';
+
+import '../datamodels/desk_sidebar_items_response.dart';
+import '../app/locator.dart';
+import '../services/api/api.dart';
+
+import '../widgets/frappe_button.dart';
+import '../widgets/card_list_tile.dart';
 
 class ModuleView extends StatefulWidget {
   @override
@@ -33,7 +36,7 @@ class _ModuleViewState extends State<ModuleView> {
       context,
     );
     var cachedModules = {};
-    var modules;
+    DeskSidebarItemsResponse modules;
 
     var isOnline = await verifyOnline();
 
@@ -43,12 +46,12 @@ class _ModuleViewState extends State<ModuleView> {
       var response = await CacheHelper.getCache('deskSidebarItems');
       response = response["data"];
       if (response != null) {
-        modules = response;
+        modules = DeskSidebarItemsResponse.fromJson(response);
       } else {
         throw Response(statusCode: HttpStatus.serviceUnavailable);
       }
     } else {
-      modules = await BackendService.getDeskSideBarItems();
+      modules = await locator<Api>().getDeskSideBarItems();
     }
     var activeModules;
     if (ConfigHelper().activeModules != null) {
@@ -124,17 +127,19 @@ class _ModuleViewState extends State<ModuleView> {
                   ),
                 );
               }
-              var modules = [
-                ...snapshot.data["modules"]["message"]["Modules"],
-                ...snapshot.data["modules"]["message"]["Administration"],
-                ...snapshot.data["modules"]["message"]["Domains"]
+              DeskSidebarItemsResponse deskSidebarItems =
+                  snapshot.data["modules"];
+              List<DeskItem> modules = [
+                ...deskSidebarItems.message.modules,
+                ...deskSidebarItems.message.administration,
+                ...deskSidebarItems.message.domains
               ];
               var modulesWidget = modules.where((m) {
-                return activeModules.keys.contains(m["name"]) &&
-                    activeModules[m["name"]].length > 0;
-              }).map<Widget>((m) {
+                return activeModules.keys.contains(m.name) &&
+                    activeModules[m.name].length > 0;
+              }).map<Widget>((module) {
                 var syncDate;
-                var c = snapshot.data["cachedModules"][m["name"]];
+                var c = snapshot.data["cachedModules"][module.name];
                 if (c["data"] == null) {
                   syncDate = "Not Synced";
                 } else {
@@ -169,7 +174,7 @@ class _ModuleViewState extends State<ModuleView> {
                               context: context);
                         } else {
                           FrappeAlert.infoAlert(
-                            title: 'Downloading ${m["name"]}...',
+                            title: 'Downloading ${module.name}...',
                             context: context,
                           );
                           try {
@@ -177,13 +182,13 @@ class _ModuleViewState extends State<ModuleView> {
                               "cacheApi",
                               false,
                             );
-                            await CacheHelper.cacheModule(m["name"]);
+                            await CacheHelper.cacheModule(module.name);
                             await putSharedPrefValue(
                               "cacheApi",
                               true,
                             );
                             FrappeAlert.infoAlert(
-                              title: '${m["name"]} is Downloaded',
+                              title: '${module.name} is Downloaded',
                               context: context,
                             );
                           } catch (e) {
@@ -192,7 +197,7 @@ class _ModuleViewState extends State<ModuleView> {
                               true,
                             );
                             FrappeAlert.errorAlert(
-                              title: '${m["name"]} Downloading Failed',
+                              title: '${module.name} Downloading Failed',
                               context: context,
                             );
                           }
@@ -210,13 +215,13 @@ class _ModuleViewState extends State<ModuleView> {
                     padding: const EdgeInsets.only(
                         left: 10.0, right: 10.0, top: 8.0),
                     child: CardListTile(
-                      title: Text(m["label"]),
+                      title: Text(module.label),
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return DoctypeView(m["name"]);
+                              return DoctypeView(module.name);
                             },
                           ),
                         );

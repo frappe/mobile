@@ -2,16 +2,16 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:frappe_app/utils/cache_helper.dart';
 import 'package:provider/provider.dart';
 
+import '../app/locator.dart';
+import '../datamodels/desktop_page_response.dart';
+import '../services/api/api.dart';
 import '../app.dart';
-
 import '../config/palette.dart';
-
 import '../screens/activate_modules.dart';
 
-import '../services/backend_service.dart';
+import '../utils/cache_helper.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
 
@@ -30,10 +30,12 @@ class DoctypeView extends StatefulWidget {
 class _DoctypeViewState extends State<DoctypeView> {
   bool offline = false;
 
-  Future _getData() async {
+  Future<DesktopPageResponse> _getData() async {
     var connectionStatus = Provider.of<ConnectivityStatus>(
       context,
     );
+
+    DesktopPageResponse desktopPage;
 
     var isOnline = await verifyOnline();
 
@@ -41,16 +43,18 @@ class _DoctypeViewState extends State<DoctypeView> {
             connectionStatus == ConnectivityStatus.offline) &&
         !isOnline) {
       offline = true;
-      var docTypes = await CacheHelper.getCache('${widget.module}Doctypes');
-      docTypes = docTypes["data"];
-      if (docTypes == null) {
+      var response = await CacheHelper.getCache('${widget.module}Doctypes');
+      response = response["data"];
+      if (response == null) {
         throw Response(statusCode: HttpStatus.serviceUnavailable);
       }
-      return docTypes;
+      desktopPage = DesktopPageResponse.fromJson(response);
     } else {
       offline = false;
-      return BackendService.getDesktopPage(widget.module);
+      desktopPage = await locator<Api>().getDesktopPage(widget.module);
     }
+
+    return desktopPage;
   }
 
   @override
@@ -69,12 +73,12 @@ class _DoctypeViewState extends State<DoctypeView> {
           future: _getData(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              var doctypesWidget = getActivatedDoctypes(
+              var activeDoctypes = getActivatedDoctypes(
                 snapshot.data,
                 widget.module,
               );
 
-              if (doctypesWidget.isEmpty) {
+              if (activeDoctypes.isEmpty) {
                 return Container(
                   color: Colors.white,
                   height: double.infinity,
@@ -107,7 +111,7 @@ class _DoctypeViewState extends State<DoctypeView> {
                   ),
                 );
               }
-              doctypesWidget = doctypesWidget.map<Widget>((m) {
+              var doctypesWidget = activeDoctypes.map<Widget>((m) {
                 return Padding(
                   padding: const EdgeInsets.only(
                     left: 10.0,
@@ -115,13 +119,13 @@ class _DoctypeViewState extends State<DoctypeView> {
                     top: 8.0,
                   ),
                   child: CardListTile(
-                    title: Text(m["label"]),
+                    title: Text(m.label),
                     onTap: () {
                       Navigator.of(context, rootNavigator: true).push(
                         MaterialPageRoute(
                           builder: (context) {
                             return CustomRouter(
-                              doctype: m["name"],
+                              doctype: m.name,
                               viewType: ViewType.list,
                             );
                           },

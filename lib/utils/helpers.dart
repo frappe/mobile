@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:frappe_app/datamodels/desktop_page_response.dart';
 import 'package:frappe_app/screens/no_internet.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -380,21 +381,24 @@ List sortBy(List data, String orderBy, Order order) {
   return data;
 }
 
-getActivatedDoctypes(Map doctypes, String module) {
+List<CardItemLink> getActivatedDoctypes(
+  DesktopPageResponse desktopPage,
+  String module,
+) {
   if (ConfigHelper().activeModules != null) {
     var activeModules = ConfigHelper().activeModules;
-    var activeDoctypes = [];
+    var activeDoctypes = <CardItemLink>[];
 
-    doctypes["message"]["cards"]["items"].forEach((item) {
-      activeDoctypes.addAll(item["links"]);
+    desktopPage.message.cards.items.forEach((item) {
+      activeDoctypes.addAll(item.links);
     });
     activeDoctypes = activeDoctypes.where((m) {
-      return activeModules[module].contains(
-        m["name"],
-      );
+      return activeModules[module].contains(m.name);
     }).toList();
 
     return activeDoctypes;
+  } else {
+    return [];
   }
 }
 
