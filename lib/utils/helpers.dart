@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frappe_app/datamodels/desktop_page_response.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
 import 'package:frappe_app/screens/no_internet.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -318,7 +319,7 @@ DateTime parseDate(val) {
   }
 }
 
-List generateFieldnames(String doctype, Map meta) {
+List generateFieldnames(String doctype, DoctypeDoc meta) {
   var fields = [
     'name',
     'modified',
@@ -329,10 +330,10 @@ List generateFieldnames(String doctype, Map meta) {
   ];
 
   if (hasTitle(meta)) {
-    fields.add(meta["title_field"]);
+    fields.add(meta.titleField);
   }
 
-  if (hasField(meta, 'status')) {
+  if (meta.fieldsMap.containsKey('status')) {
     fields.add('status');
   } else {
     fields.add('docstatus');
@@ -359,12 +360,8 @@ String getInitials(String txt) {
   return initials;
 }
 
-bool hasField(Map meta, String fieldName) {
-  return meta.containsKey('_field$fieldName');
-}
-
-bool isSubmittable(Map meta) {
-  return meta["is_submittable"] == 1;
+bool isSubmittable(DoctypeDoc meta) {
+  return meta.isSubmittable == 1;
 }
 
 List sortBy(List data, String orderBy, Order order) {
@@ -402,13 +399,13 @@ List<CardItemLink> getActivatedDoctypes(
   }
 }
 
-bool hasTitle(Map meta) {
-  return meta["title_field"] != null && meta["title_field"] != '';
+bool hasTitle(DoctypeDoc meta) {
+  return meta.titleField != null && meta.titleField != '';
 }
 
-getTitle(Map meta, Map doc) {
+getTitle(DoctypeDoc meta, Map doc) {
   if (hasTitle(meta)) {
-    return doc[meta["title_field"]];
+    return doc[meta.titleField];
   } else {
     return doc["name"];
   }

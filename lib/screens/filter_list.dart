@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
 
 import '../form/controls/control.dart';
 
@@ -10,13 +11,13 @@ import '../utils/enums.dart';
 
 class FilterList extends StatefulWidget {
   final Function filterCallback;
-  final Map wireframe;
+  final DoctypeDoc meta;
   final String appBarTitle;
   final List filters;
 
   FilterList({
     this.filterCallback,
-    @required this.wireframe,
+    @required this.meta,
     @required this.appBarTitle,
     this.filters,
   });
@@ -132,7 +133,7 @@ class _FilterListState extends State<FilterList> {
                 buttonType: ButtonType.secondary,
                 title: 'Clear All',
                 onPressed: () {
-                  FilterList.clearFilters(widget.wireframe["name"]);
+                  FilterList.clearFilters(widget.meta.name);
                   _fbKey.currentState.reset();
                   widget.filters.clear();
                   setState(() {});
@@ -148,7 +149,7 @@ class _FilterListState extends State<FilterList> {
                   _fbKey.currentState.save();
 
                   var filters = await FilterList.generateFilters(
-                    widget.wireframe["name"],
+                    widget.meta.name,
                     _fbKey.currentState.value,
                   );
 
@@ -179,7 +180,7 @@ class _FilterListState extends State<FilterList> {
         child: ListView(
           padding: EdgeInsets.all(10),
           children: _generateChildren(
-            widget.wireframe["fields"],
+            widget.meta.fields,
           ),
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
 
 import '../utils/config_helper.dart';
 import '../services/backend_service.dart';
@@ -11,7 +12,7 @@ import '../widgets/frappe_button.dart';
 class AddReview extends StatefulWidget {
   final String doctype;
   final String name;
-  final Map meta;
+  final DoctypeDoc meta;
   final Map doc;
   final Map docInfo;
 
@@ -67,9 +68,9 @@ class _AddReviewState extends State<AddReview> {
   }
 
   getInvolvedUsers() {
-    var userFields = widget.meta["fields"]
-        .where((d) => d["fieldtype"] == 'Link' && d["options"] == 'User')
-        .map((d) => d["fieldname"])
+    var userFields = widget.meta.fields
+        .where((d) => d.fieldtype == 'Link' && d.options == 'User')
+        .map((d) => d.fieldname)
         .toList();
 
     userFields.add('owner');

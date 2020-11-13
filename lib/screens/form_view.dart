@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
 import 'package:frappe_app/screens/queue_error.dart';
 import 'package:frappe_app/utils/cache_helper.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
@@ -34,7 +35,7 @@ import '../screens/comment_input.dart';
 class FormView extends StatefulWidget {
   final String doctype;
   final String name;
-  final Map meta;
+  final DoctypeDoc meta;
   final bool queued;
   final Map queuedData;
 
@@ -168,9 +169,9 @@ class _FormViewState extends State<FormView>
                     builder: (context) {
                       return EmailForm(
                         callback: _refresh,
-                        subjectField: doc[widget.meta["subject_field"]] ??
+                        subjectField: doc[widget.meta.subjectField] ??
                             getTitle(widget.meta, doc),
-                        senderField: doc[widget.meta["sender_field"]],
+                        senderField: doc[widget.meta.senderField],
                         doctype: widget.doctype,
                         doc: widget.name,
                       );
@@ -494,7 +495,7 @@ class _FormViewState extends State<FormView>
                                   height: 10,
                                 ),
                                 CustomForm(
-                                  fields: widget.meta["fields"],
+                                  fields: widget.meta.fields,
                                   formKey: _fbKey,
                                   doc: docs[0],
                                   viewType: ViewType.form,

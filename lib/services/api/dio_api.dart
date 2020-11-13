@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
+import '../../datamodels/doctype_response.dart';
 import '../../datamodels/desktop_page_response.dart';
 import '../../datamodels/desk_sidebar_items_response.dart';
 import '../../datamodels/login_response.dart';
@@ -134,7 +135,7 @@ class DioApi implements Api {
     }
   }
 
-  Future<Response> getDoctype(String doctype) async {
+  Future<DoctypeResponse> getDoctype(String doctype) async {
     var queryParams = {
       'doctype': doctype,
     };
@@ -152,14 +153,15 @@ class DioApi implements Api {
 
       if (response.statusCode == HttpStatus.ok) {
         List metaFields = response.data["docs"][0]["fields"];
+        response.data["docs"][0]["field_map"] = {};
 
         metaFields.forEach((field) {
-          response.data["docs"][0]["_field${field["fieldname"]}"] = true;
+          response.data["docs"][0]["field_map"]["${field["fieldname"]}"] = true;
         });
         if (await CacheHelper.shouldCacheApi()) {
           await CacheHelper.putCache('${doctype}Meta', response.data);
         }
-        return response;
+        return DoctypeResponse.fromJson(response.data);
       } else if (response.statusCode == HttpStatus.forbidden) {
         throw response;
       } else {
@@ -185,10 +187,10 @@ class DioApi implements Api {
   Future<List> fetchList({
     @required List fieldnames,
     @required String doctype,
+    @required DoctypeDoc meta,
     List filters,
     pageLength,
     offset,
-    @required Map meta,
   }) async {
     var queryParams = {
       'doctype': doctype,

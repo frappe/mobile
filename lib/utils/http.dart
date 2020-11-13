@@ -1,3 +1,5 @@
+import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/services/api/api.dart';
 import 'package:frappe_app/utils/dio_helper.dart';
 
 import '../utils/cache_helper.dart';
@@ -26,13 +28,13 @@ Future<void> cacheAllUsers() async {
       ["User", "enabled", "=", 1]
     ];
 
-    var meta = await BackendService.getDoctype('User');
+    var meta = await locator<Api>().getDoctype('User');
 
-    var res = await BackendService.fetchList(
+    var res = await locator<Api>().fetchList(
       fieldnames: fieldNames,
       doctype: 'User',
       filters: filters,
-      meta: meta,
+      meta: meta.docs[0],
     );
 
     var usr = {};

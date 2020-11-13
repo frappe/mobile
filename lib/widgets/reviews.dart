@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
 
 import '../screens/add_review.dart';
 
@@ -18,7 +19,7 @@ class Reviews extends StatefulWidget {
   final String name;
   final Map docInfo;
   final Function callback;
-  final Map meta;
+  final DoctypeDoc meta;
   final Map doc;
 
   Reviews({

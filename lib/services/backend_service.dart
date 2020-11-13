@@ -121,20 +121,20 @@ class BackendService {
             var key = l["keys"][j];
             var value = l["values"][i][j];
 
-            if (key == "docstatus") {
-              key = "status";
-              if (isSubmittable(meta)) {
-                if (value == 0) {
-                  value = "Draft";
-                } else if (value == 1) {
-                  value = "Submitted";
-                } else if (value == 2) {
-                  value = "Cancelled";
-                }
-              } else {
-                value = value == 0 ? "Enabled" : "Disabled";
-              }
-            }
+            // if (key == "docstatus") {
+            //   key = "status";
+            //   if (isSubmittable(meta)) {
+            //     if (value == 0) {
+            //       value = "Draft";
+            //     } else if (value == 1) {
+            //       value = "Submitted";
+            //     } else if (value == 2) {
+            //       value = "Cancelled";
+            //     }
+            //   } else {
+            //     value = value == 0 ? "Enabled" : "Disabled";
+            //   }
+            // }
             o[key] = value;
           }
           newL.add(o);

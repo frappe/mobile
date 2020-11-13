@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
+import 'package:frappe_app/services/api/api.dart';
 
 import '../utils/config_helper.dart';
 import '../services/backend_service.dart';
@@ -175,15 +176,14 @@ class CacheHelper {
     var f = <Future>[];
 
     try {
-      var docMeta = await BackendService.getDoctype(doctype);
-      docMeta = docMeta["docs"][0];
+      var docMeta = await locator<Api>().getDoctype(doctype);
 
-      var docList = await BackendService.fetchList(
+      var docList = await locator<Api>().fetchList(
         doctype: doctype,
-        fieldnames: generateFieldnames(doctype, docMeta),
+        fieldnames: generateFieldnames(doctype, docMeta.docs[0]),
         pageLength: 50,
         offset: 0,
-        meta: docMeta,
+        meta: docMeta.docs[0],
       );
 
       cache['${doctype}List'] = docList;

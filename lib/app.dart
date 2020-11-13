@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
+import 'package:frappe_app/services/api/api.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -130,6 +132,8 @@ class CustomRouter extends StatelessWidget {
   });
 
   _getData() async {
+    DoctypeResponse doctypeMeta;
+
     var meta = await CacheHelper.getCache('${doctype}Meta');
     var filter = await CacheHelper.getCache('${doctype}Filter');
     meta = meta["data"];
@@ -137,13 +141,15 @@ class CustomRouter extends StatelessWidget {
     if (meta == null) {
       var isOnline = await verifyOnline();
       if (isOnline) {
-        meta = await BackendService.getDoctype(doctype);
+        doctypeMeta = await locator<Api>().getDoctype(doctype);
       } else {
         throw Response(statusCode: HttpStatus.serviceUnavailable);
       }
+    } else {
+      doctypeMeta = DoctypeResponse.fromJson(meta);
     }
     return {
-      "meta": meta,
+      "meta": doctypeMeta,
       "filter": filter,
     };
   }
@@ -156,8 +162,7 @@ class CustomRouter extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData &&
               snapshot.connectionState == ConnectionState.done) {
-            var docMeta = snapshot.data["meta"];
-            docMeta = docMeta["docs"][0];
+            var docMeta = (snapshot.data["meta"] as DoctypeResponse).docs[0];
 
             if (viewType == ViewType.list) {
               var defaultFilters = [];
@@ -190,18 +195,18 @@ class CustomRouter extends StatelessWidget {
               );
             } else if (viewType == ViewType.filter) {
               var defaultFilters = [
-                {
-                  "is_default_filter": 1,
-                  "fieldname": "_assign",
-                  "options": "User",
-                  "label": "Assigned To",
-                  "fieldtype": "Link"
-                },
+                DoctypeField(
+                  isDefaultFilter: 1,
+                  fieldname: "_assign",
+                  options: "User",
+                  label: "Assigned To",
+                  fieldtype: "Link",
+                )
               ];
-              docMeta["fields"].addAll(defaultFilters);
+              docMeta.fields.addAll(defaultFilters);
               return FilterList(
                 filters: filters,
-                wireframe: docMeta,
+                meta: docMeta,
                 filterCallback: filterCallback,
                 appBarTitle: "Filter $doctype",
               );

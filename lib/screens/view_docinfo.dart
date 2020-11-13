@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
 import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/widgets/reviews.dart';
 import 'package:frappe_app/widgets/shared_with.dart';
@@ -14,7 +15,7 @@ class ViewDocInfo extends StatelessWidget {
   final String doctype;
   final String name;
   final Function callback;
-  final Map meta;
+  final DoctypeDoc meta;
   final Map doc;
 
   ViewDocInfo({

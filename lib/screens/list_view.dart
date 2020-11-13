@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
+import 'package:frappe_app/services/api/api.dart';
 import 'package:frappe_app/utils/cache_helper.dart';
 import 'package:frappe_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +33,7 @@ class CustomListView extends StatefulWidget {
   final Function filterCallback;
   final Function detailCallback;
   final String appBarTitle;
-  final meta;
+  final DoctypeDoc meta;
 
   CustomListView({
     @required this.doctype,
@@ -163,7 +166,7 @@ class _CustomListViewState extends State<CustomListView> {
     _pageLoadController = PagewiseLoadController(
       pageSize: PAGE_SIZE,
       pageFuture: (pageIndex) {
-        return BackendService.fetchList(
+        return locator<Api>().fetchList(
           meta: widget.meta,
           doctype: widget.doctype,
           fieldnames: widget.fieldnames,
@@ -421,7 +424,7 @@ class CustomSearch extends SearchDelegate {
       titleField = "name";
     }
     return FutureBuilder(
-      future: BackendService.fetchList(
+      future: locator<Api>().fetchList(
           pageLength: 10,
           fieldnames: data.fieldnames,
           doctype: data.doctype,

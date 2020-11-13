@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
 import 'package:frappe_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +15,7 @@ import '../widgets/custom_form.dart';
 import '../widgets/frappe_button.dart';
 
 class SimpleForm extends StatefulWidget {
-  final Map meta;
+  final DoctypeDoc meta;
 
   SimpleForm(this.meta);
 
@@ -32,7 +33,7 @@ class _SimpleFormState extends State<SimpleForm> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("New ${widget.meta["name"]}"),
+        title: Text("New ${widget.meta.name}"),
         actions: <Widget>[
           Padding(
             padding: const EdgeInsets.symmetric(
@@ -54,11 +55,11 @@ class _SimpleFormState extends State<SimpleForm> {
                     var queueLength = qc.length;
                     var qObj = {
                       "type": "Create",
-                      "doctype": widget.meta["name"],
+                      "doctype": widget.meta.name,
                       "title": hasTitle(widget.meta)
-                          ? formValue[widget.meta["title_field"]] ??
-                              "${widget.meta["name"]} ${queueLength + 1}"
-                          : "${widget.meta["name"]} ${queueLength + 1}",
+                          ? formValue[widget.meta.titleField] ??
+                              "${widget.meta.name} ${queueLength + 1}"
+                          : "${widget.meta.name} ${queueLength + 1}",
                       "data": [formValue],
                     };
                     await QueueHelper.add(qObj);
@@ -72,7 +73,7 @@ class _SimpleFormState extends State<SimpleForm> {
                   } else {
                     try {
                       var response = await BackendService.saveDocs(
-                        widget.meta["name"],
+                        widget.meta.name,
                         formValue,
                       );
                       Navigator.pushReplacement(
@@ -81,7 +82,7 @@ class _SimpleFormState extends State<SimpleForm> {
                           builder: (context) {
                             return CustomRouter(
                                 viewType: ViewType.form,
-                                doctype: widget.meta["name"],
+                                doctype: widget.meta.name,
                                 name: response.data["docs"][0]["name"]);
                           },
                         ),
@@ -98,7 +99,7 @@ class _SimpleFormState extends State<SimpleForm> {
       ),
       body: CustomForm(
         formKey: _fbKey,
-        fields: widget.meta["fields"],
+        fields: widget.meta.fields,
         viewType: ViewType.newForm,
       ),
     );
