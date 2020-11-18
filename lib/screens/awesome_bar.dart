@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/form/controls/autocomplete.dart';
-import 'package:frappe_app/utils/config_helper.dart';
-import 'package:frappe_app/utils/enums.dart';
 
+import '../form/controls/autocomplete.dart';
+import '../screens/doctype_view.dart';
 import '../app.dart';
 import '../config/palette.dart';
+
+import '../utils/config_helper.dart';
+import '../utils/enums.dart';
 
 class AwesomeBar extends StatefulWidget {
   @override
@@ -20,6 +22,15 @@ class _AwesomeBarState extends State<AwesomeBar> {
   void initState() {
     super.initState();
     var activeModules = ConfigHelper().activeModules;
+    activeModules.keys.forEach((module) {
+      awesomeBarItems.add(
+        {
+          "type": "Module",
+          "value": module,
+          "label": "Open $module",
+        },
+      );
+    });
     activeModules.values.forEach(
       (value) {
         value.forEach(
@@ -91,6 +102,16 @@ class _AwesomeBarState extends State<AwesomeBar> {
                         return CustomRouter(
                           doctype: item["value"],
                           viewType: ViewType.newForm,
+                        );
+                      },
+                    ),
+                  );
+                } else if (item["type"] == "Module") {
+                  Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return DoctypeView(
+                          item["value"],
                         );
                       },
                     ),
