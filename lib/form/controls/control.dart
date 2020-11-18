@@ -17,6 +17,7 @@ import './time.dart';
 import './autocomplete.dart';
 import './link_field.dart';
 import './multi_select.dart';
+import './signature.dart' as customSignature;
 
 Widget makeControl({
   @required Map field,
@@ -245,6 +246,21 @@ Widget makeControl({
       {
         fieldWidget = buildDecoratedWidget(
             Date(
+              key: Key(value),
+              value: value,
+              attribute: field["fieldname"],
+              validators: validators,
+              withLabel: withLabel,
+            ),
+            withLabel,
+            field["label"]);
+      }
+      break;
+
+    case "Signature":
+      {
+        fieldWidget = buildDecoratedWidget(
+            customSignature.Signature(
               key: Key(value),
               value: value,
               attribute: field["fieldname"],
