@@ -58,7 +58,7 @@ class CacheHelper {
     }
   }
 
-  static getCache(String secondaryKey) async {
+  static getCache(String secondaryKey) {
     if (ConfigHelper().primaryCacheKey == null) {
       return {"data": null};
     }

@@ -2,19 +2,16 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/app/locator.dart';
-import 'package:frappe_app/services/api/api.dart';
 
+import '../app/locator.dart';
+import '../services/api/api.dart';
 import '../screens/custom_persistent_bottom_nav_bar.dart';
-
 import '../config/palette.dart';
-
 import '../widgets/frappe_button.dart';
 
 import '../utils/frappe_alert.dart';
 import '../utils/cache_helper.dart';
 import '../utils/config_helper.dart';
-import '../services/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
 import '../utils/http.dart';
@@ -35,8 +32,8 @@ class _LoginState extends State<Login> {
   }
 
   _getData() async {
-    var savedUsr = await CacheHelper.getCache('usr');
-    var savedPwd = await CacheHelper.getCache('pwd');
+    var savedUsr = CacheHelper.getCache('usr');
+    var savedPwd = CacheHelper.getCache('pwd');
     savedUsr = savedUsr["data"];
     savedPwd = savedPwd["data"];
     return Future.value({
