@@ -24,7 +24,7 @@ class Signature extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FormBuilderSignaturePad(
-      initialValue: base64.decode(value.split(',').last),
+      initialValue: value != null ? base64.decode(value.split(',').last) : null,
       key: key,
       decoration: Palette.formFieldDecoration(
         withLabel,
