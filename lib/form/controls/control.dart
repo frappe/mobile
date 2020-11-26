@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/form/controls/barcode.dart';
 
 import '../../utils/helpers.dart';
 
@@ -266,6 +267,20 @@ Widget makeControl({
               attribute: field["fieldname"],
               validators: validators,
               withLabel: withLabel,
+            ),
+            withLabel,
+            field["label"]);
+      }
+      break;
+
+    case "Barcode":
+      {
+        fieldWidget = buildDecoratedWidget(
+            FormBuilderBarcode(
+              key: Key(value),
+              initialValue: value,
+              attribute: field["fieldname"],
+              validators: validators,
             ),
             withLabel,
             field["label"]);
