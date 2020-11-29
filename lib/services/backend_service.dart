@@ -508,7 +508,7 @@ class BackendService {
     try {
       final response = await DioHelper.dio.post(
         '/method/frappe.desk.form.save.savedocs',
-        data: "doc=${Uri.encodeFull(json.encode(data))}&action=Save",
+        data: "doc=${Uri.encodeComponent(json.encode(data))}&action=Save",
         options: Options(
           contentType: Headers.formUrlEncodedContentType,
         ),
