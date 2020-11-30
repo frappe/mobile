@@ -129,20 +129,37 @@ class CustomRouter extends StatelessWidget {
   });
 
   _getData() async {
-    var meta = await CacheHelper.getCache('${doctype}Meta');
+    var cachedMeta = await CacheHelper.getCache('${doctype}Meta');
     var filter = await CacheHelper.getCache('${doctype}Filter');
-    meta = meta["data"];
+    var metaResponse;
+
+    var isOnline = await verifyOnline();
+
     filter = filter["data"];
-    if (meta == null) {
-      var isOnline = await verifyOnline();
-      if (isOnline) {
-        meta = await BackendService.getDoctype(doctype);
+
+    if (isOnline) {
+      if (cachedMeta["data"] != null) {
+        DateTime cacheTime = cachedMeta["timestamp"];
+        var cacheTimeElapsedMins =
+            DateTime.now().difference(cacheTime).inMinutes;
+        if (cacheTimeElapsedMins > 15) {
+          metaResponse = await BackendService.getDoctype(doctype);
+        } else {
+          metaResponse = cachedMeta["data"];
+        }
+      } else {
+        metaResponse = await BackendService.getDoctype(doctype);
+      }
+    } else {
+      if (cachedMeta["data"] != null) {
+        metaResponse = cachedMeta["data"];
       } else {
         throw Response(statusCode: HttpStatus.serviceUnavailable);
       }
     }
+
     return {
-      "meta": meta,
+      "meta": metaResponse,
       "filter": filter,
     };
   }
