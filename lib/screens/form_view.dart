@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -189,6 +190,13 @@ class _FormViewState extends State<FormView>
   _handleUpdate(Map doc, ConnectivityStatus connectionStatus) async {
     if (_fbKey.currentState.saveAndValidate()) {
       var formValue = _fbKey.currentState.value;
+      formValue.forEach((key, value) {
+        if (value is Uint8List) {
+          var str = base64.encode(value);
+
+          formValue[key] = "data:image/png;base64,$str";
+        }
+      });
       var isOnline = await verifyOnline();
       if ((connectionStatus == null ||
               connectionStatus == ConnectivityStatus.offline) &&

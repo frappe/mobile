@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/form/controls/barcode.dart';
 
 import '../../config/palette.dart';
 import '../../utils/helpers.dart';
@@ -19,6 +21,7 @@ import './time.dart';
 import './autocomplete.dart';
 import './link_field.dart';
 import './multi_select.dart';
+import './signature.dart' as customSignature;
 
 Widget makeControl({
   @required Map field,
@@ -264,6 +267,35 @@ Widget makeControl({
               attribute: field["fieldname"],
               validators: validators,
               withLabel: withLabel,
+            ),
+            withLabel,
+            field["label"]);
+      }
+      break;
+
+    case "Signature":
+      {
+        fieldWidget = buildDecoratedWidget(
+            customSignature.Signature(
+              key: Key(value),
+              value: value,
+              attribute: field["fieldname"],
+              validators: validators,
+              withLabel: withLabel,
+            ),
+            withLabel,
+            field["label"]);
+      }
+      break;
+
+    case "Barcode":
+      {
+        fieldWidget = buildDecoratedWidget(
+            FormBuilderBarcode(
+              key: Key(value),
+              initialValue: value,
+              attribute: field["fieldname"],
+              validators: validators,
             ),
             withLabel,
             field["label"]);
