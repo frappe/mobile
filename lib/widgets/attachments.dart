@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/app/router.gr.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 import 'package:open_file/open_file.dart';
 
 import 'dart:io' as io;
@@ -92,16 +95,12 @@ class _AttachmentsState extends State<Attachments> {
         child: FrappeIconButton(
           buttonType: ButtonType.secondary,
           onPressed: () async {
-            var nav = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return CustomFilePicker(
-                    callback: widget.callback,
-                    doctype: widget.doctype,
-                    name: widget.name,
-                  );
-                },
+            var nav = await locator<NavigationService>().navigateTo(
+              Routes.customFilePicker,
+              arguments: CustomFilePickerArguments(
+                callback: widget.callback,
+                doctype: widget.doctype,
+                name: widget.name,
               ),
             );
 

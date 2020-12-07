@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../services/backend_service.dart';
@@ -25,7 +27,7 @@ class CommentBox extends StatelessWidget {
               FlatButton(
                 child: Text('Yes'),
                 onPressed: () async {
-                  Navigator.of(context).pop();
+                  locator<NavigationService>().pop();
                   BackendService.deleteComment(data["name"]);
                   callback();
                 },
@@ -33,7 +35,7 @@ class CommentBox extends StatelessWidget {
               FlatButton(
                 child: Text('No'),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  locator<NavigationService>().pop();
                 },
               )
             ],

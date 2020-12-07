@@ -3,11 +3,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:frappe_app/config/frappe_icons.dart';
 
-import '../services/backend_service.dart';
 import '../utils/enums.dart';
+import '../app/locator.dart';
+
+import '../config/frappe_icons.dart';
 import '../config/palette.dart';
+
+import '../services/navigation_service.dart';
+import '../services/backend_service.dart';
+
 import '../widgets/frappe_button.dart';
 import '../widgets/card_list_tile.dart';
 
@@ -66,7 +71,7 @@ class _FilePickerState extends State<CustomFilePicker> {
                           widget.name,
                           _files,
                         );
-                        Navigator.of(context).pop(true);
+                        locator<NavigationService>().pop(true);
                         widget.callback();
                       }
                     : null,

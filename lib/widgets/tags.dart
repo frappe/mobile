@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/app/router.gr.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 
 import '../screens/add_tags.dart';
 
@@ -77,15 +80,11 @@ class _TagsState extends State<Tags> {
         child: FrappeIconButton(
           buttonType: ButtonType.secondary,
           onPressed: () async {
-            var nav = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return AddTags(
-                    doctype: widget.doctype,
-                    name: widget.name,
-                  );
-                },
+            var nav = await locator<NavigationService>().navigateTo(
+              Routes.addTags,
+              arguments: AddTagsArguments(
+                doctype: widget.doctype,
+                name: widget.name,
               ),
             );
 

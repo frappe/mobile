@@ -5,9 +5,12 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/app/router.gr.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/datamodels/doctype_response.dart';
 import 'package:frappe_app/screens/queue_error.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 import 'package:frappe_app/utils/cache_helper.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/utils/helpers.dart';
@@ -141,18 +144,13 @@ class _FormViewState extends State<FormView>
               minWidth: 120,
               title: 'Comment',
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      // TODO
-                      return CommentInput(
-                        doctype: widget.doctype,
-                        name: widget.name,
-                        authorEmail: ConfigHelper().user,
-                        callback: _refresh,
-                      );
-                    },
+                locator<NavigationService>().navigateTo(
+                  Routes.commentInput,
+                  arguments: CommentInputArguments(
+                    doctype: widget.doctype,
+                    name: widget.name,
+                    authorEmail: ConfigHelper().user,
+                    callback: _refresh,
                   ),
                 );
               },
@@ -164,19 +162,15 @@ class _FormViewState extends State<FormView>
               minWidth: 120,
               title: 'New Email',
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return EmailForm(
-                        callback: _refresh,
-                        subjectField: doc[widget.meta.subjectField] ??
-                            getTitle(widget.meta, doc),
-                        senderField: doc[widget.meta.senderField],
-                        doctype: widget.doctype,
-                        doc: widget.name,
-                      );
-                    },
+                locator<NavigationService>().navigateTo(
+                  Routes.emailForm,
+                  arguments: EmailFormArguments(
+                    callback: _refresh,
+                    subjectField: doc[widget.meta.subjectField] ??
+                        getTitle(widget.meta, doc),
+                    senderField: doc[widget.meta.senderField],
+                    doctype: widget.doctype,
+                    doc: widget.name,
                   ),
                 );
               },
@@ -245,7 +239,7 @@ class _FormViewState extends State<FormView>
           subtitle: 'Added to Queue',
           context: context,
         );
-        Navigator.of(context).pop();
+        locator<NavigationService>().pop();
       } else {
         formValue = {
           ...doc,
@@ -298,19 +292,15 @@ class _FormViewState extends State<FormView>
             behavior: HitTestBehavior.translucent,
             onTap: !widget.queued
                 ? () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return ViewDocInfo(
-                            meta: widget.meta,
-                            doc: doc,
-                            docInfo: docInfo,
-                            doctype: widget.doctype,
-                            name: widget.name,
-                            callback: _refresh,
-                          );
-                        },
+                    locator<NavigationService>().navigateTo(
+                      Routes.viewDocInfo,
+                      arguments: ViewDocInfoArguments(
+                        meta: widget.meta,
+                        doc: doc,
+                        docInfo: docInfo,
+                        doctype: widget.doctype,
+                        name: widget.name,
+                        callback: _refresh,
                       ),
                     );
                   }
@@ -342,16 +332,11 @@ class _FormViewState extends State<FormView>
                         height: 24,
                         title: "Show Error",
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return QueueError(
-                                  error: widget.queuedData["error"],
-                                  dataToUpdate:
-                                      widget.queuedData["updated_keys"],
-                                );
-                              },
+                          locator<NavigationService>().navigateTo(
+                            Routes.queueError,
+                            arguments: QueueErrorArguments(
+                              error: widget.queuedData["error"],
+                              dataToUpdate: widget.queuedData["updated_keys"],
                             ),
                           );
                         },
@@ -361,19 +346,15 @@ class _FormViewState extends State<FormView>
                     if (!widget.queued)
                       InkWell(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return ViewDocInfo(
-                                  doc: doc,
-                                  meta: widget.meta,
-                                  docInfo: docInfo,
-                                  doctype: widget.doctype,
-                                  name: widget.name,
-                                  callback: _refresh,
-                                );
-                              },
+                          locator<NavigationService>().navigateTo(
+                            Routes.viewDocInfo,
+                            arguments: ViewDocInfoArguments(
+                              doc: doc,
+                              meta: widget.meta,
+                              docInfo: docInfo,
+                              doctype: widget.doctype,
+                              name: widget.name,
+                              callback: _refresh,
                             ),
                           );
                         },

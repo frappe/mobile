@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/app/router.gr.dart';
 
 import '../services/navigation_service.dart';
 import '../config/palette.dart';
@@ -22,26 +23,16 @@ class SettingsPage extends StatelessWidget {
           CardListTile(
             title: Text('Activate Modules'),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return ActivateModules();
-                  },
-                ),
+              locator<NavigationService>().navigateTo(
+                Routes.activateModules,
               );
             },
           ),
           CardListTile(
             title: Text('Queue'),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return QueueList();
-                  },
-                ),
+              locator<NavigationService>().navigateTo(
+                Routes.queueList,
               );
             },
           ),

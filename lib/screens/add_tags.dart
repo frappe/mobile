@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/form/controls/autocomplete.dart';
 
+import '../app/locator.dart';
+import '../form/controls/autocomplete.dart';
+
+import '../services/navigation_service.dart';
 import '../services/backend_service.dart';
+
 import '../widgets/card_list_tile.dart';
 
 class AddTags extends StatefulWidget {
@@ -50,7 +54,7 @@ class _AddTagsState extends State<AddTags> {
   }
 
   _handleBack() {
-    Navigator.of(context).pop(true);
+    locator<NavigationService>().pop(true);
   }
 
   @override

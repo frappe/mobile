@@ -13,9 +13,10 @@ class NavigationService {
     );
   }
 
-  Future pushReplacement(String routeName) {
+  Future pushReplacement(String routeName, {Object arguments}) {
     return navigatorKey.currentState.pushReplacementNamed(
       routeName,
+      arguments: arguments,
     );
   }
 
@@ -24,5 +25,9 @@ class NavigationService {
       routeName,
       (_) => false,
     );
+  }
+
+  pop([Object result]) {
+    return navigatorKey.currentState.pop(result);
   }
 }

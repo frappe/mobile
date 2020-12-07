@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/app/router.gr.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 
 import '../screens/share.dart';
 
@@ -57,16 +60,12 @@ class _SharedWithState extends State<SharedWith> {
         ),
         child: CardListTile(
           onTap: () async {
-            var nav = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return Share(
-                    docInfo: docInfo,
-                    doctype: widget.doctype,
-                    name: widget.name,
-                  );
-                },
+            var nav = await locator<NavigationService>().navigateTo(
+              Routes.share,
+              arguments: ShareArguments(
+                docInfo: docInfo,
+                doctype: widget.doctype,
+                name: widget.name,
               ),
             );
 
@@ -92,16 +91,12 @@ class _SharedWithState extends State<SharedWith> {
         child: FrappeIconButton(
           buttonType: ButtonType.secondary,
           onPressed: () async {
-            var nav = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return Share(
-                    docInfo: docInfo,
-                    doctype: widget.doctype,
-                    name: widget.name,
-                  );
-                },
+            var nav = await locator<NavigationService>().navigateTo(
+              Routes.share,
+              arguments: ShareArguments(
+                docInfo: docInfo,
+                doctype: widget.doctype,
+                name: widget.name,
               ),
             );
 

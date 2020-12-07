@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
+import '../app/locator.dart';
+
+import '../services/navigation_service.dart';
 import '../services/backend_service.dart';
+
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
 
@@ -120,7 +124,7 @@ class _EmailFormState extends State<EmailForm> {
                   doctypeName: widget.doc,
                 );
                 widget.callback();
-                Navigator.of(context).pop();
+                locator<NavigationService>().pop();
               }
             },
             child: Text('Send'),

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/services/backend_service.dart';
+
+import '../app/locator.dart';
+
+import '../services/backend_service.dart';
+import '../services/navigation_service.dart';
 
 class CommentInput extends StatelessWidget {
   final String doctype;
@@ -35,7 +39,7 @@ class CommentInput extends StatelessWidget {
                 authorEmail,
               );
               callback();
-              Navigator.of(context).pop();
+              locator<NavigationService>().pop();
             },
           )
         ],

@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:frappe_app/app/locator.dart';
-import 'package:frappe_app/services/api/api.dart';
 import 'package:provider/provider.dart';
+
+import '../app/locator.dart';
+
+import '../services/api/api.dart';
+import '../services/navigation_service.dart';
 
 import '../screens/filter_list.dart';
 
@@ -96,7 +99,7 @@ class _ActivateModulesState extends State<ActivateModules> {
       activeModules,
     );
 
-    Navigator.of(context).pop(true);
+    locator<NavigationService>().pop(true);
   }
 
   var doctypes = [];

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 
 import '../form/controls/control.dart';
 import '../form/controls/link_field.dart';
@@ -166,7 +168,7 @@ class _ShareState extends State<Share> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Navigator.of(context).pop(true);
+        locator<NavigationService>().pop(true);
         return false;
       },
       child: Scaffold(
@@ -176,7 +178,7 @@ class _ShareState extends State<Share> {
               Icons.arrow_back,
             ),
             onPressed: () {
-              Navigator.of(context).pop(true);
+              locator<NavigationService>().pop(true);
             },
           ),
         ),

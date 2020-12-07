@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
+import '../services/navigation_service.dart';
 import '../form/controls/autocomplete.dart';
-import '../screens/doctype_view.dart';
-import '../app.dart';
 import '../config/palette.dart';
+
+import '../app/locator.dart';
+import '../app/router.gr.dart';
 
 import '../utils/config_helper.dart';
 import '../utils/enums.dart';
@@ -85,35 +87,26 @@ class _AwesomeBarState extends State<AwesomeBar> {
               },
               onSuggestionSelected: (item) {
                 if (item["type"] == "Doctype") {
-                  Navigator.of(context, rootNavigator: true).push(
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return CustomRouter(
-                          doctype: item["value"],
-                          viewType: ViewType.list,
-                        );
-                      },
+                  locator<NavigationService>().navigateTo(
+                    Routes.customRouter,
+                    arguments: CustomRouterArguments(
+                      doctype: item["value"],
+                      viewType: ViewType.list,
                     ),
                   );
                 } else if (item["type"] == "New Doc") {
-                  Navigator.of(context, rootNavigator: true).push(
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return CustomRouter(
-                          doctype: item["value"],
-                          viewType: ViewType.newForm,
-                        );
-                      },
+                  locator<NavigationService>().navigateTo(
+                    Routes.customRouter,
+                    arguments: CustomRouterArguments(
+                      doctype: item["value"],
+                      viewType: ViewType.newForm,
                     ),
                   );
                 } else if (item["type"] == "Module") {
-                  Navigator.of(context, rootNavigator: true).push(
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return DoctypeView(
-                          item["value"],
-                        );
-                      },
+                  locator<NavigationService>().navigateTo(
+                    Routes.doctypeView,
+                    arguments: DoctypeViewArguments(
+                      module: item["value"],
                     ),
                   );
                 }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/app/router.gr.dart';
 import 'package:frappe_app/datamodels/doctype_response.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 
 import '../screens/add_review.dart';
 
@@ -97,18 +100,14 @@ class _ReviewsState extends State<Reviews> {
         child: FrappeIconButton(
           buttonType: ButtonType.secondary,
           onPressed: () async {
-            var nav = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return AddReview(
-                    doctype: widget.doctype,
-                    docInfo: widget.docInfo,
-                    meta: widget.meta,
-                    doc: widget.doc,
-                    name: widget.name,
-                  );
-                },
+            var nav = await locator<NavigationService>().navigateTo(
+              Routes.addReview,
+              arguments: AddReviewArguments(
+                doctype: widget.doctype,
+                docInfo: widget.docInfo,
+                meta: widget.meta,
+                doc: widget.doc,
+                name: widget.name,
               ),
             );
 

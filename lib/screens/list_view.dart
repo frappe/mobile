@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/app/router.gr.dart';
 import 'package:frappe_app/datamodels/doctype_response.dart';
 import 'package:frappe_app/services/api/api.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 import 'package:frappe_app/utils/cache_helper.dart';
 import 'package:frappe_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
@@ -75,16 +77,12 @@ class _CustomListViewState extends State<CustomListView> {
     return ListItem(
       doctype: widget.doctype,
       onListTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return CustomRouter(
-                viewType: ViewType.form,
-                doctype: widget.doctype,
-                name: data["name"],
-              );
-            },
+        locator<NavigationService>().navigateTo(
+          Routes.customRouter,
+          arguments: CustomRouterArguments(
+            viewType: ViewType.form,
+            doctype: widget.doctype,
+            name: data["name"],
           ),
         );
       },
@@ -137,15 +135,11 @@ class _CustomListViewState extends State<CustomListView> {
             buttonType: ButtonType.primary,
             title: 'Create New',
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return CustomRouter(
-                      viewType: ViewType.newForm,
-                      doctype: widget.doctype,
-                    );
-                  },
+              locator<NavigationService>().navigateTo(
+                Routes.customRouter,
+                arguments: CustomRouterArguments(
+                  viewType: ViewType.newForm,
+                  doctype: widget.doctype,
                 ),
               );
             },
@@ -302,15 +296,11 @@ class _CustomListViewState extends State<CustomListView> {
                   color: Colors.white,
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return CustomRouter(
-                          viewType: ViewType.newForm,
-                          doctype: widget.doctype,
-                        );
-                      },
+                  locator<NavigationService>().navigateTo(
+                    Routes.customRouter,
+                    arguments: CustomRouterArguments(
+                      viewType: ViewType.newForm,
+                      doctype: widget.doctype,
                     ),
                   );
                 },
@@ -442,16 +432,12 @@ class CustomSearch extends SearchDelegate {
                   snapshot.data[index][titleField],
                 ),
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return CustomRouter(
-                          viewType: ViewType.form,
-                          doctype: data.doctype,
-                          name: snapshot.data[index]["name"],
-                        );
-                      },
+                  locator<NavigationService>().navigateTo(
+                    Routes.customRouter,
+                    arguments: CustomRouterArguments(
+                      viewType: ViewType.form,
+                      doctype: data.doctype,
+                      name: snapshot.data[index]["name"],
                     ),
                   );
                 },

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/datamodels/doctype_response.dart';
 
+import '../app/locator.dart';
+import '../datamodels/doctype_response.dart';
+import '../services/navigation_service.dart';
 import '../form/controls/control.dart';
-
 import '../widgets/frappe_button.dart';
 
 import '../utils/cache_helper.dart';
@@ -153,7 +154,7 @@ class _FilterListState extends State<FilterList> {
                     _fbKey.currentState.value,
                   );
 
-                  Navigator.of(context).pop();
+                  locator<NavigationService>().pop();
 
                   widget.filterCallback(filters);
                 },
@@ -171,7 +172,7 @@ class _FilterListState extends State<FilterList> {
             Icons.close,
           ),
           onPressed: () {
-            Navigator.of(context).pop();
+            locator<NavigationService>().pop();
           },
         ),
       ),

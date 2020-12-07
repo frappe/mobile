@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
+import '../app/locator.dart';
 import '../config/palette.dart';
 import '../form/controls/link_field.dart';
-import '../services/backend_service.dart';
 import '../utils/enums.dart';
+
+import '../services/navigation_service.dart';
+import '../services/backend_service.dart';
+
 import '../widgets/card_list_tile.dart';
 import '../widgets/frappe_button.dart';
 import '../widgets/user_avatar.dart';
@@ -69,7 +73,7 @@ class _AddAssigneesState extends State<AddAssignees> {
                         widget.name,
                         newAssignees,
                       );
-                      Navigator.of(context).pop(true);
+                      locator<NavigationService>().pop(true);
                     }
                   : null,
               title: "Assign",

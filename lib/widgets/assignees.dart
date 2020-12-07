@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/app/router.gr.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 
 import './frappe_button.dart';
 
@@ -93,15 +96,11 @@ class _AssigneesState extends State<Assignees> {
           buttonType: ButtonType.secondary,
           icon: FrappeIcons.small_add,
           onPressed: () async {
-            var nav = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return AddAssignees(
-                    doctype: widget.doctype,
-                    name: widget.name,
-                  );
-                },
+            var nav = await locator<NavigationService>().navigateTo(
+              Routes.addAssignees,
+              arguments: AddAssigneesArguments(
+                doctype: widget.doctype,
+                name: widget.name,
               ),
             );
 

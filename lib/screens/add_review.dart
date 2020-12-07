@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/datamodels/doctype_response.dart';
+
+import '../app/locator.dart';
+
+import '../datamodels/doctype_response.dart';
+
+import '../services/navigation_service.dart';
+import '../services/backend_service.dart';
 
 import '../utils/config_helper.dart';
-import '../services/backend_service.dart';
 import '../utils/enums.dart';
 
 import '../widgets/custom_form.dart';
@@ -118,7 +123,7 @@ class _AddReviewState extends State<AddReview> {
                     formValue,
                   );
 
-                  Navigator.of(context).pop(true);
+                  locator<NavigationService>().pop(true);
                 }
               },
               buttonType: ButtonType.primary,

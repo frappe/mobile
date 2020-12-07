@@ -3,7 +3,10 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/app/router.gr.dart';
 import 'package:frappe_app/datamodels/doctype_response.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 import 'package:frappe_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
 
@@ -79,22 +82,19 @@ class _SimpleFormState extends State<SimpleForm> {
                       subtitle: 'Added to Queue',
                       context: context,
                     );
-                    Navigator.of(context).pop();
+                    locator<NavigationService>().pop();
                   } else {
                     try {
                       var response = await BackendService.saveDocs(
                         widget.meta.name,
                         formValue,
                       );
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return CustomRouter(
-                                viewType: ViewType.form,
-                                doctype: widget.meta.name,
-                                name: response.data["docs"][0]["name"]);
-                          },
+                      locator<NavigationService>().pushReplacement(
+                        Routes.customRouter,
+                        arguments: CustomRouterArguments(
+                          viewType: ViewType.form,
+                          doctype: widget.meta.name,
+                          name: response.data["docs"][0]["name"],
                         ),
                       );
                     } catch (e) {

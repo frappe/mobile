@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/app/router.gr.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 import 'package:provider/provider.dart';
 
 import '../app.dart';
@@ -123,16 +126,13 @@ class _QueueListState extends State<QueueList> {
                   ),
                   onTap: () {
                     q["qIdx"] = index;
-                    Navigator.of(context, rootNavigator: true).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return CustomRouter(
-                            viewType: ViewType.form,
-                            doctype: q['doctype'],
-                            queued: true,
-                            queuedData: q,
-                          );
-                        },
+                    locator<NavigationService>().navigateTo(
+                      Routes.customRouter,
+                      arguments: CustomRouterArguments(
+                        viewType: ViewType.form,
+                        doctype: q['doctype'],
+                        queued: true,
+                        queuedData: q,
                       ),
                     );
                   },
