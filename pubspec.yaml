@@ -18,12 +18,7 @@ environment:
 
 
 dependencies:
-  observable_ish:
-  stacked: ^1.7.6
-  stacked_hooks:
-  flutter_hooks:
   auto_route:
-  stacked_services:
   injectable:
   json_table: ^1.4.0
   barcode_widget: ^1.5.0
@@ -34,7 +29,7 @@ dependencies:
   flutter_local_notifications: ^3.0.0
   workmanager: ^0.2.3
   get_it: ^5.0.0
-  fluttertoast: ^7.1.1
+  # fluttertoast: ^7.1.5
   persistent_bottom_nav_bar: ^2.0.5
   hive: ^1.4.4
   hive_flutter: ^0.3.1

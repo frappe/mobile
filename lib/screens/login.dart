@@ -2,10 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/app/router.gr.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 
 import '../app/locator.dart';
 import '../services/api/api.dart';
-import '../screens/custom_persistent_bottom_nav_bar.dart';
 import '../config/palette.dart';
 import '../widgets/frappe_button.dart';
 
@@ -76,13 +77,7 @@ class _LoginState extends State<Login> {
       );
 
       await cacheAllUsers();
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) {
-            return CustomPersistentBottomNavBar();
-          },
-        ),
-      );
+      locator<NavigationService>().pushReplacement(Routes.home);
     } catch (e) {
       ConfigHelper.set('isLoggedIn', false);
       if (e.statusCode == HttpStatus.unauthorized) {

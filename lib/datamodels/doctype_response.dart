@@ -8,7 +8,7 @@ class DoctypeResponse {
     if (json['docs'] != null) {
       docs = new List<DoctypeDoc>();
       json['docs'].forEach((v) {
-        docs.add(new DoctypeDoc.fromJson(v));
+        docs.add(new DoctypeDoc.fromJson(Map<String, dynamic>.from(v)));
       });
     }
     userSettings = json['user_settings'];
@@ -181,7 +181,7 @@ class DoctypeDoc {
     if (json['fields'] != null) {
       fields = new List<DoctypeField>();
       json['fields'].forEach((v) {
-        fields.add(new DoctypeField.fromJson(v));
+        fields.add(new DoctypeField.fromJson(Map<String, dynamic>.from(v)));
       });
     }
   }

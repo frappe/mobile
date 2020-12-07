@@ -378,10 +378,10 @@ class CardItemLink {
   String name;
   int onboard;
   String type;
-  int count;
+  dynamic count;
   List<String> dependencies;
   String doctype;
-  bool isQueryReport;
+  dynamic isQueryReport;
   String incompleteDependencies;
   String icon;
   String link;

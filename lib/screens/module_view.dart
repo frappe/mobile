@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:frappe_app/app/router.gr.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -106,14 +108,8 @@ class _ModuleViewState extends State<ModuleView> {
                         Text('Activate Modules'),
                         FrappeFlatButton(
                           onPressed: () async {
-                            var nav = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return ActivateModules();
-                                },
-                              ),
-                            );
+                            var nav = await locator<NavigationService>()
+                                .navigateTo(Routes.activateModules);
 
                             if (nav) {
                               setState(() {});
@@ -217,12 +213,10 @@ class _ModuleViewState extends State<ModuleView> {
                     child: CardListTile(
                       title: Text(module.label),
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return DoctypeView(module.name);
-                            },
+                        locator<NavigationService>().navigateTo(
+                          Routes.doctypeView,
+                          arguments: DoctypeViewArguments(
+                            module: module.name,
                           ),
                         );
                       },

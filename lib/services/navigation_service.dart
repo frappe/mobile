@@ -6,15 +6,20 @@ class NavigationService {
   final GlobalKey<NavigatorState> navigatorKey =
       new GlobalKey<NavigatorState>();
 
-  Future<dynamic> navigateTo(String routeName) {
-    return navigatorKey.currentState.pushNamed(routeName);
+  Future navigateTo(String routeName, {Object arguments}) {
+    return navigatorKey.currentState.pushNamed(
+      routeName,
+      arguments: arguments,
+    );
   }
 
-  Future<dynamic> pushReplacement(String routeName) {
-    return navigatorKey.currentState.pushReplacementNamed(routeName);
+  Future pushReplacement(String routeName) {
+    return navigatorKey.currentState.pushReplacementNamed(
+      routeName,
+    );
   }
 
-  Future<dynamic> clearAllAndNavigateTo(String routeName) {
+  Future clearAllAndNavigateTo(String routeName) {
     return navigatorKey.currentState.pushNamedAndRemoveUntil(
       routeName,
       (_) => false,

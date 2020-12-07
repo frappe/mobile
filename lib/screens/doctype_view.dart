@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:frappe_app/app/router.gr.dart';
+import 'package:frappe_app/services/navigation_service.dart';
 import 'package:provider/provider.dart';
 
 import '../app/locator.dart';
@@ -91,14 +93,8 @@ class _DoctypeViewState extends State<DoctypeView> {
                       ),
                       FrappeFlatButton(
                         onPressed: () async {
-                          var nav = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return ActivateModules();
-                              },
-                            ),
-                          );
+                          var nav = await locator<NavigationService>()
+                              .navigateTo(Routes.activateModules);
 
                           if (nav) {
                             setState(() {});
@@ -121,14 +117,11 @@ class _DoctypeViewState extends State<DoctypeView> {
                   child: CardListTile(
                     title: Text(m.label),
                     onTap: () {
-                      Navigator.of(context, rootNavigator: true).push(
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return CustomRouter(
-                              doctype: m.name,
-                              viewType: ViewType.list,
-                            );
-                          },
+                      locator<NavigationService>().navigateTo(
+                        Routes.customRouter,
+                        arguments: CustomRouterArguments(
+                          doctype: m.name,
+                          viewType: ViewType.list,
                         ),
                       );
                     },

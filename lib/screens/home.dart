@@ -5,10 +5,10 @@ import 'package:frappe_app/utils/frappe_icon.dart';
 
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
-import '../screens/module_view.dart';
-import '../screens/settings.dart';
+import 'module_view.dart';
+import 'settings.dart';
 
-class CustomPersistentBottomNavBar extends StatelessWidget {
+class Home extends StatelessWidget {
   final PersistentTabController _persistentTabController =
       PersistentTabController(initialIndex: 0);
 

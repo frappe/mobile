@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frappe_app/datamodels/doctype_response.dart';
 import 'package:frappe_app/services/api/api.dart';
+import 'app/router.gr.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -20,9 +21,7 @@ import 'utils/helpers.dart';
 import 'services/connectivity_service.dart';
 import 'services/navigation_service.dart';
 
-import 'screens/no_internet.dart';
-import 'screens/session_expired.dart';
-import 'screens/custom_persistent_bottom_nav_bar.dart';
+import 'screens/home.dart';
 import 'screens/filter_list.dart';
 import 'screens/form_view.dart';
 import 'screens/list_view.dart';
@@ -63,19 +62,8 @@ class _FrappeAppState extends State<FrappeApp> {
           debugShowCheckedModeBanner: false,
           title: 'Frappe',
           navigatorKey: locator<NavigationService>().navigatorKey,
-          onGenerateRoute: (routeSettings) {
-            switch (routeSettings.name) {
-              case 'login':
-                return MaterialPageRoute(builder: (context) => Login());
-              case 'session_expired':
-                return MaterialPageRoute(
-                    builder: (context) => SessionExpired());
-              case 'no_internet':
-                return MaterialPageRoute(builder: (context) => NoInternet());
-              default:
-                return MaterialPageRoute(builder: (context) => FrappeApp());
-            }
-          },
+          onGenerateRoute: MyRouter().onGenerateRoute,
+          initialRoute: Routes.frappeApp,
           theme: new ThemeData(
             textTheme: GoogleFonts.interTextTheme(
               Theme.of(context).textTheme.apply(
@@ -93,18 +81,13 @@ class _FrappeAppState extends State<FrappeApp> {
             child: Scaffold(
               body: _isLoaded
                   ? _isLoggedIn
-                      ? CustomPersistentBottomNavBar()
+                      ? Home()
                       : Login()
                   : Center(
                       child: CircularProgressIndicator(),
                     ),
             ),
           ),
-          routes: <String, WidgetBuilder>{
-            // Set routes for using the Navigator.
-            '/login': (BuildContext context) => Login(),
-            '/modules': (BuildContext context) => ModuleView(),
-          },
         ),
       ),
     );
@@ -131,25 +114,39 @@ class CustomRouter extends StatelessWidget {
   });
 
   _getData() async {
-    DoctypeResponse doctypeMeta;
-
-    var meta = await CacheHelper.getCache('${doctype}Meta');
+    var cachedMeta = await CacheHelper.getCache('${doctype}Meta');
     var filter = await CacheHelper.getCache('${doctype}Filter');
+    DoctypeResponse metaResponse;
+
+    var isOnline = await verifyOnline();
 
     filter = filter["data"];
-    if (meta == null) {
-      var isOnline = await verifyOnline();
-      if (isOnline) {
-        doctypeMeta = await locator<Api>().getDoctype(doctype);
+
+    if (isOnline) {
+      if (cachedMeta["data"] != null) {
+        DateTime cacheTime = cachedMeta["timestamp"];
+        var cacheTimeElapsedMins =
+            DateTime.now().difference(cacheTime).inMinutes;
+        if (cacheTimeElapsedMins > 15) {
+          metaResponse = await locator<Api>().getDoctype(doctype);
+        } else {
+          metaResponse = DoctypeResponse.fromJson(
+              Map<String, dynamic>.from(cachedMeta["data"]));
+        }
+      } else {
+        metaResponse = await locator<Api>().getDoctype(doctype);
+      }
+    } else {
+      if (cachedMeta["data"] != null) {
+        metaResponse = DoctypeResponse.fromJson(
+            Map<String, dynamic>.from(cachedMeta["data"]));
       } else {
         throw Response(statusCode: HttpStatus.serviceUnavailable);
       }
-    } else {
-      doctypeMeta = DoctypeResponse.fromJson(meta);
     }
 
     return {
-      "meta": doctypeMeta,
+      "meta": metaResponse,
       "filter": filter,
     };
   }
