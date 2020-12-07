@@ -155,6 +155,12 @@ List<Widget> generateLayout({
       val = ConfigHelper().userId;
     }
 
+    if (val is List) {
+      if (val.isEmpty) {
+        val = null;
+      }
+    }
+
     if (field["fieldtype"] == "Section Break") {
       if (sections.length > 0) {
         var sectionVisibility = sections.any((element) {

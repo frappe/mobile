@@ -17,7 +17,6 @@ import 'utils/config_helper.dart';
 import 'utils/enums.dart';
 import 'utils/helpers.dart';
 
-import 'services/backend_service.dart';
 import 'services/connectivity_service.dart';
 import 'services/navigation_service.dart';
 
@@ -136,7 +135,7 @@ class CustomRouter extends StatelessWidget {
 
     var meta = await CacheHelper.getCache('${doctype}Meta');
     var filter = await CacheHelper.getCache('${doctype}Filter');
-    meta = meta["data"];
+
     filter = filter["data"];
     if (meta == null) {
       var isOnline = await verifyOnline();
@@ -148,6 +147,7 @@ class CustomRouter extends StatelessWidget {
     } else {
       doctypeMeta = DoctypeResponse.fromJson(meta);
     }
+
     return {
       "meta": doctypeMeta,
       "filter": filter,

@@ -25,6 +25,7 @@ dependencies:
   auto_route:
   stacked_services:
   injectable:
+  json_table: ^1.4.0
   barcode_widget: ^1.5.0
   shared_preferences: ^0.5.12+2
   crypto: ^2.1.5

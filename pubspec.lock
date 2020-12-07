@@ -688,6 +688,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
+  json_table:
+    dependency: "direct main"
+    description:
+      name: json_table
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.4.0"
+  json_utilities:
+    dependency: transitive
+    description:
+      name: json_utilities
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.3"
   logging:
     dependency: transitive
     description:
