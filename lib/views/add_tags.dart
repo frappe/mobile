@@ -4,8 +4,8 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import '../app/locator.dart';
 import '../form/controls/autocomplete.dart';
 
+import '../services/api/api.dart';
 import '../services/navigation_service.dart';
-import '../services/backend_service.dart';
 
 import '../widgets/card_list_tile.dart';
 
@@ -38,7 +38,7 @@ class _AddTagsState extends State<AddTags> {
             icon: Icon(Icons.clear),
             onPressed: () {
               newTags.removeAt(idx);
-              BackendService.removeTag(
+              locator<Api>().removeTag(
                 widget.doctype,
                 widget.name,
                 val,
@@ -87,7 +87,7 @@ class _AddTagsState extends State<AddTags> {
                   hint: 'Add a tag ...',
                   onSuggestionSelected: (item) async {
                     if (item != "") {
-                      var addedTag = await BackendService.addTag(
+                      var addedTag = await locator<Api>().addTag(
                         widget.doctype,
                         widget.name,
                         item,
@@ -99,7 +99,7 @@ class _AddTagsState extends State<AddTags> {
                   },
                   suggestionsCallback: (query) async {
                     var lowercaseQuery = query.toLowerCase();
-                    var response = await BackendService.getTags(
+                    var response = await locator<Api>().getTags(
                       widget.doctype,
                       lowercaseQuery,
                     );

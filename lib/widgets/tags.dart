@@ -6,8 +6,8 @@ import '../app/router.gr.dart';
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
 
+import '../services/api/api.dart';
 import '../services/navigation_service.dart';
-import '../services/backend_service.dart';
 
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
@@ -46,7 +46,7 @@ class _TagsState extends State<Tags> {
 
   void _refresh() {
     setState(() {
-      _futureVal = BackendService.getDocinfo(widget.doctype, widget.name);
+      _futureVal = locator<Api>().getDocinfo(widget.doctype, widget.name);
     });
   }
 
@@ -60,7 +60,7 @@ class _TagsState extends State<Tags> {
           trailing: IconButton(
             icon: Icon(Icons.close),
             onPressed: () async {
-              await BackendService.removeTag(
+              await locator<Api>().removeTag(
                 widget.doctype,
                 widget.name,
                 tag,

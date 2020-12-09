@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/services/backend_service.dart';
+
+import '../../app/locator.dart';
+import '../../config/palette.dart';
+import '../../services/api/api.dart';
 
 class MultiSelect extends StatefulWidget {
   final String hint;
@@ -40,7 +42,7 @@ class _MultiSelectState extends State<MultiSelect> {
       findSuggestions: (String query) async {
         if (query.length != 0) {
           var lowercaseQuery = query.toLowerCase();
-          var response = await BackendService.getContactList(lowercaseQuery);
+          var response = await locator<Api>().getContactList(lowercaseQuery);
           var val = response["message"];
           if (val.length == 0) {
             val = [

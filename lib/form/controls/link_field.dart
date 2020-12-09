@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
 
+import '../../app/locator.dart';
+import '../../services/api/api.dart';
+
+import '../../utils/helpers.dart';
 import '../../utils/cache_helper.dart';
 import '../../utils/enums.dart';
-import '../../services/backend_service.dart';
 
 class LinkField extends StatefulWidget {
   final String hint;
@@ -137,7 +139,7 @@ class _LinkFieldState extends State<LinkField> {
                     }
                   }
                 } else {
-                  var response = await BackendService.searchLink(
+                  var response = await locator<Api>().searchLink(
                     doctype: widget.doctype,
                     refDoctype: widget.refDoctype,
                     txt: lowercaseQuery,

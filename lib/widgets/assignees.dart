@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/app/locator.dart';
-import 'package:frappe_app/app/router.gr.dart';
-import 'package:frappe_app/services/navigation_service.dart';
 
-import './frappe_button.dart';
+import 'frappe_button.dart';
+
+import '../app/locator.dart';
+import '../app/router.gr.dart';
+
+import '../services/api/api.dart';
+import '../services/navigation_service.dart';
 
 import '../config/palette.dart';
 import '../config/frappe_icons.dart';
@@ -11,11 +14,8 @@ import '../config/frappe_icons.dart';
 import '../widgets/user_avatar.dart';
 import '../widgets/card_list_tile.dart';
 
-import '../services/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
-
-import '../views/add_assignees.dart';
 
 class Assignees extends StatefulWidget {
   final String doctype;
@@ -47,7 +47,7 @@ class _AssigneesState extends State<Assignees> {
 
   void _refresh() {
     setState(() {
-      _futureVal = BackendService.getDocinfo(
+      _futureVal = locator<Api>().getDocinfo(
         widget.doctype,
         widget.name,
       );
@@ -73,7 +73,7 @@ class _AssigneesState extends State<Assignees> {
                 Icons.clear,
               ),
               onPressed: () async {
-                await BackendService.removeAssignee(
+                await locator<Api>().removeAssignee(
                   widget.doctype,
                   widget.name,
                   d["owner"],

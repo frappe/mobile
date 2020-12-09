@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/app/locator.dart';
-import 'package:frappe_app/services/navigation_service.dart';
+
+import '../app/locator.dart';
+
+import '../services/api/api.dart';
+import '../services/navigation_service.dart';
 
 import '../form/controls/control.dart';
 import '../form/controls/link_field.dart';
 
-import '../services/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
 
@@ -102,7 +104,7 @@ class _ShareState extends State<Share> {
                       field: w,
                       value: share[w["fieldname"]],
                       onChanged: (val) async {
-                        await BackendService.setPermission(
+                        await locator<Api>().setPermission(
                           widget.doctype,
                           widget.name,
                           {
@@ -133,7 +135,7 @@ class _ShareState extends State<Share> {
                       field: w,
                       value: share[w["fieldname"]],
                       onChanged: (val) async {
-                        await BackendService.setPermission(
+                        await locator<Api>().setPermission(
                           widget.doctype,
                           widget.name,
                           {
@@ -160,7 +162,7 @@ class _ShareState extends State<Share> {
 
   void _refresh() {
     setState(() {
-      _futureVal = BackendService.getDocinfo(widget.doctype, widget.name);
+      _futureVal = locator<Api>().getDocinfo(widget.doctype, widget.name);
     });
   }
 
@@ -224,7 +226,7 @@ class _ShareState extends State<Share> {
                                         ...formValue,
                                       };
 
-                                      await BackendService.shareAdd(
+                                      await locator<Api>().shareAdd(
                                         widget.doctype,
                                         widget.name,
                                         req,

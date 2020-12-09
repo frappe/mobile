@@ -7,29 +7,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:frappe_app/datamodels/desktop_page_response.dart';
-import 'package:frappe_app/datamodels/doctype_response.dart';
-import 'package:frappe_app/views/no_internet.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../main.dart';
+import '../datamodels/desktop_page_response.dart';
+import '../datamodels/doctype_response.dart';
+
+import '../services/api/api.dart';
+import '../views/no_internet.dart';
+
 import 'http.dart';
-
+import '../main.dart';
 import '../form/controls/control.dart';
-
 import '../app/locator.dart';
-
 import '../config/palette.dart';
-
 import '../services/navigation_service.dart';
 
-import '../utils/cache_helper.dart';
 import '../utils/config_helper.dart';
 import '../utils/dio_helper.dart';
 import '../utils/enums.dart';
-import '../services/backend_service.dart';
 
 import '../widgets/section.dart';
 import '../widgets/custom_expansion_tile.dart';
@@ -546,13 +543,13 @@ Future<bool> verifyOnline() async {
 }
 
 getLinkFields(String doctype) async {
-  var docMeta = await BackendService.getDoctype(
+  var docMeta = await locator<Api>().getDoctype(
     doctype,
   );
-  docMeta = docMeta["docs"][0];
-  var linkFieldDoctypes = docMeta["fields"]
-      .where((d) => d["fieldtype"] == 'Link')
-      .map((d) => d["options"])
+  var doc = docMeta.docs[0];
+  var linkFieldDoctypes = doc.fields
+      .where((d) => d.fieldtype == 'Link')
+      .map((d) => d.options)
       .toList();
 
   return linkFieldDoctypes;

@@ -10,8 +10,8 @@ import '../datamodels/doctype_response.dart';
 import '../app/locator.dart';
 import '../app/router.gr.dart';
 
+import '../services/api/api.dart';
 import '../services/navigation_service.dart';
-import '../services/backend_service.dart';
 
 import '../utils/enums.dart';
 import '../utils/frappe_alert.dart';
@@ -86,7 +86,7 @@ class _SimpleFormState extends State<SimpleForm> {
                     locator<NavigationService>().pop();
                   } else {
                     try {
-                      var response = await BackendService.saveDocs(
+                      var response = await locator<Api>().saveDocs(
                         widget.meta.name,
                         formValue,
                       );

@@ -12,8 +12,8 @@ import '../config/palette.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
 
+import '../services/api/api.dart';
 import '../services/navigation_service.dart';
-import '../services/backend_service.dart';
 
 import '../widgets/frappe_button.dart';
 import '../widgets/card_list_tile.dart';
@@ -53,7 +53,7 @@ class _ReviewsState extends State<Reviews> {
 
   void _refresh() {
     setState(() {
-      _futureVal = BackendService.getDocinfo(widget.doctype, widget.name);
+      _futureVal = locator<Api>().getDocinfo(widget.doctype, widget.name);
     });
   }
 

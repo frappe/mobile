@@ -3,8 +3,8 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import '../app/locator.dart';
 
+import '../services/api/api.dart';
 import '../services/navigation_service.dart';
-import '../services/backend_service.dart';
 
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
@@ -116,7 +116,7 @@ class _EmailFormState extends State<EmailForm> {
               if (_fbKey.currentState.saveAndValidate()) {
                 var formValue = _fbKey.currentState.value;
 
-                await BackendService.sendEmail(
+                await locator<Api>().sendEmail(
                   recipients: formValue["recipients"],
                   subject: formValue["subject"],
                   content: formValue["content"],

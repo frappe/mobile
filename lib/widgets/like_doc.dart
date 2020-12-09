@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/config/frappe_icons.dart';
-import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/services/backend_service.dart';
-import 'package:frappe_app/utils/frappe_icon.dart';
+
+import '../app/locator.dart';
+import '../config/frappe_icons.dart';
+import '../config/palette.dart';
+import '../services/api/api.dart';
+import '../utils/frappe_icon.dart';
 
 class LikeDoc extends StatefulWidget {
   bool isFav;
@@ -25,7 +27,7 @@ class _LikeDocState extends State<LikeDoc> {
       widget.isFav = !widget.isFav;
     });
 
-    var response = await BackendService.toggleLike(
+    var response = await locator<Api>().toggleLike(
       widget.doctype,
       widget.name,
       widget.isFav,

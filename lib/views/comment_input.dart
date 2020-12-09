@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../app/locator.dart';
 
-import '../services/backend_service.dart';
+import '../services/api/api.dart';
 import '../services/navigation_service.dart';
 
 class CommentInput extends StatelessWidget {
@@ -32,7 +32,7 @@ class CommentInput extends StatelessWidget {
               if (_input.text.isEmpty) {
                 return;
               }
-              await BackendService.postComment(
+              await locator<Api>().postComment(
                 doctype,
                 name,
                 _input.text,

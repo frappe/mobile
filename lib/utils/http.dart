@@ -1,10 +1,9 @@
-import 'package:frappe_app/app/locator.dart';
-import 'package:frappe_app/services/api/api.dart';
-import 'package:frappe_app/utils/dio_helper.dart';
+import '../app/locator.dart';
+import '../services/api/api.dart';
 
+import '../utils/dio_helper.dart';
 import '../utils/cache_helper.dart';
 import '../utils/config_helper.dart';
-import '../services/backend_service.dart';
 
 void initConfig() async {
   if (ConfigHelper().baseUrl != null) {

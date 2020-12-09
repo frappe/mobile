@@ -13,8 +13,8 @@ import '../config/palette.dart';
 import '../app/locator.dart';
 import '../app/router.gr.dart';
 
+import '../services/api/api.dart';
 import '../services/navigation_service.dart';
-import '../services/backend_service.dart';
 
 import '../utils/cache_helper.dart';
 import '../utils/helpers.dart';
@@ -51,7 +51,6 @@ class FormView extends StatefulWidget {
 
 class _FormViewState extends State<FormView>
     with SingleTickerProviderStateMixin {
-  BackendService backendService;
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
 
   bool editMode = false;
@@ -89,7 +88,7 @@ class _FormViewState extends State<FormView>
           throw Response(statusCode: HttpStatus.serviceUnavailable);
         }
       } else {
-        return BackendService.getdoc(
+        return locator<Api>().getdoc(
           widget.doctype,
           widget.name,
         );
@@ -241,7 +240,7 @@ class _FormViewState extends State<FormView>
         };
 
         try {
-          var response = await BackendService.saveDocs(
+          var response = await locator<Api>().saveDocs(
             widget.doctype,
             formValue,
           );

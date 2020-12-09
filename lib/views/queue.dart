@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/app/locator.dart';
-import 'package:frappe_app/app/router.gr.dart';
-import 'package:frappe_app/services/navigation_service.dart';
 import 'package:provider/provider.dart';
-
-import '../app.dart';
 
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
 
+import '../services/navigation_service.dart';
 import '../widgets/card_list_tile.dart';
+
+import '../app/locator.dart';
+import '../app/router.gr.dart';
 
 import '../utils/frappe_alert.dart';
 import '../utils/frappe_icon.dart';
-import '../services/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
 import '../utils/queue_helper.dart';
@@ -24,14 +22,6 @@ class QueueList extends StatefulWidget {
 }
 
 class _QueueListState extends State<QueueList> {
-  BackendService backendService;
-
-  @override
-  void initState() {
-    super.initState();
-    backendService = BackendService();
-  }
-
   void _refresh() {
     setState(() {});
   }

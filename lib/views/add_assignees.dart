@@ -6,8 +6,8 @@ import '../config/palette.dart';
 import '../form/controls/link_field.dart';
 import '../utils/enums.dart';
 
+import '../services/api/api.dart';
 import '../services/navigation_service.dart';
-import '../services/backend_service.dart';
 
 import '../widgets/card_list_tile.dart';
 import '../widgets/frappe_button.dart';
@@ -68,7 +68,7 @@ class _AddAssigneesState extends State<AddAssignees> {
             child: FrappeFlatButton(
               onPressed: newAssignees.length > 0
                   ? () async {
-                      await BackendService.addAssignees(
+                      await locator<Api>().addAssignees(
                         widget.doctype,
                         widget.name,
                         newAssignees,

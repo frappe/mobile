@@ -7,7 +7,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 
-import '../services/backend_service.dart';
 import '../services/connectivity_service.dart';
 import '../services/navigation_service.dart';
 import '../services/storage_service.dart';
@@ -21,7 +20,6 @@ GetIt $initGetIt(
   EnvironmentFilter environmentFilter,
 }) {
   final gh = GetItHelper(get, environment, environmentFilter);
-  gh.lazySingleton<BackendService>(() => BackendService());
   gh.lazySingleton<ConnectivityService>(() => ConnectivityService());
   gh.lazySingleton<NavigationService>(() => NavigationService());
   gh.lazySingleton<StorageService>(() => StorageService());

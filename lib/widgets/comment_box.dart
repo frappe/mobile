@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_html/flutter_html.dart';
-import 'package:frappe_app/app/locator.dart';
-import 'package:frappe_app/services/navigation_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../services/backend_service.dart';
+import '../app/locator.dart';
 import '../utils/config_helper.dart';
+
+import '../services/api/api.dart';
+import '../services/navigation_service.dart';
 
 class CommentBox extends StatelessWidget {
   final Map data;
@@ -28,7 +30,7 @@ class CommentBox extends StatelessWidget {
                 child: Text('Yes'),
                 onPressed: () async {
                   locator<NavigationService>().pop();
-                  BackendService.deleteComment(data["name"]);
+                  locator<Api>().deleteComment(data["name"]);
                   callback();
                 },
               ),

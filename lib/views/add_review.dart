@@ -5,8 +5,8 @@ import '../app/locator.dart';
 
 import '../datamodels/doctype_response.dart';
 
+import '../services/api/api.dart';
 import '../services/navigation_service.dart';
-import '../services/backend_service.dart';
 
 import '../utils/config_helper.dart';
 import '../utils/enums.dart';
@@ -117,7 +117,7 @@ class _AddReviewState extends State<AddReview> {
               onPressed: () async {
                 if (_fbKey.currentState.saveAndValidate()) {
                   var formValue = _fbKey.currentState.value;
-                  await BackendService.addReview(
+                  await locator<Api>().addReview(
                     widget.doctype,
                     widget.name,
                     formValue,

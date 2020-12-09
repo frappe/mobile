@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/config/frappe_palette.dart';
-import 'package:frappe_app/services/backend_service.dart';
-
 import 'package:json_table/json_table.dart';
+
+import '../../app/locator.dart';
+import '../../config/frappe_palette.dart';
+import '../../services/api/api.dart';
 
 class CustomTable extends StatelessWidget {
   final String doctype;
@@ -20,7 +21,7 @@ class CustomTable extends StatelessWidget {
       return Container();
     }
     return FutureBuilder(
-      future: BackendService.getDoctype(doctype),
+      future: locator<Api>().getDoctype(doctype),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           var colCount = 3;

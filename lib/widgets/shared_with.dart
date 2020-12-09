@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../app/locator.dart';
 import '../app/router.gr.dart';
 
+import '../services/api/api.dart';
 import '../services/navigation_service.dart';
-import '../services/backend_service.dart';
 
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
@@ -48,7 +48,7 @@ class _SharedWithState extends State<SharedWith> {
 
   void _refresh() {
     setState(() {
-      _futureVal = BackendService.getDocinfo(widget.doctype, widget.name);
+      _futureVal = locator<Api>().getDocinfo(widget.doctype, widget.name);
     });
   }
 
