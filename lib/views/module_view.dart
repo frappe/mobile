@@ -3,26 +3,23 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:frappe_app/app/router.gr.dart';
-import 'package:frappe_app/services/navigation_service.dart';
-
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
+
+import '../config/palette.dart';
+import '../datamodels/desk_sidebar_items_response.dart';
+
+import '../app/router.gr.dart';
+import '../app/locator.dart';
+
+import '../services/navigation_service.dart';
+import '../services/api/api.dart';
 
 import '../utils/cache_helper.dart';
 import '../utils/frappe_alert.dart';
 import '../utils/helpers.dart';
 import '../utils/config_helper.dart';
 import '../utils/enums.dart';
-
-import '../config/palette.dart';
-
-import 'doctype_view.dart';
-import 'activate_modules.dart';
-
-import '../datamodels/desk_sidebar_items_response.dart';
-import '../app/locator.dart';
-import '../services/api/api.dart';
 
 import '../widgets/frappe_button.dart';
 import '../widgets/card_list_tile.dart';

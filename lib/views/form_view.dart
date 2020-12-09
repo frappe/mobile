@@ -5,22 +5,21 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/app/locator.dart';
-import 'package:frappe_app/app/router.gr.dart';
-import 'package:frappe_app/config/frappe_icons.dart';
-import 'package:frappe_app/datamodels/doctype_response.dart';
-import 'package:frappe_app/screens/queue_error.dart';
-import 'package:frappe_app/services/navigation_service.dart';
-import 'package:frappe_app/utils/cache_helper.dart';
-import 'package:frappe_app/utils/frappe_icon.dart';
-import 'package:frappe_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
 
+import '../datamodels/doctype_response.dart';
 import '../config/palette.dart';
 
+import '../app/locator.dart';
+import '../app/router.gr.dart';
+
+import '../services/navigation_service.dart';
+import '../services/backend_service.dart';
+
+import '../utils/cache_helper.dart';
+import '../utils/helpers.dart';
 import '../utils/config_helper.dart';
 import '../utils/queue_helper.dart';
-import '../services/backend_service.dart';
 import '../utils/frappe_alert.dart';
 import '../utils/indicator.dart';
 import '../utils/enums.dart';
@@ -30,11 +29,6 @@ import '../widgets/frappe_button.dart';
 import '../widgets/timeline.dart';
 import '../widgets/user_avatar.dart';
 import '../widgets/like_doc.dart';
-
-import '../screens/no_internet.dart';
-import '../screens/view_docinfo.dart';
-import '../screens/email_form.dart';
-import '../screens/comment_input.dart';
 
 class FormView extends StatefulWidget {
   final String doctype;

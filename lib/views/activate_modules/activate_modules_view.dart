@@ -1,27 +1,20 @@
-import 'dart:io';
-
 import 'package:collection/collection.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../app/locator.dart';
+import 'activate_modules_viewmodel.dart';
 
-import '../services/api/api.dart';
-import '../services/navigation_service.dart';
+import '../../app/locator.dart';
+import '../../services/navigation_service.dart';
+import '../../widgets/custom_expansion_tile.dart';
 
-import '../screens/filter_list.dart';
+import '../../config/frappe_icons.dart';
+import '../../config/palette.dart';
 
-import '../widgets/custom_expansion_tile.dart';
-
-import '../config/frappe_icons.dart';
-import '../config/palette.dart';
-
-import '../utils/cache_helper.dart';
-import '../utils/config_helper.dart';
-import '../utils/enums.dart';
-import '../utils/frappe_icon.dart';
-import '../utils/helpers.dart';
+import '../../utils/config_helper.dart';
+import '../../utils/enums.dart';
+import '../../utils/frappe_icon.dart';
+import '../../utils/helpers.dart';
 
 class ActivateModules extends StatefulWidget {
   @override
@@ -37,59 +30,6 @@ class _ActivateModulesState extends State<ActivateModules> {
 
     if (ConfigHelper().activeModules != null) {
       activeModules = ConfigHelper().activeModules;
-    }
-  }
-
-  Future _getData() async {
-    var connectionStatus = Provider.of<ConnectivityStatus>(
-      context,
-    );
-    var isOnline = await verifyOnline();
-    if ((connectionStatus == null ||
-            connectionStatus == ConnectivityStatus.offline) &&
-        !isOnline) {
-      var response = await CacheHelper.getCache('DocTypeList');
-      response = response["data"];
-      if (response == null) {
-        throw Response(statusCode: HttpStatus.serviceUnavailable);
-      }
-      return response;
-    } else {
-      var meta = await locator<Api>().getDoctype('Doctype');
-      var doctypeDoc = meta.docs[0];
-      var deskSideBarItems = await locator<Api>().getDeskSideBarItems();
-      var deskModules = deskSideBarItems.message.modules;
-
-      var doctypes = await locator<Api>().fetchList(
-        fieldnames: [
-          "`tabDocType`.`name`",
-          "`tabDocType`.`module`",
-        ],
-        doctype: 'DocType',
-        meta: doctypeDoc,
-        filters: await FilterList.generateFilters(
-          'DocType',
-          {
-            "istable": 0,
-            "issingle": 0,
-          },
-        ),
-      );
-
-      doctypes.forEach((doctype) {
-        var deskModule = deskModules.firstWhere(
-          (deskModule) => doctype["module"] == deskModule.module,
-          orElse: () => null,
-        );
-
-        if (deskModule != null) {
-          doctype["module_label"] = deskModule.label;
-        } else {
-          doctype["module_label"] = doctype["module"];
-        }
-      });
-
-      return doctypes;
     }
   }
 
@@ -179,6 +119,9 @@ class _ActivateModulesState extends State<ActivateModules> {
 
   @override
   Widget build(BuildContext context) {
+    var connectionStatus = Provider.of<ConnectivityStatus>(
+      context,
+    );
     return WillPopScope(
       onWillPop: () async {
         _handleBack();
@@ -218,7 +161,7 @@ class _ActivateModulesState extends State<ActivateModules> {
           ),
         ),
         body: FutureBuilder(
-          future: _getData(),
+          future: ActivateModulesViewModel().getData(connectionStatus),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               doctypes = snapshot.data;

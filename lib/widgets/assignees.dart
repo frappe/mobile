@@ -15,7 +15,7 @@ import '../services/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
 
-import '../screens/add_assignees.dart';
+import '../views/add_assignees.dart';
 
 class Assignees extends StatefulWidget {
   final String doctype;

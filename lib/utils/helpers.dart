@@ -9,7 +9,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frappe_app/datamodels/desktop_page_response.dart';
 import 'package:frappe_app/datamodels/doctype_response.dart';
-import 'package:frappe_app/screens/no_internet.dart';
+import 'package:frappe_app/views/no_internet.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/datamodels/doctype_response.dart';
-import 'package:frappe_app/utils/helpers.dart';
-import 'package:frappe_app/widgets/reviews.dart';
-import 'package:frappe_app/widgets/shared_with.dart';
-import 'package:frappe_app/widgets/tags.dart';
 
+import '../datamodels/doctype_response.dart';
 import '../config/frappe_icons.dart';
+
+import '../utils/helpers.dart';
 import '../utils/frappe_icon.dart';
+
+import '../widgets/reviews.dart';
+import '../widgets/shared_with.dart';
+import '../widgets/tags.dart';
 import '../widgets/assignees.dart';
 import '../widgets/attachments.dart';
 

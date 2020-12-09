@@ -2,20 +2,21 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/app/router.gr.dart';
-import 'package:frappe_app/services/navigation_service.dart';
 
-import '../app/locator.dart';
-import '../services/api/api.dart';
-import '../config/palette.dart';
-import '../widgets/frappe_button.dart';
+import 'login_viewmodel.dart';
 
-import '../utils/frappe_alert.dart';
-import '../utils/cache_helper.dart';
-import '../utils/config_helper.dart';
-import '../utils/enums.dart';
-import '../utils/helpers.dart';
-import '../utils/http.dart';
+import '../../config/palette.dart';
+import '../../widgets/frappe_button.dart';
+
+import '../../app/router.gr.dart';
+import '../../app/locator.dart';
+
+import '../../services/navigation_service.dart';
+
+import '../../utils/frappe_alert.dart';
+import '../../utils/config_helper.dart';
+import '../../utils/enums.dart';
+import '../../utils/helpers.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -32,69 +33,6 @@ class _LoginState extends State<Login> {
     serverURL = ConfigHelper().baseUrl;
   }
 
-  _getData() async {
-    var savedUsr = CacheHelper.getCache('usr');
-    var savedPwd = CacheHelper.getCache('pwd');
-    savedUsr = savedUsr["data"];
-    savedPwd = savedPwd["data"];
-    return Future.value({
-      "savedUsr": savedUsr,
-      "savedPwd": savedPwd,
-    });
-  }
-
-  _authenticate(data) async {
-    await setBaseUrl(data["serverURL"]);
-
-    try {
-      var response = await locator<Api>().login(
-        data["usr"].trimRight(),
-        data["pwd"],
-      );
-
-      ConfigHelper.set('isLoggedIn', true);
-
-      FrappeAlert.successAlert(
-        title: 'Success',
-        context: context,
-      );
-
-      ConfigHelper.set(
-        'userId',
-        response.userId,
-      );
-      ConfigHelper.set(
-        'user',
-        response.fullName,
-      );
-      CacheHelper.putCache(
-        'usr',
-        data["usr"].trimRight(),
-      );
-      CacheHelper.putCache(
-        'pwd',
-        data["pwd"],
-      );
-
-      await cacheAllUsers();
-      locator<NavigationService>().pushReplacement(Routes.home);
-    } catch (e) {
-      ConfigHelper.set('isLoggedIn', false);
-      if (e.statusCode == HttpStatus.unauthorized) {
-        FrappeAlert.errorAlert(
-            title: "Not Authorized",
-            subtitle: 'Invalid Username or Password',
-            context: context);
-      } else {
-        FrappeAlert.errorAlert(
-          title: "Error",
-          subtitle: e.message,
-          context: context,
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,7 +42,7 @@ class _LoginState extends State<Login> {
         backgroundColor: Colors.white,
       ),
       body: FutureBuilder(
-        future: _getData(),
+        future: LoginViewModel().getData(),
         builder: (context, snapshot) {
           if (snapshot.hasData &&
               snapshot.connectionState == ConnectionState.done) {
@@ -175,10 +113,40 @@ class _LoginState extends State<Login> {
                                 fullWidth: true,
                                 height: 46,
                                 buttonType: ButtonType.primary,
-                                onPressed: () {
+                                onPressed: () async {
                                   if (_fbKey.currentState.saveAndValidate()) {
                                     var formValue = _fbKey.currentState.value;
-                                    _authenticate(formValue);
+
+                                    var response = await LoginViewModel().login(
+                                      formValue,
+                                    );
+
+                                    if (response["success"] == true) {
+                                      FrappeAlert.successAlert(
+                                        title: 'Success',
+                                        context: context,
+                                      );
+                                      locator<NavigationService>()
+                                          .pushReplacement(
+                                        Routes.home,
+                                      );
+                                    } else {
+                                      if (response["statusCode"] ==
+                                          HttpStatus.unauthorized) {
+                                        FrappeAlert.errorAlert(
+                                          title: "Not Authorized",
+                                          subtitle:
+                                              'Invalid Username or Password',
+                                          context: context,
+                                        );
+                                      } else {
+                                        FrappeAlert.errorAlert(
+                                          title: "Error",
+                                          subtitle: response["message"],
+                                          context: context,
+                                        );
+                                      }
+                                    }
                                   }
                                 },
                               ),

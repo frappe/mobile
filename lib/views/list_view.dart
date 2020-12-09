@@ -2,24 +2,25 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
-import 'package:frappe_app/app/locator.dart';
-import 'package:frappe_app/app/router.gr.dart';
-import 'package:frappe_app/datamodels/doctype_response.dart';
-import 'package:frappe_app/services/api/api.dart';
-import 'package:frappe_app/services/navigation_service.dart';
-import 'package:frappe_app/utils/cache_helper.dart';
-import 'package:frappe_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../datamodels/doctype_response.dart';
+
 import '../app.dart';
+import '../app/locator.dart';
+import '../app/router.gr.dart';
+
+import '../views/filter_list.dart';
+
+import '../services/api/api.dart';
+import '../services/navigation_service.dart';
 
 import '../config/palette.dart';
 import '../config/frappe_icons.dart';
 
-import '../screens/filter_list.dart';
-
-import '../services/backend_service.dart';
+import '../utils/cache_helper.dart';
+import '../utils/helpers.dart';
 import '../utils/config_helper.dart';
 import '../utils/frappe_icon.dart';
 import '../utils/enums.dart';

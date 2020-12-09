@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/app/locator.dart';
-import 'package:frappe_app/app/router.gr.dart';
-import 'package:frappe_app/services/navigation_service.dart';
 
-import '../screens/add_tags.dart';
+import '../app/locator.dart';
+import '../app/router.gr.dart';
 
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
 
+import '../services/navigation_service.dart';
 import '../services/backend_service.dart';
+
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
 

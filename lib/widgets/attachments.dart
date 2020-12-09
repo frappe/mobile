@@ -12,7 +12,7 @@ import '../services/backend_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
 import '../widgets/frappe_button.dart';
-import '../screens/file_picker.dart';
+import '../views/file_picker.dart';
 import '../widgets/card_list_tile.dart';
 
 class Attachments extends StatefulWidget {

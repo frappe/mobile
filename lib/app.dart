@@ -1,14 +1,12 @@
 import 'dart:io';
 
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:frappe_app/datamodels/doctype_response.dart';
-import 'package:frappe_app/services/api/api.dart';
-import 'app/router.gr.dart';
-
+import 'package:dio/dio.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
+import 'datamodels/doctype_response.dart';
+import 'app/router.gr.dart';
 
 import 'lifecycle_manager.dart';
 import 'app/locator.dart';
@@ -18,16 +16,16 @@ import 'utils/config_helper.dart';
 import 'utils/enums.dart';
 import 'utils/helpers.dart';
 
+import 'services/api/api.dart';
 import 'services/connectivity_service.dart';
 import 'services/navigation_service.dart';
 
-import 'screens/home.dart';
-import 'screens/filter_list.dart';
-import 'screens/form_view.dart';
-import 'screens/list_view.dart';
-import 'screens/simple_form.dart';
-import 'screens/login.dart';
-import 'screens/module_view.dart';
+import 'views/home.dart';
+import 'views/filter_list.dart';
+import 'views/form_view.dart';
+import 'views/list_view.dart';
+import 'views/simple_form.dart';
+import 'views/login/login_view.dart';
 
 class FrappeApp extends StatefulWidget {
   @override

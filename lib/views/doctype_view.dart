@@ -9,9 +9,7 @@ import 'package:provider/provider.dart';
 import '../app/locator.dart';
 import '../datamodels/desktop_page_response.dart';
 import '../services/api/api.dart';
-import '../app.dart';
 import '../config/palette.dart';
-import '../screens/activate_modules.dart';
 
 import '../utils/cache_helper.dart';
 import '../utils/enums.dart';

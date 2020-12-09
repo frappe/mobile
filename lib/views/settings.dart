@@ -3,8 +3,6 @@ import 'package:frappe_app/app/router.gr.dart';
 
 import '../services/navigation_service.dart';
 import '../config/palette.dart';
-import '../screens/queue.dart';
-import '../screens/activate_modules.dart';
 import '../app/locator.dart';
 import '../utils/helpers.dart';
 import '../widgets/card_list_tile.dart';
@@ -40,7 +38,7 @@ class SettingsPage extends StatelessWidget {
             title: Text('Logout'),
             onTap: () async {
               await clearLoginInfo();
-              locator<NavigationService>().clearAllAndNavigateTo('login');
+              locator<NavigationService>().clearAllAndNavigateTo(Routes.login);
             },
           ),
         ],

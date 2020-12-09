@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
-import 'package:frappe_app/screens/awesome_bar.dart';
+import 'package:frappe_app/views/awesome_bar.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';

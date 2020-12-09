@@ -1,22 +1,22 @@
 import 'package:auto_route/auto_route_annotations.dart';
-import 'package:frappe_app/screens/add_assignees.dart';
-import 'package:frappe_app/screens/add_review.dart';
-import 'package:frappe_app/screens/add_tags.dart';
-import 'package:frappe_app/screens/file_picker.dart';
-import 'package:frappe_app/screens/queue.dart';
-import 'package:frappe_app/screens/share.dart';
+import 'package:frappe_app/views/add_assignees.dart';
+import 'package:frappe_app/views/add_review.dart';
+import 'package:frappe_app/views/add_tags.dart';
+import 'package:frappe_app/views/file_picker.dart';
+import 'package:frappe_app/views/queue.dart';
+import 'package:frappe_app/views/share.dart';
 import 'package:frappe_app/widgets/email_box.dart';
 
-import '../screens/activate_modules.dart';
-import '../screens/comment_input.dart';
-import '../screens/doctype_view.dart';
-import '../screens/email_form.dart';
-import '../screens/home.dart';
-import '../screens/queue_error.dart';
-import '../screens/view_docinfo.dart';
-import '../screens/no_internet.dart';
-import '../screens/session_expired.dart';
-import '../screens/login.dart';
+import '../views/activate_modules/activate_modules_view.dart';
+import '../views/comment_input.dart';
+import '../views/doctype_view.dart';
+import '../views/email_form.dart';
+import '../views/home.dart';
+import '../views/queue_error.dart';
+import '../views/view_docinfo.dart';
+import '../views/no_internet.dart';
+import '../views/session_expired.dart';
+import '../views/login/login_view.dart';
 import '../app.dart';
 
 @MaterialAutoRouter(
