@@ -9,7 +9,7 @@ class AutoComplete extends StatefulWidget {
   final String value;
   final String attribute;
   final String txt;
-  final List options;
+  final String options;
   final bool showInputBorder;
   final bool allowClear;
   final Function onSuggestionSelected;
@@ -100,6 +100,7 @@ class _AutoCompleteState extends State<AutoComplete> {
               (query) async {
                 var lowercaseQuery = query.toLowerCase();
                 return widget.options
+                    .split('\n')
                     .where(
                       (option) => option.toLowerCase().contains(lowercaseQuery),
                     )

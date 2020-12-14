@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:json_table/json_table.dart';
 
+import '../../datamodels/doctype_response.dart';
 import '../../app/locator.dart';
 import '../../config/frappe_palette.dart';
 import '../../services/api/api.dart';
@@ -28,22 +29,22 @@ class CustomTable extends StatelessWidget {
           List<JsonTableColumn> columns = [];
           var numFields = [];
 
-          List metaFields = snapshot.data["docs"][0]["fields"];
+          var metaFields = (snapshot.data as DoctypeResponse).docs[0].fields;
           var tableFields = metaFields.where((field) {
-            return field["in_list_view"] == 1;
+            return field.inListView == 1;
           }).toList();
 
           tableFields.forEach(
             (item) {
               columns.add(
                 JsonTableColumn(
-                  item["fieldname"],
-                  label: item["label"],
+                  item.fieldname,
+                  label: item.label,
                 ),
               );
 
-              if (["Float", "Int"].contains(item["fieldtype"])) {
-                numFields.add(item["label"]);
+              if (["Float", "Int"].contains(item.fieldtype)) {
+                numFields.add(item.label);
               }
             },
           );

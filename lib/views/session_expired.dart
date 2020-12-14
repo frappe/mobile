@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/app/router.gr.dart';
 
 import '../app/locator.dart';
 import '../services/navigation_service.dart';
@@ -30,7 +31,7 @@ class SessionExpired extends StatelessWidget {
             buttonType: ButtonType.primary,
             title: 'Login',
             onPressed: () {
-              locator<NavigationService>().clearAllAndNavigateTo('login');
+              locator<NavigationService>().clearAllAndNavigateTo(Routes.login);
             },
           )
         ]),

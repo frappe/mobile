@@ -4,7 +4,7 @@ import 'package:frappe_app/config/palette.dart';
 
 class Select extends StatelessWidget {
   final Key key;
-  final List options;
+  final dynamic options;
   final String attribute;
   final String value;
   final bool allowClear;
@@ -27,6 +27,13 @@ class Select extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List opts;
+    if (options is String) {
+      opts = options.split('\n');
+    } else {
+      opts = options;
+    }
+
     return FormBuilderDropdown(
       key: key,
       initialValue: value,
@@ -38,7 +45,7 @@ class Select extends StatelessWidget {
         label,
       ),
       validators: validators,
-      items: options.map<DropdownMenuItem>((option) {
+      items: opts.map<DropdownMenuItem>((option) {
         return DropdownMenuItem(
           value: option,
           child: option != null

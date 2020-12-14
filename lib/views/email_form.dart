@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
 
 import '../app/locator.dart';
 
@@ -29,21 +30,22 @@ class EmailForm extends StatefulWidget {
 
 class _EmailFormState extends State<EmailForm> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-  Map wireframe;
+  DoctypeDoc meta;
 
   @override
   void initState() {
     super.initState();
-    wireframe = {
-      "doctype": "communication",
-      "fields": [
-        {
-          "fieldname": "recipients",
-          "fieldtype": "MultiSelect",
-          "label": "To",
-          "default": widget.senderField,
-          "reqd": 1
-        },
+    meta = DoctypeDoc(
+      doctype: "communication",
+      fields: [
+        DoctypeField(
+          fieldname: "recipients",
+          fieldtype: "MultiSelect",
+          label: "To",
+          defaultValue: widget.senderField,
+          reqd: 1,
+        ),
+
         // {
         //   "collapsible": 1,
         //   "fieldtype": "Section Break",
@@ -68,40 +70,41 @@ class _EmailFormState extends State<EmailForm> {
         // {
         //   "fieldtype": "Section Break",
         // },
-        {
-          "fieldname": "subject",
-          "fieldtype": "Small Text",
-          "label": "Subject",
-          "default": '${widget.doctype}: ${widget.subjectField} (${widget.doc})'
-        },
-        {
-          "fieldtype": "Text Editor",
-          "fieldname": "content",
-          "label": "Message",
-        },
-        {
-          "fieldname": "send_me_a_copy",
-          "fieldtype": "Check",
-          "default": false,
-          "label": "Send Me A Copy"
-        },
-        {
-          "fieldname": "send_read_receipt",
-          "fieldtype": "Check",
-          "default": false,
-          "label": "Send Read Receipt"
-        },
-        {
-          "fieldname": "attach_document_print",
-          "fieldtype": "Check",
-          "default": false,
-          "label": "Attach Document Print"
-        },
+        DoctypeField(
+          fieldname: "subject",
+          fieldtype: "Small Text",
+          label: "Subject",
+          defaultValue:
+              '${widget.doctype}: ${widget.subjectField} (${widget.doc})',
+        ),
+        DoctypeField(
+          fieldtype: "Text Editor",
+          fieldname: "content",
+          label: "Message",
+        ),
+        DoctypeField(
+          fieldname: "send_me_a_copy",
+          fieldtype: "Check",
+          defaultValue: false,
+          label: "Send Me A Copy",
+        ),
+        DoctypeField(
+          fieldname: "send_read_receipt",
+          fieldtype: "Check",
+          defaultValue: false,
+          label: "Send Read Receipt",
+        ),
+        DoctypeField(
+          fieldname: "attach_document_print",
+          fieldtype: "Check",
+          defaultValue: false,
+          label: "Attach Document Print",
+        ),
         // {"label":"Select Attachments",
         // "fieldtype":"HTML",
         // 			"fieldname":"select_attachments"}
-      ]
-    };
+      ],
+    );
   }
 
   @override
@@ -137,7 +140,7 @@ class _EmailFormState extends State<EmailForm> {
           key: _fbKey,
           child: ListView(
             children: generateLayout(
-                fields: wireframe["fields"],
+                fields: meta.fields,
                 viewType: ViewType.newForm,
                 withLabel: false),
           ),

@@ -294,6 +294,7 @@ class DoctypeField {
   int hideBorder;
   int hideDays;
   int hideSeconds;
+  dynamic defaultValue;
 
   DoctypeField(
       {this.doctype,
@@ -344,7 +345,8 @@ class DoctypeField {
       this.ignoreXssFilter,
       this.hideBorder,
       this.hideDays,
-      this.hideSeconds});
+      this.hideSeconds,
+      this.defaultValue});
 
   DoctypeField.fromJson(Map<String, dynamic> json) {
     doctype = json['doctype'];
@@ -396,6 +398,7 @@ class DoctypeField {
     hideBorder = json['hide_border'];
     hideDays = json['hide_days'];
     hideSeconds = json['hide_seconds'];
+    defaultValue = json['default'];
   }
 
   Map<String, dynamic> toJson() {
@@ -449,6 +452,7 @@ class DoctypeField {
     data['hide_border'] = this.hideBorder;
     data['hide_days'] = this.hideDays;
     data['hide_seconds'] = this.hideSeconds;
+    data['default'] = this.defaultValue;
     return data;
   }
 }

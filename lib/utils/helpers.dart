@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:frappe_app/app/router.gr.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -126,8 +127,9 @@ void showSnackBar(String txt, context) {
 }
 
 List<Widget> generateLayout({
-  @required List fields,
+  @required List<DoctypeField> fields,
   @required ViewType viewType,
+  Map doc,
   bool editMode = true,
   bool withLabel = true,
   Function onChanged,
@@ -146,7 +148,9 @@ List<Widget> generateLayout({
   int sIdx = 0;
 
   fields.forEach((field) {
-    var val = field["_current_val"] ?? field["default"];
+    var val = doc != null
+        ? doc[field.fieldname] ?? field.defaultValue
+        : field.defaultValue;
 
     if (val == '__user') {
       val = ConfigHelper().userId;
@@ -158,7 +162,7 @@ List<Widget> generateLayout({
       }
     }
 
-    if (field["fieldtype"] == "Section Break") {
+    if (field.fieldtype == "Section Break") {
       if (sections.length > 0) {
         var sectionVisibility = sections.any((element) {
           if (element is Visibility) {
@@ -221,15 +225,14 @@ List<Widget> generateLayout({
         collapsibles.clear();
       }
 
-      if (field["collapsible"] == 1) {
+      if (field.collapsible == 1) {
         isSection = false;
         isCollapsible = true;
-        collapsibleLabels.add(field["label"]);
+        collapsibleLabels.add(field.label);
       } else {
         isCollapsible = false;
         isSection = true;
-        sectionLabels
-            .add(field["label"] != null ? field["label"].toUpperCase() : '');
+        sectionLabels.add(field.label != null ? field.label.toUpperCase() : '');
       }
     } else if (isCollapsible) {
       if (viewType == ViewType.form) {
@@ -248,6 +251,7 @@ List<Widget> generateLayout({
       } else {
         collapsibles.add(
           makeControl(
+            doc: doc,
             field: field,
             value: val,
             withLabel: withLabel,
@@ -262,6 +266,7 @@ List<Widget> generateLayout({
           Visibility(
             visible: editMode ? true : val != null && val != '',
             child: makeControl(
+              doc: doc,
               field: field,
               value: val,
               withLabel: withLabel,
@@ -274,6 +279,7 @@ List<Widget> generateLayout({
         sections.add(
           makeControl(
             field: field,
+            doc: doc,
             value: val,
             withLabel: withLabel,
             editMode: editMode,
@@ -287,6 +293,7 @@ List<Widget> generateLayout({
           Visibility(
             visible: editMode ? true : val != null && val != '',
             child: makeControl(
+              doc: doc,
               field: field,
               value: val,
               withLabel: withLabel,
@@ -300,6 +307,7 @@ List<Widget> generateLayout({
           makeControl(
             field: field,
             value: val,
+            doc: doc,
             withLabel: withLabel,
             editMode: editMode,
             onChanged: onChanged,
@@ -424,7 +432,7 @@ clearLoginInfo() async {
 
 handle403() async {
   await clearLoginInfo();
-  locator<NavigationService>().clearAllAndNavigateTo('session_expired');
+  locator<NavigationService>().clearAllAndNavigateTo(Routes.sessionExpired);
 }
 
 handleError(Response error, [bool hideAppBar = false]) {
