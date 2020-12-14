@@ -52,7 +52,7 @@ class CustomForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FormBuilder(
-      readOnly: editMode ? false : true,
+      enabled: editMode ? false : true,
       key: formKey,
       child: Container(
         color: Colors.white,

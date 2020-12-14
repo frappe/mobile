@@ -26,12 +26,12 @@ class SmallText extends StatelessWidget {
     return FormBuilderTextField(
       key: key,
       initialValue: value,
-      attribute: attribute,
+      name: attribute,
       decoration: Palette.formFieldDecoration(
         withLabel,
         label,
       ),
-      validators: validators,
+      validator: FormBuilderValidators.compose(validators),
     );
   }
 }

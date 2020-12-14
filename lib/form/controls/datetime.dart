@@ -32,9 +32,9 @@ class DatetimeField extends StatelessWidget {
       resetIcon: editMode ? Icon(Icons.close) : null,
       initialTime: null,
       initialValue: parseDate(value),
-      attribute: attribute,
+      name: attribute,
       decoration: Palette.formFieldDecoration(withLabel, label),
-      validators: validators,
+      validator: FormBuilderValidators.compose(validators),
     );
   }
 }

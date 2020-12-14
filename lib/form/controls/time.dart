@@ -31,12 +31,12 @@ class Time extends StatelessWidget {
         return val != null ? val.toIso8601String() : null;
       },
       keyboardType: TextInputType.number,
-      attribute: attribute,
+      name: attribute,
       decoration: Palette.formFieldDecoration(
         withLabel,
         label,
       ),
-      validators: validators,
+      validator: FormBuilderValidators.compose(validators),
     );
   }
 }

@@ -25,17 +25,15 @@ class Data extends StatelessWidget with Control, ControlInput {
     List<String Function(dynamic)> validators = [];
 
     validators.add(
-      setMandatory(
-        doctypeField,
-      ),
+      setMandatory(doctypeField, context),
     );
 
     return FormBuilderTextField(
       key: key,
       initialValue: doc != null ? doc[doctypeField.fieldname] : null,
-      attribute: doctypeField.fieldname,
+      name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(withLabel, doctypeField.label),
-      validators: validators,
+      validator: FormBuilderValidators.compose(validators),
     );
   }
 }

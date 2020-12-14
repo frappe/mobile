@@ -68,7 +68,6 @@ class _CustomFormBuilderCheckboxState extends State<CustomFormBuilderCheckbox> {
   @override
   void initState() {
     _formState = FormBuilder.of(context);
-    _formState?.registerFieldKey(widget.attribute, _fieldKey);
     _initialValue = widget.initialValue ??
         ((_formState?.initialValue?.containsKey(widget.attribute) ?? false)
             ? _formState.initialValue[widget.attribute]
@@ -78,7 +77,6 @@ class _CustomFormBuilderCheckboxState extends State<CustomFormBuilderCheckbox> {
 
   @override
   void dispose() {
-    _formState?.unregisterFieldKey(widget.attribute);
     super.dispose();
   }
 
@@ -117,22 +115,16 @@ class _CustomFormBuilderCheckboxState extends State<CustomFormBuilderCheckbox> {
 
   @override
   Widget build(BuildContext context) {
-    _readOnly = _formState?.readOnly == true || widget.readOnly;
-
+    // TODO
     return FormField(
       key: _fieldKey,
       enabled: !_readOnly,
       initialValue: _initialValue,
-      validator: (val) =>
-          FormBuilderValidators.validateValidators(val, widget.validators),
       onSaved: (val) {
         var transformed;
         if (widget.valueTransformer != null) {
           transformed = widget.valueTransformer(val);
-          _formState?.setAttributeValue(widget.attribute, transformed);
-        } else {
-          _formState?.setAttributeValue(widget.attribute, val);
-        }
+        } else {}
         widget.onSaved?.call(transformed ?? val);
       },
       builder: (FormFieldState<dynamic> field) {

@@ -72,7 +72,7 @@ class _LinkFieldState extends State<LinkField> {
           onChanged: (_) {
             setState(() {});
           },
-          validators: widget.validators,
+          validator: FormBuilderValidators.compose(widget.validators),
           decoration: InputDecoration(
             filled: true,
             prefixIcon: widget.prefixIcon,
@@ -98,7 +98,7 @@ class _LinkFieldState extends State<LinkField> {
             }
             return item;
           },
-          attribute: widget.attribute,
+          name: widget.attribute,
           itemBuilder: widget.itemBuilder ??
               (context, item) {
                 return ListTile(

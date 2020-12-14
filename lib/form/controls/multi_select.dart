@@ -37,7 +37,7 @@ class _MultiSelectState extends State<MultiSelect> {
         enabledBorder: InputBorder.none,
         hintText: widget.hint,
       ),
-      attribute: widget.attribute,
+      name: widget.attribute,
       initialValue: widget.val,
       findSuggestions: (String query) async {
         if (query.length != 0) {

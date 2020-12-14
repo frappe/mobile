@@ -27,12 +27,12 @@ class Float extends StatelessWidget {
       key: key,
       initialValue: value != null ? value.toString() : null,
       keyboardType: TextInputType.number,
-      attribute: attribute,
+      name: attribute,
       decoration: Palette.formFieldDecoration(
         withLabel,
         label,
       ),
-      validators: validators,
+      validator: FormBuilderValidators.compose(validators),
     );
   }
 }

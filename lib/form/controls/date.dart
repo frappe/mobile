@@ -32,12 +32,12 @@ class Date extends StatelessWidget {
       },
       initialValue: parseDate(value),
       keyboardType: TextInputType.number,
-      attribute: attribute,
+      name: attribute,
       decoration: Palette.formFieldDecoration(
         withLabel,
         label,
       ),
-      validators: validators,
+      validator: FormBuilderValidators.compose(validators),
     );
   }
 }

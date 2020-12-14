@@ -77,12 +77,12 @@ class _LoginState extends State<Login> {
                               ),
                               buildDecoratedWidget(
                                 FormBuilderTextField(
-                                  attribute: 'serverURL',
+                                  name: 'serverURL',
                                   initialValue: serverURL,
-                                  validators: [
-                                    FormBuilderValidators.required(),
-                                    FormBuilderValidators.url()
-                                  ],
+                                  validator: FormBuilderValidators.compose([
+                                    FormBuilderValidators.required(context),
+                                    FormBuilderValidators.url(context),
+                                  ]),
                                   decoration: Palette.formFieldDecoration(
                                     true,
                                     "Server URL",
@@ -93,11 +93,11 @@ class _LoginState extends State<Login> {
                               ),
                               buildDecoratedWidget(
                                   FormBuilderTextField(
-                                    attribute: 'usr',
+                                    name: 'usr',
                                     initialValue: snapshot.data["savedUsr"],
-                                    validators: [
-                                      FormBuilderValidators.required(),
-                                    ],
+                                    validator: FormBuilderValidators.compose([
+                                      FormBuilderValidators.required(context),
+                                    ]),
                                     decoration: Palette.formFieldDecoration(
                                       true,
                                       "Email Address",
@@ -189,11 +189,11 @@ class _PasswordFieldState extends State<PasswordField> {
     return buildDecoratedWidget(
         FormBuilderTextField(
           maxLines: 1,
-          attribute: 'pwd',
+          name: 'pwd',
           initialValue: widget.savedPassword,
-          validators: [
-            FormBuilderValidators.required(),
-          ],
+          validator: FormBuilderValidators.compose([
+            FormBuilderValidators.required(context),
+          ]),
           obscureText: _hidePassword,
           decoration: Palette.formFieldDecoration(
             true,

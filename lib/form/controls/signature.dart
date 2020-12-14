@@ -30,8 +30,8 @@ class Signature extends StatelessWidget {
         withLabel,
         label,
       ),
-      attribute: attribute,
-      validators: validators,
+      name: attribute,
+      validator: FormBuilderValidators.compose(validators),
     );
   }
 }

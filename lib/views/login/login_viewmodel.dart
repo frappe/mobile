@@ -48,10 +48,10 @@ class LoginViewModel {
         data["usr"].trimRight(),
         data["pwd"],
       );
-      await cacheAllUsers();
-
       updateConfig(response);
       cacheCreds(data);
+      await cacheAllUsers();
+
       return {
         "success": true,
         "message": "Success",

@@ -25,12 +25,12 @@ class TextEditor extends StatelessWidget {
       key: key,
       maxLines: 10,
       initialValue: value,
-      attribute: attribute,
+      name: attribute,
       decoration: Palette.formFieldDecoration(
         withLabel,
         label,
       ),
-      validators: validators,
+      validator: FormBuilderValidators.compose(validators),
     );
   }
 }

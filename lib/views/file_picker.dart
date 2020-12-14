@@ -36,7 +36,7 @@ class _FilePickerState extends State<CustomFilePicker> {
 
   void _openFileExplorer() async {
     try {
-      _files = await FilePicker.getMultiFile(
+      _files = await FilePicker.platform.pickFiles(
             type: FileType.any,
           ) ??
           [];

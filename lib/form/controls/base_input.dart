@@ -1,11 +1,15 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import '../../datamodels/doctype_response.dart';
 
 class ControlInput {
-  String Function(dynamic) setMandatory(DoctypeField doctypeField) {
+  String Function(dynamic) setMandatory(
+    DoctypeField doctypeField,
+    BuildContext context,
+  ) {
     if (doctypeField.reqd == 1) {
-      return FormBuilderValidators.required();
+      return FormBuilderValidators.required(context);
     } else {
       return null;
     }

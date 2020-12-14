@@ -64,7 +64,7 @@ class _AutoCompleteState extends State<AutoComplete> {
           onChanged: (_) {
             setState(() {});
           },
-          validators: widget.validators,
+          validator: FormBuilderValidators.compose(widget.validators),
           decoration: InputDecoration(
             filled: true,
             prefixIcon: widget.prefixIcon,
@@ -86,7 +86,7 @@ class _AutoCompleteState extends State<AutoComplete> {
               (item) {
                 return item.toString();
               },
-          attribute: widget.attribute,
+          name: widget.attribute,
           itemBuilder: widget.itemBuilder ??
               (context, item) {
                 return ListTile(

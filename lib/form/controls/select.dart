@@ -38,13 +38,13 @@ class Select extends StatelessWidget {
       key: key,
       initialValue: value,
       allowClear: allowClear,
-      attribute: attribute,
+      name: attribute,
       hint: hint != null ? Text(hint) : null,
       decoration: Palette.formFieldDecoration(
         withLabel,
         label,
       ),
-      validators: validators,
+      validator: FormBuilderValidators.compose(validators),
       items: opts.map<DropdownMenuItem>((option) {
         return DropdownMenuItem(
           value: option,

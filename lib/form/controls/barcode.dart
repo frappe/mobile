@@ -43,7 +43,6 @@ class _FormBuilderBarcodeState extends State<FormBuilderBarcode> {
   void initState() {
     _savedValue = widget.initialValue;
     _formState = FormBuilder.of(context);
-    _formState?.registerFieldKey(widget.attribute, _fieldKey);
 
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus) {
@@ -63,7 +62,6 @@ class _FormBuilderBarcodeState extends State<FormBuilderBarcode> {
 
   @override
   void dispose() {
-    _formState?.unregisterFieldKey(widget.attribute);
     _textEditingController.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -78,19 +76,12 @@ class _FormBuilderBarcodeState extends State<FormBuilderBarcode> {
       key: _fieldKey,
       enabled: !_readOnly,
       initialValue: _initialValue,
-      validator: (val) {
-        if (_savedValue != null && val == null) return null;
-        return FormBuilderValidators.validateValidators(val, widget.validators);
-      },
       onSaved: (val) {
         if (_savedValue != null && val == null) return;
         var transformed;
         if (widget.valueTransformer != null) {
           transformed = widget.valueTransformer(val);
-          _formState?.setAttributeValue(widget.attribute, transformed);
-        } else {
-          _formState?.setAttributeValue(widget.attribute, "svgVal");
-        }
+        } else {}
         setState(() {
           _savedValue = transformed ?? val;
         });
