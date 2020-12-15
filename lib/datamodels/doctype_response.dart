@@ -260,7 +260,7 @@ class DoctypeField {
   String label;
   String fieldtype;
   String oldfieldtype;
-  String options;
+  dynamic options;
   int searchIndex;
   int hidden;
   int setOnlyOnce;

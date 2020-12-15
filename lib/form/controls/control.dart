@@ -32,7 +32,6 @@ Widget makeControl({
   Function onChanged,
 }) {
   Widget fieldWidget;
-  List<String Function(dynamic)> validators = [];
 
   switch (field.fieldtype) {
     case "Link":
@@ -40,14 +39,10 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
             LinkField(
               key: Key(value),
+              doctypeField: field,
+              doc: doc,
               fillColor: Palette.fieldBgColor,
               allowClear: editMode,
-              validators: validators,
-              attribute: field.fieldname,
-              doctype: field.options,
-              hint: !withLabel ? field.label : null,
-              // refDoctype: field.ref,
-              value: value,
             ),
             withLabel,
             field.label);
@@ -61,11 +56,8 @@ Widget makeControl({
             key: Key(value),
             fillColor: Palette.fieldBgColor,
             allowClear: editMode,
-            validators: validators,
-            attribute: field.fieldname,
-            options: field.options,
-            hint: !withLabel ? field.label : null,
-            value: value,
+            doctypeField: field,
+            doc: doc,
           ),
           withLabel,
           field.label,
@@ -77,8 +69,8 @@ Widget makeControl({
       {
         fieldWidget = buildDecoratedWidget(
           CustomTable(
-            doctype: field.options,
-            items: value,
+            doctypeField: field,
+            doc: doc,
           ),
           withLabel,
           field.label,
@@ -91,11 +83,9 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
             Select(
               key: Key(value),
-              value: value,
               allowClear: editMode,
-              attribute: field.fieldname,
-              validators: validators,
-              options: field.options,
+              doc: doc,
+              doctypeField: field,
               withLabel: withLabel,
             ),
             withLabel,
@@ -116,9 +106,8 @@ Widget makeControl({
 
         fieldWidget = buildDecoratedWidget(
           MultiSelect(
-            attribute: field.fieldname,
-            hint: field.label,
-            val: value != null ? value : [],
+            doctypeField: field,
+            doc: doc,
           ),
           withLabel,
           field.label,
@@ -131,10 +120,9 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
           SmallText(
             key: Key(value),
-            value: value,
-            attribute: field.fieldname,
+            doctypeField: field,
+            doc: doc,
             withLabel: withLabel,
-            validators: validators,
           ),
           withLabel,
           field.label,
@@ -161,11 +149,9 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
             Check(
               key: UniqueKey(),
-              value: value == 1,
+              doctypeField: field,
+              doc: doc,
               onChanged: onChanged,
-              attribute: field.fieldname,
-              label: field.label,
-              validators: validators,
               withLabel: withLabel,
             ),
             false);
@@ -176,9 +162,8 @@ Widget makeControl({
       {
         fieldWidget = buildDecoratedWidget(
           TextEditor(
-            value: value,
-            attribute: field.fieldname,
-            validators: validators,
+            doctypeField: field,
+            doc: doc,
             withLabel: withLabel,
           ),
           withLabel,
@@ -192,9 +177,8 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
           DatetimeField(
             key: Key(value),
-            value: value,
-            attribute: field.fieldname,
-            validators: validators,
+            doctypeField: field,
+            doc: doc,
             withLabel: withLabel,
             editMode: editMode,
           ),
@@ -209,9 +193,8 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
           Float(
             key: Key(value.toString()),
-            value: value,
-            attribute: field.fieldname,
-            validators: validators,
+            doctypeField: field,
+            doc: doc,
             withLabel: withLabel,
           ),
           withLabel,
@@ -225,9 +208,8 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
           Int(
             key: Key(value.toString()),
-            value: value,
-            attribute: field.fieldname,
-            validators: validators,
+            doctypeField: field,
+            doc: doc,
             withLabel: withLabel,
           ),
           withLabel,
@@ -241,9 +223,8 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
           Time(
             key: Key(value),
-            value: value,
-            attribute: field.fieldname,
-            validators: validators,
+            doctypeField: field,
+            doc: doc,
             withLabel: withLabel,
           ),
           withLabel,
@@ -257,9 +238,8 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
           Date(
             key: Key(value),
-            value: value,
-            attribute: field.fieldname,
-            validators: validators,
+            doctypeField: field,
+            doc: doc,
             withLabel: withLabel,
           ),
           withLabel,
@@ -273,9 +253,8 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
           customSignature.Signature(
             key: Key(value),
-            value: value,
-            attribute: field.fieldname,
-            validators: validators,
+            doc: doc,
+            doctypeField: field,
             withLabel: withLabel,
           ),
           withLabel,
@@ -289,9 +268,8 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
           FormBuilderBarcode(
             key: Key(value),
-            initialValue: value,
-            attribute: field.fieldname,
-            validators: validators,
+            doctypeField: field,
+            doc: doc,
           ),
           withLabel,
           field.label,

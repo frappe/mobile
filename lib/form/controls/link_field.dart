@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 
+import '../../datamodels/doctype_response.dart';
 import '../../app/locator.dart';
 import '../../services/api/api.dart';
 
@@ -9,38 +10,34 @@ import '../../utils/helpers.dart';
 import '../../utils/cache_helper.dart';
 import '../../utils/enums.dart';
 
+import 'base_control.dart';
+import 'base_input.dart';
+
 class LinkField extends StatefulWidget {
-  final String hint;
-  final String value;
-  final String attribute;
-  final String doctype;
-  final String refDoctype;
-  final String txt;
+  final DoctypeField doctypeField;
+  final Map doc;
+
+  final key;
   final bool showInputBorder;
   final bool allowClear;
   final Function onSuggestionSelected;
   final Icon prefixIcon;
   final Color fillColor;
-  final key;
   final ItemBuilder itemBuilder;
   final SuggestionsCallback suggestionsCallback;
 
   final List<String Function(dynamic)> validators;
 
   LinkField({
-    @required this.hint,
-    @required this.fillColor,
-    @required this.doctype,
-    this.refDoctype,
-    this.prefixIcon,
     this.key,
+    @required this.doctypeField,
+    @required this.fillColor,
+    this.doc,
+    this.prefixIcon,
     this.allowClear = true,
     this.onSuggestionSelected,
-    this.txt,
     this.validators,
     this.showInputBorder = false,
-    this.attribute,
-    this.value,
     this.itemBuilder,
     this.suggestionsCallback,
   });
@@ -49,11 +46,17 @@ class LinkField extends StatefulWidget {
   _LinkFieldState createState() => _LinkFieldState();
 }
 
-class _LinkFieldState extends State<LinkField> {
+class _LinkFieldState extends State<LinkField> with Control, ControlInput {
   final TextEditingController _typeAheadController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    List<String Function(dynamic)> validators = [];
+
+    validators.add(
+      setMandatory(widget.doctypeField, context),
+    );
+
     var connectionStatus = Provider.of<ConnectivityStatus>(
       context,
     );
@@ -72,7 +75,7 @@ class _LinkFieldState extends State<LinkField> {
           onChanged: (_) {
             setState(() {});
           },
-          validator: FormBuilderValidators.compose(widget.validators),
+          validator: FormBuilderValidators.compose(validators),
           decoration: InputDecoration(
             filled: true,
             prefixIcon: widget.prefixIcon,
@@ -88,7 +91,7 @@ class _LinkFieldState extends State<LinkField> {
                 : null,
             fillColor: widget.fillColor,
             enabledBorder: !widget.showInputBorder ? InputBorder.none : null,
-            hintText: widget.hint,
+            hintText: widget.doctypeField.label,
           ),
           selectionToTextTransformer: (item) {
             if (item != null) {
@@ -98,7 +101,7 @@ class _LinkFieldState extends State<LinkField> {
             }
             return item;
           },
-          name: widget.attribute,
+          name: widget.doctypeField.fieldname,
           itemBuilder: widget.itemBuilder ??
               (context, item) {
                 return ListTile(
@@ -107,7 +110,7 @@ class _LinkFieldState extends State<LinkField> {
                   ),
                 );
               },
-          initialValue: widget.value,
+          initialValue: widget.doc[widget.doctypeField.fieldname],
           suggestionsCallback: widget.suggestionsCallback ??
               (query) async {
                 var lowercaseQuery = query.toLowerCase();
@@ -115,8 +118,8 @@ class _LinkFieldState extends State<LinkField> {
                 if ((connectionStatus == null ||
                         connectionStatus == ConnectivityStatus.offline) &&
                     !isOnline) {
-                  var linkFull =
-                      await CacheHelper.getCache('${widget.doctype}LinkFull');
+                  var linkFull = await CacheHelper.getCache(
+                      '${widget.doctypeField.options}LinkFull');
                   linkFull = linkFull["data"];
 
                   if (linkFull != null) {
@@ -129,7 +132,7 @@ class _LinkFieldState extends State<LinkField> {
                     ).toList();
                   } else {
                     var queryLink = await CacheHelper.getCache(
-                        '$lowercaseQuery${widget.doctype}Link');
+                        '$lowercaseQuery${widget.doctypeField.options}Link');
                     queryLink = queryLink["data"];
 
                     if (queryLink != null) {
@@ -140,8 +143,7 @@ class _LinkFieldState extends State<LinkField> {
                   }
                 } else {
                   var response = await locator<Api>().searchLink(
-                    doctype: widget.doctype,
-                    refDoctype: widget.refDoctype,
+                    doctype: widget.doctypeField.options,
                     txt: lowercaseQuery,
                   );
 

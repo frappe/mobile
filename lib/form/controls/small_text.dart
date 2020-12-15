@@ -1,35 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
 
-class SmallText extends StatelessWidget {
+import 'base_control.dart';
+import 'base_input.dart';
+
+class SmallText extends StatelessWidget with Control, ControlInput {
   final Key key;
-  final String attribute;
-  final String value;
+  final DoctypeField doctypeField;
+  final Map doc;
+
   final bool withLabel;
-  final String hint;
-  final List<String Function(dynamic)> validators;
-  final String label;
 
   const SmallText({
     this.key,
-    this.attribute,
-    this.value,
-    this.hint,
-    this.validators,
-    this.label,
+    @required this.doctypeField,
+    this.doc,
     this.withLabel,
   });
 
   @override
   Widget build(BuildContext context) {
+    List<String Function(dynamic)> validators = [];
+
+    validators.add(
+      setMandatory(doctypeField, context),
+    );
     return FormBuilderTextField(
       key: key,
-      initialValue: value,
-      name: attribute,
+      initialValue: doc[doctypeField.fieldname],
+      name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(
         withLabel,
-        label,
+        doctypeField.label,
       ),
       validator: FormBuilderValidators.compose(validators),
     );

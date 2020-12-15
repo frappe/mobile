@@ -1,29 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/config/palette.dart';
-import 'package:frappe_app/utils/helpers.dart';
 
-class DatetimeField extends StatelessWidget {
+import '../../config/palette.dart';
+import '../../datamodels/doctype_response.dart';
+import '../../utils/helpers.dart';
+
+import 'base_control.dart';
+import 'base_input.dart';
+
+class DatetimeField extends StatelessWidget with Control, ControlInput {
   final Key key;
-  final String attribute;
-  final String value;
+  final Map doc;
+  final DoctypeField doctypeField;
   final bool withLabel;
-  final List<String Function(dynamic)> validators;
-  final String label;
   final bool editMode;
 
   const DatetimeField({
     this.key,
-    this.attribute,
-    this.value,
-    this.validators,
-    this.label,
+    @required this.doctypeField,
+    this.doc,
     this.withLabel,
     this.editMode,
   });
 
   @override
   Widget build(BuildContext context) {
+    List<String Function(dynamic)> validators = [];
+
+    validators.add(
+      setMandatory(doctypeField, context),
+    );
+
     return FormBuilderDateTimePicker(
       key: key,
       valueTransformer: (val) {
@@ -31,9 +38,9 @@ class DatetimeField extends StatelessWidget {
       },
       resetIcon: editMode ? Icon(Icons.close) : null,
       initialTime: null,
-      initialValue: parseDate(value),
-      name: attribute,
-      decoration: Palette.formFieldDecoration(withLabel, label),
+      initialValue: parseDate(doc[doctypeField.fieldname]),
+      name: doctypeField.fieldname,
+      decoration: Palette.formFieldDecoration(withLabel, doctypeField.label),
       validator: FormBuilderValidators.compose(validators),
     );
   }

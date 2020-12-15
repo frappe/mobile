@@ -14,9 +14,9 @@ class Data extends StatelessWidget with Control, ControlInput {
   final Map doc;
 
   const Data({
+    @required this.doctypeField,
     this.key,
     this.withLabel,
-    this.doctypeField,
     this.doc,
   });
 

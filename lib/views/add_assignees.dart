@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
+import '../datamodels/doctype_response.dart';
 import '../app/locator.dart';
 import '../config/palette.dart';
 import '../form/controls/link_field.dart';
@@ -91,9 +92,10 @@ class _AddAssigneesState extends State<AddAssignees> {
                 key: UniqueKey(),
                 prefixIcon: Icon(Icons.search),
                 fillColor: Colors.white,
-                doctype: 'User',
-                refDoctype: 'Issue',
-                hint: 'Assign To',
+                doctypeField: DoctypeField(
+                  options: 'User',
+                  label: 'Assign To',
+                ),
                 onSuggestionSelected: (item) {
                   newAssignees.add(item["value"]);
                   selectedUser = null;

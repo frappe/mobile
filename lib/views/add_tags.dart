@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
 
 import '../app/locator.dart';
 import '../form/controls/autocomplete.dart';
@@ -84,7 +85,7 @@ class _AddTagsState extends State<AddTags> {
                   key: UniqueKey(),
                   prefixIcon: Icon(Icons.search),
                   fillColor: Colors.white,
-                  hint: 'Add a tag ...',
+                  doctypeField: DoctypeField(label: 'Add a tag ...'),
                   onSuggestionSelected: (item) async {
                     if (item != "") {
                       var addedTag = await locator<Api>().addTag(

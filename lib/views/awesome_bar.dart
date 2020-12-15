@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
 
 import '../services/navigation_service.dart';
 import '../form/controls/autocomplete.dart';
@@ -69,7 +70,7 @@ class _AwesomeBarState extends State<AwesomeBar> {
         child: Column(
           children: [
             AutoComplete(
-              hint: "Search",
+              doctypeField: DoctypeField(label: "Search"),
               fillColor: Palette.fieldBgColor,
               itemBuilder: (context, item) {
                 return ListTile(

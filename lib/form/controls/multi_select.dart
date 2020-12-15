@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
+import '../../datamodels/doctype_response.dart';
 import '../../app/locator.dart';
 import '../../config/palette.dart';
 import '../../services/api/api.dart';
 
+import 'base_input.dart';
+import 'base_control.dart';
+
 class MultiSelect extends StatefulWidget {
-  final String hint;
-  final String attribute;
-  final List val;
+  final DoctypeField doctypeField;
+  final Map doc;
 
   MultiSelect({
-    @required this.attribute,
-    @required this.hint,
-    this.val,
+    @required this.doctypeField,
+    this.doc,
   });
   @override
   _MultiSelectState createState() => _MultiSelectState();
 }
 
-class _MultiSelectState extends State<MultiSelect> {
+class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
   @override
   Widget build(BuildContext context) {
     return FormBuilderChipsInput(
@@ -35,10 +37,10 @@ class _MultiSelectState extends State<MultiSelect> {
         filled: true,
         fillColor: Palette.fieldBgColor,
         enabledBorder: InputBorder.none,
-        hintText: widget.hint,
+        hintText: widget.doctypeField.label,
       ),
-      name: widget.attribute,
-      initialValue: widget.val,
+      name: widget.doctypeField.fieldname,
+      initialValue: widget.doc[widget.doctypeField.fieldname],
       findSuggestions: (String query) async {
         if (query.length != 0) {
           var lowercaseQuery = query.toLowerCase();

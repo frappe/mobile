@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
+import '../../datamodels/doctype_response.dart';
+
+import 'base_control.dart';
+import 'base_input.dart';
+
 typedef String SelectionToTextTransformer<T>(T selection);
 
 class AutoComplete extends StatefulWidget {
-  final String hint;
-  final String value;
-  final String attribute;
-  final String txt;
-  final String options;
+  final DoctypeField doctypeField;
+  final Map doc;
+
   final bool showInputBorder;
   final bool allowClear;
   final Function onSuggestionSelected;
@@ -20,21 +23,15 @@ class AutoComplete extends StatefulWidget {
   final SuggestionsCallback suggestionsCallback;
   final SelectionToTextTransformer selectionToTextTransformer;
 
-  final List<String Function(dynamic)> validators;
-
   AutoComplete({
-    @required this.hint,
+    @required this.doctypeField,
     @required this.fillColor,
+    this.doc,
     this.prefixIcon,
     this.key,
     this.allowClear = true,
     this.onSuggestionSelected,
-    this.txt,
-    this.options,
-    this.validators,
     this.showInputBorder = false,
-    this.attribute,
-    this.value,
     this.itemBuilder,
     this.suggestionsCallback,
     this.selectionToTextTransformer,
@@ -44,11 +41,18 @@ class AutoComplete extends StatefulWidget {
   _AutoCompleteState createState() => _AutoCompleteState();
 }
 
-class _AutoCompleteState extends State<AutoComplete> {
+class _AutoCompleteState extends State<AutoComplete>
+    with Control, ControlInput {
   final TextEditingController _typeAheadController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    List<String Function(dynamic)> validators = [];
+
+    validators.add(
+      setMandatory(widget.doctypeField, context),
+    );
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Theme(
@@ -64,7 +68,7 @@ class _AutoCompleteState extends State<AutoComplete> {
           onChanged: (_) {
             setState(() {});
           },
-          validator: FormBuilderValidators.compose(widget.validators),
+          validator: FormBuilderValidators.compose(validators),
           decoration: InputDecoration(
             filled: true,
             prefixIcon: widget.prefixIcon,
@@ -80,13 +84,13 @@ class _AutoCompleteState extends State<AutoComplete> {
                 : null,
             fillColor: widget.fillColor,
             enabledBorder: !widget.showInputBorder ? InputBorder.none : null,
-            hintText: widget.hint,
+            hintText: widget.doctypeField.label,
           ),
           selectionToTextTransformer: widget.selectionToTextTransformer ??
               (item) {
                 return item.toString();
               },
-          name: widget.attribute,
+          name: widget.doctypeField.fieldname,
           itemBuilder: widget.itemBuilder ??
               (context, item) {
                 return ListTile(
@@ -95,11 +99,11 @@ class _AutoCompleteState extends State<AutoComplete> {
                   ),
                 );
               },
-          initialValue: widget.value,
+          initialValue: widget.doc[widget.doctypeField.fieldname],
           suggestionsCallback: widget.suggestionsCallback ??
               (query) async {
                 var lowercaseQuery = query.toLowerCase();
-                return widget.options
+                return widget.doctypeField.options
                     .split('\n')
                     .where(
                       (option) => option.toLowerCase().contains(lowercaseQuery),
