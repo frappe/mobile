@@ -1,80 +1,276 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:frappe_app/config/frappe_icons.dart';
-import 'package:frappe_app/views/awesome_bar.dart';
-import 'package:frappe_app/utils/frappe_icon.dart';
+import 'package:frappe_app/datamodels/desktop_page_response.dart';
+import 'package:frappe_app/widgets/header_app_bar.dart';
+import 'package:provider/provider.dart';
 
-import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+import '../config/palette.dart';
+import '../datamodels/desk_sidebar_items_response.dart';
 
-import 'module_view.dart';
-import 'settings.dart';
+import '../app/router.gr.dart';
+import '../app/locator.dart';
 
-class Home extends StatelessWidget {
-  final PersistentTabController _persistentTabController =
-      PersistentTabController(initialIndex: 0);
+import '../services/navigation_service.dart';
+import '../services/api/api.dart';
 
-  List<Widget> _buildScreens() {
-    return [
-      ModuleView(),
-      AwesomeBar(),
-      SettingsPage(),
+import '../utils/cache_helper.dart';
+import '../utils/frappe_alert.dart';
+import '../utils/helpers.dart';
+import '../utils/config_helper.dart';
+import '../utils/enums.dart';
+
+import '../widgets/frappe_button.dart';
+import '../widgets/card_list_tile.dart';
+
+class Home extends StatefulWidget {
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
+  var currentModule = ConfigHelper().activeModules.keys.first;
+
+  Future _getActiveModules(ConnectivityStatus connectionStatus) async {
+    DeskSidebarItemsResponse deskSidebarItems;
+    var activeModules;
+    if (ConfigHelper().activeModules != null) {
+      activeModules = ConfigHelper().activeModules;
+    } else {
+      activeModules = {};
+    }
+
+    var isOnline = await verifyOnline();
+
+    if ((connectionStatus == null ||
+            connectionStatus == ConnectivityStatus.offline) &&
+        !isOnline) {
+      var deskSidebarItemsCache =
+          await CacheHelper.getCache('deskSidebarItems');
+      deskSidebarItemsCache = deskSidebarItemsCache["data"];
+
+      if (deskSidebarItemsCache != null) {
+        deskSidebarItems =
+            DeskSidebarItemsResponse.fromJson(deskSidebarItemsCache);
+      } else {
+        throw Response(statusCode: HttpStatus.serviceUnavailable);
+      }
+    } else {
+      deskSidebarItems = await locator<Api>().getDeskSideBarItems();
+    }
+
+    List<DeskItem> modules = [
+      ...deskSidebarItems.message.modules,
+      ...deskSidebarItems.message.administration,
+      ...deskSidebarItems.message.domains
     ];
+    modules = modules.where((m) {
+      return activeModules.keys.contains(m.name) &&
+          activeModules[m.name].length > 0;
+    }).toList();
+
+    return modules;
   }
 
-  List<PersistentBottomNavBarItem> _navBarsItems() {
-    return [
-      PersistentBottomNavBarItem(
-        activeColor: Colors.black54,
-        icon: Icon(
-          Icons.home,
-          color: Colors.black54,
-        ),
-        title: "Home",
+  Future<DesktopPageResponse> _getData(
+    ConnectivityStatus connectionStatus,
+  ) async {
+    DesktopPageResponse desktopPage;
+
+    var isOnline = await verifyOnline();
+
+    if ((connectionStatus == null ||
+            connectionStatus == ConnectivityStatus.offline) &&
+        !isOnline) {
+      var moduleDoctypes =
+          await CacheHelper.getCache('${currentModule}Doctypes');
+      moduleDoctypes = moduleDoctypes["data"];
+
+      if (moduleDoctypes != null) {
+        desktopPage = DesktopPageResponse.fromJson(moduleDoctypes);
+      } else {
+        throw Response(statusCode: HttpStatus.serviceUnavailable);
+      }
+    } else {
+      desktopPage = await locator<Api>().getDesktopPage(currentModule);
+    }
+
+    return desktopPage;
+  }
+
+  Drawer _buildDrawer(
+    ConnectivityStatus connectionStatus,
+  ) {
+    return Drawer(
+      child: FutureBuilder(
+        future: _getActiveModules(connectionStatus),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            var listItems = [
+              Container(
+                height: 30,
+              ),
+              ListTile(
+                title: Text('Modules'),
+              ),
+            ];
+            snapshot.data.forEach((element) {
+              listItems.add(ListTile(
+                title: Text(element.label),
+                onTap: () {
+                  setState(() {
+                    currentModule = element.name;
+                  });
+                  locator<NavigationService>().pop();
+                },
+              ));
+            });
+
+            return ListView(
+              children: listItems,
+            );
+          } else if (snapshot.hasError) {
+            return Text(snapshot.error);
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
-      PersistentBottomNavBarItem(
-        activeColor: Colors.black54,
-        icon: FrappeIcon(
-          FrappeIcons.search,
-        ),
-        title: "Search",
-      ),
-      PersistentBottomNavBarItem(
-        activeColor: Colors.black54,
-        icon: Icon(
-          Icons.settings,
-          color: Colors.black54,
-        ),
-        title: "Settings",
-      ),
-    ];
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return PersistentTabView(
-      controller: _persistentTabController,
-      screens: _buildScreens(),
-      items: _navBarsItems(),
-      confineInSafeArea: true,
-      backgroundColor: Colors.white,
-      handleAndroidBackButtonPress: true,
-      resizeToAvoidBottomInset: true,
-      stateManagement: true,
-      hideNavigationBarWhenKeyboardShows: true,
-      // decoration: NavBarDecoration(
-      //     colorBehindNavBar: Colors.indigo,
-      //     borderRadius: BorderRadius.circular(20.0)),
-      popAllScreensOnTapOfSelectedTab: true,
-      itemAnimationProperties: ItemAnimationProperties(
-        duration: Duration(milliseconds: 400),
-        curve: Curves.ease,
+    var connectionStatus = Provider.of<ConnectivityStatus>(
+      context,
+    );
+
+    return Scaffold(
+      key: _drawerKey,
+      backgroundColor: Palette.bgColor,
+      drawer: _buildDrawer(
+        connectionStatus,
       ),
-      screenTransitionAnimation: ScreenTransitionAnimation(
-        animateTabTransition: true,
-        curve: Curves.ease,
-        duration: Duration(milliseconds: 200),
+      body: HeaderAppBar(
+        subtitle: currentModule,
+        drawerCallback: () {
+          _drawerKey.currentState.openDrawer();
+        },
+        body: RefreshIndicator(
+          onRefresh: () async {
+            setState(() {});
+          },
+          child: FutureBuilder(
+            future: _getData(
+              connectionStatus,
+            ),
+            builder: (context, snapshot) {
+              if (snapshot.hasData &&
+                  snapshot.connectionState == ConnectionState.done) {
+                var activeModules;
+                if (ConfigHelper().activeModules != null) {
+                  activeModules = ConfigHelper().activeModules;
+                } else {
+                  activeModules = {};
+                }
+                if (activeModules.keys.isEmpty) {
+                  return Center(
+                    child: Container(
+                      color: Colors.white,
+                      width: double.infinity,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Activate Modules'),
+                          FrappeFlatButton(
+                            onPressed: () async {
+                              var nav = await locator<NavigationService>()
+                                  .navigateTo(Routes.activateModules);
+
+                              if (nav) {
+                                setState(() {});
+                              }
+                            },
+                            title: 'Activate Modules',
+                            buttonType: ButtonType.primary,
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                var activeDoctypes = getActivatedDoctypes(
+                  snapshot.data,
+                  currentModule,
+                );
+
+                if (activeDoctypes.isEmpty) {
+                  return Container(
+                    color: Colors.white,
+                    height: double.infinity,
+                    width: double.infinity,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'No Doctypes are yet Activated or you dont have permission',
+                        ),
+                        FrappeFlatButton(
+                          onPressed: () async {
+                            var nav = await locator<NavigationService>()
+                                .navigateTo(Routes.activateModules);
+
+                            if (nav) {
+                              setState(() {});
+                            }
+                          },
+                          title: 'Activate Doctypes',
+                          buttonType: ButtonType.primary,
+                        )
+                      ],
+                    ),
+                  );
+                }
+                var doctypesWidget = activeDoctypes.map<Widget>((m) {
+                  return Padding(
+                    padding: const EdgeInsets.only(
+                      left: 10.0,
+                      right: 10.0,
+                      top: 8.0,
+                    ),
+                    child: CardListTile(
+                      title: Text(m.label),
+                      onTap: () {
+                        locator<NavigationService>().navigateTo(
+                          Routes.customRouter,
+                          arguments: CustomRouterArguments(
+                            doctype: m.name,
+                            viewType: ViewType.list,
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }).toList();
+                return ListView(
+                  children: doctypesWidget,
+                );
+              } else if (snapshot.hasError) {
+                return handleError(snapshot.error);
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            },
+          ),
+        ),
       ),
-      navBarStyle:
-          NavBarStyle.style13, // Choose the nav bar style with this property
     );
   }
 }

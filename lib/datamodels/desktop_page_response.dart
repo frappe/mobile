@@ -382,7 +382,7 @@ class CardItemLink {
   List<String> dependencies;
   String doctype;
   dynamic isQueryReport;
-  String incompleteDependencies;
+  dynamic incompleteDependencies;
   String icon;
   String link;
 

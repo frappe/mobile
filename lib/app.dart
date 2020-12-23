@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:frappe_app/views/home.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +21,6 @@ import 'services/api/api.dart';
 import 'services/connectivity_service.dart';
 import 'services/navigation_service.dart';
 
-import 'views/home.dart';
 import 'views/filter_list.dart';
 import 'views/form_view.dart';
 import 'views/list_view.dart';

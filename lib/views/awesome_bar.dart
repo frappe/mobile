@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/datamodels/doctype_response.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
 
 import '../services/navigation_service.dart';
-import '../form/controls/autocomplete.dart';
 import '../config/palette.dart';
 
 import '../app/locator.dart';
@@ -12,18 +11,60 @@ import '../app/router.gr.dart';
 import '../utils/config_helper.dart';
 import '../utils/enums.dart';
 
-class AwesomeBar extends StatefulWidget {
+class Awesombar extends StatelessWidget {
   @override
-  _AwesomeBarState createState() => _AwesomeBarState();
+  Widget build(BuildContext context) {
+    return TextField(
+      onTap: () {
+        showSearch(context: context, delegate: AwesomeSearch());
+      },
+      readOnly: true,
+      decoration: InputDecoration(
+        // border: CircleBorder(side: ),
+        filled: true,
+        enabledBorder: InputBorder.none,
+        fillColor: Palette.bgColor,
+        prefixIcon: FrappeIcon(
+          FrappeIcons.search,
+          size: 5,
+        ),
+        hintText: 'Search',
+      ),
+    );
+  }
 }
 
-class _AwesomeBarState extends State<AwesomeBar> {
-  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-  var awesomeBarItems = [];
+class AwesomeSearch extends SearchDelegate {
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      )
+    ];
+  }
 
   @override
-  void initState() {
-    super.initState();
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, null);
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return Container();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    var awesomeBarItems = [];
     var activeModules = ConfigHelper().activeModules;
     activeModules.keys.forEach((module) {
       awesomeBarItems.add(
@@ -36,7 +77,7 @@ class _AwesomeBarState extends State<AwesomeBar> {
     });
     activeModules.values.forEach(
       (value) {
-        value.forEach(
+        (value as List).forEach(
           (v) {
             awesomeBarItems.add(
               {
@@ -56,75 +97,48 @@ class _AwesomeBarState extends State<AwesomeBar> {
         );
       },
     );
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Search'),
-      ),
-      backgroundColor: Colors.white,
-      body: FormBuilder(
-        key: _fbKey,
-        child: Column(
-          children: [
-            AutoComplete(
-              doctypeField: DoctypeField(label: "Search"),
-              fillColor: Palette.fieldBgColor,
-              itemBuilder: (context, item) {
-                return ListTile(
-                  title: Text(
-                    item["label"],
-                  ),
-                );
-              },
-              selectionToTextTransformer: (item) {
-                if (item is Map) {
-                  return item["value"];
-                } else {
-                  return item;
-                }
-              },
-              onSuggestionSelected: (item) {
-                if (item["type"] == "Doctype") {
-                  locator<NavigationService>().navigateTo(
-                    Routes.customRouter,
-                    arguments: CustomRouterArguments(
-                      doctype: item["value"],
-                      viewType: ViewType.list,
-                    ),
-                  );
-                } else if (item["type"] == "New Doc") {
-                  locator<NavigationService>().navigateTo(
-                    Routes.customRouter,
-                    arguments: CustomRouterArguments(
-                      doctype: item["value"],
-                      viewType: ViewType.newForm,
-                    ),
-                  );
-                } else if (item["type"] == "Module") {
-                  locator<NavigationService>().navigateTo(
-                    Routes.doctypeView,
-                    arguments: DoctypeViewArguments(
-                      module: item["value"],
-                    ),
-                  );
-                }
-              },
-              suggestionsCallback: (query) {
-                var lowercaseQuery = query.toLowerCase();
-                var ss = awesomeBarItems.where((item) {
-                  return (item["value"] as String)
-                      .toLowerCase()
-                      .contains(lowercaseQuery);
-                }).toList();
-                return ss;
-              },
-            ),
-          ],
-        ),
-      ),
+    awesomeBarItems = awesomeBarItems.where((element) {
+      var lowercaseQuery = query.toLowerCase();
+      return (element["value"] as String)
+          .toLowerCase()
+          .contains(lowercaseQuery);
+    }).toList();
+
+    return ListView.builder(
+      itemCount: awesomeBarItems.length,
+      itemBuilder: (_, index) {
+        var item = awesomeBarItems[index];
+        return ListTile(
+          title: Text(item["label"]),
+          onTap: () {
+            if (item["type"] == "Doctype") {
+              locator<NavigationService>().navigateTo(
+                Routes.customRouter,
+                arguments: CustomRouterArguments(
+                  doctype: item["value"],
+                  viewType: ViewType.list,
+                ),
+              );
+            } else if (item["type"] == "New Doc") {
+              locator<NavigationService>().navigateTo(
+                Routes.customRouter,
+                arguments: CustomRouterArguments(
+                  doctype: item["value"],
+                  viewType: ViewType.newForm,
+                ),
+              );
+            } else if (item["type"] == "Module") {
+              locator<NavigationService>().navigateTo(
+                Routes.doctypeView,
+                arguments: DoctypeViewArguments(
+                  module: item["value"],
+                ),
+              );
+            }
+          },
+        );
+      },
     );
   }
 }

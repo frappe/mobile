@@ -243,6 +243,7 @@ List<Widget> generateLayout({
             child: makeControl(
               field: field,
               value: val,
+              doc: doc,
               withLabel: withLabel,
               editMode: editMode,
               onChanged: onChanged,

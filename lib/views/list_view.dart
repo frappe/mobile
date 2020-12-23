@@ -410,7 +410,7 @@ class CustomSearch extends SearchDelegate {
   Widget buildSuggestions(BuildContext context) {
     var titleField;
     if (hasTitle(data.meta)) {
-      titleField = data.meta["title_field"];
+      titleField = (data.meta as DoctypeDoc).titleField;
     } else {
       titleField = "name";
     }

@@ -16,10 +16,8 @@ import '../views/add_assignees.dart';
 import '../views/add_review.dart';
 import '../views/add_tags.dart';
 import '../views/comment_input.dart';
-import '../views/doctype_view.dart';
 import '../views/email_form.dart';
 import '../views/file_picker.dart';
-import '../views/home.dart';
 import '../views/login/login_view.dart';
 import '../views/no_internet.dart';
 import '../views/queue.dart';
@@ -79,9 +77,7 @@ class MyRouter extends RouterBase {
   final _routes = <RouteDef>[
     RouteDef(Routes.frappeApp, page: FrappeApp),
     RouteDef(Routes.login, page: Login),
-    RouteDef(Routes.home, page: Home),
     RouteDef(Routes.activateModules, page: ActivateModules),
-    RouteDef(Routes.doctypeView, page: DoctypeView),
     RouteDef(Routes.sessionExpired, page: SessionExpired),
     RouteDef(Routes.noInternet, page: NoInternet),
     RouteDef(Routes.customRouter, page: CustomRouter),
@@ -112,22 +108,9 @@ class MyRouter extends RouterBase {
         settings: data,
       );
     },
-    Home: (data) {
-      return MaterialPageRoute<dynamic>(
-        builder: (context) => Home(),
-        settings: data,
-      );
-    },
     ActivateModules: (data) {
       return MaterialPageRoute<dynamic>(
         builder: (context) => ActivateModules(),
-        settings: data,
-      );
-    },
-    DoctypeView: (data) {
-      final args = data.getArgs<DoctypeViewArguments>(nullOk: false);
-      return MaterialPageRoute<dynamic>(
-        builder: (context) => DoctypeView(args.module),
         settings: data,
       );
     },
