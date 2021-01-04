@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../datamodels/doctype_response.dart';
+import '../utils/enums.dart';
 import '../views/activate_modules/activate_modules_view.dart';
 import '../views/add_assignees.dart';
 import '../views/add_review.dart';
@@ -18,6 +19,7 @@ import '../views/add_tags.dart';
 import '../views/comment_input.dart';
 import '../views/email_form.dart';
 import '../views/file_picker.dart';
+import '../views/home.dart';
 import '../views/login/login_view.dart';
 import '../views/no_internet.dart';
 import '../views/queue.dart';
@@ -25,7 +27,6 @@ import '../views/queue_error.dart';
 import '../views/session_expired.dart';
 import '../views/share.dart';
 import '../views/view_docinfo.dart';
-import '../utils/enums.dart';
 import '../widgets/email_box.dart';
 
 class Routes {
@@ -33,7 +34,6 @@ class Routes {
   static const String login = '/Login';
   static const String home = '/Home';
   static const String activateModules = '/activate-modules';
-  static const String doctypeView = '/doctype-view';
   static const String sessionExpired = '/session-expired';
   static const String noInternet = '/no-internet';
   static const String customRouter = '/custom-router';
@@ -53,7 +53,6 @@ class Routes {
     login,
     home,
     activateModules,
-    doctypeView,
     sessionExpired,
     noInternet,
     customRouter,
@@ -77,6 +76,7 @@ class MyRouter extends RouterBase {
   final _routes = <RouteDef>[
     RouteDef(Routes.frappeApp, page: FrappeApp),
     RouteDef(Routes.login, page: Login),
+    RouteDef(Routes.home, page: Home),
     RouteDef(Routes.activateModules, page: ActivateModules),
     RouteDef(Routes.sessionExpired, page: SessionExpired),
     RouteDef(Routes.noInternet, page: NoInternet),
@@ -105,6 +105,12 @@ class MyRouter extends RouterBase {
     Login: (data) {
       return MaterialPageRoute<dynamic>(
         builder: (context) => Login(),
+        settings: data,
+      );
+    },
+    Home: (data) {
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => Home(),
         settings: data,
       );
     },
@@ -278,12 +284,6 @@ class MyRouter extends RouterBase {
 /// ************************************************************************
 /// Arguments holder classes
 /// *************************************************************************
-
-/// DoctypeView arguments holder class
-class DoctypeViewArguments {
-  final String module;
-  DoctypeViewArguments({@required this.module});
-}
 
 /// NoInternet arguments holder class
 class NoInternetArguments {

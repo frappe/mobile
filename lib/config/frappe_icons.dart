@@ -21,4 +21,5 @@ class FrappeIcons {
   static const warning = '$_basePath/warning.svg';
   static const question = '$_basePath/question.svg';
   static const error = '$_basePath/error.svg';
+  static const frappe = '$_basePath/frappe.svg';
 }

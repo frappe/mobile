@@ -30,4 +30,8 @@ class NavigationService {
   pop([Object result]) {
     return navigatorKey.currentState.pop(result);
   }
+
+  bool canPop() {
+    return navigatorKey.currentState.canPop();
+  }
 }

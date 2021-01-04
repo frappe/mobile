@@ -88,17 +88,16 @@ class FilterList extends StatefulWidget {
 class _FilterListState extends State<FilterList> {
   GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
 
-  List<Widget> _generateChildren(var fields) {
+  List<Widget> _generateChildren(List<DoctypeField> fields) {
     return fields.where((field) {
-      return field["in_standard_filter"] == 1 ||
-          field["is_default_filter"] == 1;
+      return field.inStandardFilter == 1 || field.isDefaultFilter == 1;
     }).map<Widget>(
       (field) {
         var val;
 
         if (widget.filters != null && widget.filters.length > 0) {
           for (int i = 0; i < widget.filters.length; i++) {
-            if (widget.filters[i][1] == field["fieldname"]) {
+            if (widget.filters[i][1] == field.fieldname) {
               val = widget.filters[i][3];
             }
           }

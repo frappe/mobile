@@ -20,13 +20,18 @@ class Awesombar extends StatelessWidget {
       },
       readOnly: true,
       decoration: InputDecoration(
-        // border: CircleBorder(side: ),
         filled: true,
         enabledBorder: InputBorder.none,
         fillColor: Palette.bgColor,
-        prefixIcon: FrappeIcon(
-          FrappeIcons.search,
-          size: 5,
+        prefixIcon: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: FrappeIcon(
+            FrappeIcons.search,
+          ),
+        ),
+        prefixIconConstraints: BoxConstraints(
+          minHeight: 42,
+          maxHeight: 42,
         ),
         hintText: 'Search',
       ),
@@ -66,15 +71,15 @@ class AwesomeSearch extends SearchDelegate {
   Widget buildSuggestions(BuildContext context) {
     var awesomeBarItems = [];
     var activeModules = ConfigHelper().activeModules;
-    activeModules.keys.forEach((module) {
-      awesomeBarItems.add(
-        {
-          "type": "Module",
-          "value": module,
-          "label": "Open $module",
-        },
-      );
-    });
+    // activeModules.keys.forEach((module) {
+    //   awesomeBarItems.add(
+    //     {
+    //       "type": "Module",
+    //       "value": module,
+    //       "label": "Open $module",
+    //     },
+    //   );
+    // });
     activeModules.values.forEach(
       (value) {
         (value as List).forEach(
@@ -129,12 +134,12 @@ class AwesomeSearch extends SearchDelegate {
                 ),
               );
             } else if (item["type"] == "Module") {
-              locator<NavigationService>().navigateTo(
-                Routes.doctypeView,
-                arguments: DoctypeViewArguments(
-                  module: item["value"],
-                ),
-              );
+              // locator<NavigationService>().navigateTo(
+              //   Routes.home,
+              //   arguments: DoctypeViewArguments(
+              //     module: item["value"],
+              //   ),
+              // );
             }
           },
         );

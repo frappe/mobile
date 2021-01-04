@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:frappe_app/widgets/header_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -152,10 +153,6 @@ class _CustomListViewState extends State<CustomListView> {
 
   @override
   Widget build(BuildContext context) {
-    var connectionStatus = Provider.of<ConnectivityStatus>(
-      context,
-    );
-
     // if (connectionStatus == ConnectivityStatus.offline ||
     //     connectionStatus == null) {
     _pageLoadController = PagewiseLoadController(
@@ -268,22 +265,9 @@ class _CustomListViewState extends State<CustomListView> {
           ),
         ),
       ),
-      appBar: AppBar(
-        elevation: 0.6,
-        title: Text(widget.appBarTitle),
-        actions: <Widget>[
-          IconButton(
-            icon: FrappeIcon(
-              FrappeIcons.search,
-              color: Palette.iconColor,
-            ),
-            onPressed: () {
-              showSearch(
-                context: context,
-                delegate: CustomSearch(widget),
-              );
-            },
-          ),
+      body: HeaderAppBar(
+        subtitle: widget.appBarTitle,
+        subActions: <Widget>[
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Container(
@@ -309,150 +293,67 @@ class _CustomListViewState extends State<CustomListView> {
             ),
           )
         ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await _pageLoadController.reset();
-        },
-        child: FutureBuilder(
-          future: verifyOnline(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData &&
-                snapshot.connectionState == ConnectionState.done) {
-              bool isOnline = snapshot.data;
-              return Container(
-                color: Palette.bgColor,
-                child: isOnline
-                    ? PagewiseListView(
-                        noItemsFoundBuilder: (context) {
-                          return _noItemsFoundBuilder();
-                        },
-                        pageLoadController: _pageLoadController,
-                        itemBuilder: ((buildContext, entry, _) {
-                          return _generateItem(entry);
-                        }),
-                      )
-                    : FutureBuilder(
-                        future: CacheHelper.getCache('${widget.doctype}List'),
-                        builder: (buildContext, snapshot) {
-                          if (snapshot.hasData &&
-                              snapshot.connectionState ==
-                                  ConnectionState.done) {
-                            var list = snapshot.data["data"];
-
-                            if (list != null) {
-                              list = list;
-                              return ListView.builder(
-                                itemCount: list.length,
-                                itemBuilder: (context, index) {
-                                  return _generateItem(list[index]);
-                                },
-                              );
-                            } else {
-                              return NoInternet(true);
-                            }
-                          } else if (snapshot.hasError) {
-                            return Text(snapshot.error);
-                          } else {
-                            return Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                        },
-                      ),
-              );
-            } else if (snapshot.hasError) {
-              return handleError(snapshot.error);
-            } else {
-              return CircularProgressIndicator();
-            }
+        body: RefreshIndicator(
+          onRefresh: () async {
+            await _pageLoadController.reset();
           },
+          child: FutureBuilder(
+            future: verifyOnline(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData &&
+                  snapshot.connectionState == ConnectionState.done) {
+                bool isOnline = snapshot.data;
+                return Container(
+                  color: Palette.bgColor,
+                  child: isOnline
+                      ? PagewiseListView(
+                          padding: EdgeInsets.zero,
+                          noItemsFoundBuilder: (context) {
+                            return _noItemsFoundBuilder();
+                          },
+                          pageLoadController: _pageLoadController,
+                          itemBuilder: ((buildContext, entry, _) {
+                            return _generateItem(entry);
+                          }),
+                        )
+                      : FutureBuilder(
+                          future: CacheHelper.getCache('${widget.doctype}List'),
+                          builder: (buildContext, snapshot) {
+                            if (snapshot.hasData &&
+                                snapshot.connectionState ==
+                                    ConnectionState.done) {
+                              var list = snapshot.data["data"];
+
+                              if (list != null) {
+                                list = list;
+                                return ListView.builder(
+                                  itemCount: list.length,
+                                  itemBuilder: (context, index) {
+                                    return _generateItem(list[index]);
+                                  },
+                                );
+                              } else {
+                                return NoInternet(true);
+                              }
+                            } else if (snapshot.hasError) {
+                              return Text(snapshot.error);
+                            } else {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                          },
+                        ),
+                );
+              } else if (snapshot.hasError) {
+                return handleError(snapshot.error);
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
         ),
       ),
-    );
-  }
-}
-
-class CustomSearch extends SearchDelegate {
-  final data;
-
-  // TODO hintText
-  CustomSearch(this.data);
-
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
-        icon: Icon(Icons.clear),
-        onPressed: () {
-          query = '';
-        },
-      )
-    ];
-  }
-
-  @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-      icon: Icon(Icons.arrow_back),
-      onPressed: () {
-        close(context, null);
-      },
-    );
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    return Container();
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    var titleField;
-    if (hasTitle(data.meta)) {
-      titleField = (data.meta as DoctypeDoc).titleField;
-    } else {
-      titleField = "name";
-    }
-    return FutureBuilder(
-      future: locator<Api>().fetchList(
-          pageLength: 10,
-          fieldnames: data.fieldnames,
-          doctype: data.doctype,
-          meta: data.meta,
-          filters: [
-            [data.doctype, titleField, 'like', '%$query%']
-          ]),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return ListView.builder(
-            itemCount: snapshot.data.length,
-            itemBuilder: (_, index) {
-              return ListTile(
-                title: Text(
-                  snapshot.data[index][titleField],
-                ),
-                onTap: () {
-                  locator<NavigationService>().navigateTo(
-                    Routes.customRouter,
-                    arguments: CustomRouterArguments(
-                      viewType: ViewType.form,
-                      doctype: data.doctype,
-                      name: snapshot.data[index]["name"],
-                    ),
-                  );
-                },
-              );
-            },
-          );
-        } else if (snapshot.hasError) {
-          return handleError(snapshot.error);
-        } else {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      },
     );
   }
 }

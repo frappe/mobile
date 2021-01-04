@@ -18,6 +18,7 @@ class LinkField extends StatefulWidget {
   final Map doc;
 
   final key;
+  final bool withLabel;
   final bool showInputBorder;
   final bool allowClear;
   final Function onSuggestionSelected;
@@ -32,6 +33,7 @@ class LinkField extends StatefulWidget {
     this.key,
     @required this.doctypeField,
     @required this.fillColor,
+    this.withLabel,
     this.doc,
     this.prefixIcon,
     this.allowClear = true,
@@ -91,7 +93,7 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
                 : null,
             fillColor: widget.fillColor,
             enabledBorder: !widget.showInputBorder ? InputBorder.none : null,
-            hintText: widget.doctypeField.label,
+            hintText: widget.withLabel ? null : widget.doctypeField.label,
           ),
           selectionToTextTransformer: (item) {
             if (item != null) {
@@ -110,7 +112,9 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
                   ),
                 );
               },
-          initialValue: widget.doc[widget.doctypeField.fieldname],
+          initialValue: widget.doc != null
+              ? widget.doc[widget.doctypeField.fieldname]
+              : null,
           suggestionsCallback: widget.suggestionsCallback ??
               (query) async {
                 var lowercaseQuery = query.toLowerCase();

@@ -41,10 +41,10 @@ class Select extends StatelessWidget with Control, ControlInput {
 
     return FormBuilderDropdown(
       key: key,
-      initialValue: doc[doctypeField.fieldname],
+      initialValue: doc != null ? doc[doctypeField.fieldname] : null,
       allowClear: allowClear,
       name: doctypeField.fieldname,
-      hint: doctypeField.label != null ? Text(doctypeField.label) : null,
+      hint: !withLabel ? Text(doctypeField.label) : null,
       decoration: Palette.formFieldDecoration(
         withLabel,
         doctypeField.label,

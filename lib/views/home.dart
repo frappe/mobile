@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/datamodels/desktop_page_response.dart';
 import 'package:frappe_app/widgets/header_app_bar.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +32,9 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
-  var currentModule = ConfigHelper().activeModules.keys.first;
+  var currentModule = ConfigHelper().activeModules != null
+      ? ConfigHelper().activeModules.keys.first
+      : '';
 
   Future _getActiveModules(ConnectivityStatus connectionStatus) async {
     DeskSidebarItemsResponse deskSidebarItems;
@@ -108,23 +111,29 @@ class _HomeState extends State<Home> {
         future: _getActiveModules(connectionStatus),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            var listItems = [
+            List<Widget> listItems = [
               Container(
                 height: 30,
               ),
               ListTile(
-                title: Text('Modules'),
+                title: Text('MODULES'),
               ),
             ];
             snapshot.data.forEach((element) {
-              listItems.add(ListTile(
-                title: Text(element.label),
-                onTap: () {
-                  setState(() {
-                    currentModule = element.name;
-                  });
-                  locator<NavigationService>().pop();
-                },
+              listItems.add(Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: ListTile(
+                  tileColor: currentModule == element.name
+                      ? Palette.bgColor
+                      : Colors.white,
+                  title: Text(element.label),
+                  onTap: () {
+                    setState(() {
+                      currentModule = element.name;
+                    });
+                    locator<NavigationService>().pop();
+                  },
+                ),
               ));
             });
 
@@ -145,6 +154,39 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    var activeModules;
+    if (ConfigHelper().activeModules != null) {
+      activeModules = ConfigHelper().activeModules;
+    } else {
+      activeModules = {};
+    }
+    if (activeModules.keys.isEmpty) {
+      return Center(
+        child: Container(
+          color: Colors.white,
+          width: double.infinity,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Activate Modules'),
+              FrappeFlatButton(
+                onPressed: () async {
+                  var nav = await locator<NavigationService>()
+                      .navigateTo(Routes.activateModules);
+
+                  if (nav) {
+                    setState(() {});
+                  }
+                },
+                title: 'Activate Modules',
+                buttonType: ButtonType.primary,
+              )
+            ],
+          ),
+        ),
+      );
+    }
+
     var connectionStatus = Provider.of<ConnectivityStatus>(
       context,
     );
@@ -156,10 +198,9 @@ class _HomeState extends State<Home> {
         connectionStatus,
       ),
       body: HeaderAppBar(
+        isRoot: true,
         subtitle: currentModule,
-        drawerCallback: () {
-          _drawerKey.currentState.openDrawer();
-        },
+        showSecondaryLeading: true,
         body: RefreshIndicator(
           onRefresh: () async {
             setState(() {});
@@ -211,6 +252,7 @@ class _HomeState extends State<Home> {
 
                 if (activeDoctypes.isEmpty) {
                   return Container(
+                    margin: EdgeInsets.zero,
                     color: Colors.white,
                     height: double.infinity,
                     width: double.infinity,
@@ -258,6 +300,7 @@ class _HomeState extends State<Home> {
                   );
                 }).toList();
                 return ListView(
+                  padding: EdgeInsets.zero,
                   children: doctypesWidget,
                 );
               } else if (snapshot.hasError) {

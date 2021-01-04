@@ -13,7 +13,6 @@ class FrappeIcon extends StatelessWidget {
   });
 
   @override
-  @override
   Widget build(BuildContext context) {
     return SvgPicture.asset(
       path,

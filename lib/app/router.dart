@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route_annotations.dart';
 import '../widgets/email_box.dart';
 import '../app.dart';
 
+import '../views/home.dart';
 import '../views/add_assignees.dart';
 import '../views/add_review.dart';
 import '../views/add_tags.dart';
@@ -23,6 +24,7 @@ import '../views/login/login_view.dart';
     // initial route is named "/"
     MaterialRoute(page: FrappeApp, initial: true),
     MaterialRoute(page: Login),
+    MaterialRoute(page: Home),
     MaterialRoute(page: ActivateModules),
     MaterialRoute(page: SessionExpired),
     MaterialRoute(page: NoInternet),

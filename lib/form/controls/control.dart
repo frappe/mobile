@@ -43,6 +43,7 @@ Widget makeControl({
               doc: doc,
               fillColor: Palette.fieldBgColor,
               allowClear: editMode,
+              withLabel: withLabel,
             ),
             withLabel,
             field.label);
@@ -248,34 +249,34 @@ Widget makeControl({
       }
       break;
 
-    case "Signature":
-      {
-        fieldWidget = buildDecoratedWidget(
-          customSignature.Signature(
-            key: Key(value),
-            doc: doc,
-            doctypeField: field,
-            withLabel: withLabel,
-          ),
-          withLabel,
-          field.label,
-        );
-      }
-      break;
+    // case "Signature":
+    //   {
+    //     fieldWidget = buildDecoratedWidget(
+    //       customSignature.Signature(
+    //         key: Key(value),
+    //         doc: doc,
+    //         doctypeField: field,
+    //         withLabel: withLabel,
+    //       ),
+    //       withLabel,
+    //       field.label,
+    //     );
+    //   }
+    //   break;
 
-    case "Barcode":
-      {
-        fieldWidget = buildDecoratedWidget(
-          FormBuilderBarcode(
-            key: Key(value),
-            doctypeField: field,
-            doc: doc,
-          ),
-          withLabel,
-          field.label,
-        );
-      }
-      break;
+    // case "Barcode":
+    //   {
+    //     fieldWidget = buildDecoratedWidget(
+    //       FormBuilderBarcode(
+    //         key: Key(value),
+    //         doctypeField: field,
+    //         doc: doc,
+    //       ),
+    //       withLabel,
+    //       field.label,
+    //     );
+    //   }
+    //   break;
 
     default:
       fieldWidget = Container();
