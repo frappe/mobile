@@ -40,6 +40,7 @@ class _SimpleFormState extends State<SimpleForm> {
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: Text("New ${widget.meta.name}"),
         actions: <Widget>[
           Padding(

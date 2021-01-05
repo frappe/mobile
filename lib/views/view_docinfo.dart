@@ -34,6 +34,7 @@ class ViewDocInfo extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        elevation: 0,
         title: Text(getTitle(meta, doc)),
       ),
       body: Padding(

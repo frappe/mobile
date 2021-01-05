@@ -28,7 +28,7 @@ dependencies:
   flutter_local_notifications: ^3.0.0
   workmanager: ^0.2.3
   get_it: ^5.0.0
-  # fluttertoast: ^7.1.5
+  fluttertoast: ^7.1.6
   hive: ^1.4.4
   hive_flutter: ^0.3.1
   connectivity: ^2.0.2

@@ -89,6 +89,7 @@ class _AddAssigneesState extends State<AddAssignees> {
           Container(
             child: FormBuilder(
               child: LinkField(
+                withLabel: false,
                 key: UniqueKey(),
                 prefixIcon: Icon(Icons.search),
                 fillColor: Colors.white,

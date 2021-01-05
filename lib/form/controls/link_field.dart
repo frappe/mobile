@@ -33,7 +33,7 @@ class LinkField extends StatefulWidget {
     this.key,
     @required this.doctypeField,
     @required this.fillColor,
-    this.withLabel,
+    this.withLabel = true,
     this.doc,
     this.prefixIcon,
     this.allowClear = true,
