@@ -403,7 +403,7 @@ List<CardItemLink> getActivatedDoctypes(
       activeDoctypes.addAll(item.links);
     });
     activeDoctypes = activeDoctypes.where((m) {
-      return activeModules[module].contains(m.name);
+      return activeModules[module].contains(m.label);
     }).toList();
 
     return activeDoctypes;

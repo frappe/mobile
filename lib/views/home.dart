@@ -298,7 +298,7 @@ class _HomeState extends State<Home> {
                         locator<NavigationService>().navigateTo(
                           Routes.customRouter,
                           arguments: CustomRouterArguments(
-                            doctype: m.name,
+                            doctype: m.label,
                             viewType: ViewType.list,
                           ),
                         );

@@ -379,7 +379,7 @@ class CardItemLink {
   int onboard;
   String type;
   dynamic count;
-  List<String> dependencies;
+  dynamic dependencies;
   String doctype;
   dynamic isQueryReport;
   dynamic incompleteDependencies;
@@ -407,7 +407,7 @@ class CardItemLink {
     onboard = json['onboard'];
     type = json['type'];
     count = json['count'];
-    dependencies = json['dependencies']?.cast<String>();
+    dependencies = json['dependencies'];
     doctype = json['doctype'];
     isQueryReport = json['is_query_report'];
     incompleteDependencies = json['incomplete_dependencies'];
