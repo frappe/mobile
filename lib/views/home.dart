@@ -161,27 +161,34 @@ class _HomeState extends State<Home> {
       activeModules = {};
     }
     if (activeModules.keys.isEmpty) {
-      return Center(
-        child: Container(
-          color: Colors.white,
-          width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Activate Modules'),
-              FrappeFlatButton(
-                onPressed: () async {
-                  var nav = await locator<NavigationService>()
-                      .navigateTo(Routes.activateModules);
+      return Scaffold(
+        body: HeaderAppBar(
+          isRoot: true,
+          subtitle: '',
+          showSecondaryLeading: true,
+          body: Center(
+            child: Container(
+              color: Colors.white,
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Activate Modules'),
+                  FrappeFlatButton(
+                    onPressed: () async {
+                      var nav = await locator<NavigationService>()
+                          .navigateTo(Routes.activateModules);
 
-                  if (nav) {
-                    setState(() {});
-                  }
-                },
-                title: 'Activate Modules',
-                buttonType: ButtonType.primary,
-              )
-            ],
+                      if (nav) {
+                        setState(() {});
+                      }
+                    },
+                    title: 'Activate Modules',
+                    buttonType: ButtonType.primary,
+                  )
+                ],
+              ),
+            ),
           ),
         ),
       );
