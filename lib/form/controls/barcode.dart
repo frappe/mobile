@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
+
+import 'base_control.dart';
+import 'base_input.dart';
 
 class FormBuilderBarcode extends StatefulWidget {
-  final String attribute;
-  final List<FormFieldValidator> validators;
-  final String initialValue;
+  final DoctypeField doctypeField;
+  final Map doc;
   final bool readOnly;
   final InputDecoration decoration;
   final ValueTransformer valueTransformer;
@@ -16,11 +19,10 @@ class FormBuilderBarcode extends StatefulWidget {
 
   FormBuilderBarcode({
     Key key,
-    @required this.attribute,
-    this.validators = const [],
+    @required this.doctypeField,
+    this.doc,
     this.readOnly = false,
     this.decoration = const InputDecoration(),
-    this.initialValue,
     this.valueTransformer,
     this.onChanged,
     this.onSaved,
@@ -30,7 +32,8 @@ class FormBuilderBarcode extends StatefulWidget {
   _FormBuilderBarcodeState createState() => _FormBuilderBarcodeState();
 }
 
-class _FormBuilderBarcodeState extends State<FormBuilderBarcode> {
+class _FormBuilderBarcodeState extends State<FormBuilderBarcode>
+    with Control, ControlInput {
   bool _readOnly = false;
   String _initialValue;
   final GlobalKey<FormFieldState> _fieldKey = GlobalKey<FormFieldState>();
@@ -41,9 +44,8 @@ class _FormBuilderBarcodeState extends State<FormBuilderBarcode> {
 
   @override
   void initState() {
-    _savedValue = widget.initialValue;
+    _savedValue = widget.doc[widget.doctypeField.fieldname];
     _formState = FormBuilder.of(context);
-    _formState?.registerFieldKey(widget.attribute, _fieldKey);
 
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus) {
@@ -63,7 +65,6 @@ class _FormBuilderBarcodeState extends State<FormBuilderBarcode> {
 
   @override
   void dispose() {
-    _formState?.unregisterFieldKey(widget.attribute);
     _textEditingController.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -78,19 +79,12 @@ class _FormBuilderBarcodeState extends State<FormBuilderBarcode> {
       key: _fieldKey,
       enabled: !_readOnly,
       initialValue: _initialValue,
-      validator: (val) {
-        if (_savedValue != null && val == null) return null;
-        return FormBuilderValidators.validateValidators(val, widget.validators);
-      },
       onSaved: (val) {
         if (_savedValue != null && val == null) return;
         var transformed;
         if (widget.valueTransformer != null) {
           transformed = widget.valueTransformer(val);
-          _formState?.setAttributeValue(widget.attribute, transformed);
-        } else {
-          _formState?.setAttributeValue(widget.attribute, "svgVal");
-        }
+        } else {}
         setState(() {
           _savedValue = transformed ?? val;
         });
@@ -153,7 +147,7 @@ class _FormBuilderBarcodeState extends State<FormBuilderBarcode> {
 
         return Center(
           child: SvgPicture.string(
-            widget.initialValue,
+            widget.doc[widget.doctypeField.fieldname],
           ),
         );
       },

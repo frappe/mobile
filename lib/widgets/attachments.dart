@@ -1,15 +1,21 @@
+import 'dart:io' as io;
+
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 
-import 'dart:io' as io;
+import '../app/locator.dart';
+import '../app/router.gr.dart';
+
+import '../services/api/api.dart';
+import '../services/navigation_service.dart';
 
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
-import '../utils/backend_service.dart';
+
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
+
 import '../widgets/frappe_button.dart';
-import '../screens/file_picker.dart';
 import '../widgets/card_list_tile.dart';
 
 class Attachments extends StatefulWidget {
@@ -43,7 +49,7 @@ class _AttachmentsState extends State<Attachments> {
 
   void _refresh() {
     setState(() {
-      _futureVal = BackendService.getDocinfo(widget.doctype, widget.name);
+      _futureVal = locator<Api>().getDocinfo(widget.doctype, widget.name);
     });
   }
 
@@ -72,7 +78,7 @@ class _AttachmentsState extends State<Attachments> {
           trailing: IconButton(
             icon: Icon(Icons.close),
             onPressed: () async {
-              await BackendService.removeAttachment(
+              await locator<Api>().removeAttachment(
                 widget.doctype,
                 widget.name,
                 attachment["name"],
@@ -92,16 +98,12 @@ class _AttachmentsState extends State<Attachments> {
         child: FrappeIconButton(
           buttonType: ButtonType.secondary,
           onPressed: () async {
-            var nav = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return CustomFilePicker(
-                    callback: widget.callback,
-                    doctype: widget.doctype,
-                    name: widget.name,
-                  );
-                },
+            var nav = await locator<NavigationService>().navigateTo(
+              Routes.customFilePicker,
+              arguments: CustomFilePickerArguments(
+                callback: widget.callback,
+                doctype: widget.doctype,
+                name: widget.name,
               ),
             );
 

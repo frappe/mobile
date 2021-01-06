@@ -1,9 +1,10 @@
-import 'package:frappe_app/utils/backend_service.dart';
-import 'package:frappe_app/utils/config_helper.dart';
 import 'package:hive/hive.dart';
 
 import '../services/storage_service.dart';
-import '../service_locator.dart';
+import '../services/api/api.dart';
+
+import '../app/locator.dart';
+import '../utils/config_helper.dart';
 
 class QueueHelper {
   static Box getQueueContainer() {
@@ -65,7 +66,7 @@ class QueueHelper {
 
   static Future processQueueItem(var q, int index) async {
     try {
-      var response = await BackendService.saveDocs(
+      var response = await locator<Api>().saveDocs(
         q["doctype"],
         q["data"][0],
       );

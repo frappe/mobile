@@ -1,14 +1,14 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
+import 'package:frappe_app/services/api/api.dart';
 
 import '../utils/config_helper.dart';
-import '../utils/backend_service.dart';
 import '../utils/helpers.dart';
 
 import '../services/storage_service.dart';
 
-import '../service_locator.dart';
+import '../app/locator.dart';
 
 class CacheHelper {
   static String generateKeyHash(String key) {
@@ -57,7 +57,7 @@ class CacheHelper {
     }
   }
 
-  static getCache(String secondaryKey) async {
+  static getCache(String secondaryKey) {
     if (ConfigHelper().primaryCacheKey == null) {
       return {"data": null};
     }
@@ -80,8 +80,8 @@ class CacheHelper {
   static cacheModule(String module, [bool isIsolate = false]) async {
     try {
       var cache = {};
-      var deskSideBarItems = await BackendService.getDeskSideBarItems();
-      var doctypes = await BackendService.getDesktopPage(module);
+      var deskSideBarItems = await locator<Api>().getDeskSideBarItems();
+      var doctypes = await locator<Api>().getDesktopPage(module);
       var activeDoctypes = getActivatedDoctypes(doctypes, module);
 
       cache["${module}Doctypes"] = doctypes;
@@ -91,15 +91,13 @@ class CacheHelper {
 
       for (var doctype in activeDoctypes) {
         f.add(
-          cacheDocListAndDoc(
-            doctype["name"],
-          ),
+          cacheDocListAndDoc(doctype.name),
         );
         f.add(
-          cacheLinkFields(doctype["name"]),
+          cacheLinkFields(doctype.name),
         );
         f.add(
-          cacheDoctypeMeta(doctype["name"]),
+          cacheDoctypeMeta(doctype.name),
         );
       }
 
@@ -121,7 +119,7 @@ class CacheHelper {
   static Future<Map> cacheDoctypeMeta(String doctype) async {
     var cache = {};
     try {
-      var response = await BackendService.getDoctype(doctype);
+      var response = await locator<Api>().getDoctype(doctype);
       cache['${doctype}Meta'] = response;
     } catch (e) {
       print(e);
@@ -160,7 +158,7 @@ class CacheHelper {
   static Future<Map> cacheLinkField(String doctype) async {
     var cache = {};
     try {
-      var linkData = await BackendService.searchLink(
+      var linkData = await locator<Api>().searchLink(
         doctype: doctype,
         pageLength: 9999,
       );
@@ -177,15 +175,14 @@ class CacheHelper {
     var f = <Future>[];
 
     try {
-      var docMeta = await BackendService.getDoctype(doctype);
-      docMeta = docMeta["docs"][0];
+      var docMeta = await locator<Api>().getDoctype(doctype);
 
-      var docList = await BackendService.fetchList(
+      var docList = await locator<Api>().fetchList(
         doctype: doctype,
-        fieldnames: generateFieldnames(doctype, docMeta),
+        fieldnames: generateFieldnames(doctype, docMeta.docs[0]),
         pageLength: 50,
         offset: 0,
-        meta: docMeta,
+        meta: docMeta.docs[0],
       );
 
       cache['${doctype}List'] = docList;
@@ -219,7 +216,7 @@ class CacheHelper {
   static Future<Map> cacheDoc(String doctype, String docName) async {
     var cache = {};
     try {
-      var docForm = await BackendService.getdoc(doctype, docName);
+      var docForm = await locator<Api>().getdoc(doctype, docName);
       cache['$doctype$docName'] = docForm;
     } catch (e) {
       print(e);

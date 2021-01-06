@@ -1,21 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:injectable/injectable.dart';
 
+@lazySingleton
 class NavigationService {
   final GlobalKey<NavigatorState> navigatorKey =
       new GlobalKey<NavigatorState>();
 
-  Future<dynamic> navigateTo(String routeName) {
-    return navigatorKey.currentState.pushNamed(routeName);
+  Future navigateTo(String routeName, {Object arguments}) {
+    return navigatorKey.currentState.pushNamed(
+      routeName,
+      arguments: arguments,
+    );
   }
 
-  Future<dynamic> pushReplacement(String routeName) {
-    return navigatorKey.currentState.pushReplacementNamed(routeName);
+  Future pushReplacement(String routeName, {Object arguments}) {
+    return navigatorKey.currentState.pushReplacementNamed(
+      routeName,
+      arguments: arguments,
+    );
   }
 
-  Future<dynamic> clearAllAndNavigateTo(String routeName) {
+  Future clearAllAndNavigateTo(String routeName) {
     return navigatorKey.currentState.pushNamedAndRemoveUntil(
       routeName,
       (_) => false,
     );
+  }
+
+  pop([Object result]) {
+    return navigatorKey.currentState.pop(result);
+  }
+
+  bool canPop() {
+    return navigatorKey.currentState.canPop();
   }
 }

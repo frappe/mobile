@@ -1,42 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
 
-class Time extends StatelessWidget {
+import 'base_control.dart';
+import 'base_input.dart';
+
+class Time extends StatelessWidget with Control, ControlInput {
   final Key key;
-  final String attribute;
-  final dynamic value;
+  final DoctypeField doctypeField;
+  final Map doc;
   final bool withLabel;
-  final List<String Function(dynamic)> validators;
-  final String label;
   final bool editMode;
 
   const Time({
     this.key,
-    this.attribute,
-    this.value,
-    this.validators,
-    this.label,
+    @required this.doctypeField,
+    this.doc,
     this.withLabel,
     this.editMode,
   });
 
   @override
   Widget build(BuildContext context) {
+    List<String Function(dynamic)> validators = [];
+
+    validators.add(
+      setMandatory(doctypeField, context),
+    );
+
     return FormBuilderDateTimePicker(
       key: key,
-      initialValue: value,
+      initialValue: doc != null ? doc[doctypeField.fieldname] : null,
       inputType: InputType.time,
       valueTransformer: (val) {
         return val != null ? val.toIso8601String() : null;
       },
       keyboardType: TextInputType.number,
-      attribute: attribute,
+      name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(
         withLabel,
-        label,
+        doctypeField.label,
       ),
-      validators: validators,
+      validator: FormBuilderValidators.compose(validators),
     );
   }
 }

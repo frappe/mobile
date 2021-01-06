@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:frappe_app/config/frappe_icons.dart';
-import 'package:frappe_app/config/frappe_palette.dart';
-import 'package:frappe_app/utils/frappe_icon.dart';
+
+import '../config/frappe_icons.dart';
+import '../config/frappe_palette.dart';
+import '../utils/frappe_icon.dart';
 
 class FrappeAlert {
   static showAlert({

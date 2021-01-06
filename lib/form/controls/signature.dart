@@ -2,36 +2,46 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/config/palette.dart';
 
-class Signature extends StatelessWidget {
+import '../../config/palette.dart';
+import '../../datamodels/doctype_response.dart';
+
+import 'base_control.dart';
+import 'base_input.dart';
+
+class Signature extends StatelessWidget with Control, ControlInput {
   final Key key;
-  final String attribute;
-  final dynamic value;
+  final DoctypeField doctypeField;
+  final Map doc;
   final bool withLabel;
-  final List<String Function(dynamic)> validators;
-  final String label;
 
   const Signature({
     this.key,
-    this.attribute,
-    this.value,
-    this.validators,
-    this.label,
+    @required this.doctypeField,
+    this.doc,
     this.withLabel,
   });
 
   @override
   Widget build(BuildContext context) {
+    List<String Function(dynamic)> validators = [];
+
+    validators.add(
+      setMandatory(doctypeField, context),
+    );
     return FormBuilderSignaturePad(
-      initialValue: value != null ? base64.decode(value.split(',').last) : null,
+      initialValue: doc != null
+          ? doc[doctypeField.fieldname] != null
+              ? base64.decode(doc[doctypeField.fieldname].split(',').last)
+              : null
+          : null,
       key: key,
       decoration: Palette.formFieldDecoration(
         withLabel,
-        label,
+        doctypeField.label,
       ),
-      attribute: attribute,
-      validators: validators,
+      name: doctypeField.name,
+      validator: FormBuilderValidators.compose(validators),
     );
   }
 }

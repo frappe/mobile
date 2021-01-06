@@ -1,44 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
 
-class Int extends StatelessWidget {
+import '../../config/palette.dart';
+
+import 'base_control.dart';
+import 'base_input.dart';
+
+class Int extends StatelessWidget with Control, ControlInput {
   final Key key;
-  final String attribute;
-  final dynamic value;
+  final DoctypeField doctypeField;
+  final Map doc;
+
   final bool withLabel;
-  final List<String Function(dynamic)> validators;
-  final String label;
+
   final bool editMode;
 
   const Int({
     this.key,
-    this.attribute,
-    this.value,
-    this.validators,
-    this.label,
+    @required this.doctypeField,
+    this.doc,
     this.withLabel,
     this.editMode,
   });
 
   @override
   Widget build(BuildContext context) {
+    List<String Function(dynamic)> validators = [];
+
+    validators.add(
+      setMandatory(doctypeField, context),
+    );
+
     return FormBuilderTextField(
       key: key,
-      valueTransformer: (val) {
-        if (val == "") {
-          return val;
-        }
-        return int.parse(val);
-      },
-      initialValue: value != null ? value.toString() : null,
+      initialValue: doc != null
+          ? doc[doctypeField.fieldname] != null
+              ? doc[doctypeField.fieldname].toString()
+              : null
+          : null,
       keyboardType: TextInputType.number,
-      attribute: attribute,
+      name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(
         withLabel,
-        label,
+        doctypeField.label,
       ),
-      validators: validators,
+      validator: FormBuilderValidators.compose(validators),
     );
   }
 }

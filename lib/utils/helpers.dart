@@ -7,27 +7,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:frappe_app/screens/no_internet.dart';
+import 'package:frappe_app/app/router.gr.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../main.dart';
+import '../datamodels/desktop_page_response.dart';
+import '../datamodels/doctype_response.dart';
+
+import '../services/api/api.dart';
+import '../views/no_internet.dart';
+
 import 'http.dart';
-
+import '../main.dart';
 import '../form/controls/control.dart';
-
-import '../service_locator.dart';
-
+import '../app/locator.dart';
 import '../config/palette.dart';
-
 import '../services/navigation_service.dart';
 
-import '../utils/cache_helper.dart';
 import '../utils/config_helper.dart';
 import '../utils/dio_helper.dart';
 import '../utils/enums.dart';
-import '../utils/backend_service.dart';
 
 import '../widgets/section.dart';
 import '../widgets/custom_expansion_tile.dart';
@@ -89,23 +88,25 @@ downloadFile(String fileUrl, String downloadPath) async {
 }
 
 Future<bool> _checkPermission() async {
-  if (Platform.isAndroid) {
-    PermissionStatus permission = await PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.storage);
-    if (permission != PermissionStatus.granted) {
-      Map<PermissionGroup, PermissionStatus> permissions =
-          await PermissionHandler()
-              .requestPermissions([PermissionGroup.storage]);
-      if (permissions[PermissionGroup.storage] == PermissionStatus.granted) {
-        return true;
-      }
-    } else {
-      return true;
-    }
-  } else {
-    return true;
-  }
-  return false;
+  // TODO
+  return true;
+  // if (Platform.isAndroid) {
+  //   PermissionStatus permission = await PermissionHandler()
+  //       .checkPermissionStatus(PermissionGroup.storage);
+  //   if (permission != PermissionStatus.granted) {
+  //     Map<PermissionGroup, PermissionStatus> permissions =
+  //         await PermissionHandler()
+  //             .requestPermissions([PermissionGroup.storage]);
+  //     if (permissions[PermissionGroup.storage] == PermissionStatus.granted) {
+  //       return true;
+  //     }
+  //   } else {
+  //     return true;
+  //   }
+  // } else {
+  //   return true;
+  // }
+  // return false;
 }
 
 String toTitleCase(String str) {
@@ -127,8 +128,9 @@ void showSnackBar(String txt, context) {
 }
 
 List<Widget> generateLayout({
-  @required List fields,
+  @required List<DoctypeField> fields,
   @required ViewType viewType,
+  Map doc,
   bool editMode = true,
   bool withLabel = true,
   Function onChanged,
@@ -147,7 +149,9 @@ List<Widget> generateLayout({
   int sIdx = 0;
 
   fields.forEach((field) {
-    var val = field["_current_val"] ?? field["default"];
+    var val = doc != null
+        ? doc[field.fieldname] ?? field.defaultValue
+        : field.defaultValue;
 
     if (val == '__user') {
       val = ConfigHelper().userId;
@@ -159,7 +163,7 @@ List<Widget> generateLayout({
       }
     }
 
-    if (field["fieldtype"] == "Section Break") {
+    if (field.fieldtype == "Section Break") {
       if (sections.length > 0) {
         var sectionVisibility = sections.any((element) {
           if (element is Visibility) {
@@ -222,15 +226,14 @@ List<Widget> generateLayout({
         collapsibles.clear();
       }
 
-      if (field["collapsible"] == 1) {
+      if (field.collapsible == 1) {
         isSection = false;
         isCollapsible = true;
-        collapsibleLabels.add(field["label"]);
+        collapsibleLabels.add(field.label);
       } else {
         isCollapsible = false;
         isSection = true;
-        sectionLabels
-            .add(field["label"] != null ? field["label"].toUpperCase() : '');
+        sectionLabels.add(field.label != null ? field.label.toUpperCase() : '');
       }
     } else if (isCollapsible) {
       if (viewType == ViewType.form) {
@@ -240,6 +243,7 @@ List<Widget> generateLayout({
             child: makeControl(
               field: field,
               value: val,
+              doc: doc,
               withLabel: withLabel,
               editMode: editMode,
               onChanged: onChanged,
@@ -249,6 +253,7 @@ List<Widget> generateLayout({
       } else {
         collapsibles.add(
           makeControl(
+            doc: doc,
             field: field,
             value: val,
             withLabel: withLabel,
@@ -263,6 +268,7 @@ List<Widget> generateLayout({
           Visibility(
             visible: editMode ? true : val != null && val != '',
             child: makeControl(
+              doc: doc,
               field: field,
               value: val,
               withLabel: withLabel,
@@ -275,6 +281,7 @@ List<Widget> generateLayout({
         sections.add(
           makeControl(
             field: field,
+            doc: doc,
             value: val,
             withLabel: withLabel,
             editMode: editMode,
@@ -288,6 +295,7 @@ List<Widget> generateLayout({
           Visibility(
             visible: editMode ? true : val != null && val != '',
             child: makeControl(
+              doc: doc,
               field: field,
               value: val,
               withLabel: withLabel,
@@ -301,6 +309,7 @@ List<Widget> generateLayout({
           makeControl(
             field: field,
             value: val,
+            doc: doc,
             withLabel: withLabel,
             editMode: editMode,
             onChanged: onChanged,
@@ -323,7 +332,7 @@ DateTime parseDate(val) {
   }
 }
 
-List generateFieldnames(String doctype, Map meta) {
+List generateFieldnames(String doctype, DoctypeDoc meta) {
   var fields = [
     'name',
     'modified',
@@ -334,10 +343,10 @@ List generateFieldnames(String doctype, Map meta) {
   ];
 
   if (hasTitle(meta)) {
-    fields.add(meta["title_field"]);
+    fields.add(meta.titleField);
   }
 
-  if (hasField(meta, 'status')) {
+  if (meta.fieldsMap.containsKey('status')) {
     fields.add('status');
   } else {
     fields.add('docstatus');
@@ -364,12 +373,8 @@ String getInitials(String txt) {
   return initials;
 }
 
-bool hasField(Map meta, String fieldName) {
-  return meta.containsKey('_field$fieldName');
-}
-
-bool isSubmittable(Map meta) {
-  return meta["is_submittable"] == 1;
+bool isSubmittable(DoctypeDoc meta) {
+  return meta.isSubmittable == 1;
 }
 
 List sortBy(List data, String orderBy, Order order) {
@@ -386,31 +391,34 @@ List sortBy(List data, String orderBy, Order order) {
   return data;
 }
 
-getActivatedDoctypes(Map doctypes, String module) {
+List<CardItemLink> getActivatedDoctypes(
+  DesktopPageResponse desktopPage,
+  String module,
+) {
   if (ConfigHelper().activeModules != null) {
     var activeModules = ConfigHelper().activeModules;
-    var activeDoctypes = [];
+    var activeDoctypes = <CardItemLink>[];
 
-    doctypes["message"]["cards"]["items"].forEach((item) {
-      activeDoctypes.addAll(item["links"]);
+    desktopPage.message.cards.items.forEach((item) {
+      activeDoctypes.addAll(item.links);
     });
     activeDoctypes = activeDoctypes.where((m) {
-      return activeModules[module].contains(
-        m["name"],
-      );
+      return activeModules[module].contains(m.label);
     }).toList();
 
     return activeDoctypes;
+  } else {
+    return [];
   }
 }
 
-bool hasTitle(Map meta) {
-  return meta["title_field"] != null && meta["title_field"] != '';
+bool hasTitle(DoctypeDoc meta) {
+  return meta.titleField != null && meta.titleField != '';
 }
 
-getTitle(Map meta, Map doc) {
+getTitle(DoctypeDoc meta, Map doc) {
   if (hasTitle(meta)) {
-    return doc[meta["title_field"]];
+    return doc[meta.titleField];
   } else {
     return doc["name"];
   }
@@ -426,7 +434,7 @@ clearLoginInfo() async {
 
 handle403() async {
   await clearLoginInfo();
-  locator<NavigationService>().clearAllAndNavigateTo('session_expired');
+  locator<NavigationService>().clearAllAndNavigateTo(Routes.sessionExpired);
 }
 
 handleError(Response error, [bool hideAppBar = false]) {
@@ -489,7 +497,7 @@ showErrorDialog(e, BuildContext context) {
           FlatButton(
             child: Text('Ok'),
             onPressed: () async {
-              Navigator.of(context).pop();
+              locator<NavigationService>().pop();
             },
           ),
         ],
@@ -545,13 +553,13 @@ Future<bool> verifyOnline() async {
 }
 
 getLinkFields(String doctype) async {
-  var docMeta = await BackendService.getDoctype(
+  var docMeta = await locator<Api>().getDoctype(
     doctype,
   );
-  docMeta = docMeta["docs"][0];
-  var linkFieldDoctypes = docMeta["fields"]
-      .where((d) => d["fieldtype"] == 'Link')
-      .map((d) => d["options"])
+  var doc = docMeta.docs[0];
+  var linkFieldDoctypes = doc.fields
+      .where((d) => d.fieldtype == 'Link')
+      .map((d) => d.options)
       .toList();
 
   return linkFieldDoctypes;

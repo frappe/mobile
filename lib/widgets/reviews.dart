@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 
-import '../screens/add_review.dart';
+import '../app/locator.dart';
+import '../app/router.gr.dart';
+
+import '../datamodels/doctype_response.dart';
 
 import '../config/frappe_palette.dart';
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
 
-import '../utils/helpers.dart';
-import '../utils/backend_service.dart';
 import '../utils/enums.dart';
+import '../utils/helpers.dart';
+
+import '../services/api/api.dart';
+import '../services/navigation_service.dart';
 
 import '../widgets/frappe_button.dart';
 import '../widgets/card_list_tile.dart';
@@ -18,7 +23,7 @@ class Reviews extends StatefulWidget {
   final String name;
   final Map docInfo;
   final Function callback;
-  final Map meta;
+  final DoctypeDoc meta;
   final Map doc;
 
   Reviews({
@@ -48,7 +53,7 @@ class _ReviewsState extends State<Reviews> {
 
   void _refresh() {
     setState(() {
-      _futureVal = BackendService.getDocinfo(widget.doctype, widget.name);
+      _futureVal = locator<Api>().getDocinfo(widget.doctype, widget.name);
     });
   }
 
@@ -96,18 +101,14 @@ class _ReviewsState extends State<Reviews> {
         child: FrappeIconButton(
           buttonType: ButtonType.secondary,
           onPressed: () async {
-            var nav = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return AddReview(
-                    doctype: widget.doctype,
-                    docInfo: widget.docInfo,
-                    meta: widget.meta,
-                    doc: widget.doc,
-                    name: widget.name,
-                  );
-                },
+            var nav = await locator<NavigationService>().navigateTo(
+              Routes.addReview,
+              arguments: AddReviewArguments(
+                doctype: widget.doctype,
+                docInfo: widget.docInfo,
+                meta: widget.meta,
+                doc: widget.doc,
+                name: widget.name,
               ),
             );
 

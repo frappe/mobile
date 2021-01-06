@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
 import 'package:frappe_app/form/controls/barcode.dart';
 
 import '../../config/palette.dart';
@@ -24,92 +24,73 @@ import './multi_select.dart';
 import './signature.dart' as customSignature;
 
 Widget makeControl({
-  @required Map field,
+  @required DoctypeField field,
   dynamic value,
+  Map doc,
   bool withLabel = true,
   bool editMode = true,
   Function onChanged,
 }) {
   Widget fieldWidget;
-  List<String Function(dynamic)> validators = [];
 
-  if (field["reqd"] == 1) {
-    validators.add(FormBuilderValidators.required());
-  }
-
-  switch (field["fieldtype"]) {
+  switch (field.fieldtype) {
     case "Link":
       {
         fieldWidget = buildDecoratedWidget(
             LinkField(
               key: Key(value),
+              doctypeField: field,
+              doc: doc,
               fillColor: Palette.fieldBgColor,
               allowClear: editMode,
-              validators: validators,
-              attribute: field["fieldname"],
-              doctype: field["options"],
-              hint: !withLabel ? field["label"] : null,
-              refDoctype: field["refDoctype"],
-              value: value,
+              withLabel: withLabel,
             ),
             withLabel,
-            field["label"]);
+            field.label);
       }
       break;
 
     case "Autocomplete":
       {
         fieldWidget = buildDecoratedWidget(
-            AutoComplete(
-              key: Key(value),
-              fillColor: Palette.fieldBgColor,
-              allowClear: editMode,
-              validators: validators,
-              attribute: field["fieldname"],
-              options: field["options"],
-              hint: !withLabel ? field["label"] : null,
-              value: value,
-            ),
-            withLabel,
-            field["label"]);
+          AutoComplete(
+            key: Key(value),
+            fillColor: Palette.fieldBgColor,
+            allowClear: editMode,
+            doctypeField: field,
+            doc: doc,
+          ),
+          withLabel,
+          field.label,
+        );
       }
       break;
 
     case "Table":
       {
         fieldWidget = buildDecoratedWidget(
-            CustomTable(
-              doctype: field["options"],
-              items: value,
-            ),
-            withLabel,
-            field["label"]);
+          CustomTable(
+            doctypeField: field,
+            doc: doc,
+          ),
+          withLabel,
+          field.label,
+        );
       }
       break;
 
     case "Select":
       {
-        var options = [];
-        if (field["options"] != null) {
-          if (field["options"] is String) {
-            options = field["options"].split('\n');
-          } else {
-            options = field["options"];
-          }
-        }
-
         fieldWidget = buildDecoratedWidget(
             Select(
               key: Key(value),
-              value: value,
               allowClear: editMode,
-              attribute: field["fieldname"],
-              validators: validators,
-              options: options,
+              doc: doc,
+              doctypeField: field,
               withLabel: withLabel,
             ),
             withLabel,
-            field["label"]);
+            field.label);
       }
       break;
 
@@ -125,13 +106,13 @@ Widget makeControl({
         }
 
         fieldWidget = buildDecoratedWidget(
-            MultiSelect(
-              attribute: field["fieldname"],
-              hint: field["label"],
-              val: value != null ? value : [],
-            ),
-            withLabel,
-            field["label"]);
+          MultiSelect(
+            doctypeField: field,
+            doc: doc,
+          ),
+          withLabel,
+          field.label,
+        );
       }
       break;
 
@@ -140,13 +121,12 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
           SmallText(
             key: Key(value),
-            value: value,
-            attribute: field["fieldname"],
+            doctypeField: field,
+            doc: doc,
             withLabel: withLabel,
-            validators: validators,
           ),
           withLabel,
-          field["label"],
+          field.label,
         );
       }
       break;
@@ -156,13 +136,12 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
             Data(
               key: Key(value),
-              value: value,
-              attribute: field["fieldname"],
+              doc: doc,
+              doctypeField: field,
               withLabel: withLabel,
-              validators: validators,
             ),
             withLabel,
-            field["label"]);
+            field.label);
       }
       break;
 
@@ -171,11 +150,9 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
             Check(
               key: UniqueKey(),
-              value: value == 1,
+              doctypeField: field,
+              doc: doc,
               onChanged: onChanged,
-              attribute: field["fieldname"],
-              label: field["label"],
-              validators: validators,
               withLabel: withLabel,
             ),
             false);
@@ -185,14 +162,14 @@ Widget makeControl({
     case "Text Editor":
       {
         fieldWidget = buildDecoratedWidget(
-            TextEditor(
-              value: value,
-              attribute: field["fieldname"],
-              validators: validators,
-              withLabel: withLabel,
-            ),
-            withLabel,
-            field["label"]);
+          TextEditor(
+            doctypeField: field,
+            doc: doc,
+            withLabel: withLabel,
+          ),
+          withLabel,
+          field.label,
+        );
       }
       break;
 
@@ -201,14 +178,13 @@ Widget makeControl({
         fieldWidget = buildDecoratedWidget(
           DatetimeField(
             key: Key(value),
-            value: value,
-            attribute: field["fieldname"],
-            validators: validators,
+            doctypeField: field,
+            doc: doc,
             withLabel: withLabel,
             editMode: editMode,
           ),
           withLabel,
-          field["label"],
+          field.label,
         );
       }
       break;
@@ -216,91 +192,91 @@ Widget makeControl({
     case "Float":
       {
         fieldWidget = buildDecoratedWidget(
-            Float(
-              key: Key(value.toString()),
-              value: value,
-              attribute: field["fieldname"],
-              validators: validators,
-              withLabel: withLabel,
-            ),
-            withLabel,
-            field["label"]);
+          Float(
+            key: Key(value.toString()),
+            doctypeField: field,
+            doc: doc,
+            withLabel: withLabel,
+          ),
+          withLabel,
+          field.label,
+        );
       }
       break;
 
     case "Int":
       {
         fieldWidget = buildDecoratedWidget(
-            Int(
-              key: Key(value.toString()),
-              value: value,
-              attribute: field["fieldname"],
-              validators: validators,
-              withLabel: withLabel,
-            ),
-            withLabel,
-            field["label"]);
+          Int(
+            key: Key(value.toString()),
+            doctypeField: field,
+            doc: doc,
+            withLabel: withLabel,
+          ),
+          withLabel,
+          field.label,
+        );
       }
       break;
 
     case "Time":
       {
         fieldWidget = buildDecoratedWidget(
-            Time(
-              key: Key(value),
-              value: value,
-              attribute: field["fieldname"],
-              validators: validators,
-              withLabel: withLabel,
-            ),
-            withLabel,
-            field["label"]);
+          Time(
+            key: Key(value),
+            doctypeField: field,
+            doc: doc,
+            withLabel: withLabel,
+          ),
+          withLabel,
+          field.label,
+        );
       }
       break;
 
     case "Date":
       {
         fieldWidget = buildDecoratedWidget(
-            Date(
-              key: Key(value),
-              value: value,
-              attribute: field["fieldname"],
-              validators: validators,
-              withLabel: withLabel,
-            ),
-            withLabel,
-            field["label"]);
+          Date(
+            key: Key(value),
+            doctypeField: field,
+            doc: doc,
+            withLabel: withLabel,
+          ),
+          withLabel,
+          field.label,
+        );
       }
       break;
 
-    case "Signature":
-      {
-        fieldWidget = buildDecoratedWidget(
-            customSignature.Signature(
-              key: Key(value),
-              value: value,
-              attribute: field["fieldname"],
-              validators: validators,
-              withLabel: withLabel,
-            ),
-            withLabel,
-            field["label"]);
-      }
-      break;
+    // case "Signature":
+    //   {
+    //     fieldWidget = buildDecoratedWidget(
+    //       customSignature.Signature(
+    //         key: Key(value),
+    //         doc: doc,
+    //         doctypeField: field,
+    //         withLabel: withLabel,
+    //       ),
+    //       withLabel,
+    //       field.label,
+    //     );
+    //   }
+    //   break;
 
-    case "Barcode":
-      {
-        fieldWidget = buildDecoratedWidget(
-            FormBuilderBarcode(
-              key: Key(value),
-              initialValue: value,
-              attribute: field["fieldname"],
-              validators: validators,
-            ),
-            withLabel,
-            field["label"]);
-      }
-      break;
+    // case "Barcode":
+    //   {
+    //     fieldWidget = buildDecoratedWidget(
+    //       FormBuilderBarcode(
+    //         key: Key(value),
+    //         doctypeField: field,
+    //         doc: doc,
+    //       ),
+    //       withLabel,
+    //       field.label,
+    //     );
+    //   }
+    //   break;
 
     default:
       fieldWidget = Container();

@@ -1,49 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/config/frappe_palette.dart';
-
 import 'package:json_table/json_table.dart';
 
-import '../../utils/backend_service.dart';
+import '../../datamodels/doctype_response.dart';
+import '../../app/locator.dart';
+import '../../config/frappe_palette.dart';
+import '../../services/api/api.dart';
 
 class CustomTable extends StatelessWidget {
-  final String doctype;
-  final List items;
+  final DoctypeField doctypeField;
+  final Map doc;
 
   const CustomTable({
     Key key,
-    @required this.doctype,
-    @required this.items,
+    @required this.doctypeField,
+    this.doc,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    if (items == null) {
+    if (doc == null || doc[doctypeField.fieldname] == null) {
       return Container();
     }
     return FutureBuilder(
-      future: BackendService.getDoctype(doctype),
+      future: locator<Api>().getDoctype(doctypeField.options),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           var colCount = 3;
           List<JsonTableColumn> columns = [];
           var numFields = [];
 
-          List metaFields = snapshot.data["docs"][0]["fields"];
+          var metaFields = (snapshot.data as DoctypeResponse).docs[0].fields;
           var tableFields = metaFields.where((field) {
-            return field["in_list_view"] == 1;
+            return field.inListView == 1;
           }).toList();
 
           tableFields.forEach(
             (item) {
               columns.add(
                 JsonTableColumn(
-                  item["fieldname"],
-                  label: item["label"],
+                  item.fieldname,
+                  label: item.label,
                 ),
               );
 
-              if (["Float", "Int"].contains(item["fieldtype"])) {
-                numFields.add(item["label"]);
+              if (["Float", "Int"].contains(item.fieldtype)) {
+                numFields.add(item.label);
               }
             },
           );
@@ -51,7 +52,7 @@ class CustomTable extends StatelessWidget {
           colCount = columns.length < colCount ? columns.length : colCount;
 
           return JsonTable(
-            items,
+            doc[doctypeField.fieldname],
             tableCellBuilder: (value) {
               var isNum = double.tryParse(value) != null;
               return Container(

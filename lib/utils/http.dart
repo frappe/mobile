@@ -1,8 +1,9 @@
-import 'package:frappe_app/utils/dio_helper.dart';
+import '../app/locator.dart';
+import '../services/api/api.dart';
 
+import '../utils/dio_helper.dart';
 import '../utils/cache_helper.dart';
 import '../utils/config_helper.dart';
-import '../utils/backend_service.dart';
 
 void initConfig() async {
   if (ConfigHelper().baseUrl != null) {
@@ -10,7 +11,7 @@ void initConfig() async {
   }
 }
 
-void cacheAllUsers() async {
+Future<void> cacheAllUsers() async {
   var allUsers = await CacheHelper.getCache('allUsers');
   allUsers = allUsers["data"];
   if (allUsers != null) {
@@ -26,13 +27,13 @@ void cacheAllUsers() async {
       ["User", "enabled", "=", 1]
     ];
 
-    var meta = await BackendService.getDoctype('User');
+    var meta = await locator<Api>().getDoctype('User');
 
-    var res = await BackendService.fetchList(
+    var res = await locator<Api>().fetchList(
       fieldnames: fieldNames,
       doctype: 'User',
       filters: filters,
-      meta: meta,
+      meta: meta.docs[0],
     );
 
     var usr = {};
@@ -43,7 +44,7 @@ void cacheAllUsers() async {
   }
 }
 
-void setBaseUrl(url) async {
+Future<void> setBaseUrl(url) async {
   if (!url.startsWith('https://')) {
     url = "https://$url";
   }

@@ -1,6 +1,6 @@
 import '../services/storage_service.dart';
 
-import '../service_locator.dart';
+import '../app/locator.dart';
 
 class ConfigHelper {
   static var configContainer = locator<StorageService>().getBox('config');

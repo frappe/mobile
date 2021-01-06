@@ -1,32 +1,31 @@
 import 'dart:io';
 
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:frappe_app/utils/backend_service.dart';
-
+import 'package:dio/dio.dart';
+import 'package:frappe_app/views/home.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import 'datamodels/doctype_response.dart';
+import 'app/router.gr.dart';
+
 import 'lifecycle_manager.dart';
+import 'app/locator.dart';
+
 import 'utils/cache_helper.dart';
 import 'utils/config_helper.dart';
 import 'utils/enums.dart';
 import 'utils/helpers.dart';
 
-import 'service_locator.dart';
+import 'services/api/api.dart';
 import 'services/connectivity_service.dart';
 import 'services/navigation_service.dart';
 
-import 'screens/no_internet.dart';
-import 'screens/session_expired.dart';
-import 'screens/custom_persistent_bottom_nav_bar.dart';
-import 'screens/filter_list.dart';
-import 'screens/form_view.dart';
-import 'screens/list_view.dart';
-import 'screens/simple_form.dart';
-import 'screens/login.dart';
-import 'screens/module_view.dart';
+import 'views/filter_list.dart';
+import 'views/form_view.dart';
+import 'views/list_view.dart';
+import 'views/simple_form.dart';
+import 'views/login/login_view.dart';
 
 class FrappeApp extends StatefulWidget {
   @override
@@ -61,19 +60,8 @@ class _FrappeAppState extends State<FrappeApp> {
           debugShowCheckedModeBanner: false,
           title: 'Frappe',
           navigatorKey: locator<NavigationService>().navigatorKey,
-          onGenerateRoute: (routeSettings) {
-            switch (routeSettings.name) {
-              case 'login':
-                return MaterialPageRoute(builder: (context) => Login());
-              case 'session_expired':
-                return MaterialPageRoute(
-                    builder: (context) => SessionExpired());
-              case 'no_internet':
-                return MaterialPageRoute(builder: (context) => NoInternet());
-              default:
-                return MaterialPageRoute(builder: (context) => FrappeApp());
-            }
-          },
+          onGenerateRoute: MyRouter().onGenerateRoute,
+          initialRoute: Routes.frappeApp,
           theme: new ThemeData(
             textTheme: GoogleFonts.interTextTheme(
               Theme.of(context).textTheme.apply(
@@ -91,18 +79,13 @@ class _FrappeAppState extends State<FrappeApp> {
             child: Scaffold(
               body: _isLoaded
                   ? _isLoggedIn
-                      ? CustomPersistentBottomNavBar()
+                      ? Home()
                       : Login()
                   : Center(
                       child: CircularProgressIndicator(),
                     ),
             ),
           ),
-          routes: <String, WidgetBuilder>{
-            // Set routes for using the Navigator.
-            '/login': (BuildContext context) => Login(),
-            '/modules': (BuildContext context) => ModuleView(),
-          },
         ),
       ),
     );
@@ -131,7 +114,7 @@ class CustomRouter extends StatelessWidget {
   _getData() async {
     var cachedMeta = await CacheHelper.getCache('${doctype}Meta');
     var filter = await CacheHelper.getCache('${doctype}Filter');
-    var metaResponse;
+    DoctypeResponse metaResponse;
 
     var isOnline = await verifyOnline();
 
@@ -143,16 +126,18 @@ class CustomRouter extends StatelessWidget {
         var cacheTimeElapsedMins =
             DateTime.now().difference(cacheTime).inMinutes;
         if (cacheTimeElapsedMins > 15) {
-          metaResponse = await BackendService.getDoctype(doctype);
+          metaResponse = await locator<Api>().getDoctype(doctype);
         } else {
-          metaResponse = cachedMeta["data"];
+          metaResponse = DoctypeResponse.fromJson(
+              Map<String, dynamic>.from(cachedMeta["data"]));
         }
       } else {
-        metaResponse = await BackendService.getDoctype(doctype);
+        metaResponse = await locator<Api>().getDoctype(doctype);
       }
     } else {
       if (cachedMeta["data"] != null) {
-        metaResponse = cachedMeta["data"];
+        metaResponse = DoctypeResponse.fromJson(
+            Map<String, dynamic>.from(cachedMeta["data"]));
       } else {
         throw Response(statusCode: HttpStatus.serviceUnavailable);
       }
@@ -172,8 +157,7 @@ class CustomRouter extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData &&
               snapshot.connectionState == ConnectionState.done) {
-            var docMeta = snapshot.data["meta"];
-            docMeta = docMeta["docs"][0];
+            var docMeta = (snapshot.data["meta"] as DoctypeResponse).docs[0];
 
             if (viewType == ViewType.list) {
               var defaultFilters = [];
@@ -206,18 +190,18 @@ class CustomRouter extends StatelessWidget {
               );
             } else if (viewType == ViewType.filter) {
               var defaultFilters = [
-                {
-                  "is_default_filter": 1,
-                  "fieldname": "_assign",
-                  "options": "User",
-                  "label": "Assigned To",
-                  "fieldtype": "Link"
-                },
+                DoctypeField(
+                  isDefaultFilter: 1,
+                  fieldname: "_assign",
+                  options: "User",
+                  label: "Assigned To",
+                  fieldtype: "Link",
+                )
               ];
-              docMeta["fields"].addAll(defaultFilters);
+              docMeta.fields.addAll(defaultFilters);
               return FilterList(
                 filters: filters,
-                wireframe: docMeta,
+                meta: docMeta,
                 filterCallback: filterCallback,
                 appBarTitle: "Filter $doctype",
               );

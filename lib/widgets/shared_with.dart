@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
-import '../screens/share.dart';
+import '../app/locator.dart';
+import '../app/router.gr.dart';
+
+import '../services/api/api.dart';
+import '../services/navigation_service.dart';
 
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
 
 import '../utils/helpers.dart';
-import '../utils/backend_service.dart';
 import '../utils/enums.dart';
 
 import '../widgets/frappe_button.dart';
@@ -45,7 +48,7 @@ class _SharedWithState extends State<SharedWith> {
 
   void _refresh() {
     setState(() {
-      _futureVal = BackendService.getDocinfo(widget.doctype, widget.name);
+      _futureVal = locator<Api>().getDocinfo(widget.doctype, widget.name);
     });
   }
 
@@ -57,16 +60,12 @@ class _SharedWithState extends State<SharedWith> {
         ),
         child: CardListTile(
           onTap: () async {
-            var nav = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return Share(
-                    docInfo: docInfo,
-                    doctype: widget.doctype,
-                    name: widget.name,
-                  );
-                },
+            var nav = await locator<NavigationService>().navigateTo(
+              Routes.share,
+              arguments: ShareArguments(
+                docInfo: docInfo,
+                doctype: widget.doctype,
+                name: widget.name,
               ),
             );
 
@@ -92,16 +91,12 @@ class _SharedWithState extends State<SharedWith> {
         child: FrappeIconButton(
           buttonType: ButtonType.secondary,
           onPressed: () async {
-            var nav = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return Share(
-                    docInfo: docInfo,
-                    doctype: widget.doctype,
-                    name: widget.name,
-                  );
-                },
+            var nav = await locator<NavigationService>().navigateTo(
+              Routes.share,
+              arguments: ShareArguments(
+                docInfo: docInfo,
+                doctype: widget.doctype,
+                name: widget.name,
               ),
             );
 
