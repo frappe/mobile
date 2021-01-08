@@ -20,7 +20,9 @@ import '../views/comment_input.dart';
 import '../views/email_form.dart';
 import '../views/file_picker.dart';
 import '../views/home.dart';
+import '../views/list_view.dart';
 import '../views/login/login_view.dart';
+import '../views/new_doc.dart';
 import '../views/no_internet.dart';
 import '../views/queue.dart';
 import '../views/queue_error.dart';
@@ -33,6 +35,8 @@ class Routes {
   static const String frappeApp = '/';
   static const String login = '/Login';
   static const String home = '/Home';
+  static const String customListView = '/custom-list-view';
+  static const String newDoc = '/new-doc';
   static const String activateModules = '/activate-modules';
   static const String sessionExpired = '/session-expired';
   static const String noInternet = '/no-internet';
@@ -52,6 +56,8 @@ class Routes {
     frappeApp,
     login,
     home,
+    customListView,
+    newDoc,
     activateModules,
     sessionExpired,
     noInternet,
@@ -77,6 +83,8 @@ class MyRouter extends RouterBase {
     RouteDef(Routes.frappeApp, page: FrappeApp),
     RouteDef(Routes.login, page: Login),
     RouteDef(Routes.home, page: Home),
+    RouteDef(Routes.customListView, page: CustomListView),
+    RouteDef(Routes.newDoc, page: NewDoc),
     RouteDef(Routes.activateModules, page: ActivateModules),
     RouteDef(Routes.sessionExpired, page: SessionExpired),
     RouteDef(Routes.noInternet, page: NoInternet),
@@ -111,6 +119,23 @@ class MyRouter extends RouterBase {
     Home: (data) {
       return MaterialPageRoute<dynamic>(
         builder: (context) => Home(),
+        settings: data,
+      );
+    },
+    CustomListView: (data) {
+      final args = data.getArgs<CustomListViewArguments>(nullOk: false);
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => CustomListView(
+          doctype: args.doctype,
+          filterCallback: args.filterCallback,
+        ),
+        settings: data,
+      );
+    },
+    NewDoc: (data) {
+      final args = data.getArgs<NewDocArguments>(nullOk: false);
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => NewDoc(doctype: args.doctype),
         settings: data,
       );
     },
@@ -284,6 +309,19 @@ class MyRouter extends RouterBase {
 /// ************************************************************************
 /// Arguments holder classes
 /// *************************************************************************
+
+/// CustomListView arguments holder class
+class CustomListViewArguments {
+  final String doctype;
+  final Function filterCallback;
+  CustomListViewArguments({@required this.doctype, this.filterCallback});
+}
+
+/// NewDoc arguments holder class
+class NewDocArguments {
+  final String doctype;
+  NewDocArguments({@required this.doctype});
+}
 
 /// NoInternet arguments holder class
 class NoInternetArguments {

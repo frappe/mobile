@@ -3,6 +3,8 @@ import 'package:auto_route/auto_route_annotations.dart';
 import '../widgets/email_box.dart';
 import '../app.dart';
 
+import '../views/new_doc.dart';
+import '../views/list_view.dart';
 import '../views/home.dart';
 import '../views/add_assignees.dart';
 import '../views/add_review.dart';
@@ -25,6 +27,8 @@ import '../views/login/login_view.dart';
     MaterialRoute(page: FrappeApp, initial: true),
     MaterialRoute(page: Login),
     MaterialRoute(page: Home),
+    MaterialRoute(page: CustomListView),
+    MaterialRoute(page: NewDoc),
     MaterialRoute(page: ActivateModules),
     MaterialRoute(page: SessionExpired),
     MaterialRoute(page: NoInternet),

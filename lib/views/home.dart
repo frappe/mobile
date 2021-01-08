@@ -296,10 +296,9 @@ class _HomeState extends State<Home> {
                       title: Text(m.label),
                       onTap: () {
                         locator<NavigationService>().navigateTo(
-                          Routes.customRouter,
-                          arguments: CustomRouterArguments(
+                          Routes.customListView,
+                          arguments: CustomListViewArguments(
                             doctype: m.label,
-                            viewType: ViewType.list,
                           ),
                         );
                       },

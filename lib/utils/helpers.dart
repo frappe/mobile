@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frappe_app/app/router.gr.dart';
+import 'package:frappe_app/services/storage_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -574,4 +575,32 @@ Future<bool> getSharedPrefValue(String key) async {
   var _prefs = await SharedPreferences.getInstance();
   await _prefs.reload();
   return _prefs.getBool(key);
+}
+
+resetValues() async {
+  await putSharedPrefValue("backgroundTask", false);
+  await putSharedPrefValue("cacheApi", true);
+}
+
+initDb() async {
+  await locator<StorageService>().initStorage();
+
+  await locator<StorageService>().initBox('queue');
+  await locator<StorageService>().initBox('cache');
+  await locator<StorageService>().initBox('config');
+}
+
+initLocatlNotifications() async {
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('app_icon');
+
+  final IOSInitializationSettings initializationSettingsIOS =
+      IOSInitializationSettings();
+  final InitializationSettings initializationSettings = InitializationSettings(
+    iOS: initializationSettingsIOS,
+    android: initializationSettingsAndroid,
+  );
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+  );
 }

@@ -5,7 +5,7 @@ import '../utils/dio_helper.dart';
 import '../utils/cache_helper.dart';
 import '../utils/config_helper.dart';
 
-void initConfig() async {
+initApiConfig() async {
   if (ConfigHelper().baseUrl != null) {
     await DioHelper.init(ConfigHelper().baseUrl);
   }

@@ -22,7 +22,7 @@ void callbackDispatcher() {
     await locator<StorageService>().initBox('queue');
     await locator<StorageService>().initBox('cache');
 
-    await initConfig();
+    await initApiConfig();
 
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();

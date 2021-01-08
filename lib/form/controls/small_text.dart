@@ -29,7 +29,7 @@ class SmallText extends StatelessWidget with Control, ControlInput {
     );
     return FormBuilderTextField(
       key: key,
-      initialValue: doc[doctypeField.fieldname],
+      initialValue: doc != null ? doc[doctypeField.fieldname] : null,
       name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(
         withLabel,

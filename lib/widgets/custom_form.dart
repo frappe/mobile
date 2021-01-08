@@ -21,7 +21,10 @@ class CustomForm extends StatelessWidget {
   }) : super(key: key);
 
   List<Widget> _generateChildren(
-      List<DoctypeField> fields, Map doc, bool editMode) {
+    List<DoctypeField> fields,
+    Map doc,
+    bool editMode,
+  ) {
     List<DoctypeField> filteredFields;
 
     if (viewType == ViewType.form) {

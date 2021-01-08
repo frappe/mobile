@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:dio/dio.dart';
+import 'package:frappe_app/datamodels/doctype_response.dart';
 import 'package:frappe_app/services/api/api.dart';
 
 import '../utils/config_helper.dart';
@@ -229,5 +232,36 @@ class CacheHelper {
       "cacheApi",
     );
     return cacheApi ?? true;
+  }
+
+  static Future<DoctypeResponse> getMeta(String doctype) async {
+    var cachedMeta = getCache('${doctype}Meta');
+    var isOnline = await verifyOnline();
+
+    DoctypeResponse metaResponse;
+
+    if (isOnline) {
+      if (cachedMeta["data"] != null) {
+        DateTime cacheTime = cachedMeta["timestamp"];
+        var cacheTimeElapsedMins =
+            DateTime.now().difference(cacheTime).inMinutes;
+        if (cacheTimeElapsedMins > 15) {
+          metaResponse = await locator<Api>().getDoctype(doctype);
+        } else {
+          metaResponse = DoctypeResponse.fromJson(
+              Map<String, dynamic>.from(cachedMeta["data"]));
+        }
+      } else {
+        metaResponse = await locator<Api>().getDoctype(doctype);
+      }
+    } else {
+      if (cachedMeta["data"] != null) {
+        metaResponse = DoctypeResponse.fromJson(
+            Map<String, dynamic>.from(cachedMeta["data"]));
+      } else {
+        throw Response(statusCode: HttpStatus.serviceUnavailable);
+      }
+    }
+    return metaResponse;
   }
 }

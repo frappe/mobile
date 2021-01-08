@@ -11,16 +11,10 @@ import '../utils/cache_helper.dart';
 import '../utils/enums.dart';
 
 class FilterList extends StatefulWidget {
-  final Function filterCallback;
-  final DoctypeDoc meta;
-  final String appBarTitle;
-  final List filters;
+  final String doctype;
 
   FilterList({
-    this.filterCallback,
-    @required this.meta,
-    @required this.appBarTitle,
-    this.filters,
+    @required this.doctype,
   });
 
   static int getFieldFilterIndex(List filters, String field) {
@@ -88,17 +82,26 @@ class FilterList extends StatefulWidget {
 class _FilterListState extends State<FilterList> {
   GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
 
-  List<Widget> _generateChildren(List<DoctypeField> fields) {
+  List<Widget> _generateChildren(List<DoctypeField> fields, List filters) {
+    fields.add(DoctypeField(
+      isDefaultFilter: 1,
+      fieldname: "_assign",
+      options: "User",
+      label: "Assigned To",
+      fieldtype: "Link",
+    ));
     return fields.where((field) {
       return field.inStandardFilter == 1 || field.isDefaultFilter == 1;
     }).map<Widget>(
       (field) {
         var val;
+        var valObj;
 
-        if (widget.filters != null && widget.filters.length > 0) {
-          for (int i = 0; i < widget.filters.length; i++) {
-            if (widget.filters[i][1] == field.fieldname) {
-              val = widget.filters[i][3];
+        if (filters != null && filters.length > 0) {
+          for (int i = 0; i < filters.length; i++) {
+            if (filters[i][1] == field.fieldname) {
+              val = filters[i][3];
+              valObj = {field.fieldname: filters[i][3]};
             }
           }
         }
@@ -106,7 +109,7 @@ class _FilterListState extends State<FilterList> {
         return Column(
           children: <Widget>[
             ListTile(
-              title: makeControl(field: field, value: val),
+              title: makeControl(field: field, value: val, doc: valObj),
             ),
             Divider(
               height: 10.0,
@@ -117,73 +120,101 @@ class _FilterListState extends State<FilterList> {
     ).toList();
   }
 
+  _getData() async {
+    var meta = await CacheHelper.getMeta(widget.doctype);
+    var cachedFilter = CacheHelper.getCache('${widget.doctype}Filter');
+    List filter = cachedFilter["data"] ?? [];
+
+    return {
+      "meta": meta,
+      "filter": filter,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      bottomNavigationBar: Container(
-        height: 60,
-        child: BottomAppBar(
-          color: Colors.white,
-          child: Row(
-            children: [
-              Spacer(),
-              FrappeFlatButton(
-                minWidth: 120.0,
-                buttonType: ButtonType.secondary,
-                title: 'Clear All',
+    return FutureBuilder(
+      future: _getData(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData &&
+            snapshot.connectionState == ConnectionState.done) {
+          var meta = snapshot.data["meta"];
+          var filters = snapshot.data["filter"];
+          return Scaffold(
+            backgroundColor: Colors.white,
+            bottomNavigationBar: Container(
+              height: 60,
+              child: BottomAppBar(
+                color: Colors.white,
+                child: Row(
+                  children: [
+                    Spacer(),
+                    FrappeFlatButton(
+                      minWidth: 120.0,
+                      buttonType: ButtonType.secondary,
+                      title: 'Clear All',
+                      onPressed: () {
+                        FilterList.clearFilters(meta.docs[0].name);
+                        _fbKey.currentState.reset();
+                        filters.clear();
+                        setState(() {});
+                      },
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    FrappeFlatButton(
+                      minWidth: 120.0,
+                      buttonType: ButtonType.primary,
+                      onPressed: () async {
+                        _fbKey.currentState.save();
+
+                        await FilterList.generateFilters(
+                          meta.docs[0].name,
+                          _fbKey.currentState.value,
+                        );
+
+                        locator<NavigationService>().pop(true);
+                      },
+                      title: 'Apply',
+                    ),
+                    Spacer()
+                  ],
+                ),
+              ),
+            ),
+            appBar: AppBar(
+              elevation: 0.5,
+              leading: IconButton(
+                icon: Icon(
+                  Icons.close,
+                ),
                 onPressed: () {
-                  FilterList.clearFilters(widget.meta.name);
-                  _fbKey.currentState.reset();
-                  widget.filters.clear();
-                  setState(() {});
-                },
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              FrappeFlatButton(
-                minWidth: 120.0,
-                buttonType: ButtonType.primary,
-                onPressed: () async {
-                  _fbKey.currentState.save();
-
-                  var filters = await FilterList.generateFilters(
-                    widget.meta.name,
-                    _fbKey.currentState.value,
-                  );
-
                   locator<NavigationService>().pop();
-
-                  widget.filterCallback(filters);
                 },
-                title: 'Apply',
               ),
-              Spacer()
-            ],
-          ),
-        ),
-      ),
-      appBar: AppBar(
-        elevation: 0.5,
-        leading: IconButton(
-          icon: Icon(
-            Icons.close,
-          ),
-          onPressed: () {
-            locator<NavigationService>().pop();
-          },
-        ),
-      ),
-      body: FormBuilder(
-        key: _fbKey,
-        child: ListView(
-          padding: EdgeInsets.all(10),
-          children: _generateChildren(
-            widget.meta.fields,
-          ),
-        ),
-      ),
+            ),
+            body: FormBuilder(
+              key: _fbKey,
+              child: ListView(
+                padding: EdgeInsets.all(10),
+                children: _generateChildren(
+                  meta.docs[0].fields,
+                  filters,
+                ),
+              ),
+            ),
+          );
+        } else {
+          return Scaffold(
+            body: snapshot.hasError
+                ? Center(child: Text(snapshot.error))
+                : Center(
+                    child: CircularProgressIndicator(),
+                  ),
+          );
+        }
+      },
     );
   }
 }

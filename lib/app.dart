@@ -24,7 +24,7 @@ import 'services/navigation_service.dart';
 import 'views/filter_list.dart';
 import 'views/form_view.dart';
 import 'views/list_view.dart';
-import 'views/simple_form.dart';
+import 'views/new_doc.dart';
 import 'views/login/login_view.dart';
 
 class FrappeApp extends StatefulWidget {
@@ -159,28 +159,7 @@ class CustomRouter extends StatelessWidget {
               snapshot.connectionState == ConnectionState.done) {
             var docMeta = (snapshot.data["meta"] as DoctypeResponse).docs[0];
 
-            if (viewType == ViewType.list) {
-              var defaultFilters = [];
-              if (filters == null) {
-                // cached filters
-                // TODO
-                if (snapshot.data["filter"] != null) {
-                  defaultFilters = snapshot.data["filter"];
-                } else if (ConfigHelper().userId != null) {
-                  defaultFilters.add(
-                    [doctype, "_assign", "like", "%${ConfigHelper().userId}%"],
-                  );
-                }
-              }
-
-              return CustomListView(
-                filters: filters ?? defaultFilters,
-                meta: docMeta,
-                doctype: doctype,
-                appBarTitle: doctype,
-                fieldnames: generateFieldnames(doctype, docMeta),
-              );
-            } else if (viewType == ViewType.form) {
+            if (viewType == ViewType.form) {
               return FormView(
                 doctype: doctype,
                 name: name,
@@ -188,25 +167,6 @@ class CustomRouter extends StatelessWidget {
                 queued: queued ?? false,
                 queuedData: queuedData,
               );
-            } else if (viewType == ViewType.filter) {
-              var defaultFilters = [
-                DoctypeField(
-                  isDefaultFilter: 1,
-                  fieldname: "_assign",
-                  options: "User",
-                  label: "Assigned To",
-                  fieldtype: "Link",
-                )
-              ];
-              docMeta.fields.addAll(defaultFilters);
-              return FilterList(
-                filters: filters,
-                meta: docMeta,
-                filterCallback: filterCallback,
-                appBarTitle: "Filter $doctype",
-              );
-            } else if (viewType == ViewType.newForm) {
-              return SimpleForm(docMeta);
             }
           } else if (snapshot.hasError) {
             return handleError(snapshot.error);
