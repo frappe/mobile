@@ -1,78 +1,39 @@
 class DeskSidebarItemsResponse {
-  DeskMessage message;
+  List<DeskMessage> message;
 
   DeskSidebarItemsResponse({this.message});
 
   DeskSidebarItemsResponse.fromJson(Map<String, dynamic> json) {
-    message = json['message'] != null
-        ? new DeskMessage.fromJson(json['message'])
-        : null;
+    if (json['message'] != null) {
+      message = new List<DeskMessage>();
+      json['message'].forEach((v) {
+        message.add(new DeskMessage.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.message != null) {
-      data['message'] = this.message.toJson();
+      data['message'] = this.message.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class DeskMessage {
-  List<DeskItem> modules;
-  List<DeskItem> administration;
-  List<DeskItem> domains;
-
-  DeskMessage({this.modules, this.administration, this.domains});
-
-  DeskMessage.fromJson(Map<String, dynamic> json) {
-    if (json['Modules'] != null) {
-      modules = new List<DeskItem>();
-      json['Modules'].forEach((v) {
-        modules.add(new DeskItem.fromJson(v));
-      });
-    }
-    if (json['Administration'] != null) {
-      administration = new List<DeskItem>();
-      json['Administration'].forEach((v) {
-        administration.add(new DeskItem.fromJson(v));
-      });
-    }
-    if (json['Domains'] != null) {
-      domains = new List<DeskItem>();
-      json['Domains'].forEach((v) {
-        domains.add(new DeskItem.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.modules != null) {
-      data['Modules'] = this.modules.map((v) => v.toJson()).toList();
-    }
-    if (this.administration != null) {
-      data['Administration'] =
-          this.administration.map((v) => v.toJson()).toList();
-    }
-    if (this.domains != null) {
-      data['Domains'] = this.domains.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
-}
-
-class DeskItem {
   String name;
   String category;
+  String icon;
   String module;
   String label;
 
-  DeskItem({this.name, this.category, this.module, this.label});
+  DeskMessage({this.name, this.category, this.icon, this.module, this.label});
 
-  DeskItem.fromJson(Map<String, dynamic> json) {
+  DeskMessage.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     category = json['category'];
+    icon = json['icon'];
     module = json['module'];
     label = json['label'];
   }
@@ -81,6 +42,7 @@ class DeskItem {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['name'] = this.name;
     data['category'] = this.category;
+    data['icon'] = this.icon;
     data['module'] = this.module;
     data['label'] = this.label;
     return data;

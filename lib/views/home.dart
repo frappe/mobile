@@ -64,12 +64,7 @@ class _HomeState extends State<Home> {
       deskSidebarItems = await locator<Api>().getDeskSideBarItems();
     }
 
-    List<DeskItem> modules = [
-      ...deskSidebarItems.message.modules,
-      ...deskSidebarItems.message.administration,
-      ...deskSidebarItems.message.domains
-    ];
-    modules = modules.where((m) {
+    var modules = deskSidebarItems.message.where((m) {
       return activeModules.keys.contains(m.name) &&
           activeModules[m.name].length > 0;
     }).toList();

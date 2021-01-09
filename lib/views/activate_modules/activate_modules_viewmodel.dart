@@ -26,7 +26,9 @@ class ActivateModulesViewModel {
       var meta = await locator<Api>().getDoctype('Doctype');
       var doctypeDoc = meta.docs[0];
       var deskSideBarItems = await locator<Api>().getDeskSideBarItems();
-      var deskModules = deskSideBarItems.message.modules;
+      var deskModules = deskSideBarItems.message.where((item) {
+        return item.category == "Modules";
+      }).toList();
 
       var doctypes = await locator<Api>().fetchList(
         fieldnames: [
