@@ -33,14 +33,12 @@ import '../widgets/like_doc.dart';
 class FormView extends StatefulWidget {
   final String doctype;
   final String name;
-  final DoctypeDoc meta;
   final bool queued;
   final Map queuedData;
 
   FormView({
     @required this.doctype,
     this.name,
-    this.meta,
     this.queued = false,
     this.queuedData,
   });
@@ -66,7 +64,12 @@ class _FormViewState extends State<FormView>
     if (widget.queued) {
       return Future.value(
         {
-          "docs": widget.queuedData["data"],
+          "data": {
+            "docs": widget.queuedData["data"],
+          },
+          "meta": await CacheHelper.getMeta(
+            widget.doctype,
+          )
         },
       );
     } else {
@@ -79,19 +82,32 @@ class _FormViewState extends State<FormView>
       if ((connectionStatus == null ||
               connectionStatus == ConnectivityStatus.offline) &&
           !isOnline) {
-        var response =
-            await CacheHelper.getCache('${widget.doctype}${widget.name}');
+        var response = await CacheHelper.getCache(
+          '${widget.doctype}${widget.name}',
+        );
         response = response["data"];
         if (response != null) {
-          return response;
+          return {
+            "data": response,
+            "meta": await CacheHelper.getMeta(
+              widget.doctype,
+            )
+          };
         } else {
-          throw Response(statusCode: HttpStatus.serviceUnavailable);
+          throw Response(
+            statusCode: HttpStatus.serviceUnavailable,
+          );
         }
       } else {
-        return locator<Api>().getdoc(
-          widget.doctype,
-          widget.name,
-        );
+        return {
+          "data": await locator<Api>().getdoc(
+            widget.doctype,
+            widget.name,
+          ),
+          "meta": await CacheHelper.getMeta(
+            widget.doctype,
+          )
+        };
       }
     }
   }
@@ -125,7 +141,7 @@ class _FormViewState extends State<FormView>
     return w;
   }
 
-  Widget _bottomBar(Map doc) {
+  Widget _bottomBar(Map doc, DoctypeResponse meta) {
     return Container(
       height: editMode ? 0 : 60,
       child: BottomAppBar(
@@ -159,9 +175,9 @@ class _FormViewState extends State<FormView>
                   Routes.emailForm,
                   arguments: EmailFormArguments(
                     callback: _refresh,
-                    subjectField: doc[widget.meta.subjectField] ??
-                        getTitle(widget.meta, doc),
-                    senderField: doc[widget.meta.senderField],
+                    subjectField: doc[meta.docs[0].subjectField] ??
+                        getTitle(meta.docs[0], doc),
+                    senderField: doc[meta.docs[0].senderField],
                     doctype: widget.doctype,
                     doc: widget.name,
                   ),
@@ -175,7 +191,8 @@ class _FormViewState extends State<FormView>
     );
   }
 
-  _handleUpdate(Map doc, ConnectivityStatus connectionStatus) async {
+  _handleUpdate(Map doc, ConnectivityStatus connectionStatus,
+      DoctypeResponse meta) async {
     if (_fbKey.currentState.saveAndValidate()) {
       var formValue = _fbKey.currentState.value;
       formValue.forEach((key, value) {
@@ -204,7 +221,7 @@ class _FormViewState extends State<FormView>
             )
           };
           widget.queuedData["title"] = getTitle(
-            widget.meta,
+            meta.docs[0],
             formValue,
           );
 
@@ -217,7 +234,7 @@ class _FormViewState extends State<FormView>
             "type": "Update",
             "name": widget.name,
             "doctype": widget.doctype,
-            "title": getTitle(widget.meta, formValue),
+            "title": getTitle(meta.docs[0], formValue),
             "updated_keys": extractChangedValues(doc, formValue),
             "data": [
               {
@@ -259,17 +276,17 @@ class _FormViewState extends State<FormView>
     }
   }
 
-  Widget _appBar({
-    Map doc,
-    Map docInfo,
-    BuildContext context,
-    ConnectivityStatus connectionStatus,
-  }) {
+  Widget _appBar(
+      {Map doc,
+      Map docInfo,
+      BuildContext context,
+      ConnectivityStatus connectionStatus,
+      @required DoctypeResponse meta}) {
     String title;
     if (widget.queuedData != null) {
       title = widget.queuedData["title"];
     } else {
-      title = getTitle(widget.meta, doc) ?? "";
+      title = getTitle(meta.docs[0], doc) ?? "";
     }
 
     return SliverAppBar(
@@ -288,7 +305,7 @@ class _FormViewState extends State<FormView>
                     locator<NavigationService>().navigateTo(
                       Routes.viewDocInfo,
                       arguments: ViewDocInfoArguments(
-                        meta: widget.meta,
+                        meta: meta.docs[0],
                         doc: doc,
                         docInfo: docInfo,
                         doctype: widget.doctype,
@@ -343,7 +360,7 @@ class _FormViewState extends State<FormView>
                             Routes.viewDocInfo,
                             arguments: ViewDocInfoArguments(
                               doc: doc,
-                              meta: widget.meta,
+                              meta: meta.docs[0],
                               docInfo: docInfo,
                               doctype: widget.doctype,
                               name: widget.name,
@@ -393,7 +410,7 @@ class _FormViewState extends State<FormView>
             buttonType: ButtonType.primary,
             title: editMode ? 'Save' : 'Edit',
             onPressed: editMode
-                ? () => _handleUpdate(doc, connectionStatus)
+                ? () => _handleUpdate(doc, connectionStatus, meta)
                 : () {
                     setState(() {
                       editMode = true;
@@ -436,9 +453,12 @@ class _FormViewState extends State<FormView>
     return FutureBuilder(
         future: _getData(),
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            var docs = snapshot.data["docs"];
-            var docInfo = snapshot.data["docinfo"];
+          if (snapshot.hasData &&
+              snapshot.connectionState == ConnectionState.done) {
+            var docs = snapshot.data["data"]["docs"];
+            var docInfo = snapshot.data["data"]["docinfo"];
+            var meta = (snapshot.data["meta"] as DoctypeResponse);
+
             var builderContext;
             var likedBy = docs[0]['_liked_by'] != null
                 ? json.decode(docs[0]['_liked_by'])
@@ -447,7 +467,7 @@ class _FormViewState extends State<FormView>
 
             return Scaffold(
               backgroundColor: Palette.bgColor,
-              bottomNavigationBar: _bottomBar(docs[0]),
+              bottomNavigationBar: _bottomBar(docs[0], meta),
               body: Builder(
                 builder: (context) {
                   builderContext = context;
@@ -462,6 +482,7 @@ class _FormViewState extends State<FormView>
                             connectionStatus: connectionStatus,
                             doc: docs[0],
                             docInfo: docInfo,
+                            meta: meta,
                           ),
                           _tabHeader(),
                         ];
@@ -477,7 +498,7 @@ class _FormViewState extends State<FormView>
                                   height: 10,
                                 ),
                                 CustomForm(
-                                  fields: widget.meta.fields,
+                                  fields: meta.docs[0].fields,
                                   formKey: _fbKey,
                                   doc: docs[0],
                                   viewType: ViewType.form,
@@ -507,11 +528,13 @@ class _FormViewState extends State<FormView>
                 },
               ),
             );
-          } else if (snapshot.hasError) {
-            return handleError(snapshot.error);
           } else {
-            return Center(
-              child: CircularProgressIndicator(),
+            return Scaffold(
+              body: snapshot.hasError
+                  ? handleError(snapshot.error)
+                  : Center(
+                      child: CircularProgressIndicator(),
+                    ),
             );
           }
         });

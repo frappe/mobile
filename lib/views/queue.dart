@@ -117,9 +117,8 @@ class _QueueListState extends State<QueueList> {
                   onTap: () {
                     q["qIdx"] = index;
                     locator<NavigationService>().navigateTo(
-                      Routes.customRouter,
-                      arguments: CustomRouterArguments(
-                        viewType: ViewType.form,
+                      Routes.formView,
+                      arguments: FormViewArguments(
                         doctype: q['doctype'],
                         queued: true,
                         queuedData: q,

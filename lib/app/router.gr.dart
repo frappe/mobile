@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../datamodels/doctype_response.dart';
-import '../utils/enums.dart';
 import '../views/activate_modules/activate_modules_view.dart';
 import '../views/add_assignees.dart';
 import '../views/add_review.dart';
@@ -19,6 +18,7 @@ import '../views/add_tags.dart';
 import '../views/comment_input.dart';
 import '../views/email_form.dart';
 import '../views/file_picker.dart';
+import '../views/form_view.dart';
 import '../views/home.dart';
 import '../views/list_view.dart';
 import '../views/login/login_view.dart';
@@ -37,10 +37,10 @@ class Routes {
   static const String home = '/Home';
   static const String customListView = '/custom-list-view';
   static const String newDoc = '/new-doc';
+  static const String formView = '/form-view';
   static const String activateModules = '/activate-modules';
   static const String sessionExpired = '/session-expired';
   static const String noInternet = '/no-internet';
-  static const String customRouter = '/custom-router';
   static const String commentInput = '/comment-input';
   static const String emailForm = '/email-form';
   static const String viewDocInfo = '/view-doc-info';
@@ -58,10 +58,10 @@ class Routes {
     home,
     customListView,
     newDoc,
+    formView,
     activateModules,
     sessionExpired,
     noInternet,
-    customRouter,
     commentInput,
     emailForm,
     viewDocInfo,
@@ -85,10 +85,10 @@ class MyRouter extends RouterBase {
     RouteDef(Routes.home, page: Home),
     RouteDef(Routes.customListView, page: CustomListView),
     RouteDef(Routes.newDoc, page: NewDoc),
+    RouteDef(Routes.formView, page: FormView),
     RouteDef(Routes.activateModules, page: ActivateModules),
     RouteDef(Routes.sessionExpired, page: SessionExpired),
     RouteDef(Routes.noInternet, page: NoInternet),
-    RouteDef(Routes.customRouter, page: CustomRouter),
     RouteDef(Routes.commentInput, page: CommentInput),
     RouteDef(Routes.emailForm, page: EmailForm),
     RouteDef(Routes.viewDocInfo, page: ViewDocInfo),
@@ -139,6 +139,18 @@ class MyRouter extends RouterBase {
         settings: data,
       );
     },
+    FormView: (data) {
+      final args = data.getArgs<FormViewArguments>(nullOk: false);
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => FormView(
+          doctype: args.doctype,
+          name: args.name,
+          queued: args.queued,
+          queuedData: args.queuedData,
+        ),
+        settings: data,
+      );
+    },
     ActivateModules: (data) {
       return MaterialPageRoute<dynamic>(
         builder: (context) => ActivateModules(),
@@ -155,21 +167,6 @@ class MyRouter extends RouterBase {
       final args = data.getArgs<NoInternetArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
         builder: (context) => NoInternet(args.hideAppBar),
-        settings: data,
-      );
-    },
-    CustomRouter: (data) {
-      final args = data.getArgs<CustomRouterArguments>(nullOk: false);
-      return MaterialPageRoute<dynamic>(
-        builder: (context) => CustomRouter(
-          viewType: args.viewType,
-          doctype: args.doctype,
-          name: args.name,
-          filters: args.filters,
-          filterCallback: args.filterCallback,
-          queued: args.queued,
-          queuedData: args.queuedData,
-        ),
         settings: data,
       );
     },
@@ -323,29 +320,23 @@ class NewDocArguments {
   NewDocArguments({@required this.doctype});
 }
 
+/// FormView arguments holder class
+class FormViewArguments {
+  final String doctype;
+  final String name;
+  final bool queued;
+  final Map<dynamic, dynamic> queuedData;
+  FormViewArguments(
+      {@required this.doctype,
+      this.name,
+      this.queued = false,
+      this.queuedData});
+}
+
 /// NoInternet arguments holder class
 class NoInternetArguments {
   final bool hideAppBar;
   NoInternetArguments({@required this.hideAppBar = false});
-}
-
-/// CustomRouter arguments holder class
-class CustomRouterArguments {
-  final ViewType viewType;
-  final String doctype;
-  final String name;
-  final List<dynamic> filters;
-  final Function filterCallback;
-  final bool queued;
-  final Map<dynamic, dynamic> queuedData;
-  CustomRouterArguments(
-      {@required this.viewType,
-      @required this.doctype,
-      this.name,
-      this.filters,
-      this.filterCallback,
-      this.queued,
-      this.queuedData});
 }
 
 /// CommentInput arguments holder class

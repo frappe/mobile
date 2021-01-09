@@ -302,9 +302,8 @@ class _CustomListViewState extends State<CustomListView> {
                               meta: meta.docs[0],
                               onListTap: () {
                                 locator<NavigationService>().navigateTo(
-                                  Routes.customRouter,
-                                  arguments: CustomRouterArguments(
-                                    viewType: ViewType.form,
+                                  Routes.formView,
+                                  arguments: FormViewArguments(
                                     doctype: widget.doctype,
                                     name: entry["name"],
                                   ),
@@ -339,9 +338,8 @@ class _CustomListViewState extends State<CustomListView> {
                                       data: list[index],
                                       onListTap: () {
                                         locator<NavigationService>().navigateTo(
-                                          Routes.customRouter,
-                                          arguments: CustomRouterArguments(
-                                            viewType: ViewType.form,
+                                          Routes.formView,
+                                          arguments: FormViewArguments(
                                             doctype: widget.doctype,
                                             name: list[index]["name"],
                                           ),

@@ -119,18 +119,16 @@ class AwesomeSearch extends SearchDelegate {
           onTap: () {
             if (item["type"] == "Doctype") {
               locator<NavigationService>().navigateTo(
-                Routes.customRouter,
-                arguments: CustomRouterArguments(
+                Routes.customListView,
+                arguments: CustomListViewArguments(
                   doctype: item["value"],
-                  viewType: ViewType.list,
                 ),
               );
             } else if (item["type"] == "New Doc") {
               locator<NavigationService>().navigateTo(
-                Routes.customRouter,
-                arguments: CustomRouterArguments(
+                Routes.newDoc,
+                arguments: NewDocArguments(
                   doctype: item["value"],
-                  viewType: ViewType.newForm,
                 ),
               );
             } else if (item["type"] == "Module") {

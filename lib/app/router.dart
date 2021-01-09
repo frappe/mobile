@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route_annotations.dart';
 import '../widgets/email_box.dart';
 import '../app.dart';
 
+import '../views/form_view.dart';
 import '../views/new_doc.dart';
 import '../views/list_view.dart';
 import '../views/home.dart';
@@ -29,10 +30,10 @@ import '../views/login/login_view.dart';
     MaterialRoute(page: Home),
     MaterialRoute(page: CustomListView),
     MaterialRoute(page: NewDoc),
+    MaterialRoute(page: FormView),
     MaterialRoute(page: ActivateModules),
     MaterialRoute(page: SessionExpired),
     MaterialRoute(page: NoInternet),
-    MaterialRoute(page: CustomRouter),
     MaterialRoute(page: CommentInput),
     MaterialRoute(page: EmailForm),
     MaterialRoute(page: ViewDocInfo),

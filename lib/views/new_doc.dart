@@ -102,9 +102,8 @@ class _NewDocState extends State<NewDoc> {
                               formValue,
                             );
                             locator<NavigationService>().pushReplacement(
-                              Routes.customRouter,
-                              arguments: CustomRouterArguments(
-                                viewType: ViewType.form,
+                              Routes.formView,
+                              arguments: FormViewArguments(
                                 doctype: meta.docs[0].name,
                                 name: response.data["docs"][0]["name"],
                               ),
