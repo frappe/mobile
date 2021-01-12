@@ -80,28 +80,31 @@ class AwesomeSearch extends SearchDelegate {
     //     },
     //   );
     // });
-    activeModules.values.forEach(
-      (value) {
-        (value as List).forEach(
-          (v) {
-            awesomeBarItems.add(
-              {
-                "type": "Doctype",
-                "value": v,
-                "label": "$v List",
-              },
-            );
-            awesomeBarItems.add(
-              {
-                "type": "New Doc",
-                "value": v,
-                "label": "New $v",
-              },
-            );
-          },
-        );
-      },
-    );
+
+    if (activeModules != null) {
+      activeModules.values.forEach(
+        (value) {
+          (value as List).forEach(
+            (v) {
+              awesomeBarItems.add(
+                {
+                  "type": "Doctype",
+                  "value": v,
+                  "label": "$v List",
+                },
+              );
+              awesomeBarItems.add(
+                {
+                  "type": "New Doc",
+                  "value": v,
+                  "label": "New $v",
+                },
+              );
+            },
+          );
+        },
+      );
+    }
 
     awesomeBarItems = awesomeBarItems.where((element) {
       var lowercaseQuery = query.toLowerCase();

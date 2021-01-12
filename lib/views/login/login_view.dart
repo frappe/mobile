@@ -37,10 +37,6 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-      ),
       body: FutureBuilder(
         future: LoginViewModel().getData(),
         builder: (context, snapshot) {
@@ -49,6 +45,9 @@ class _LoginState extends State<Login> {
             return SingleChildScrollView(
               child: Column(
                 children: <Widget>[
+                  SizedBox(
+                    height: 60,
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(

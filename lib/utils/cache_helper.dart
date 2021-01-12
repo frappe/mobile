@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:frappe_app/datamodels/doctype_response.dart';
 import 'package:frappe_app/services/api/api.dart';
+import 'package:frappe_app/utils/constants.dart';
 
 import '../utils/config_helper.dart';
 import '../utils/helpers.dart';
@@ -183,7 +184,7 @@ class CacheHelper {
       var docList = await locator<Api>().fetchList(
         doctype: doctype,
         fieldnames: generateFieldnames(doctype, docMeta.docs[0]),
-        pageLength: 50,
+        pageLength: Constants.offlinePageSize,
         offset: 0,
         meta: docMeta.docs[0],
       );

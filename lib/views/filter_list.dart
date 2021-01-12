@@ -82,6 +82,47 @@ class FilterList extends StatefulWidget {
 class _FilterListState extends State<FilterList> {
   GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
 
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _getData(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData &&
+            snapshot.connectionState == ConnectionState.done) {
+          var meta = snapshot.data["meta"];
+          var filters = snapshot.data["filter"];
+
+          return Scaffold(
+            backgroundColor: Colors.white,
+            bottomNavigationBar: _bottomBar(
+              meta: meta,
+              filters: filters,
+            ),
+            appBar: _appBar(),
+            body: FormBuilder(
+              key: _fbKey,
+              child: ListView(
+                padding: EdgeInsets.all(10),
+                children: _generateChildren(
+                  meta.docs[0].fields,
+                  filters,
+                ),
+              ),
+            ),
+          );
+        } else {
+          return Scaffold(
+            body: snapshot.hasError
+                ? Center(child: Text(snapshot.error))
+                : Center(
+                    child: CircularProgressIndicator(),
+                  ),
+          );
+        }
+      },
+    );
+  }
+
   List<Widget> _generateChildren(List<DoctypeField> fields, List filters) {
     fields.add(DoctypeField(
       isDefaultFilter: 1,
@@ -131,90 +172,64 @@ class _FilterListState extends State<FilterList> {
     };
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _getData(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData &&
-            snapshot.connectionState == ConnectionState.done) {
-          var meta = snapshot.data["meta"];
-          var filters = snapshot.data["filter"];
-          return Scaffold(
-            backgroundColor: Colors.white,
-            bottomNavigationBar: Container(
-              height: 60,
-              child: BottomAppBar(
-                color: Colors.white,
-                child: Row(
-                  children: [
-                    Spacer(),
-                    FrappeFlatButton(
-                      minWidth: 120.0,
-                      buttonType: ButtonType.secondary,
-                      title: 'Clear All',
-                      onPressed: () {
-                        FilterList.clearFilters(meta.docs[0].name);
-                        _fbKey.currentState.reset();
-                        filters.clear();
-                        setState(() {});
-                      },
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    FrappeFlatButton(
-                      minWidth: 120.0,
-                      buttonType: ButtonType.primary,
-                      onPressed: () async {
-                        _fbKey.currentState.save();
+  Widget _bottomBar({
+    @required DoctypeResponse meta,
+    @required List filters,
+  }) {
+    return Container(
+      height: 60,
+      child: BottomAppBar(
+        color: Colors.white,
+        child: Row(
+          children: [
+            Spacer(),
+            FrappeFlatButton(
+              minWidth: 120.0,
+              buttonType: ButtonType.secondary,
+              title: 'Clear All',
+              onPressed: () {
+                FilterList.clearFilters(meta.docs[0].name);
+                _fbKey.currentState.reset();
+                filters.clear();
+                setState(() {});
+              },
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            FrappeFlatButton(
+              minWidth: 120.0,
+              buttonType: ButtonType.primary,
+              onPressed: () async {
+                _fbKey.currentState.save();
 
-                        await FilterList.generateFilters(
-                          meta.docs[0].name,
-                          _fbKey.currentState.value,
-                        );
+                await FilterList.generateFilters(
+                  meta.docs[0].name,
+                  _fbKey.currentState.value,
+                );
 
-                        locator<NavigationService>().pop(true);
-                      },
-                      title: 'Apply',
-                    ),
-                    Spacer()
-                  ],
-                ),
-              ),
+                locator<NavigationService>().pop(true);
+              },
+              title: 'Apply',
             ),
-            appBar: AppBar(
-              elevation: 0.5,
-              leading: IconButton(
-                icon: Icon(
-                  Icons.close,
-                ),
-                onPressed: () {
-                  locator<NavigationService>().pop();
-                },
-              ),
-            ),
-            body: FormBuilder(
-              key: _fbKey,
-              child: ListView(
-                padding: EdgeInsets.all(10),
-                children: _generateChildren(
-                  meta.docs[0].fields,
-                  filters,
-                ),
-              ),
-            ),
-          );
-        } else {
-          return Scaffold(
-            body: snapshot.hasError
-                ? Center(child: Text(snapshot.error))
-                : Center(
-                    child: CircularProgressIndicator(),
-                  ),
-          );
-        }
-      },
+            Spacer()
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _appBar() {
+    return AppBar(
+      elevation: 0.5,
+      leading: IconButton(
+        icon: Icon(
+          Icons.close,
+        ),
+        onPressed: () {
+          locator<NavigationService>().pop();
+        },
+      ),
     );
   }
 }
