@@ -5,8 +5,8 @@ import '../app.dart';
 
 import '../views/form_view.dart';
 import '../views/new_doc.dart';
-import '../views/list_view.dart';
-import '../views/home.dart';
+import '../views/list_view/list_view.dart';
+import '../views/home/home_view.dart';
 import '../views/add_assignees.dart';
 import '../views/add_review.dart';
 import '../views/add_tags.dart';

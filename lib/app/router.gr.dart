@@ -19,8 +19,8 @@ import '../views/comment_input.dart';
 import '../views/email_form.dart';
 import '../views/file_picker.dart';
 import '../views/form_view.dart';
-import '../views/home.dart';
-import '../views/list_view.dart';
+import '../views/home/home_view.dart';
+import '../views/list_view/list_view.dart';
 import '../views/login/login_view.dart';
 import '../views/new_doc.dart';
 import '../views/no_internet.dart';
@@ -125,10 +125,7 @@ class MyRouter extends RouterBase {
     CustomListView: (data) {
       final args = data.getArgs<CustomListViewArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
-        builder: (context) => CustomListView(
-          doctype: args.doctype,
-          filterCallback: args.filterCallback,
-        ),
+        builder: (context) => CustomListView(doctype: args.doctype),
         settings: data,
       );
     },
@@ -310,8 +307,7 @@ class MyRouter extends RouterBase {
 /// CustomListView arguments holder class
 class CustomListViewArguments {
   final String doctype;
-  final Function filterCallback;
-  CustomListViewArguments({@required this.doctype, this.filterCallback});
+  CustomListViewArguments({@required this.doctype});
 }
 
 /// NewDoc arguments holder class
