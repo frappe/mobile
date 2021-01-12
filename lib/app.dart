@@ -1,30 +1,19 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import 'package:frappe_app/views/home.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import 'datamodels/doctype_response.dart';
 import 'app/router.gr.dart';
 
 import 'lifecycle_manager.dart';
 import 'app/locator.dart';
 
-import 'utils/cache_helper.dart';
 import 'utils/config_helper.dart';
 import 'utils/enums.dart';
-import 'utils/helpers.dart';
 
-import 'services/api/api.dart';
 import 'services/connectivity_service.dart';
 import 'services/navigation_service.dart';
 
-import 'views/filter_list.dart';
-import 'views/form_view.dart';
-import 'views/list_view.dart';
-import 'views/new_doc.dart';
+import 'views/home/home_view.dart';
 import 'views/login/login_view.dart';
 
 class FrappeApp extends StatefulWidget {
