@@ -144,10 +144,12 @@ class _CustomListViewState extends State<CustomListView> {
         return _generateItem(
           data: entry,
           meta: meta.docs[0],
-          onListTap: ListViewViewModel().onListTap(
-            doctype: widget.doctype,
-            name: entry["name"],
-          ),
+          onListTap: () {
+            ListViewViewModel().onListTap(
+              doctype: widget.doctype,
+              name: entry["name"],
+            );
+          },
           onButtonTap: (filter) async {
             // TODO use provider
             filters.clear();
