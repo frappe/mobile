@@ -39,7 +39,7 @@ class Check extends StatelessWidget with Control, ControlInput {
       },
       activeColor: FrappePalette.blue,
       leadingInput: true,
-      initialValue: doc[doctypeField.fieldname] == 1,
+      initialValue: doc != null ? doc[doctypeField.fieldname] == 1 : null,
       onChanged: onChanged != null
           ? (val) {
               val = val == true ? 1 : 0;
