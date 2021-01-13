@@ -62,20 +62,20 @@ class _HomeState extends State<Home> {
                   return _activateModules();
                 }
 
-                var activeDoctypes = getActivatedDoctypes(
-                  snapshot.data,
-                  currentModule,
+                var filteredActiveDoctypes =
+                    HomeViewModel().filterActiveDoctypes(
+                  desktopPage: snapshot.data,
+                  module: currentModule,
                 );
 
-                if (activeDoctypes.isEmpty) {
+                if (filteredActiveDoctypes.message.shortcuts.items.isEmpty &&
+                    filteredActiveDoctypes.message.cards.items.isEmpty) {
                   return _activateDoctypes();
                 }
 
-                var doctypesWidget = _generateChildren(activeDoctypes);
-
                 return ListView(
                   padding: EdgeInsets.zero,
-                  children: doctypesWidget,
+                  children: _generateChildren(filteredActiveDoctypes),
                 );
               } else if (snapshot.hasError) {
                 return handleError(snapshot.error);
@@ -91,27 +91,147 @@ class _HomeState extends State<Home> {
     );
   }
 
-  List<Widget> _generateChildren(List<CardItemLink> activeDoctypes) {
-    return activeDoctypes.map<Widget>((m) {
-      return Padding(
-        padding: const EdgeInsets.only(
-          left: 10.0,
-          right: 10.0,
-          top: 8.0,
+  Widget _heading(String title) {
+    return CardListTile(
+      color: Palette.bgColor,
+      elevation: 0,
+      title: Text(
+        title,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
         ),
-        child: CardListTile(
-          title: Text(m.label),
-          onTap: () {
-            locator<NavigationService>().navigateTo(
-              Routes.customListView,
-              arguments: CustomListViewArguments(
-                doctype: m.label,
-              ),
-            );
-          },
+      ),
+    );
+  }
+
+  Widget _subHeading(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 10.0,
+        right: 10.0,
+      ),
+      child: CardListTile(
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _shortcut(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 10.0,
+        right: 10.0,
+        top: 8.0,
+      ),
+      child: CardListTile(
+        title: Text(label),
+        onTap: () {
+          locator<NavigationService>().navigateTo(
+            Routes.customListView,
+            arguments: CustomListViewArguments(
+              doctype: label,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _item(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 10.0,
+        right: 10.0,
+      ),
+      child: CardListTile(
+        title: Row(
+          children: [
+            Icon(
+              Icons.circle,
+              size: 8,
+            ),
+            SizedBox(
+              width: 8,
+            ),
+            Text(
+              label,
+            ),
+          ],
+        ),
+        onTap: () {
+          locator<NavigationService>().navigateTo(
+            Routes.customListView,
+            arguments: CustomListViewArguments(
+              doctype: label,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  List<Widget> _generateChildren(DesktopPageResponse desktopPage) {
+    List<Widget> widgets = [];
+
+    if (desktopPage.message.shortcuts.items.isNotEmpty) {
+      widgets.add(
+        _heading("Your Shortcuts"),
+      );
+
+      widgets.addAll(desktopPage.message.shortcuts.items.map<Widget>(
+        (item) {
+          return _shortcut(
+            item.label,
+          );
+        },
+      ).toList());
+
+      widgets.add(
+        SizedBox(
+          height: 20,
         ),
       );
-    }).toList();
+    }
+
+    if (desktopPage.message.cards.items.isNotEmpty) {
+      widgets.add(
+        _heading("Masters"),
+      );
+
+      desktopPage.message.cards.items.forEach(
+        (item) {
+          widgets.add(
+            _subHeading(
+              item.label,
+            ),
+          );
+
+          item.links.forEach(
+            (link) {
+              widgets.add(
+                _item(
+                  link.label,
+                ),
+              );
+            },
+          );
+
+          widgets.add(
+            SizedBox(
+              height: 15,
+            ),
+          );
+        },
+      );
+    }
+
+    return widgets;
   }
 
   Drawer _buildDrawer(

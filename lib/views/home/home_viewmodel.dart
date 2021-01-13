@@ -48,6 +48,31 @@ class HomeViewModel {
     return modules;
   }
 
+  DesktopPageResponse filterActiveDoctypes({
+    @required DesktopPageResponse desktopPage,
+    @required String module,
+  }) {
+    var activeModules = ConfigHelper().activeModules;
+    desktopPage.message.shortcuts.items =
+        desktopPage.message.shortcuts.items.where((item) {
+      return item.type == "DocType" &&
+          activeModules[module].contains(item.label);
+    }).toList();
+
+    desktopPage.message.cards.items.forEach((item) {
+      item.links = item.links.where((item) {
+        return activeModules[module].contains(item.label);
+      }).toList();
+    });
+
+    desktopPage.message.cards.items =
+        desktopPage.message.cards.items.where((item) {
+      return item.links.isNotEmpty;
+    }).toList();
+
+    return desktopPage;
+  }
+
   Future<DesktopPageResponse> getData({
     @required ConnectivityStatus connectionStatus,
     @required String currentModule,
