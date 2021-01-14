@@ -26,7 +26,11 @@ class _HomeState extends State<Home> {
   GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
   var currentModule = ConfigHelper().activeModules != null
       ? ConfigHelper().activeModules.keys.first
-      : '';
+      : null;
+
+  void _refresh() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,46 +50,47 @@ class _HomeState extends State<Home> {
         showSecondaryLeading: true,
         body: RefreshIndicator(
           onRefresh: () async {
-            setState(() {});
+            _refresh();
           },
-          child: FutureBuilder(
-            future: HomeViewModel().getData(
-              connectionStatus: connectionStatus,
-              currentModule: currentModule,
-            ),
-            builder: (context, snapshot) {
-              if (snapshot.hasData &&
-                  snapshot.connectionState == ConnectionState.done) {
-                var activeModules = ConfigHelper().activeModules;
+          child: currentModule == null
+              ? _activateModules(() {
+                  setState(() {
+                    currentModule = ConfigHelper().activeModules.keys.first;
+                  });
+                })
+              : FutureBuilder(
+                  future: HomeViewModel().getData(
+                    connectionStatus: connectionStatus,
+                    currentModule: currentModule,
+                  ),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData &&
+                        snapshot.connectionState == ConnectionState.done) {
+                      var filteredActiveDoctypes =
+                          HomeViewModel().filterActiveDoctypes(
+                        desktopPage: snapshot.data,
+                        module: currentModule,
+                      );
 
-                if (activeModules == null) {
-                  return _activateModules();
-                }
+                      if (filteredActiveDoctypes
+                              .message.shortcuts.items.isEmpty &&
+                          filteredActiveDoctypes.message.cards.items.isEmpty) {
+                        return _activateDoctypes();
+                      }
 
-                var filteredActiveDoctypes =
-                    HomeViewModel().filterActiveDoctypes(
-                  desktopPage: snapshot.data,
-                  module: currentModule,
-                );
-
-                if (filteredActiveDoctypes.message.shortcuts.items.isEmpty &&
-                    filteredActiveDoctypes.message.cards.items.isEmpty) {
-                  return _activateDoctypes();
-                }
-
-                return ListView(
-                  padding: EdgeInsets.zero,
-                  children: _generateChildren(filteredActiveDoctypes),
-                );
-              } else if (snapshot.hasError) {
-                return handleError(snapshot.error);
-              } else {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-            },
-          ),
+                      return ListView(
+                        padding: EdgeInsets.zero,
+                        children: _generateChildren(filteredActiveDoctypes),
+                      );
+                    } else if (snapshot.hasError) {
+                      return handleError(snapshot.error);
+                    } else {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
+                ),
         ),
       ),
     );
@@ -283,7 +288,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _activateModules() {
+  Widget _activateModules(Function refresh) {
     return Center(
       child: Container(
         color: Colors.white,
@@ -298,7 +303,7 @@ class _HomeState extends State<Home> {
                     .navigateTo(Routes.activateModules);
 
                 if (nav) {
-                  setState(() {});
+                  refresh();
                 }
               },
               title: 'Activate Modules',
@@ -328,7 +333,7 @@ class _HomeState extends State<Home> {
                   .navigateTo(Routes.activateModules);
 
               if (nav) {
-                setState(() {});
+                _refresh();
               }
             },
             title: 'Activate Doctypes',
