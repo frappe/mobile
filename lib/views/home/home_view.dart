@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:provider/provider.dart';
 
 import '../../datamodels/desktop_page_response.dart';
@@ -111,17 +112,11 @@ class _HomeState extends State<Home> {
   }
 
   Widget _subHeading(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: 10.0,
-        right: 10.0,
-      ),
-      child: CardListTile(
-        title: Text(
-          title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+    return ListTile(
+      title: Text(
+        title,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
@@ -149,35 +144,43 @@ class _HomeState extends State<Home> {
   }
 
   Widget _item(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: 10.0,
-        right: 10.0,
+    return ListTile(
+      title: Row(
+        children: [
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  color: FrappePalette.grey[100],
+                ),
+                width: 20,
+                height: 20,
+              ),
+              Icon(
+                Icons.circle,
+                color: FrappePalette.grey[800],
+                size: 6,
+              ),
+            ],
+          ),
+          SizedBox(
+            width: 8,
+          ),
+          Text(
+            label,
+          ),
+        ],
       ),
-      child: CardListTile(
-        title: Row(
-          children: [
-            Icon(
-              Icons.circle,
-              size: 8,
-            ),
-            SizedBox(
-              width: 8,
-            ),
-            Text(
-              label,
-            ),
-          ],
-        ),
-        onTap: () {
-          locator<NavigationService>().navigateTo(
-            Routes.customListView,
-            arguments: CustomListViewArguments(
-              doctype: label,
-            ),
-          );
-        },
-      ),
+      onTap: () {
+        locator<NavigationService>().navigateTo(
+          Routes.customListView,
+          arguments: CustomListViewArguments(
+            doctype: label,
+          ),
+        );
+      },
     );
   }
 
@@ -212,19 +215,28 @@ class _HomeState extends State<Home> {
       desktopPage.message.cards.items.forEach(
         (item) {
           widgets.add(
-            _subHeading(
-              item.label,
-            ),
-          );
-
-          item.links.forEach(
-            (link) {
-              widgets.add(
-                _item(
-                  link.label,
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10.0,
+              ),
+              child: Card(
+                color: Colors.white,
+                child: Column(
+                  children: [
+                    _subHeading(
+                      item.label,
+                    ),
+                    ...item.links.map(
+                      (link) {
+                        return _item(
+                          link.label,
+                        );
+                      },
+                    ).toList()
+                  ],
                 ),
-              );
-            },
+              ),
+            ),
           );
 
           widgets.add(
