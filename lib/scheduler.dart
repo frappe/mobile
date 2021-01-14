@@ -137,10 +137,10 @@ void callbackDispatcher() {
   });
 }
 
-initAutoSync(bool isDebugMode) async {
+initAutoSync({bool debug = false}) async {
   await Workmanager.initialize(
     callbackDispatcher,
-    isInDebugMode: isDebugMode,
+    isInDebugMode: debug,
   );
   registerPeriodicTask();
 }

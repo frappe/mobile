@@ -19,12 +19,10 @@ void main() async {
   setupLocator();
   await resetValues();
   await initDb();
-  await FlutterDownloader.initialize(
-    debug: kReleaseMode == true ? false : true,
-  );
+  await FlutterDownloader.initialize();
   await initApiConfig();
   await initLocatlNotifications();
-  await initAutoSync(kReleaseMode == true ? false : true);
+  await initAutoSync();
 
   runApp(FrappeApp());
 }
