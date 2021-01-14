@@ -55,8 +55,14 @@ class HeaderAppBar extends StatelessWidget {
         return <Widget>[
           SliverAppBar(
             leading: isRoot
-                ? FrappeIcon(
-                    FrappeIcons.frappe,
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FrappeIcon(
+                        FrappeIcons.frappe,
+                        size: 50,
+                      ),
+                    ],
                   )
                 : locator<NavigationService>().canPop()
                     ? IconButton(
