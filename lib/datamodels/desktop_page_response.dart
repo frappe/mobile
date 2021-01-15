@@ -3,7 +3,7 @@ class DesktopPageResponse {
 
   DesktopPageResponse({this.message});
 
-  DesktopPageResponse.fromJson(Map<String, dynamic> json) {
+  DesktopPageResponse.fromJson(Map<dynamic, dynamic> json) {
     message = json['message'] != null
         ? new DesktopPageMessage.fromJson(json['message'])
         : null;
@@ -27,7 +27,7 @@ class DesktopPageMessage {
   DesktopPageMessage(
       {this.charts, this.shortcuts, this.cards, this.allowCustomization});
 
-  DesktopPageMessage.fromJson(Map<String, dynamic> json) {
+  DesktopPageMessage.fromJson(Map<dynamic, dynamic> json) {
     charts = json['charts'] != null
         ? new DesktopPageCharts.fromJson(json['charts'])
         : null;
@@ -62,7 +62,7 @@ class DesktopPageCharts {
 
   DesktopPageCharts({this.label, this.items});
 
-  DesktopPageCharts.fromJson(Map<String, dynamic> json) {
+  DesktopPageCharts.fromJson(Map<dynamic, dynamic> json) {
     label = json['label'];
     if (json['items'] != null) {
       items = new List<ChartItem>();
@@ -88,7 +88,7 @@ class DesktopPageShortcuts {
 
   DesktopPageShortcuts({this.label, this.items});
 
-  DesktopPageShortcuts.fromJson(Map<String, dynamic> json) {
+  DesktopPageShortcuts.fromJson(Map<dynamic, dynamic> json) {
     label = json['label'];
     if (json['items'] != null) {
       items = new List<ShortcutItem>();
@@ -114,7 +114,7 @@ class DesktopPageCards {
 
   DesktopPageCards({this.label, this.items});
 
-  DesktopPageCards.fromJson(Map<String, dynamic> json) {
+  DesktopPageCards.fromJson(Map<dynamic, dynamic> json) {
     label = json['label'];
     if (json['items'] != null) {
       items = new List<CardItem>();
@@ -164,7 +164,7 @@ class ChartItem {
       this.label,
       this.doctype});
 
-  ChartItem.fromJson(Map<String, dynamic> json) {
+  ChartItem.fromJson(Map<dynamic, dynamic> json) {
     name = json['name'];
     owner = json['owner'];
     creation = json['creation'];
@@ -245,7 +245,7 @@ class ShortcutItem {
       this.doctype,
       this.isQueryReport});
 
-  ShortcutItem.fromJson(Map<String, dynamic> json) {
+  ShortcutItem.fromJson(Map<dynamic, dynamic> json) {
     name = json['name'];
     owner = json['owner'];
     creation = json['creation'];
@@ -328,7 +328,7 @@ class CardItem {
       this.links,
       this.doctype});
 
-  CardItem.fromJson(Map<String, dynamic> json) {
+  CardItem.fromJson(Map<dynamic, dynamic> json) {
     name = json['name'];
     owner = json['owner'];
     creation = json['creation'];
@@ -400,7 +400,7 @@ class CardItemLink {
       this.icon,
       this.link});
 
-  CardItemLink.fromJson(Map<String, dynamic> json) {
+  CardItemLink.fromJson(Map<dynamic, dynamic> json) {
     description = json['description'];
     label = json['label'];
     name = json['name'];

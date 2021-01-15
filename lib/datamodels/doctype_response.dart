@@ -4,11 +4,11 @@ class DoctypeResponse {
 
   DoctypeResponse({this.docs, this.userSettings});
 
-  DoctypeResponse.fromJson(Map<String, dynamic> json) {
+  DoctypeResponse.fromJson(Map<dynamic, dynamic> json) {
     if (json['docs'] != null) {
       docs = new List<DoctypeDoc>();
       json['docs'].forEach((v) {
-        docs.add(new DoctypeDoc.fromJson(Map<String, dynamic>.from(v)));
+        docs.add(new DoctypeDoc.fromJson(Map<dynamic, dynamic>.from(v)));
       });
     }
     userSettings = json['user_settings'];
@@ -128,7 +128,7 @@ class DoctypeDoc {
       this.fields,
       this.fieldsMap});
 
-  DoctypeDoc.fromJson(Map<String, dynamic> json) {
+  DoctypeDoc.fromJson(Map<dynamic, dynamic> json) {
     doctype = json['doctype'];
     name = json['name'];
     owner = json['owner'];
@@ -181,7 +181,7 @@ class DoctypeDoc {
     if (json['fields'] != null) {
       fields = new List<DoctypeField>();
       json['fields'].forEach((v) {
-        fields.add(new DoctypeField.fromJson(Map<String, dynamic>.from(v)));
+        fields.add(new DoctypeField.fromJson(Map<dynamic, dynamic>.from(v)));
       });
     }
   }
@@ -348,7 +348,7 @@ class DoctypeField {
       this.hideSeconds,
       this.defaultValue});
 
-  DoctypeField.fromJson(Map<String, dynamic> json) {
+  DoctypeField.fromJson(Map<dynamic, dynamic> json) {
     doctype = json['doctype'];
     name = json['name'];
     owner = json['owner'];

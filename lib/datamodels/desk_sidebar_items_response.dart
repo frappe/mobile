@@ -3,7 +3,7 @@ class DeskSidebarItemsResponse {
 
   DeskSidebarItemsResponse({this.message});
 
-  DeskSidebarItemsResponse.fromJson(Map<String, dynamic> json) {
+  DeskSidebarItemsResponse.fromJson(Map<dynamic, dynamic> json) {
     if (json['message'] != null) {
       message = new List<DeskMessage>();
       json['message'].forEach((v) {
@@ -30,7 +30,7 @@ class DeskMessage {
 
   DeskMessage({this.name, this.category, this.icon, this.module, this.label});
 
-  DeskMessage.fromJson(Map<String, dynamic> json) {
+  DeskMessage.fromJson(Map<dynamic, dynamic> json) {
     name = json['name'];
     category = json['category'];
     icon = json['icon'];
