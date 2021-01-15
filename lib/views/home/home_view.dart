@@ -98,10 +98,12 @@ class _HomeState extends State<Home> {
   }
 
   Widget _heading(String title) {
-    return CardListTile(
-      color: Palette.bgColor,
-      elevation: 0,
-      title: Text(
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 6.0,
+        horizontal: 16,
+      ),
+      child: Text(
         title,
         style: TextStyle(
           fontWeight: FontWeight.bold,
@@ -113,6 +115,7 @@ class _HomeState extends State<Home> {
 
   Widget _subHeading(String title) {
     return ListTile(
+      visualDensity: VisualDensity(horizontal: 0, vertical: -4),
       title: Text(
         title,
         style: TextStyle(
@@ -145,6 +148,7 @@ class _HomeState extends State<Home> {
 
   Widget _item(String label) {
     return ListTile(
+      visualDensity: VisualDensity(horizontal: 0, vertical: -4),
       title: Row(
         children: [
           Stack(
@@ -189,6 +193,11 @@ class _HomeState extends State<Home> {
 
     if (desktopPage.message.shortcuts.items.isNotEmpty) {
       widgets.add(
+        SizedBox(
+          height: 20,
+        ),
+      );
+      widgets.add(
         _heading("Your Shortcuts"),
       );
 
@@ -221,19 +230,34 @@ class _HomeState extends State<Home> {
               ),
               child: Card(
                 color: Colors.white,
-                child: Column(
-                  children: [
-                    _subHeading(
-                      item.label,
-                    ),
-                    ...item.links.map(
-                      (link) {
-                        return _item(
-                          link.label,
-                        );
-                      },
-                    ).toList()
-                  ],
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    width: 0.5,
+                    color: FrappePalette.grey[400],
+                  ),
+                  borderRadius: BorderRadius.circular(
+                    6.0,
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12.0,
+                  ),
+                  child: Column(
+                    children: [
+                      _subHeading(
+                        item.label,
+                      ),
+                      ...item.links.map(
+                        (link) {
+                          return _item(
+                            link.label,
+                          );
+                        },
+                      ).toList()
+                    ],
+                  ),
                 ),
               ),
             ),
