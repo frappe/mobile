@@ -15,27 +15,37 @@ class Awesombar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
-      onTap: () {
-        showSearch(context: context, delegate: AwesomeSearch());
-      },
-      readOnly: true,
-      decoration: InputDecoration(
-        filled: true,
-        enabledBorder: InputBorder.none,
-        fillColor: Palette.bgColor,
-        prefixIcon: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: FrappeIcon(
-            FrappeIcons.search,
+        onTap: () {
+          showSearch(context: context, delegate: AwesomeSearch());
+        },
+        readOnly: true,
+        decoration: InputDecoration(
+          filled: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(
+              8,
+            ),
           ),
-        ),
-        prefixIconConstraints: BoxConstraints(
-          minHeight: 42,
-          maxHeight: 42,
-        ),
-        hintText: 'Search',
-      ),
-    );
+          enabledBorder: InputBorder.none,
+          fillColor: Palette.bgColor,
+          prefixIcon: Row(children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: FrappeIcon(
+                FrappeIcons.search,
+                size: 22,
+              ),
+            ),
+            Text(
+              'Search',
+              style: TextStyle(fontSize: 18),
+            ),
+          ]),
+          prefixIconConstraints: BoxConstraints(
+            minHeight: 42,
+            maxHeight: 42,
+          ),
+        ));
   }
 }
 
