@@ -37,8 +37,7 @@ class CustomForm extends StatelessWidget {
       ).toList();
     } else if (viewType == ViewType.newForm) {
       filteredFields = fields.where((field) {
-        return (field.readOnly == 1 || field.fieldtype == "Section Break") &&
-            field.hidden != 1;
+        return field.fieldtype == "Section Break" || field.hidden != 1;
       }).toList();
     } else {
       filteredFields = fields;
@@ -55,7 +54,7 @@ class CustomForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FormBuilder(
-      enabled: editMode ? false : true,
+      enabled: editMode,
       key: formKey,
       child: Container(
         color: Colors.white,

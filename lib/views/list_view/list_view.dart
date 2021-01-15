@@ -90,11 +90,7 @@ class _CustomListViewState extends State<CustomListView> {
         } else {
           return Scaffold(
             body: snapshot.hasError
-                ? Center(
-                    child: Text(
-                      snapshot.error,
-                    ),
-                  )
+                ? handleError(snapshot.error)
                 : Center(
                     child: CircularProgressIndicator(),
                   ),
