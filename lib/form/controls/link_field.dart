@@ -55,9 +55,13 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
   Widget build(BuildContext context) {
     List<String Function(dynamic)> validators = [];
 
-    validators.add(
-      setMandatory(widget.doctypeField, context),
-    );
+    var f = setMandatory(widget.doctypeField);
+
+    if (f != null) {
+      validators.add(
+        f(context),
+      );
+    }
 
     var connectionStatus = Provider.of<ConnectivityStatus>(
       context,

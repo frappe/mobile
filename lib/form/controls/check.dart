@@ -29,9 +29,14 @@ class Check extends StatelessWidget with Control, ControlInput {
   Widget build(BuildContext context) {
     List<String Function(dynamic)> validators = [];
 
-    validators.add(
-      setMandatory(doctypeField, context),
-    );
+    var f = setMandatory(doctypeField);
+
+    if (f != null) {
+      validators.add(
+        f(context),
+      );
+    }
+
     return CustomFormBuilderCheckbox(
       key: key,
       valueTransformer: (val) {

@@ -27,7 +27,7 @@ class Signature extends StatelessWidget with Control, ControlInput {
     List<String Function(dynamic)> validators = [];
 
     validators.add(
-      setMandatory(doctypeField, context),
+      setMandatory(doctypeField)(context),
     );
     return FormBuilderSignaturePad(
       initialValue: doc != null

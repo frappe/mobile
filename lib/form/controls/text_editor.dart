@@ -25,13 +25,17 @@ class TextEditor extends StatelessWidget with Control, ControlInput {
   Widget build(BuildContext context) {
     List<String Function(dynamic)> validators = [];
 
-    validators.add(
-      setMandatory(doctypeField, context),
-    );
+    var f = setMandatory(doctypeField);
+
+    if (f != null) {
+      validators.add(
+        f(context),
+      );
+    }
     return FormBuilderTextField(
       key: key,
       maxLines: 10,
-      initialValue: doc[doctypeField.fieldname],
+      initialValue: doc != null ? doc[doctypeField.fieldname] : null,
       name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(
         withLabel,

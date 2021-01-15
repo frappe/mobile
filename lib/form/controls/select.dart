@@ -28,15 +28,19 @@ class Select extends StatelessWidget with Control, ControlInput {
   Widget build(BuildContext context) {
     List<String Function(dynamic)> validators = [];
 
-    validators.add(
-      setMandatory(doctypeField, context),
-    );
+    var f = setMandatory(doctypeField);
+
+    if (f != null) {
+      validators.add(
+        f(context),
+      );
+    }
 
     List opts;
     if (doctypeField.options is String) {
       opts = doctypeField.options.split('\n');
     } else {
-      opts = doctypeField.options;
+      opts = doctypeField.options ?? [];
     }
 
     return FormBuilderDropdown(

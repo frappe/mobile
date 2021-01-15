@@ -27,9 +27,13 @@ class DatetimeField extends StatelessWidget with Control, ControlInput {
   Widget build(BuildContext context) {
     List<String Function(dynamic)> validators = [];
 
-    validators.add(
-      setMandatory(doctypeField, context),
-    );
+    var f = setMandatory(doctypeField);
+
+    if (f != null) {
+      validators.add(
+        f(context),
+      );
+    }
 
     return FormBuilderDateTimePicker(
       key: key,
@@ -38,7 +42,7 @@ class DatetimeField extends StatelessWidget with Control, ControlInput {
       },
       resetIcon: editMode ? Icon(Icons.close) : null,
       initialTime: null,
-      initialValue: parseDate(doc[doctypeField.fieldname]),
+      initialValue: doc != null ? parseDate(doc[doctypeField.fieldname]) : null,
       name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(withLabel, doctypeField.label),
       validator: FormBuilderValidators.compose(validators),

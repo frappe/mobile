@@ -49,9 +49,13 @@ class _AutoCompleteState extends State<AutoComplete>
   Widget build(BuildContext context) {
     List<String Function(dynamic)> validators = [];
 
-    validators.add(
-      setMandatory(widget.doctypeField, context),
-    );
+    var f = setMandatory(widget.doctypeField);
+
+    if (f != null) {
+      validators.add(
+        f(context),
+      );
+    }
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
