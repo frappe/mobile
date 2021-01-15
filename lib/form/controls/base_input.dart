@@ -4,12 +4,12 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import '../../datamodels/doctype_response.dart';
 
 class ControlInput {
-  String Function(dynamic) setMandatory(
+  String Function(dynamic) Function(BuildContext, {String errorText})
+      setMandatory(
     DoctypeField doctypeField,
-    BuildContext context,
   ) {
     if (doctypeField.reqd == 1) {
-      return FormBuilderValidators.required(context);
+      return FormBuilderValidators.required;
     } else {
       return null;
     }
