@@ -60,7 +60,7 @@ class HeaderAppBar extends StatelessWidget {
                     children: [
                       FrappeIcon(
                         FrappeIcons.frappe,
-                        size: 50,
+                        size: 36,
                       ),
                     ],
                   )
