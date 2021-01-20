@@ -66,6 +66,12 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+dependency_overrides:
+  workmanager:
+    git:
+      url: https://github.com/ened/flutter_workmanager.git
+      ref: 1c4e162ea4e71855856fb9e55a1545b3dae9a25d # flutter 1.20 compatibility
+
 flutter_icons:
   android: "launcher_icon"
   ios: true
