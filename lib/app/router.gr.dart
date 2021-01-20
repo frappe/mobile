@@ -22,7 +22,7 @@ import '../views/form_view.dart';
 import '../views/home/home_view.dart';
 import '../views/list_view/list_view.dart';
 import '../views/login/login_view.dart';
-import '../views/new_doc.dart';
+import '../views/new_doc/new_doc_view.dart';
 import '../views/no_internet.dart';
 import '../views/queue.dart';
 import '../views/queue_error.dart';

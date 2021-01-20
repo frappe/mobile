@@ -4,7 +4,7 @@ import '../widgets/email_box.dart';
 import '../app.dart';
 
 import '../views/form_view.dart';
-import '../views/new_doc.dart';
+import '../views/new_doc/new_doc_view.dart';
 import '../views/list_view/list_view.dart';
 import '../views/home/home_view.dart';
 import '../views/add_assignees.dart';

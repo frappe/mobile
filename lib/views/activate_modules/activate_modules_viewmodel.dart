@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 
-import '../filter_list.dart';
+import '../filter_list/filter_list_view.dart';
 import '../../app/locator.dart';
 import '../../services/api/api.dart';
 

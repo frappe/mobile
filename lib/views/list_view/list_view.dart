@@ -10,7 +10,7 @@ import '../../app/locator.dart';
 import '../../app/router.gr.dart';
 
 import '../../views/list_view/list_view_viewmodel.dart';
-import '../../views/filter_list.dart';
+import '../../views/filter_list/filter_list_view.dart';
 
 import '../../services/navigation_service.dart';
 

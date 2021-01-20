@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-import '../app/locator.dart';
-import '../datamodels/doctype_response.dart';
-import '../services/navigation_service.dart';
-import '../form/controls/control.dart';
-import '../widgets/frappe_button.dart';
+import '../../views/filter_list/filter_list_viewmodel.dart';
+import '../../app/locator.dart';
+import '../../datamodels/doctype_response.dart';
+import '../../services/navigation_service.dart';
+import '../../form/controls/control.dart';
+import '../../widgets/frappe_button.dart';
 
-import '../utils/cache_helper.dart';
-import '../utils/enums.dart';
+import '../../utils/cache_helper.dart';
+import '../../utils/enums.dart';
 
 class FilterList extends StatefulWidget {
   final String doctype;
@@ -85,7 +86,9 @@ class _FilterListState extends State<FilterList> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _getData(),
+      future: FilterListViewModel().getData(
+        widget.doctype,
+      ),
       builder: (context, snapshot) {
         if (snapshot.hasData &&
             snapshot.connectionState == ConnectionState.done) {
@@ -159,17 +162,6 @@ class _FilterListState extends State<FilterList> {
         );
       },
     ).toList();
-  }
-
-  _getData() async {
-    var meta = await CacheHelper.getMeta(widget.doctype);
-    var cachedFilter = CacheHelper.getCache('${widget.doctype}Filter');
-    List filter = cachedFilter["data"] ?? [];
-
-    return {
-      "meta": meta,
-      "filter": filter,
-    };
   }
 
   Widget _bottomBar({
