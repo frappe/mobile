@@ -26,3 +26,8 @@ enum ConnectivityStatus {
   cellular,
   offline,
 }
+
+enum ViewState {
+  idle,
+  busy,
+}

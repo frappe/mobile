@@ -11,160 +11,157 @@ import '../../widgets/frappe_button.dart';
 import '../../app/router.gr.dart';
 import '../../app/locator.dart';
 
+import '../../views/base_view.dart';
 import '../../services/navigation_service.dart';
 
 import '../../utils/frappe_alert.dart';
-import '../../utils/config_helper.dart';
 import '../../utils/enums.dart';
 import '../../utils/helpers.dart';
 
-class Login extends StatefulWidget {
-  @override
-  _LoginState createState() => _LoginState();
-}
-
-class _LoginState extends State<Login> {
+class Login extends StatelessWidget {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-  var serverURL;
-
-  @override
-  void initState() {
-    super.initState();
-    serverURL = ConfigHelper().baseUrl;
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: FutureBuilder(
-        future: LoginViewModel().getData(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData &&
-              snapshot.connectionState == ConnectionState.done) {
-            return SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  SizedBox(
-                    height: 60,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      children: <Widget>[
-                        FormBuilder(
-                          key: _fbKey,
-                          child: Column(
-                            children: <Widget>[
-                              Image(
-                                image: AssetImage('assets/frappe_icon.jpg'),
-                                width: 60,
-                                height: 60,
-                              ),
-                              SizedBox(
-                                height: 24,
-                              ),
-                              Text(
-                                'Login to Frappe',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 24,
-                              ),
-                              buildDecoratedWidget(
-                                FormBuilderTextField(
-                                  name: 'serverURL',
-                                  initialValue: serverURL,
-                                  validator: FormBuilderValidators.compose([
-                                    FormBuilderValidators.required(context),
-                                    FormBuilderValidators.url(context),
-                                  ]),
-                                  decoration: Palette.formFieldDecoration(
-                                    true,
-                                    "Server URL",
-                                  ),
-                                ),
+    return BaseView<LoginViewModel>(
+      onModelReady: (model) {
+        model.init();
+      },
+      builder: (context, model, child) => Scaffold(
+        backgroundColor: Colors.white,
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                height: 60,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: <Widget>[
+                    FormBuilder(
+                      key: _fbKey,
+                      child: Column(
+                        children: <Widget>[
+                          FrappeLogo(),
+                          SizedBox(
+                            height: 24,
+                          ),
+                          Title(),
+                          SizedBox(
+                            height: 24,
+                          ),
+                          buildDecoratedWidget(
+                            FormBuilderTextField(
+                              name: 'serverURL',
+                              initialValue: model.savedCreds["serverURL"],
+                              validator: FormBuilderValidators.compose([
+                                FormBuilderValidators.required(context),
+                                FormBuilderValidators.url(context),
+                              ]),
+                              decoration: Palette.formFieldDecoration(
                                 true,
                                 "Server URL",
                               ),
-                              buildDecoratedWidget(
-                                  FormBuilderTextField(
-                                    name: 'usr',
-                                    initialValue: snapshot.data["savedUsr"],
-                                    validator: FormBuilderValidators.compose([
-                                      FormBuilderValidators.required(context),
-                                    ]),
-                                    decoration: Palette.formFieldDecoration(
-                                      true,
-                                      "Email Address",
-                                    ),
-                                  ),
-                                  true,
-                                  "Email Address"),
-                              PasswordField(
-                                savedPassword: snapshot.data["savedPwd"],
-                              ),
-                              FrappeFlatButton(
-                                title: 'Login',
-                                fullWidth: true,
-                                height: 46,
-                                buttonType: ButtonType.primary,
-                                onPressed: () async {
-                                  if (_fbKey.currentState.saveAndValidate()) {
-                                    var formValue = _fbKey.currentState.value;
-
-                                    var response = await LoginViewModel().login(
-                                      formValue,
-                                    );
-
-                                    if (response["success"] == true) {
-                                      FrappeAlert.successAlert(
-                                        title: 'Success',
-                                        context: context,
-                                      );
-                                      locator<NavigationService>()
-                                          .pushReplacement(
-                                        Routes.home,
-                                      );
-                                    } else {
-                                      if (response["statusCode"] ==
-                                          HttpStatus.unauthorized) {
-                                        FrappeAlert.errorAlert(
-                                          title: "Not Authorized",
-                                          subtitle:
-                                              'Invalid Username or Password',
-                                          context: context,
-                                        );
-                                      } else {
-                                        FrappeAlert.errorAlert(
-                                          title: "Error",
-                                          subtitle: response["message"],
-                                          context: context,
-                                        );
-                                      }
-                                    }
-                                  }
-                                },
-                              ),
-                            ],
+                            ),
+                            true,
+                            "Server URL",
                           ),
-                        ),
-                      ],
+                          buildDecoratedWidget(
+                              FormBuilderTextField(
+                                name: 'usr',
+                                initialValue: model.savedCreds["usr"],
+                                validator: FormBuilderValidators.compose([
+                                  FormBuilderValidators.required(context),
+                                ]),
+                                decoration: Palette.formFieldDecoration(
+                                  true,
+                                  "Email Address",
+                                ),
+                              ),
+                              true,
+                              "Email Address"),
+                          PasswordField(
+                            savedPassword: model.savedCreds["pwd"],
+                          ),
+                          FrappeFlatButton(
+                            title: model.loginButtonLabel,
+                            fullWidth: true,
+                            height: 46,
+                            buttonType: ButtonType.primary,
+                            onPressed: () async {
+                              if (_fbKey.currentState.saveAndValidate()) {
+                                var formValue = _fbKey.currentState.value;
+
+                                var response = await model.login(
+                                  formValue,
+                                );
+
+                                if (response["success"] == true) {
+                                  locator<NavigationService>().pushReplacement(
+                                    Routes.home,
+                                  );
+                                } else {
+                                  if (response["statusCode"] ==
+                                      HttpStatus.unauthorized) {
+                                    FrappeAlert.errorAlert(
+                                      title: "Not Authorized",
+                                      subtitle: 'Invalid Username or Password',
+                                      context: context,
+                                    );
+                                  } else {
+                                    FrappeAlert.errorAlert(
+                                      title: "Error",
+                                      subtitle: response["message"],
+                                      context: context,
+                                    );
+                                  }
+                                }
+                              }
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            );
-          } else if (snapshot.hasError) {
-            return Text(snapshot.error);
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
+            ],
+          ),
+        ),
       ),
+    );
+  }
+}
+
+class Title extends StatelessWidget {
+  const Title({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'Login to Frappe',
+      style: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+}
+
+class FrappeLogo extends StatelessWidget {
+  const FrappeLogo({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Image(
+      image: AssetImage('assets/frappe_icon.jpg'),
+      width: 60,
+      height: 60,
     );
   }
 }

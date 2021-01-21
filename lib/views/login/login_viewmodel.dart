@@ -1,19 +1,35 @@
+import 'package:frappe_app/views/base_viewmodel.dart';
+import 'package:injectable/injectable.dart';
+
 import '../../app/locator.dart';
 import '../../services/api/api.dart';
 import '../../utils/cache_helper.dart';
 import '../../utils/config_helper.dart';
 import '../../utils/http.dart';
 
-class LoginViewModel {
-  getData() async {
+@lazySingleton
+class LoginViewModel extends BaseViewModel {
+  var savedCreds = {
+    "serverUrl": "",
+    "usr": "",
+    "pwd": "",
+  };
+
+  String loginButtonLabel;
+
+  init() {
+    loginButtonLabel = "Login";
     var savedUsr = CacheHelper.getCache('usr');
     var savedPwd = CacheHelper.getCache('pwd');
+    var serverURL = ConfigHelper().baseUrl;
     savedUsr = savedUsr["data"];
     savedPwd = savedPwd["data"];
-    return Future.value({
-      "savedUsr": savedUsr,
-      "savedPwd": savedPwd,
-    });
+
+    savedCreds = {
+      "serverURL": serverURL,
+      "usr": savedUsr,
+      "pwd": savedPwd,
+    };
   }
 
   updateConfig(response) {
@@ -41,6 +57,8 @@ class LoginViewModel {
   }
 
   login(data) async {
+    loginButtonLabel = "Verifying...";
+    notifyListeners();
     await setBaseUrl(data["serverURL"]);
 
     try {
@@ -52,12 +70,17 @@ class LoginViewModel {
       cacheCreds(data);
       await cacheAllUsers();
 
+      loginButtonLabel = "Success";
+      notifyListeners();
+
       return {
         "success": true,
         "message": "Success",
       };
     } catch (e) {
       ConfigHelper.set('isLoggedIn', false);
+      loginButtonLabel = "Login";
+      notifyListeners();
       return {
         "success": false,
         "message": e.statusMessage,

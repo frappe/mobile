@@ -10,28 +10,15 @@ import '../../services/navigation_service.dart';
 import '../../app/router.gr.dart';
 import '../../app/locator.dart';
 
-import '../../utils/helpers.dart';
-import '../../utils/config_helper.dart';
 import '../../utils/enums.dart';
 
 import '../../widgets/frappe_button.dart';
 import '../../widgets/header_app_bar.dart';
 import '../../widgets/card_list_tile.dart';
+import '../base_view.dart';
 
-class Home extends StatefulWidget {
-  @override
-  _HomeState createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
-  var currentModule = ConfigHelper().activeModules != null
-      ? ConfigHelper().activeModules.keys.first
-      : null;
-
-  void _refresh() {
-    setState(() {});
-  }
+class Home extends StatelessWidget {
+  final GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -39,59 +26,62 @@ class _HomeState extends State<Home> {
       context,
     );
 
-    return Scaffold(
-      key: _drawerKey,
-      backgroundColor: Palette.bgColor,
-      drawer: _buildDrawer(
-        connectionStatus,
-      ),
-      body: HeaderAppBar(
-        isRoot: true,
-        subtitle: currentModule ?? "",
-        showSecondaryLeading: true,
-        body: RefreshIndicator(
-          onRefresh: () async {
-            _refresh();
-          },
-          child: currentModule == null
-              ? _activateModules(() {
-                  setState(() {
-                    currentModule = ConfigHelper().activeModules.keys.first;
-                  });
-                })
-              : FutureBuilder(
-                  future: HomeViewModel().getData(
-                    connectionStatus: connectionStatus,
-                    currentModule: currentModule,
-                  ),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData &&
-                        snapshot.connectionState == ConnectionState.done) {
-                      var filteredActiveDoctypes =
-                          HomeViewModel().filterActiveDoctypes(
-                        desktopPage: snapshot.data,
-                        module: currentModule,
-                      );
-
-                      if (filteredActiveDoctypes
-                              .message.shortcuts.items.isEmpty &&
-                          filteredActiveDoctypes.message.cards.items.isEmpty) {
-                        return _activateDoctypes();
-                      }
-
-                      return ListView(
-                        padding: EdgeInsets.zero,
-                        children: _generateChildren(filteredActiveDoctypes),
-                      );
-                    } else if (snapshot.hasError) {
-                      return handleError(snapshot.error);
-                    } else {
-                      return Center(
+    return BaseView<HomeViewModel>(
+      onModelReady: (model) {
+        model.getActiveModules(connectionStatus);
+        model.getData(
+          connectionStatus: connectionStatus,
+          currentModule: model.currentModule,
+        );
+      },
+      builder: (context, model, child) => Scaffold(
+        key: _drawerKey,
+        backgroundColor: Palette.bgColor,
+        drawer: _buildDrawer(
+          connectionStatus: connectionStatus,
+          model: model,
+        ),
+        body: HeaderAppBar(
+          isRoot: true,
+          subtitle: model.currentModule ?? "",
+          showSecondaryLeading: true,
+          body: RefreshIndicator(
+            onRefresh: () async {
+              model.refresh(connectionStatus);
+            },
+            child: model.currentModule == null
+                ? _activateModules(
+                    model: model,
+                    connectivityStatus: connectionStatus,
+                  )
+                : model.state == ViewState.busy
+                    ? Center(
                         child: CircularProgressIndicator(),
-                      );
-                    }
-                  },
-                ),
+                      )
+                    : Builder(
+                        builder: (
+                          context,
+                        ) {
+                          var filteredActiveDoctypes =
+                              HomeViewModel().filterActiveDoctypes(
+                            desktopPage: model.desktopPage,
+                            module: model.currentModule,
+                          );
+
+                          if (filteredActiveDoctypes
+                                  .message.shortcuts.items.isEmpty &&
+                              filteredActiveDoctypes
+                                  .message.cards.items.isEmpty) {
+                            return _activateDoctypes();
+                          }
+
+                          return ListView(
+                            padding: EdgeInsets.zero,
+                            children: _generateChildren(filteredActiveDoctypes),
+                          );
+                        },
+                      ),
+          ),
         ),
       ),
     );
@@ -172,8 +162,10 @@ class _HomeState extends State<Home> {
           SizedBox(
             width: 8,
           ),
-          Text(
-            label,
+          Expanded(
+            child: Text(
+              label,
+            ),
           ),
         ],
       ),
@@ -275,56 +267,58 @@ class _HomeState extends State<Home> {
     return widgets;
   }
 
-  Drawer _buildDrawer(
-    ConnectivityStatus connectionStatus,
-  ) {
+  Drawer _buildDrawer({
+    @required ConnectivityStatus connectionStatus,
+    @required HomeViewModel model,
+  }) {
     return Drawer(
-      child: FutureBuilder(
-        future: HomeViewModel().getActiveModules(connectionStatus),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            List<Widget> listItems = [
-              Container(
-                height: 30,
-              ),
-              ListTile(
-                title: Text('MODULES'),
-              ),
-            ];
-            snapshot.data.forEach((element) {
-              listItems.add(Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: ListTile(
-                  tileColor: currentModule == element.name
-                      ? Palette.bgColor
-                      : Colors.white,
-                  title: Text(element.label),
-                  onTap: () {
-                    setState(() {
-                      currentModule = element.name;
-                    });
-                    locator<NavigationService>().pop();
-                  },
-                ),
-              ));
-            });
-
-            return ListView(
-              children: listItems,
-            );
-          } else if (snapshot.hasError) {
-            return Text(snapshot.error);
-          } else {
-            return Center(
+      child: model.state == ViewState.busy
+          ? Center(
               child: CircularProgressIndicator(),
-            );
-          }
-        },
-      ),
+            )
+          : Builder(
+              builder: (context) {
+                List<Widget> listItems = [
+                  Container(
+                    height: 30,
+                  ),
+                  ListTile(
+                    title: Text('MODULES'),
+                  ),
+                ];
+                model.activeModules.forEach((element) {
+                  listItems.add(Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: ListTile(
+                      tileColor: model.currentModule == element.name
+                          ? Palette.bgColor
+                          : Colors.white,
+                      title: Text(element.label),
+                      onTap: () {
+                        model.switchModule(element.name);
+                        model.getData(
+                          connectionStatus: connectionStatus,
+                          currentModule: model.currentModule,
+                        );
+
+                        locator<NavigationService>().pop();
+                      },
+                    ),
+                  ));
+                });
+
+                return ListView(
+                  children: listItems,
+                );
+              },
+            ),
     );
   }
 
-  Widget _activateModules(Function refresh) {
+  Widget _activateModules({
+    HomeViewModel model,
+    ConnectivityStatus connectivityStatus,
+  }) {
     return Center(
       child: Container(
         color: Colors.white,
@@ -339,7 +333,7 @@ class _HomeState extends State<Home> {
                     .navigateTo(Routes.activateModules);
 
                 if (nav) {
-                  refresh();
+                  model.getActiveModules(connectivityStatus);
                 }
               },
               title: 'Activate Modules',
@@ -369,7 +363,7 @@ class _HomeState extends State<Home> {
                   .navigateTo(Routes.activateModules);
 
               if (nav) {
-                _refresh();
+                // _refresh();
               }
             },
             title: 'Activate Doctypes',

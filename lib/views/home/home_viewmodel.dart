@@ -10,15 +10,32 @@ import 'package:frappe_app/utils/cache_helper.dart';
 import 'package:frappe_app/utils/config_helper.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/helpers.dart';
+import 'package:frappe_app/views/base_viewmodel.dart';
+import 'package:injectable/injectable.dart';
 
-class HomeViewModel {
+@lazySingleton
+class HomeViewModel extends BaseViewModel {
+  String currentModule = ConfigHelper().activeModules.keys.first;
+  List<DeskMessage> activeModules = [];
+  DesktopPageResponse desktopPage;
+
+  refresh(ConnectivityStatus connectivityStatus) async {
+    await getActiveModules(connectivityStatus);
+    notifyListeners();
+  }
+
+  switchModule(String newModule) {
+    currentModule = newModule;
+    notifyListeners();
+  }
+
   Future getActiveModules(ConnectivityStatus connectionStatus) async {
     DeskSidebarItemsResponse deskSidebarItems;
-    var activeModules;
+    var _activeModules;
     if (ConfigHelper().activeModules != null) {
-      activeModules = ConfigHelper().activeModules;
+      _activeModules = ConfigHelper().activeModules;
     } else {
-      activeModules = {};
+      _activeModules = {};
     }
 
     var isOnline = await verifyOnline();
@@ -41,11 +58,12 @@ class HomeViewModel {
     }
 
     var modules = deskSidebarItems.message.where((m) {
-      return activeModules.keys.contains(m.name) &&
-          activeModules[m.name].length > 0;
+      return _activeModules.keys.contains(m.name) &&
+          _activeModules[m.name].length > 0;
     }).toList();
 
-    return modules;
+    activeModules = modules;
+    notifyListeners();
   }
 
   DesktopPageResponse filterActiveDoctypes({
@@ -73,11 +91,12 @@ class HomeViewModel {
     return desktopPage;
   }
 
-  Future<DesktopPageResponse> getData({
+  getData({
     @required ConnectivityStatus connectionStatus,
     @required String currentModule,
   }) async {
-    DesktopPageResponse desktopPage;
+    setState(ViewState.busy);
+    DesktopPageResponse _desktopPage;
 
     var isOnline = await verifyOnline();
 
@@ -89,14 +108,15 @@ class HomeViewModel {
       moduleDoctypes = moduleDoctypes["data"];
 
       if (moduleDoctypes != null) {
-        desktopPage = DesktopPageResponse.fromJson(moduleDoctypes);
+        _desktopPage = DesktopPageResponse.fromJson(moduleDoctypes);
       } else {
         throw Response(statusCode: HttpStatus.serviceUnavailable);
       }
     } else {
-      desktopPage = await locator<Api>().getDesktopPage(currentModule);
+      _desktopPage = await locator<Api>().getDesktopPage(currentModule);
     }
 
-    return desktopPage;
+    desktopPage = _desktopPage;
+    setState(ViewState.idle);
   }
 }
