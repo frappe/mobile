@@ -18,8 +18,6 @@ import '../../widgets/card_list_tile.dart';
 import '../base_view.dart';
 
 class Home extends StatelessWidget {
-  final GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
-
   @override
   Widget build(BuildContext context) {
     var connectionStatus = Provider.of<ConnectivityStatus>(
@@ -35,7 +33,6 @@ class Home extends StatelessWidget {
         );
       },
       builder: (context, model, child) => Scaffold(
-        key: _drawerKey,
         backgroundColor: Palette.bgColor,
         drawer: _buildDrawer(
           connectionStatus: connectionStatus,

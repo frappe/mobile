@@ -37,7 +37,7 @@ class ActivateModulesViewModel {
         ],
         doctype: 'DocType',
         meta: doctypeDoc,
-        filters: await FilterList.generateFilters(
+        filters: FilterList.generateFilters(
           'DocType',
           {
             "istable": 0,
