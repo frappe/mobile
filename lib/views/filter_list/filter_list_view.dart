@@ -8,70 +8,31 @@ import '../../services/navigation_service.dart';
 import '../../form/controls/control.dart';
 import '../../widgets/frappe_button.dart';
 
-import '../../utils/cache_helper.dart';
 import '../../utils/enums.dart';
 
 class FilterList extends StatefulWidget {
   final String doctype;
+  final Map filters;
 
   FilterList({
     @required this.doctype,
+    @required this.filters,
   });
 
-  static int getFieldFilterIndex(List filters, String field) {
-    int idx;
-    for (int i = 0; i < filters.length; i++) {
-      if (filters[i][1] == field) {
-        idx = i;
-        break;
-      }
-    }
-
-    return idx;
-  }
-
-  static clearFilters(String doctype) {
-    CacheHelper.remove(
-      "${doctype}Filter",
-    );
-  }
-
-  static Future<List> generateFilters(String doctype, Map filters) async {
-    var transformedFilters;
-    var kIdx;
-    var cacheKey = '${doctype}Filter';
-    var cachedFilters = await CacheHelper.getCache(cacheKey);
-    cachedFilters = cachedFilters["data"];
-    if (cachedFilters != null) {
-      transformedFilters = cachedFilters;
-    } else {
-      transformedFilters = [];
-    }
+  static List generateFilters(String doctype, Map filters) {
+    var transformedFilters = [];
 
     filters.forEach((k, v) {
       if (v != null) {
-        if (k == '_assign' && v != '') {
-          kIdx = getFieldFilterIndex(transformedFilters, k);
-          if (kIdx != null) {
-            transformedFilters.removeAt(kIdx);
-          }
+        if ((k == '_assign' || k == '_liked_by') && v != '') {
           transformedFilters.add([doctype, k, "like", "%$v%"]);
         } else {
           if (v != "") {
-            kIdx = getFieldFilterIndex(transformedFilters, k);
-            if (kIdx != null) {
-              transformedFilters.removeAt(kIdx);
-            }
             transformedFilters.add([doctype, k, "=", v]);
           }
         }
       }
     });
-
-    await CacheHelper.putCache(
-      cacheKey,
-      transformedFilters,
-    );
 
     return transformedFilters;
   }
@@ -93,13 +54,12 @@ class _FilterListState extends State<FilterList> {
         if (snapshot.hasData &&
             snapshot.connectionState == ConnectionState.done) {
           var meta = snapshot.data["meta"];
-          var filters = snapshot.data["filter"];
 
           return Scaffold(
             backgroundColor: Colors.white,
             bottomNavigationBar: _bottomBar(
               meta: meta,
-              filters: filters,
+              filters: widget.filters,
             ),
             appBar: _appBar(),
             body: FormBuilder(
@@ -108,7 +68,7 @@ class _FilterListState extends State<FilterList> {
                 padding: EdgeInsets.all(10),
                 children: _generateChildren(
                   meta.docs[0].fields,
-                  filters,
+                  widget.filters,
                 ),
               ),
             ),
@@ -126,7 +86,7 @@ class _FilterListState extends State<FilterList> {
     );
   }
 
-  List<Widget> _generateChildren(List<DoctypeField> fields, List filters) {
+  List<Widget> _generateChildren(List<DoctypeField> fields, Map filters) {
     fields.add(DoctypeField(
       isDefaultFilter: 1,
       fieldname: "_assign",
@@ -142,18 +102,18 @@ class _FilterListState extends State<FilterList> {
         var valObj;
 
         if (filters != null && filters.length > 0) {
-          for (int i = 0; i < filters.length; i++) {
-            if (filters[i][1] == field.fieldname) {
-              val = filters[i][3];
-              valObj = {field.fieldname: filters[i][3]};
-            }
-          }
+          val = filters[field.fieldname];
+          valObj = {field.fieldname: val};
         }
 
         return Column(
           children: <Widget>[
             ListTile(
-              title: makeControl(field: field, value: val, doc: valObj),
+              title: makeControl(
+                field: field,
+                value: val,
+                doc: valObj,
+              ),
             ),
             Divider(
               height: 10.0,
@@ -166,7 +126,7 @@ class _FilterListState extends State<FilterList> {
 
   Widget _bottomBar({
     @required DoctypeResponse meta,
-    @required List filters,
+    @required Map filters,
   }) {
     return Container(
       height: 60,
@@ -180,10 +140,7 @@ class _FilterListState extends State<FilterList> {
               buttonType: ButtonType.secondary,
               title: 'Clear All',
               onPressed: () {
-                FilterList.clearFilters(meta.docs[0].name);
                 _fbKey.currentState.reset();
-                filters.clear();
-                setState(() {});
               },
             ),
             SizedBox(
@@ -194,13 +151,14 @@ class _FilterListState extends State<FilterList> {
               buttonType: ButtonType.primary,
               onPressed: () async {
                 _fbKey.currentState.save();
+                var formVal = _fbKey.currentState.value;
+                var formValClone = {
+                  ...formVal,
+                };
 
-                await FilterList.generateFilters(
-                  meta.docs[0].name,
-                  _fbKey.currentState.value,
-                );
+                formValClone.removeWhere((key, val) => val == null);
 
-                locator<NavigationService>().pop(true);
+                locator<NavigationService>().pop(formValClone);
               },
               title: 'Apply',
             ),

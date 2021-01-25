@@ -79,7 +79,7 @@ class ListItem extends StatelessWidget {
                   Container(
                     width: colWidth,
                     child: Text(
-                      title,
+                      title ?? "",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(

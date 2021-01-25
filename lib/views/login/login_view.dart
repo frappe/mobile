@@ -35,6 +35,14 @@ class Login extends StatelessWidget {
               SizedBox(
                 height: 60,
               ),
+              FrappeLogo(),
+              SizedBox(
+                height: 24,
+              ),
+              Title(),
+              SizedBox(
+                height: 24,
+              ),
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
@@ -43,18 +51,10 @@ class Login extends StatelessWidget {
                       key: _fbKey,
                       child: Column(
                         children: <Widget>[
-                          FrappeLogo(),
-                          SizedBox(
-                            height: 24,
-                          ),
-                          Title(),
-                          SizedBox(
-                            height: 24,
-                          ),
                           buildDecoratedWidget(
                             FormBuilderTextField(
                               name: 'serverURL',
-                              initialValue: model.savedCreds["serverURL"],
+                              initialValue: model.savedCreds.serverURL,
                               validator: FormBuilderValidators.compose([
                                 FormBuilderValidators.required(context),
                                 FormBuilderValidators.url(context),
@@ -70,7 +70,7 @@ class Login extends StatelessWidget {
                           buildDecoratedWidget(
                               FormBuilderTextField(
                                 name: 'usr',
-                                initialValue: model.savedCreds["usr"],
+                                initialValue: model.savedCreds.usr,
                                 validator: FormBuilderValidators.compose([
                                   FormBuilderValidators.required(context),
                                 ]),
@@ -82,7 +82,7 @@ class Login extends StatelessWidget {
                               true,
                               "Email Address"),
                           PasswordField(
-                            savedPassword: model.savedCreds["pwd"],
+                            savedPassword: model.savedCreds.pwd,
                           ),
                           FrappeFlatButton(
                             title: model.loginButtonLabel,

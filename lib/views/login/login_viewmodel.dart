@@ -7,13 +7,21 @@ import '../../utils/cache_helper.dart';
 import '../../utils/config_helper.dart';
 import '../../utils/http.dart';
 
+class SavedCredentials {
+  String serverURL;
+  String usr;
+  String pwd;
+
+  SavedCredentials({
+    this.serverURL = "",
+    this.usr = "",
+    this.pwd = "",
+  });
+}
+
 @lazySingleton
 class LoginViewModel extends BaseViewModel {
-  var savedCreds = {
-    "serverUrl": "",
-    "usr": "",
-    "pwd": "",
-  };
+  var savedCreds = SavedCredentials();
 
   String loginButtonLabel;
 
@@ -25,11 +33,11 @@ class LoginViewModel extends BaseViewModel {
     savedUsr = savedUsr["data"];
     savedPwd = savedPwd["data"];
 
-    savedCreds = {
-      "serverURL": serverURL,
-      "usr": savedUsr,
-      "pwd": savedPwd,
-    };
+    savedCreds = SavedCredentials(
+      serverURL: serverURL,
+      usr: savedUsr,
+      pwd: savedPwd,
+    );
   }
 
   updateConfig(response) {
