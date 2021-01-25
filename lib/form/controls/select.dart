@@ -54,7 +54,7 @@ class Select extends StatelessWidget with Control, ControlInput {
         doctypeField.label,
       ),
       validator: FormBuilderValidators.compose(validators),
-      items: opts.map<DropdownMenuItem>((option) {
+      items: opts.toSet().toList().map<DropdownMenuItem>((option) {
         return DropdownMenuItem(
           value: option,
           child: option != null
