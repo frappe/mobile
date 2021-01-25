@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:frappe_app/views/base_view.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../datamodels/doctype_response.dart';
@@ -18,7 +19,6 @@ import '../../config/palette.dart';
 import '../../config/frappe_icons.dart';
 
 import '../../utils/helpers.dart';
-import '../../utils/config_helper.dart';
 import '../../utils/frappe_icon.dart';
 import '../../utils/enums.dart';
 
@@ -26,7 +26,7 @@ import '../../widgets/header_app_bar.dart';
 import '../../widgets/frappe_button.dart';
 import '../../widgets/list_item.dart';
 
-class CustomListView extends StatefulWidget {
+class CustomListView extends StatelessWidget {
   final String doctype;
 
   CustomListView({
@@ -34,69 +34,56 @@ class CustomListView extends StatefulWidget {
   });
 
   @override
-  _CustomListViewState createState() => _CustomListViewState();
-}
-
-class _CustomListViewState extends State<CustomListView> {
-  final userId = ConfigHelper().userId;
-
-  var _pageLoadController;
-  bool showLiked;
-
-  @override
-  void dispose() {
-    super.dispose();
-    _pageLoadController?.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: ListViewViewModel().getData(widget.doctype),
-      builder: (context, snapshot) {
-        if (snapshot.hasData &&
-            snapshot.connectionState == ConnectionState.done) {
-          var meta = snapshot.data["meta"];
-          var filters = snapshot.data["filter"];
-          _pageLoadController = snapshot.data["pageLoadController"];
-
-          if (FilterList.getFieldFilterIndex(filters, '_liked_by') != null) {
-            showLiked = true;
-          } else {
-            showLiked = false;
-          }
-
-          return Scaffold(
-            bottomNavigationBar: _bottomBar(filters),
-            body: HeaderAppBar(
-              subtitle: widget.doctype,
-              subActions: <Widget>[
-                _newDoc(),
-              ],
-              body: RefreshIndicator(
-                onRefresh: () async {
-                  await _pageLoadController.reset();
-                },
-                child: Container(
-                  color: Palette.bgColor,
-                  child: _generateList(
-                    filters: filters,
-                    meta: meta,
-                  ),
-                ),
-              ),
-            ),
-          );
-        } else {
-          return Scaffold(
-            body: snapshot.hasError
-                ? handleError(snapshot.error)
-                : Center(
-                    child: CircularProgressIndicator(),
-                  ),
-          );
-        }
+    return BaseView<ListViewViewModel>(
+      onModelReady: (model) {
+        model.getData(doctype);
       },
+      onModelClose: (model) {
+        model.filters = {};
+        model.meta = null;
+        model.showLiked = false;
+        model.pagewiseLoadController.dispose();
+      },
+      builder: (context, model, child) => model.state == ViewState.busy
+          ? Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          : Builder(
+              builder: (context) {
+                var meta = model.meta;
+                var filters = model.filters;
+
+                return Scaffold(
+                  bottomNavigationBar: _bottomBar(
+                    model: model,
+                    filters: filters,
+                    context: context,
+                  ),
+                  body: HeaderAppBar(
+                    subtitle: doctype,
+                    subActions: <Widget>[
+                      _newDoc(),
+                    ],
+                    body: RefreshIndicator(
+                      onRefresh: () {
+                        return Future.value(model.refresh());
+                      },
+                      child: Container(
+                        color: Palette.bgColor,
+                        child: _generateList(
+                          model: model,
+                          filters: filters,
+                          meta: meta,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 
@@ -117,7 +104,7 @@ class _CustomListViewState extends State<CustomListView> {
             locator<NavigationService>().navigateTo(
               Routes.newDoc,
               arguments: NewDocArguments(
-                doctype: widget.doctype,
+                doctype: doctype,
               ),
             );
           },
@@ -127,33 +114,36 @@ class _CustomListViewState extends State<CustomListView> {
   }
 
   Widget _generateList({
-    @required List filters,
+    @required Map filters,
     @required DoctypeResponse meta,
+    @required ListViewViewModel model,
   }) {
     return PagewiseListView(
-      pageLoadController: _pageLoadController,
+      pageLoadController: model.pagewiseLoadController,
       padding: EdgeInsets.zero,
       noItemsFoundBuilder: (context) {
-        return _noItemsFoundBuilder(filters);
+        return _noItemsFoundBuilder(
+          filters: filters,
+          context: context,
+          model: model,
+        );
       },
       itemBuilder: ((buildContext, entry, _) {
         return _generateItem(
+          model: model,
           data: entry,
           meta: meta.docs[0],
           onListTap: () {
-            ListViewViewModel().onListTap(
-              doctype: widget.doctype,
+            model.onListTap(
+              doctype: doctype,
               name: entry["name"],
             );
           },
-          onButtonTap: (filter) async {
-            // TODO use provider
-            filters.clear();
-            filters.addAll(
-              await FilterList.generateFilters(widget.doctype, filter),
+          onButtonTap: (filter) {
+            model.onButtonTap(
+              doctype: doctype,
+              filter: filter,
             );
-            _pageLoadController.reset();
-            setState(() {});
           },
         );
       }),
@@ -161,23 +151,24 @@ class _CustomListViewState extends State<CustomListView> {
   }
 
   Widget _generateItem({
-    Map data,
-    Function onListTap,
-    Function onButtonTap,
-    DoctypeDoc meta,
+    @required Map data,
+    @required Function onListTap,
+    @required Function onButtonTap,
+    @required DoctypeDoc meta,
+    @required ListViewViewModel model,
   }) {
     var assignee =
         data["_assign"] != null ? json.decode(data["_assign"]) : null;
 
     var likedBy =
         data["_liked_by"] != null ? json.decode(data["_liked_by"]) : [];
-    var isLikedByUser = likedBy.contains(userId);
+    var isLikedByUser = likedBy.contains(model.userId);
 
     var seenBy = data["_seen"] != null ? json.decode(data["_seen"]) : [];
-    var isSeenByUser = seenBy.contains(userId);
+    var isSeenByUser = seenBy.contains(model.userId);
 
     return ListItem(
-      doctype: widget.doctype,
+      doctype: doctype,
       onListTap: onListTap,
       isFav: isLikedByUser,
       seen: isSeenByUser,
@@ -197,7 +188,11 @@ class _CustomListViewState extends State<CustomListView> {
     );
   }
 
-  Widget _noItemsFoundBuilder(List filters) {
+  Widget _noItemsFoundBuilder({
+    @required Map filters,
+    @required BuildContext context,
+    @required ListViewViewModel model,
+  }) {
     return Container(
       color: Colors.white,
       width: MediaQuery.of(context).size.width,
@@ -211,10 +206,8 @@ class _CustomListViewState extends State<CustomListView> {
               buttonType: ButtonType.secondary,
               title: 'Clear Filters',
               onPressed: () {
-                FilterList.clearFilters(widget.doctype);
                 filters.clear();
-                _pageLoadController.reset();
-                setState(() {});
+                model.pagewiseLoadController.reset();
               },
             ),
           FrappeFlatButton.small(
@@ -224,7 +217,7 @@ class _CustomListViewState extends State<CustomListView> {
               locator<NavigationService>().navigateTo(
                 Routes.newDoc,
                 arguments: NewDocArguments(
-                  doctype: widget.doctype,
+                  doctype: doctype,
                 ),
               );
             },
@@ -234,7 +227,11 @@ class _CustomListViewState extends State<CustomListView> {
     );
   }
 
-  Widget _bottomBar(List filters) {
+  Widget _bottomBar({
+    @required Map filters,
+    @required BuildContext context,
+    @required ListViewViewModel model,
+  }) {
     return Container(
       height: 60,
       child: BottomAppBar(
@@ -245,24 +242,23 @@ class _CustomListViewState extends State<CustomListView> {
             FrappeRaisedButton(
               minWidth: 120,
               onPressed: () async {
-                var saved = await showModalBottomSheet(
+                Map newFilters = await showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
                   builder: (BuildContext context) {
                     return FractionallySizedBox(
                       heightFactor: 0.96,
                       child: FilterList(
-                        doctype: widget.doctype,
+                        filters: filters,
+                        doctype: doctype,
                       ),
                     );
                   },
                 );
 
-                if (saved) {
-                  setState(() {});
-                }
+                model.applyFilters(newFilters);
               },
-              title: 'Filters (${filters.length})',
+              title: 'Filters (${model.filters.length})',
               icon: FrappeIcons.filter,
             ),
             SizedBox(
@@ -271,31 +267,12 @@ class _CustomListViewState extends State<CustomListView> {
             FrappeRaisedButton(
               minWidth: 120,
               onPressed: () {
-                if (!showLiked) {
-                  filters.add([
-                    widget.doctype,
-                    '_liked_by',
-                    'like',
-                    '%$userId%',
-                  ]);
-                } else {
-                  int likedByIdx = FilterList.getFieldFilterIndex(
-                    filters,
-                    '_liked_by',
-                  );
-
-                  if (likedByIdx != null) {
-                    filters.removeAt(likedByIdx);
-                  }
-                }
-
-                setState(() {
-                  showLiked = !showLiked;
-                  _pageLoadController.reset();
-                });
+                model.toggleLiked(
+                  doctype,
+                );
               },
               title: 'Liked',
-              icon: showLiked
+              icon: model.showLiked
                   ? FrappeIcons.favourite_active
                   : FrappeIcons.favourite_resting,
               iconSize: 16.0,
