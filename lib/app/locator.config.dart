@@ -8,6 +8,7 @@ import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 
 import '../services/connectivity_service.dart';
+import '../views/filter_list/filter_list_viewmodel.dart';
 import '../views/home/home_viewmodel.dart';
 import '../views/list_view/list_view_viewmodel.dart';
 import '../views/login/login_viewmodel.dart';
@@ -24,6 +25,7 @@ GetIt $initGetIt(
 }) {
   final gh = GetItHelper(get, environment, environmentFilter);
   gh.lazySingleton<ConnectivityService>(() => ConnectivityService());
+  gh.lazySingleton<FilterListViewModel>(() => FilterListViewModel());
   gh.lazySingleton<HomeViewModel>(() => HomeViewModel());
   gh.lazySingleton<ListViewViewModel>(() => ListViewViewModel());
   gh.lazySingleton<LoginViewModel>(() => LoginViewModel());

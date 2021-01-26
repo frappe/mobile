@@ -251,6 +251,7 @@ class CustomListView extends StatelessWidget {
                       child: FilterList(
                         filters: filters,
                         doctype: doctype,
+                        meta: model.meta,
                       ),
                     );
                   },

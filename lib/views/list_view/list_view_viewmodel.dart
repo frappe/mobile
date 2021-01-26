@@ -108,7 +108,7 @@ class ListViewViewModel extends BaseViewModel {
 
   applyFilters(Map newFilters) {
     if (newFilters != null) {
-      filters.addAll(newFilters);
+      filters = newFilters;
 
       pagewiseLoadController.reset();
       notifyListeners();

@@ -1,11 +1,43 @@
-import 'package:frappe_app/utils/cache_helper.dart';
+import 'package:injectable/injectable.dart';
+import '../../datamodels/doctype_response.dart';
+import '../../views/base_viewmodel.dart';
 
-class FilterListViewModel {
-  getData(String doctype) async {
-    var meta = await CacheHelper.getMeta(doctype);
+@lazySingleton
+class FilterListViewModel extends BaseViewModel {
+  Map doc = {};
+  List<DoctypeField> filterFields = [];
 
-    return {
-      "meta": meta,
-    };
+  getFieldsWithValue(
+    List<DoctypeField> fields,
+    Map filters,
+  ) {
+    var _doc = {};
+    var standardFilterFields = fields.where((field) {
+      return field.inStandardFilter == 1 || field.isDefaultFilter == 1;
+    }).toList();
+
+    standardFilterFields.add(DoctypeField(
+      isDefaultFilter: 1,
+      fieldname: "_assign",
+      options: "User",
+      label: "Assigned To",
+      fieldtype: "Link",
+    ));
+
+    standardFilterFields.forEach(
+      (field) {
+        if (filters != null && filters.length > 0) {
+          _doc[field.fieldname] = filters[field.fieldname];
+        }
+      },
+    );
+
+    doc = _doc;
+    filterFields = standardFilterFields;
+  }
+
+  clearFields() {
+    doc = {};
+    notifyListeners();
   }
 }
