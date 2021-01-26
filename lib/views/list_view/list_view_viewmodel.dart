@@ -86,11 +86,10 @@ class ListViewViewModel extends BaseViewModel {
   }
 
   onButtonTap({
-    @required String doctype,
-    @required Map filter,
+    @required String key,
+    @required String value,
   }) {
-    // TODO
-    filters.addAll(filter);
+    filters[key] = value;
     pagewiseLoadController.reset();
     notifyListeners();
   }
@@ -113,5 +112,11 @@ class ListViewViewModel extends BaseViewModel {
       pagewiseLoadController.reset();
       notifyListeners();
     }
+  }
+
+  clearFilters() {
+    filters.clear();
+    pagewiseLoadController.reset();
+    notifyListeners();
   }
 }

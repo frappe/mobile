@@ -139,11 +139,8 @@ class CustomListView extends StatelessWidget {
               name: entry["name"],
             );
           },
-          onButtonTap: (filter) {
-            model.onButtonTap(
-              doctype: doctype,
-              filter: filter,
-            );
+          onButtonTap: (k, v) {
+            model.onButtonTap(key: k, value: v);
           },
         );
       }),
@@ -206,8 +203,7 @@ class CustomListView extends StatelessWidget {
               buttonType: ButtonType.secondary,
               title: 'Clear Filters',
               onPressed: () {
-                filters.clear();
-                model.pagewiseLoadController.reset();
+                model.clearFilters();
               },
             ),
           FrappeFlatButton.small(
@@ -242,20 +238,32 @@ class CustomListView extends StatelessWidget {
             FrappeRaisedButton(
               minWidth: 120,
               onPressed: () async {
-                Map newFilters = await showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (BuildContext context) {
-                    return FractionallySizedBox(
-                      heightFactor: 0.96,
-                      child: FilterList(
+                Map newFilters = await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return FilterList(
                         filters: filters,
                         doctype: doctype,
                         meta: model.meta,
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 );
+
+                // Map newFilters = await showModalBottomSheet(
+                //   context: context,
+                //   isScrollControlled: true,
+                //   builder: (BuildContext context) {
+                //     return FractionallySizedBox(
+                //       heightFactor: 0.96,
+                //       child: FilterList(
+                //         filters: filters,
+                //         doctype: doctype,
+                //         meta: model.meta,
+                //       ),
+                //     );
+                //   },
+                // );
 
                 model.applyFilters(newFilters);
               },

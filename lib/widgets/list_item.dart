@@ -98,9 +98,10 @@ class ListItem extends StatelessWidget {
               Row(
                 children: <Widget>[
                   GestureDetector(
-                    onTap: () => onButtonTap({
-                      status[0]: status[1],
-                    }),
+                    onTap: () => onButtonTap(
+                      status[0],
+                      status[1],
+                    ),
                     child: Indicator.buildStatusButton(
                       doctype,
                       status[1],
@@ -122,9 +123,10 @@ class ListItem extends StatelessWidget {
                   GestureDetector(
                     onTap: assignee != null
                         ? () {
-                            onButtonTap({
-                              assignee[0]: assignee[1],
-                            });
+                            onButtonTap(
+                              assignee[0],
+                              assignee[1],
+                            );
                           }
                         : null,
                     child: UserAvatar(
