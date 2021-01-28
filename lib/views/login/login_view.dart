@@ -90,6 +90,10 @@ class Login extends StatelessWidget {
                             height: 46,
                             buttonType: ButtonType.primary,
                             onPressed: () async {
+                              FocusScope.of(context).requestFocus(
+                                FocusNode(),
+                              );
+
                               if (_fbKey.currentState.saveAndValidate()) {
                                 var formValue = _fbKey.currentState.value;
 
