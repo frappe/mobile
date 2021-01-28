@@ -404,7 +404,7 @@ class _FormViewState extends State<FormView>
         Padding(
           padding: const EdgeInsets.symmetric(
             vertical: 12.0,
-            horizontal: 4,
+            horizontal: 8,
           ),
           child: FrappeFlatButton(
             buttonType: ButtonType.primary,

@@ -65,7 +65,7 @@ class CustomListView extends StatelessWidget {
                   body: HeaderAppBar(
                     subtitle: doctype,
                     subActions: <Widget>[
-                      _newDoc(),
+                      _newDoc(model),
                     ],
                     body: RefreshIndicator(
                       onRefresh: () {
@@ -87,7 +87,7 @@ class CustomListView extends StatelessWidget {
     );
   }
 
-  Widget _newDoc() {
+  Widget _newDoc(ListViewViewModel model) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Container(
@@ -103,9 +103,7 @@ class CustomListView extends StatelessWidget {
           onPressed: () {
             locator<NavigationService>().navigateTo(
               Routes.newDoc,
-              arguments: NewDocArguments(
-                doctype: doctype,
-              ),
+              arguments: NewDocArguments(doctype: doctype, meta: model.meta),
             );
           },
         ),
@@ -214,6 +212,7 @@ class CustomListView extends StatelessWidget {
                 Routes.newDoc,
                 arguments: NewDocArguments(
                   doctype: doctype,
+                  meta: model.meta,
                 ),
               );
             },

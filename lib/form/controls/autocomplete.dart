@@ -103,12 +103,19 @@ class _AutoCompleteState extends State<AutoComplete>
                   ),
                 );
               },
-          initialValue: widget.doc[widget.doctypeField.fieldname],
+          initialValue: widget.doc != null
+              ? widget.doc[widget.doctypeField.fieldname]
+              : null,
           suggestionsCallback: widget.suggestionsCallback ??
               (query) async {
                 var lowercaseQuery = query.toLowerCase();
-                return widget.doctypeField.options
-                    .split('\n')
+                List opts;
+                if (widget.doctypeField.options is String) {
+                  opts = widget.doctypeField.options.split('\n');
+                } else {
+                  opts = widget.doctypeField.options ?? [];
+                }
+                return opts
                     .where(
                       (option) => option.toLowerCase().contains(lowercaseQuery),
                     )

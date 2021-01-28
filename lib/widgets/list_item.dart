@@ -51,6 +51,13 @@ class ListItem extends StatelessWidget {
         ),
         elevation: 0,
         child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: Palette.secondaryButtonColor,
+              ),
+            ),
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
           child: Column(
             children: <Widget>[
@@ -130,8 +137,7 @@ class ListItem extends StatelessWidget {
                           }
                         : null,
                     child: UserAvatar(
-                      borderRadius: BorderRadius.all(Radius.circular(6)),
-                      size: 24,
+                      size: 16,
                       uid: assignee != null ? assignee[1] : null,
                     ),
                   ),

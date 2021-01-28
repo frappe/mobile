@@ -27,6 +27,7 @@ class Home extends StatelessWidget {
     return BaseView<HomeViewModel>(
       onModelReady: (model) {
         model.getActiveModules(connectionStatus);
+
         model.getData(
           connectionStatus: connectionStatus,
           currentModule: model.currentModule,

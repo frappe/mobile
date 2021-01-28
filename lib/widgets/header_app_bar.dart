@@ -72,18 +72,12 @@ class HeaderAppBar extends StatelessWidget {
                       )
                     : null,
             actions: [
-              Spacer(
-                flex: 1,
-              ),
               Flexible(
                 flex: 7,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Awesombar(),
                 ),
-              ),
-              Spacer(
-                flex: 1,
               ),
               Flexible(
                 flex: 2,
@@ -108,13 +102,9 @@ class HeaderAppBar extends StatelessWidget {
                     ];
                   },
                   child: Padding(
-                    padding: const EdgeInsets.only(
-                      right: 10.0,
-                      top: 5.0,
-                    ),
+                    padding: const EdgeInsets.only(right: 8.0),
                     child: UserAvatar(
-                      borderRadius: const BorderRadius.all(Radius.circular(25)),
-                      size: 50,
+                      size: 22,
                       uid: ConfigHelper().userId,
                     ),
                   ),

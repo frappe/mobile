@@ -15,7 +15,9 @@ import 'package:injectable/injectable.dart';
 
 @lazySingleton
 class HomeViewModel extends BaseViewModel {
-  String currentModule = ConfigHelper().activeModules.keys.first;
+  String currentModule = ConfigHelper().activeModules != null
+      ? ConfigHelper().activeModules.keys.first
+      : null;
   List<DeskMessage> activeModules = [];
   DesktopPageResponse desktopPage;
 
@@ -63,6 +65,9 @@ class HomeViewModel extends BaseViewModel {
     }).toList();
 
     activeModules = modules;
+    currentModule = ConfigHelper().activeModules != null
+        ? ConfigHelper().activeModules.keys.first
+        : null;
     notifyListeners();
   }
 

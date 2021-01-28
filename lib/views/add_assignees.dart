@@ -40,7 +40,9 @@ class _AddAssigneesState extends State<AddAssignees> {
         var val = entry.value;
         return CardListTile(
           color: Palette.newIndicatorColor,
-          leading: UserAvatar(uid: val),
+          leading: UserAvatar(
+            uid: val,
+          ),
           title: Text(val),
           trailing: IconButton(
             icon: Icon(Icons.clear),

@@ -40,35 +40,32 @@ class _AddReviewState extends State<AddReview> {
   void initState() {
     super.initState();
     wireframe = [
-      {
-        "fieldname": 'to_user',
-        "fieldtype": 'Autocomplete',
-        "label": 'To User',
-        "reqd": 1,
-        "options": getInvolvedUsers(),
-        "ignore_validation": 1,
-        "description": 'Only users involved in the document are listed'
-      },
-      {
-        "fieldname": 'review_type',
-        "fieldtype": 'Select',
-        "label": 'Action',
-        "options": ['Appreciation', 'Criticism'],
-        "default": 'Appreciation'
-      },
-      {
-        "fieldname": 'points',
-        "fieldtype": 'Int',
-        "label": 'Points',
-        "reqd": 1,
-        // "description": "Currently you have ${this.points.review_points} review points".
-      },
-      {
-        "fieldtype": 'Small Text',
-        "fieldname": 'reason',
-        "reqd": 1,
-        "label": 'Reason',
-      }
+      DoctypeField(
+        fieldname: 'to_user',
+        fieldtype: 'Autocomplete',
+        label: 'To User',
+        reqd: 1,
+        options: getInvolvedUsers(),
+      ),
+      DoctypeField(
+          fieldname: 'review_type',
+          fieldtype: 'Select',
+          label: 'Action',
+          options: ['Appreciation', 'Criticism'],
+          defaultValue: 'Appreciation'),
+      DoctypeField(
+        fieldname: 'points',
+        fieldtype: 'Int',
+        label: 'Points',
+        reqd: 1,
+        // description: Currently you have ${this.points.review_points} review points.
+      ),
+      DoctypeField(
+        fieldtype: 'Small Text',
+        fieldname: 'reason',
+        reqd: 1,
+        label: 'Reason',
+      ),
     ];
   }
 
