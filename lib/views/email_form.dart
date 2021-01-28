@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/datamodels/doctype_response.dart';
 
 import '../app/locator.dart';
+import '../datamodels/doctype_response.dart';
 
 import '../services/api/api.dart';
 import '../services/navigation_service.dart';
@@ -10,7 +10,7 @@ import '../services/navigation_service.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
 
-class EmailForm extends StatefulWidget {
+class EmailForm extends StatelessWidget {
   final String doctype;
   final String doc;
   final String subjectField;
@@ -24,25 +24,18 @@ class EmailForm extends StatefulWidget {
       this.senderField,
       @required this.callback});
 
-  @override
-  _EmailFormState createState() => _EmailFormState();
-}
-
-class _EmailFormState extends State<EmailForm> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-  DoctypeDoc meta;
 
   @override
-  void initState() {
-    super.initState();
-    meta = DoctypeDoc(
+  Widget build(BuildContext context) {
+    final meta = DoctypeDoc(
       doctype: "communication",
       fields: [
         DoctypeField(
           fieldname: "recipients",
           fieldtype: "MultiSelect",
           label: "To",
-          defaultValue: widget.senderField,
+          defaultValue: senderField,
           reqd: 1,
         ),
 
@@ -74,8 +67,7 @@ class _EmailFormState extends State<EmailForm> {
           fieldname: "subject",
           fieldtype: "Small Text",
           label: "Subject",
-          defaultValue:
-              '${widget.doctype}: ${widget.subjectField} (${widget.doc})',
+          defaultValue: '$doctype}: $subjectField} ($doc})',
         ),
         DoctypeField(
           fieldtype: "Text Editor",
@@ -105,10 +97,6 @@ class _EmailFormState extends State<EmailForm> {
         // 			"fieldname":"select_attachments"}
       ],
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -123,10 +111,10 @@ class _EmailFormState extends State<EmailForm> {
                   recipients: formValue["recipients"],
                   subject: formValue["subject"],
                   content: formValue["content"],
-                  doctype: widget.doctype,
-                  doctypeName: widget.doc,
+                  doctype: doctype,
+                  doctypeName: doc,
                 );
-                widget.callback();
+                callback();
                 locator<NavigationService>().pop();
               }
             },

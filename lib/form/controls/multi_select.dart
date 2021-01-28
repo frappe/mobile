@@ -40,7 +40,8 @@ class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
         hintText: widget.doctypeField.label,
       ),
       name: widget.doctypeField.fieldname,
-      initialValue: widget.doc[widget.doctypeField.fieldname],
+      initialValue:
+          widget.doc != null ? widget.doc[widget.doctypeField.fieldname] : [],
       findSuggestions: (String query) async {
         if (query.length != 0) {
           var lowercaseQuery = query.toLowerCase();
