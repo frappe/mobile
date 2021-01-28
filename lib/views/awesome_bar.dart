@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
+import 'package:frappe_app/utils/cache_helper.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 
 import '../services/navigation_service.dart';
@@ -9,7 +10,6 @@ import '../app/locator.dart';
 import '../app/router.gr.dart';
 
 import '../utils/config_helper.dart';
-import '../utils/enums.dart';
 
 class Awesombar extends StatelessWidget {
   @override
@@ -22,23 +22,25 @@ class Awesombar extends StatelessWidget {
         decoration: InputDecoration(
           filled: true,
           border: OutlineInputBorder(
+            borderSide: BorderSide.none,
             borderRadius: BorderRadius.circular(
-              8,
+              6,
             ),
           ),
-          enabledBorder: InputBorder.none,
           fillColor: Palette.bgColor,
           prefixIcon: Row(children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: FrappeIcon(
                 FrappeIcons.search,
-                size: 22,
+                size: 21,
               ),
             ),
             Text(
               'Search',
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(
+                fontSize: 18,
+              ),
             ),
           ]),
           prefixIconConstraints: BoxConstraints(
@@ -129,7 +131,7 @@ class AwesomeSearch extends SearchDelegate {
         var item = awesomeBarItems[index];
         return ListTile(
           title: Text(item["label"]),
-          onTap: () {
+          onTap: () async {
             if (item["type"] == "Doctype") {
               locator<NavigationService>().navigateTo(
                 Routes.customListView,
@@ -138,9 +140,11 @@ class AwesomeSearch extends SearchDelegate {
                 ),
               );
             } else if (item["type"] == "New Doc") {
+              var meta = await CacheHelper.getMeta(item["value"]);
               locator<NavigationService>().navigateTo(
                 Routes.newDoc,
                 arguments: NewDocArguments(
+                  meta: meta,
                   doctype: item["value"],
                 ),
               );

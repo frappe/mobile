@@ -44,8 +44,13 @@ class Palette {
       [Widget suffixIcon, bool filled = true]) {
     return InputDecoration(
       suffixIcon: suffixIcon,
+      border: OutlineInputBorder(
+        borderSide: BorderSide.none,
+        borderRadius: const BorderRadius.all(
+          const Radius.circular(6.0),
+        ),
+      ),
       hintText: !withLabel ? label : null,
-      enabledBorder: InputBorder.none,
       filled: filled,
       fillColor: Palette.fieldBgColor,
     );

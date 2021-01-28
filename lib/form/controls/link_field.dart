@@ -84,6 +84,12 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
           validator: FormBuilderValidators.compose(validators),
           decoration: InputDecoration(
             filled: true,
+            border: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: const BorderRadius.all(
+                const Radius.circular(6),
+              ),
+            ),
             prefixIcon: widget.prefixIcon,
             suffixIcon: widget.allowClear
                 ? _typeAheadController.text != ''
@@ -96,7 +102,6 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
                     : null
                 : null,
             fillColor: widget.fillColor,
-            enabledBorder: !widget.showInputBorder ? InputBorder.none : null,
             hintText: widget.withLabel ? null : widget.doctypeField.label,
           ),
           selectionToTextTransformer: (item) {
