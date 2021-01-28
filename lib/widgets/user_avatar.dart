@@ -13,30 +13,21 @@ import '../utils/http.dart';
 class UserAvatar extends StatelessWidget {
   final String uid;
   final double size;
-  final BorderRadius borderRadius;
 
   UserAvatar({
     this.uid,
-    this.borderRadius = const BorderRadius.all(Radius.circular(20)),
-    this.size = 40,
+    this.size,
   });
 
   static Widget renderShape({
     String txt,
     ImageProvider imageProvider,
-    double size = 40,
-    BorderRadius borderRadius = const BorderRadius.all(Radius.circular(20)),
+    double size,
   }) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: Palette.bgColor,
-        borderRadius: borderRadius,
-        image: imageProvider != null
-            ? DecorationImage(image: imageProvider, fit: BoxFit.cover)
-            : null,
-      ),
+    return CircleAvatar(
+      radius: size,
+      backgroundColor: Palette.bgColor,
+      backgroundImage: imageProvider,
       child: txt != null
           ? Center(
               child: Text(
@@ -69,39 +60,33 @@ class UserAvatar extends StatelessWidget {
           imageBuilder: (context, imageProvider) => UserAvatar.renderShape(
             imageProvider: imageProvider,
             size: size,
-            borderRadius: borderRadius,
           ),
           placeholder: (context, url) => UserAvatar.renderShape(
             txt: getInitials(
               user["full_name"],
             ),
             size: size,
-            borderRadius: borderRadius,
           ),
           errorWidget: (context, url, error) => UserAvatar.renderShape(
             txt: '',
             size: size,
-            borderRadius: borderRadius,
           ),
         );
       } else if (user == null) {
         return UserAvatar.renderShape(
           txt: uid[0].toUpperCase(),
           size: size,
-          borderRadius: borderRadius,
         );
       } else {
         return UserAvatar.renderShape(
           txt: getInitials(user["full_name"]),
           size: size,
-          borderRadius: borderRadius,
         );
       }
     } else {
       return UserAvatar.renderShape(
         txt: uid[0].toUpperCase(),
         size: size,
-        borderRadius: borderRadius,
       );
     }
   }
