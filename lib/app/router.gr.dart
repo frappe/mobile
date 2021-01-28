@@ -27,7 +27,7 @@ import '../views/no_internet.dart';
 import '../views/queue.dart';
 import '../views/queue_error.dart';
 import '../views/session_expired.dart';
-import '../views/share.dart';
+import '../views/share/share_view.dart';
 import '../views/view_docinfo.dart';
 import '../widgets/email_box.dart';
 
@@ -132,7 +132,10 @@ class MyRouter extends RouterBase {
     NewDoc: (data) {
       final args = data.getArgs<NewDocArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
-        builder: (context) => NewDoc(doctype: args.doctype),
+        builder: (context) => NewDoc(
+          doctype: args.doctype,
+          meta: args.meta,
+        ),
         settings: data,
       );
     },
@@ -313,7 +316,8 @@ class CustomListViewArguments {
 /// NewDoc arguments holder class
 class NewDocArguments {
   final String doctype;
-  NewDocArguments({@required this.doctype});
+  final DoctypeResponse meta;
+  NewDocArguments({@required this.doctype, @required this.meta});
 }
 
 /// FormView arguments holder class

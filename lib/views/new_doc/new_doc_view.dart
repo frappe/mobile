@@ -1,3 +1,4 @@
+import 'package:frappe_app/views/base_view.dart';
 import 'package:frappe_app/views/new_doc/new_doc_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -10,18 +11,15 @@ import '../../utils/enums.dart';
 import '../../widgets/custom_form.dart';
 import '../../widgets/frappe_button.dart';
 
-class NewDoc extends StatefulWidget {
+class NewDoc extends StatelessWidget {
   final String doctype;
+  final DoctypeResponse meta;
 
   const NewDoc({
     @required this.doctype,
+    @required this.meta,
   });
 
-  @override
-  _NewDocState createState() => _NewDocState();
-}
-
-class _NewDocState extends State<NewDoc> {
   @override
   Widget build(BuildContext context) {
     final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
@@ -29,12 +27,9 @@ class _NewDocState extends State<NewDoc> {
       context,
     );
 
-    return FutureBuilder<DoctypeResponse>(
-      future: NewDocViewModel().getData(widget.doctype),
-      builder: (context, snapshot) {
-        if (snapshot.hasData &&
-            snapshot.connectionState == ConnectionState.done) {
-          var meta = snapshot.data;
+    return BaseView<NewDocViewModel>(
+      builder: (context, model, child) => Builder(
+        builder: (context) {
           return Scaffold(
             appBar: AppBar(
               elevation: 0,
@@ -48,7 +43,7 @@ class _NewDocState extends State<NewDoc> {
                   child: FrappeFlatButton(
                     buttonType: ButtonType.primary,
                     title: 'Save',
-                    onPressed: () => NewDocViewModel().saveDoc(
+                    onPressed: () => model.saveDoc(
                       connectionStatus: connectionStatus,
                       formKey: _fbKey,
                       meta: meta,
@@ -64,18 +59,8 @@ class _NewDocState extends State<NewDoc> {
               viewType: ViewType.newForm,
             ),
           );
-        } else {
-          return Scaffold(
-            body: snapshot.hasError
-                ? Center(
-                    child: Text(snapshot.error),
-                  )
-                : Center(
-                    child: CircularProgressIndicator(),
-                  ),
-          );
-        }
-      },
+        },
+      ),
     );
   }
 }

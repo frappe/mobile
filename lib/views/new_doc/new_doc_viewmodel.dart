@@ -3,24 +3,21 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:frappe_app/app/locator.dart';
-import 'package:frappe_app/app/router.gr.dart';
-import 'package:frappe_app/datamodels/doctype_response.dart';
-import 'package:frappe_app/services/api/api.dart';
-import 'package:frappe_app/services/navigation_service.dart';
-import 'package:frappe_app/utils/cache_helper.dart';
-import 'package:frappe_app/utils/enums.dart';
-import 'package:frappe_app/utils/frappe_alert.dart';
-import 'package:frappe_app/utils/helpers.dart';
-import 'package:frappe_app/utils/queue_helper.dart';
+import 'package:injectable/injectable.dart';
 
-class NewDocViewModel {
-  getData(String doctype) {
-    return CacheHelper.getMeta(
-      doctype,
-    );
-  }
+import '../../app/locator.dart';
+import '../../app/router.gr.dart';
+import '../../datamodels/doctype_response.dart';
+import '../../services/api/api.dart';
+import '../../services/navigation_service.dart';
+import '../../utils/enums.dart';
+import '../../utils/frappe_alert.dart';
+import '../../utils/helpers.dart';
+import '../../utils/queue_helper.dart';
+import '../../views/base_viewmodel.dart';
 
+@lazySingleton
+class NewDocViewModel extends BaseViewModel {
   saveDoc({
     @required var formKey,
     @required var connectionStatus,

@@ -13,6 +13,8 @@ import '../views/home/home_viewmodel.dart';
 import '../views/list_view/list_view_viewmodel.dart';
 import '../views/login/login_viewmodel.dart';
 import '../services/navigation_service.dart';
+import '../views/new_doc/new_doc_viewmodel.dart';
+import '../views/share/share_viewmodel.dart';
 import '../services/storage_service.dart';
 
 /// adds generated dependencies
@@ -30,6 +32,8 @@ GetIt $initGetIt(
   gh.lazySingleton<ListViewViewModel>(() => ListViewViewModel());
   gh.lazySingleton<LoginViewModel>(() => LoginViewModel());
   gh.lazySingleton<NavigationService>(() => NavigationService());
+  gh.lazySingleton<NewDocViewModel>(() => NewDocViewModel());
+  gh.lazySingleton<ShareViewModel>(() => ShareViewModel());
   gh.lazySingleton<StorageService>(() => StorageService());
   return get;
 }

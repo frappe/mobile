@@ -12,7 +12,7 @@ import '../views/add_review.dart';
 import '../views/add_tags.dart';
 import '../views/file_picker.dart';
 import '../views/queue.dart';
-import '../views/share.dart';
+import '../views/share/share_view.dart';
 import '../views/activate_modules/activate_modules_view.dart';
 import '../views/comment_input.dart';
 import '../views/email_form.dart';
