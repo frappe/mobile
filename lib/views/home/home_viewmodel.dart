@@ -22,12 +22,18 @@ class HomeViewModel extends BaseViewModel {
   DesktopPageResponse desktopPage;
 
   refresh(ConnectivityStatus connectivityStatus) async {
-    await getActiveModules(connectivityStatus);
-    notifyListeners();
+    getData(connectivityStatus);
   }
 
-  switchModule(String newModule) {
+  switchModule({
+    @required String newModule,
+    @required ConnectivityStatus connectivityStatus,
+  }) async {
     currentModule = newModule;
+    await getDesktopPage(
+      connectionStatus: connectivityStatus,
+      currentModule: currentModule,
+    );
     notifyListeners();
   }
 
@@ -68,7 +74,6 @@ class HomeViewModel extends BaseViewModel {
     currentModule = ConfigHelper().activeModules != null
         ? ConfigHelper().activeModules.keys.first
         : null;
-    notifyListeners();
   }
 
   DesktopPageResponse filterActiveDoctypes({
@@ -96,11 +101,10 @@ class HomeViewModel extends BaseViewModel {
     return desktopPage;
   }
 
-  getData({
+  getDesktopPage({
     @required ConnectivityStatus connectionStatus,
     @required String currentModule,
   }) async {
-    setState(ViewState.busy);
     DesktopPageResponse _desktopPage;
 
     var isOnline = await verifyOnline();
@@ -108,8 +112,7 @@ class HomeViewModel extends BaseViewModel {
     if ((connectionStatus == null ||
             connectionStatus == ConnectivityStatus.offline) &&
         !isOnline) {
-      var moduleDoctypes =
-          await CacheHelper.getCache('${currentModule}Doctypes');
+      var moduleDoctypes = CacheHelper.getCache('${currentModule}Doctypes');
       moduleDoctypes = moduleDoctypes["data"];
 
       if (moduleDoctypes != null) {
@@ -122,6 +125,16 @@ class HomeViewModel extends BaseViewModel {
     }
 
     desktopPage = _desktopPage;
+  }
+
+  getData(ConnectivityStatus connectivityStatus) async {
+    setState(ViewState.busy);
+    await getActiveModules(connectivityStatus);
+
+    await getDesktopPage(
+      connectionStatus: connectivityStatus,
+      currentModule: currentModule,
+    );
     setState(ViewState.idle);
   }
 }

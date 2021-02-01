@@ -26,12 +26,7 @@ class Home extends StatelessWidget {
 
     return BaseView<HomeViewModel>(
       onModelReady: (model) {
-        model.getActiveModules(connectionStatus);
-
-        model.getData(
-          connectionStatus: connectionStatus,
-          currentModule: model.currentModule,
-        );
+        model.getData(connectionStatus);
       },
       builder: (context, model, child) => Scaffold(
         backgroundColor: Palette.bgColor,
@@ -61,7 +56,7 @@ class Home extends StatelessWidget {
                           context,
                         ) {
                           var filteredActiveDoctypes =
-                              HomeViewModel().filterActiveDoctypes(
+                              model.filterActiveDoctypes(
                             desktopPage: model.desktopPage,
                             module: model.currentModule,
                           );
@@ -293,10 +288,9 @@ class Home extends StatelessWidget {
                           : Colors.white,
                       title: Text(element.label),
                       onTap: () {
-                        model.switchModule(element.name);
-                        model.getData(
-                          connectionStatus: connectionStatus,
-                          currentModule: model.currentModule,
+                        model.switchModule(
+                          newModule: element.name,
+                          connectivityStatus: connectionStatus,
                         );
 
                         locator<NavigationService>().pop();
@@ -331,7 +325,7 @@ class Home extends StatelessWidget {
                     .navigateTo(Routes.activateModules);
 
                 if (nav) {
-                  model.getActiveModules(connectivityStatus);
+                  model.getData(connectivityStatus);
                 }
               },
               title: 'Activate Modules',
