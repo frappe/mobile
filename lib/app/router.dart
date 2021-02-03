@@ -3,7 +3,7 @@ import 'package:auto_route/auto_route_annotations.dart';
 import '../widgets/email_box.dart';
 import '../app.dart';
 
-import '../views/form_view.dart';
+import '../views/form_view/form_view.dart';
 import '../views/new_doc/new_doc_view.dart';
 import '../views/list_view/list_view.dart';
 import '../views/home/home_view.dart';

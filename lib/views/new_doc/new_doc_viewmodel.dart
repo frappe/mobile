@@ -66,6 +66,7 @@ class NewDocViewModel extends BaseViewModel {
             Routes.formView,
             arguments: FormViewArguments(
               doctype: meta.docs[0].name,
+              meta: meta,
               name: response.data["docs"][0]["name"],
             ),
           );

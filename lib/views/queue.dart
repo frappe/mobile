@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/utils/cache_helper.dart';
 import 'package:provider/provider.dart';
 
 import '../config/frappe_icons.dart';
@@ -114,13 +115,14 @@ class _QueueListState extends State<QueueList> {
                     },
                     icon: Icon(Icons.clear),
                   ),
-                  onTap: () {
+                  onTap: () async {
                     q["qIdx"] = index;
                     locator<NavigationService>().navigateTo(
                       Routes.formView,
                       arguments: FormViewArguments(
                         doctype: q['doctype'],
                         queued: true,
+                        meta: await CacheHelper.getMeta(q['doctype']),
                         queuedData: q,
                       ),
                     );

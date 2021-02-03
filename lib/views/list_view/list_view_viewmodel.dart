@@ -80,6 +80,7 @@ class ListViewViewModel extends BaseViewModel {
         arguments: FormViewArguments(
           doctype: doctype,
           name: name,
+          meta: meta,
         ),
       );
     }

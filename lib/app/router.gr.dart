@@ -18,7 +18,7 @@ import '../views/add_tags/add_tags_view.dart';
 import '../views/comment_input.dart';
 import '../views/email_form.dart';
 import '../views/file_picker.dart';
-import '../views/form_view.dart';
+import '../views/form_view/form_view.dart';
 import '../views/home/home_view.dart';
 import '../views/list_view/list_view.dart';
 import '../views/login/login_view.dart';
@@ -144,6 +144,7 @@ class MyRouter extends RouterBase {
       return MaterialPageRoute<dynamic>(
         builder: (context) => FormView(
           doctype: args.doctype,
+          meta: args.meta,
           name: args.name,
           queued: args.queued,
           queuedData: args.queuedData,
@@ -323,11 +324,13 @@ class NewDocArguments {
 /// FormView arguments holder class
 class FormViewArguments {
   final String doctype;
+  final DoctypeResponse meta;
   final String name;
   final bool queued;
   final Map<dynamic, dynamic> queuedData;
   FormViewArguments(
       {@required this.doctype,
+      @required this.meta,
       this.name,
       this.queued = false,
       this.queuedData});
