@@ -15,7 +15,7 @@ import '../../utils/cache_helper.dart';
 import '../../utils/config_helper.dart';
 import '../../utils/enums.dart';
 import '../../utils/helpers.dart';
-import '../../utils/queue_helper.dart';
+import '../../model/queue.dart';
 
 @lazySingleton
 class FormViewViewModel extends BaseViewModel {
@@ -111,12 +111,12 @@ class FormViewViewModel extends BaseViewModel {
           formValue,
         );
 
-        QueueHelper.putAt(
+        Queue.putAt(
           queuedData["qIdx"],
           queuedData,
         );
       } else {
-        QueueHelper.add({
+        Queue.add({
           "type": "Update",
           "name": name,
           "doctype": doctype,

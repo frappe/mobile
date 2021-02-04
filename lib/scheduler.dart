@@ -1,7 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frappe_app/utils/config_helper.dart';
 import 'package:frappe_app/utils/helpers.dart';
-import 'package:frappe_app/utils/queue_helper.dart';
+import 'package:frappe_app/model/queue.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'utils/cache_helper.dart';
@@ -91,7 +91,7 @@ void callbackDispatcher() {
             index: notificationCount,
           );
           try {
-            await QueueHelper.processQueue();
+            await Queue.processQueue();
           } catch (e) {
             await showNotification(
               title: "Queue",
@@ -114,7 +114,7 @@ void callbackDispatcher() {
             index: notificationCount,
           );
           try {
-            await QueueHelper.processQueue();
+            await Queue.processQueue();
           } catch (e) {
             await showNotification(
               title: "Queue",

@@ -6,7 +6,7 @@ import '../services/api/api.dart';
 import '../app/locator.dart';
 import '../utils/config_helper.dart';
 
-class QueueHelper {
+class Queue {
   static Box getQueueContainer() {
     return locator<StorageService>().getBox('queue');
   }
@@ -54,7 +54,7 @@ class QueueHelper {
   }
 
   static Future processQueue() async {
-    var qc = QueueHelper.getQueueItems();
+    var qc = getQueueItems();
     var queueLength = qc.length;
     var l = List.generate(queueLength, (index) => 0);
 
@@ -72,9 +72,9 @@ class QueueHelper {
       );
 
       if (response.statusCode == 200) {
-        await QueueHelper.deleteAt(index);
+        await deleteAt(index);
       } else {
-        await QueueHelper.putAt(
+        await putAt(
           index,
           {
             ...q,
@@ -84,7 +84,7 @@ class QueueHelper {
       }
     } catch (e) {
       print(e);
-      QueueHelper.putAt(
+      putAt(
         index,
         {
           ...q,

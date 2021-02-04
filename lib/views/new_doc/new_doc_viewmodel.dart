@@ -13,7 +13,7 @@ import '../../services/navigation_service.dart';
 import '../../utils/enums.dart';
 import '../../utils/frappe_alert.dart';
 import '../../utils/helpers.dart';
-import '../../utils/queue_helper.dart';
+import '../../model/queue.dart';
 import '../../views/base_viewmodel.dart';
 
 @lazySingleton
@@ -37,7 +37,7 @@ class NewDocViewModel extends BaseViewModel {
       if ((connectionStatus == null ||
               connectionStatus == ConnectivityStatus.offline) &&
           !isOnline) {
-        var qc = QueueHelper.getQueueContainer();
+        var qc = Queue.getQueueContainer();
         var queueLength = qc.length;
         var qObj = {
           "type": "Create",
@@ -48,7 +48,7 @@ class NewDocViewModel extends BaseViewModel {
               : "${meta.docs[0].name} ${queueLength + 1}",
           "data": [formValue],
         };
-        await QueueHelper.add(qObj);
+        await Queue.add(qObj);
 
         FrappeAlert.infoAlert(
           title: 'No Internet Connection',

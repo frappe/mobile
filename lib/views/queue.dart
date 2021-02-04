@@ -15,7 +15,7 @@ import '../utils/frappe_alert.dart';
 import '../utils/frappe_icon.dart';
 import '../utils/enums.dart';
 import '../utils/helpers.dart';
-import '../utils/queue_helper.dart';
+import '../model/queue.dart';
 
 class QueueList extends StatefulWidget {
   @override
@@ -46,7 +46,7 @@ class _QueueListState extends State<QueueList> {
           builder: (
             context,
           ) {
-            var l = QueueHelper.getQueueItems();
+            var l = Queue.getQueueItems();
             if (l.length < 1) {
               return Padding(
                 padding: EdgeInsets.all(8),
@@ -86,7 +86,7 @@ class _QueueListState extends State<QueueList> {
                         return;
                       }
 
-                      await QueueHelper.processQueueItem(q, index);
+                      await Queue.processQueueItem(q, index);
                       _refresh();
                     },
                   ),
@@ -110,7 +110,7 @@ class _QueueListState extends State<QueueList> {
                   ),
                   trailing: IconButton(
                     onPressed: () {
-                      QueueHelper.deleteAt(index);
+                      Queue.deleteAt(index);
                       setState(() {});
                     },
                     icon: Icon(Icons.clear),
