@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-import '../../datamodels/doctype_response.dart';
+import '../../model/doctype_response.dart';
 import '../../app/locator.dart';
 
 import '../../views/base_view.dart';

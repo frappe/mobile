@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:json_table/json_table.dart';
 
-import '../../datamodels/doctype_response.dart';
+import '../../model/doctype_response.dart';
 import '../../app/locator.dart';
 import '../../config/frappe_palette.dart';
 import '../../services/api/api.dart';

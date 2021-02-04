@@ -4,7 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import '../../views/add_assignees/add_assignees_viewmodel.dart';
 import '../../views/base_view.dart';
 
-import '../../datamodels/doctype_response.dart';
+import '../../model/doctype_response.dart';
 import '../../app/locator.dart';
 import '../../config/palette.dart';
 import '../../form/controls/link_field.dart';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import '../../utils/enums.dart';
-import '../../datamodels/doctype_response.dart';
+import '../../model/doctype_response.dart';
 import '../../app/locator.dart';
 import '../../form/controls/autocomplete.dart';
 import '../../services/navigation_service.dart';

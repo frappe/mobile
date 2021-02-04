@@ -6,7 +6,7 @@ import 'package:frappe_app/views/base_view.dart';
 import 'package:frappe_app/views/form_view/form_view_viewmodel.dart';
 import 'package:provider/provider.dart';
 
-import '../../datamodels/doctype_response.dart';
+import '../../model/doctype_response.dart';
 import '../../config/palette.dart';
 
 import '../../app/locator.dart';

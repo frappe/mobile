@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
-import 'package:frappe_app/datamodels/doctype_response.dart';
+import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/services/api/api.dart';
 import 'package:frappe_app/utils/constants.dart';
 

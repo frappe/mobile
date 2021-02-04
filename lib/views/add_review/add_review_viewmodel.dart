@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:frappe_app/datamodels/doctype_response.dart';
+import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/utils/config_helper.dart';
 import 'package:frappe_app/views/base_viewmodel.dart';
 import 'package:injectable/injectable.dart';

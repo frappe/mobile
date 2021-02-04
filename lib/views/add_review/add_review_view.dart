@@ -6,7 +6,7 @@ import '../../views/base_view.dart';
 
 import '../../app/locator.dart';
 
-import '../../datamodels/doctype_response.dart';
+import '../../model/doctype_response.dart';
 
 import '../../services/api/api.dart';
 import '../../services/navigation_service.dart';

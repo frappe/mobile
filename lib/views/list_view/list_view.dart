@@ -5,7 +5,7 @@ import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:frappe_app/views/base_view.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../../datamodels/doctype_response.dart';
+import '../../model/doctype_response.dart';
 
 import '../../app/locator.dart';
 import '../../app/router.gr.dart';

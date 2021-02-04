@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../app/locator.dart';
-import '../../datamodels/doctype_response.dart';
+import '../../model/doctype_response.dart';
 import '../../views/base_viewmodel.dart';
 import '../../services/api/api.dart';
 

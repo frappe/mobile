@@ -4,10 +4,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
-import '../../datamodels/doctype_response.dart';
-import '../../datamodels/desktop_page_response.dart';
-import '../../datamodels/desk_sidebar_items_response.dart';
-import '../../datamodels/login_response.dart';
+import '../../model/doctype_response.dart';
+import '../../model/desktop_page_response.dart';
+import '../../model/desk_sidebar_items_response.dart';
+import '../../model/login_response.dart';
 
 import '../../services/api/api.dart';
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import '../../config/palette.dart';
-import '../../datamodels/doctype_response.dart';
+import '../../model/doctype_response.dart';
 import '../../utils/helpers.dart';
 
 import 'base_control.dart';

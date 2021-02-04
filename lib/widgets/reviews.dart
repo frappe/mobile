@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../app/locator.dart';
 import '../app/router.gr.dart';
 
-import '../datamodels/doctype_response.dart';
+import '../model/doctype_response.dart';
 
 import '../config/frappe_palette.dart';
 import '../config/frappe_icons.dart';

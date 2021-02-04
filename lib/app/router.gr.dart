@@ -10,7 +10,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 import '../app.dart';
-import '../datamodels/doctype_response.dart';
+import '../model/doctype_response.dart';
 import '../views/activate_modules/activate_modules_view.dart';
 import '../views/add_assignees/add_assignees_view.dart';
 import '../views/add_review/add_review_view.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/datamodels/doctype_response.dart';
+import 'package:frappe_app/model/doctype_response.dart';
 
 import '../../config/frappe_palette.dart';
 import '../../config/palette.dart';

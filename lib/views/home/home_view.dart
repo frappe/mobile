@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:provider/provider.dart';
 
-import '../../datamodels/desktop_page_response.dart';
+import '../../model/desktop_page_response.dart';
 import '../../config/palette.dart';
 import '../../views/home/home_viewmodel.dart';
 import '../../services/navigation_service.dart';

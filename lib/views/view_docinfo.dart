@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../datamodels/doctype_response.dart';
+import '../model/doctype_response.dart';
 import '../config/frappe_icons.dart';
 
 import '../utils/helpers.dart';

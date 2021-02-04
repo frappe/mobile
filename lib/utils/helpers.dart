@@ -12,8 +12,8 @@ import 'package:frappe_app/services/storage_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../datamodels/desktop_page_response.dart';
-import '../datamodels/doctype_response.dart';
+import '../model/desktop_page_response.dart';
+import '../model/doctype_response.dart';
 
 import '../services/api/api.dart';
 import '../views/no_internet.dart';

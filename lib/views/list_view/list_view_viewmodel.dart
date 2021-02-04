@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 
 import 'package:frappe_app/app/router.gr.dart';
-import 'package:frappe_app/datamodels/doctype_response.dart';
+import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/services/navigation_service.dart';
 import 'package:frappe_app/utils/config_helper.dart';
 import 'package:frappe_app/utils/constants.dart';

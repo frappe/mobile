@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import '../app/locator.dart';
-import '../datamodels/doctype_response.dart';
+import '../model/doctype_response.dart';
 
 import '../services/api/api.dart';
 import '../services/navigation_service.dart';

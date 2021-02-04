@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:frappe_app/app/locator.dart';
-import 'package:frappe_app/datamodels/doctype_response.dart';
+import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/services/api/api.dart';
 import 'package:frappe_app/views/base_viewmodel.dart';
 import 'package:injectable/injectable.dart';

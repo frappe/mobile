@@ -1,5 +1,5 @@
 import 'package:injectable/injectable.dart';
-import '../../datamodels/doctype_response.dart';
+import '../../model/doctype_response.dart';
 import '../../views/base_viewmodel.dart';
 
 @lazySingleton
