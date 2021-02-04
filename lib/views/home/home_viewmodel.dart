@@ -6,7 +6,7 @@ import 'package:frappe_app/app/locator.dart';
 import 'package:frappe_app/model/desk_sidebar_items_response.dart';
 import 'package:frappe_app/model/desktop_page_response.dart';
 import 'package:frappe_app/services/api/api.dart';
-import 'package:frappe_app/utils/cache_helper.dart';
+import 'package:frappe_app/model/offline_storage.dart';
 import 'package:frappe_app/utils/config_helper.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/helpers.dart';
@@ -52,7 +52,7 @@ class HomeViewModel extends BaseViewModel {
             connectionStatus == ConnectivityStatus.offline) &&
         !isOnline) {
       var deskSidebarItemsCache =
-          await CacheHelper.getCache('deskSidebarItems');
+          await OfflineStorage.getItem('deskSidebarItems');
       deskSidebarItemsCache = deskSidebarItemsCache["data"];
 
       if (deskSidebarItemsCache != null) {
@@ -112,7 +112,7 @@ class HomeViewModel extends BaseViewModel {
     if ((connectionStatus == null ||
             connectionStatus == ConnectivityStatus.offline) &&
         !isOnline) {
-      var moduleDoctypes = CacheHelper.getCache('${currentModule}Doctypes');
+      var moduleDoctypes = OfflineStorage.getItem('${currentModule}Doctypes');
       moduleDoctypes = moduleDoctypes["data"];
 
       if (moduleDoctypes != null) {

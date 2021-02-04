@@ -11,7 +11,7 @@ import '../../model/doctype_response.dart';
 import '../../views/base_viewmodel.dart';
 import '../../services/api/api.dart';
 
-import '../../utils/cache_helper.dart';
+import '../../model/offline_storage.dart';
 import '../../utils/config_helper.dart';
 import '../../utils/enums.dart';
 import '../../utils/helpers.dart';
@@ -51,7 +51,7 @@ class FormViewViewModel extends BaseViewModel {
       if ((connectivityStatus == null ||
               connectivityStatus == ConnectivityStatus.offline) &&
           !isOnline) {
-        var response = await CacheHelper.getCache(
+        var response = await OfflineStorage.getItem(
           '$doctype$name',
         );
         response = response["data"];

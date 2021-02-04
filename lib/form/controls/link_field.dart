@@ -7,7 +7,7 @@ import '../../app/locator.dart';
 import '../../services/api/api.dart';
 
 import '../../utils/helpers.dart';
-import '../../utils/cache_helper.dart';
+import '../../model/offline_storage.dart';
 import '../../utils/enums.dart';
 
 import 'base_control.dart';
@@ -131,7 +131,7 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
                 if ((connectionStatus == null ||
                         connectionStatus == ConnectivityStatus.offline) &&
                     !isOnline) {
-                  var linkFull = await CacheHelper.getCache(
+                  var linkFull = await OfflineStorage.getItem(
                       '${widget.doctypeField.options}LinkFull');
                   linkFull = linkFull["data"];
 
@@ -144,7 +144,7 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
                       },
                     ).toList();
                   } else {
-                    var queryLink = await CacheHelper.getCache(
+                    var queryLink = await OfflineStorage.getItem(
                         '$lowercaseQuery${widget.doctypeField.options}Link');
                     queryLink = queryLink["data"];
 

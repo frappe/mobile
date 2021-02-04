@@ -2,7 +2,7 @@ import '../app/locator.dart';
 import '../services/api/api.dart';
 
 import '../utils/dio_helper.dart';
-import '../utils/cache_helper.dart';
+import '../model/offline_storage.dart';
 import '../utils/config_helper.dart';
 
 initApiConfig() async {
@@ -12,7 +12,7 @@ initApiConfig() async {
 }
 
 Future<void> cacheAllUsers() async {
-  var allUsers = await CacheHelper.getCache('allUsers');
+  var allUsers = await OfflineStorage.getItem('allUsers');
   allUsers = allUsers["data"];
   if (allUsers != null) {
     return;
@@ -40,7 +40,7 @@ Future<void> cacheAllUsers() async {
     res.forEach((element) {
       usr[element["name"]] = element;
     });
-    CacheHelper.putCache('allUsers', usr);
+    OfflineStorage.putItem('allUsers', usr);
   }
 }
 

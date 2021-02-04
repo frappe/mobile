@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../config/palette.dart';
 
-import '../utils/cache_helper.dart';
+import '../model/offline_storage.dart';
 import '../utils/dio_helper.dart';
 import '../utils/helpers.dart';
 import '../utils/http.dart';
@@ -43,7 +43,7 @@ class UserAvatar extends StatelessWidget {
     if (uid == null) {
       return Container();
     }
-    var allUsers = await CacheHelper.getCache('allUsers');
+    var allUsers = await OfflineStorage.getItem('allUsers');
     allUsers = allUsers["data"];
     if (allUsers != null) {
       var user = allUsers[uid];

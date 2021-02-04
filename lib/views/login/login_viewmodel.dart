@@ -3,7 +3,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../app/locator.dart';
 import '../../services/api/api.dart';
-import '../../utils/cache_helper.dart';
+import '../../model/offline_storage.dart';
 import '../../utils/config_helper.dart';
 import '../../utils/http.dart';
 
@@ -27,8 +27,8 @@ class LoginViewModel extends BaseViewModel {
 
   init() {
     loginButtonLabel = "Login";
-    var savedUsr = CacheHelper.getCache('usr');
-    var savedPwd = CacheHelper.getCache('pwd');
+    var savedUsr = OfflineStorage.getItem('usr');
+    var savedPwd = OfflineStorage.getItem('pwd');
     var serverURL = ConfigHelper().baseUrl;
     savedUsr = savedUsr["data"];
     savedPwd = savedPwd["data"];
@@ -54,11 +54,11 @@ class LoginViewModel extends BaseViewModel {
   }
 
   cacheCreds(data) {
-    CacheHelper.putCache(
+    OfflineStorage.putItem(
       'usr',
       data["usr"].trimRight(),
     );
-    CacheHelper.putCache(
+    OfflineStorage.putItem(
       'pwd',
       data["pwd"],
     );

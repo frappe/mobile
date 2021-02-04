@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
-import 'package:frappe_app/utils/cache_helper.dart';
+import 'package:frappe_app/model/offline_storage.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 
 import '../services/navigation_service.dart';
@@ -140,7 +140,7 @@ class AwesomeSearch extends SearchDelegate {
                 ),
               );
             } else if (item["type"] == "New Doc") {
-              var meta = await CacheHelper.getMeta(item["value"]);
+              var meta = await OfflineStorage.getMeta(item["value"]);
               locator<NavigationService>().navigateTo(
                 Routes.newDoc,
                 arguments: NewDocArguments(

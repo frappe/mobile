@@ -14,7 +14,7 @@ import 'package:injectable/injectable.dart';
 import '../../app/locator.dart';
 import '../../services/api/api.dart';
 
-import '../../utils/cache_helper.dart';
+import '../../model/offline_storage.dart';
 import '../../utils/helpers.dart';
 
 @lazySingleton
@@ -31,7 +31,7 @@ class ListViewViewModel extends BaseViewModel {
 
   getData(String doctype) async {
     setState(ViewState.busy);
-    meta = await CacheHelper.getMeta(doctype);
+    meta = await OfflineStorage.getMeta(doctype);
     var isOnline = await verifyOnline();
 
     if (isOnline) {
@@ -59,7 +59,7 @@ class ListViewViewModel extends BaseViewModel {
         pageSize: Constants.offlinePageSize,
         pageFuture: (pageIndex) {
           return Future.delayed(Duration(seconds: 1), () {
-            var response = CacheHelper.getCache(
+            var response = OfflineStorage.getItem(
               '${doctype}List',
             );
             return response["data"];

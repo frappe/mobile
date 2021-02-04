@@ -13,7 +13,7 @@ import '../../services/api/api.dart';
 
 import '../../utils/helpers.dart';
 import '../../utils/dio_helper.dart';
-import '../../utils/cache_helper.dart';
+import '../../model/offline_storage.dart';
 
 class DioApi implements Api {
   Future<LoginResponse> login(String usr, String pwd) async {
@@ -66,8 +66,8 @@ class DioApi implements Api {
       );
 
       if (response.statusCode == HttpStatus.ok) {
-        if (await CacheHelper.shouldCacheApi()) {
-          await CacheHelper.putCache('deskSidebarItems', response.data);
+        if (await OfflineStorage.storeApiResponse()) {
+          await OfflineStorage.putItem('deskSidebarItems', response.data);
         }
 
         return DeskSidebarItemsResponse.fromJson(response.data);
@@ -108,8 +108,8 @@ class DioApi implements Api {
       );
 
       if (response.statusCode == 200) {
-        if (await CacheHelper.shouldCacheApi()) {
-          await CacheHelper.putCache('${module}Doctypes', response.data);
+        if (await OfflineStorage.storeApiResponse()) {
+          await OfflineStorage.putItem('${module}Doctypes', response.data);
         }
 
         return DesktopPageResponse.fromJson(response.data);
@@ -158,8 +158,8 @@ class DioApi implements Api {
         metaFields.forEach((field) {
           response.data["docs"][0]["field_map"]["${field["fieldname"]}"] = true;
         });
-        if (await CacheHelper.shouldCacheApi()) {
-          await CacheHelper.putCache('${doctype}Meta', response.data);
+        if (await OfflineStorage.storeApiResponse()) {
+          await OfflineStorage.putItem('${doctype}Meta', response.data);
         }
         return DoctypeResponse.fromJson(response.data);
       } else if (response.statusCode == HttpStatus.forbidden) {
@@ -248,8 +248,8 @@ class DioApi implements Api {
           newL.add(o);
         }
 
-        if (await CacheHelper.shouldCacheApi()) {
-          await CacheHelper.putCache('${doctype}List', newL);
+        if (await OfflineStorage.storeApiResponse()) {
+          await OfflineStorage.putItem('${doctype}List', newL);
         }
 
         return newL;
@@ -293,8 +293,8 @@ class DioApi implements Api {
       );
 
       if (response.statusCode == 200) {
-        if (await CacheHelper.shouldCacheApi()) {
-          await CacheHelper.putCache('$doctype$name', response.data);
+        if (await OfflineStorage.storeApiResponse()) {
+          await OfflineStorage.putItem('$doctype$name', response.data);
         }
         return response.data;
       } else if (response.statusCode == 403) {
@@ -582,11 +582,11 @@ class DioApi implements Api {
         ),
       );
       if (response.statusCode == 200) {
-        if (await CacheHelper.shouldCacheApi()) {
+        if (await OfflineStorage.storeApiResponse()) {
           if (pageLength != null && pageLength == 9999) {
-            await CacheHelper.putCache('${doctype}LinkFull', response.data);
+            await OfflineStorage.putItem('${doctype}LinkFull', response.data);
           } else {
-            await CacheHelper.putCache('$txt${doctype}Link', response.data);
+            await OfflineStorage.putItem('$txt${doctype}Link', response.data);
           }
         }
         return response.data;

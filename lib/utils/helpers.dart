@@ -579,14 +579,14 @@ Future<bool> getSharedPrefValue(String key) async {
 
 resetValues() async {
   await putSharedPrefValue("backgroundTask", false);
-  await putSharedPrefValue("cacheApi", true);
+  await putSharedPrefValue("storeApiResponse", true);
 }
 
 initDb() async {
   await locator<StorageService>().initStorage();
 
   await locator<StorageService>().initBox('queue');
-  await locator<StorageService>().initBox('cache');
+  await locator<StorageService>().initBox('offline');
   await locator<StorageService>().initBox('config');
 }
 

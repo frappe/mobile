@@ -6,7 +6,7 @@ import '../filter_list/filter_list_view.dart';
 import '../../app/locator.dart';
 import '../../services/api/api.dart';
 
-import '../../utils/cache_helper.dart';
+import '../../model/offline_storage.dart';
 import '../../utils/enums.dart';
 import '../../utils/helpers.dart';
 
@@ -16,7 +16,7 @@ class ActivateModulesViewModel {
     if ((connectionStatus == null ||
             connectionStatus == ConnectivityStatus.offline) &&
         !isOnline) {
-      var response = await CacheHelper.getCache('DocTypeList');
+      var response = await OfflineStorage.getItem('DocTypeList');
       response = response["data"];
       if (response == null) {
         throw Response(statusCode: HttpStatus.serviceUnavailable);

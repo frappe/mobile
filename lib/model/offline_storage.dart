@@ -14,12 +14,12 @@ import '../services/storage_service.dart';
 
 import '../app/locator.dart';
 
-class CacheHelper {
+class OfflineStorage {
   static String generateKeyHash(String key) {
     return sha1.convert(utf8.encode(key)).toString();
   }
 
-  static putCache(String secondaryKey, dynamic data) async {
+  static putItem(String secondaryKey, dynamic data) async {
     if (ConfigHelper().primaryCacheKey == null) {
       return;
     }
@@ -32,10 +32,10 @@ class CacheHelper {
       'data': data,
     };
 
-    await locator<StorageService>().getBox('cache').put(kHash, v);
+    await locator<StorageService>().getBox('offline').put(kHash, v);
   }
 
-  static putAllCache(Map data, [bool isIsolate = false]) async {
+  static putAllItems(Map data, [bool isIsolate = false]) async {
     if (ConfigHelper().primaryCacheKey == null) {
       return;
     }
@@ -54,34 +54,34 @@ class CacheHelper {
     if (isIsolate) {
       var runBackgroundTask = await getSharedPrefValue("backgroundTask");
       if (runBackgroundTask) {
-        await locator<StorageService>().getBox('cache').putAll(v);
+        await locator<StorageService>().getBox('offline').putAll(v);
       }
     } else {
-      await locator<StorageService>().getBox('cache').putAll(v);
+      await locator<StorageService>().getBox('offline').putAll(v);
     }
   }
 
-  static getCache(String secondaryKey) {
+  static getItem(String secondaryKey) {
     if (ConfigHelper().primaryCacheKey == null) {
       return {"data": null};
     }
     var k = ConfigHelper().primaryCacheKey + "#@#" + secondaryKey;
     var keyHash = generateKeyHash(k);
 
-    if (locator<StorageService>().getBox('cache').get(keyHash) == null) {
+    if (locator<StorageService>().getBox('offline').get(keyHash) == null) {
       return {"data": null};
     }
 
-    return locator<StorageService>().getBox('cache').get(keyHash);
+    return locator<StorageService>().getBox('offline').get(keyHash);
   }
 
   static Future remove(String secondaryKey) async {
     var k = ConfigHelper().primaryCacheKey + "#@#" + secondaryKey;
     var keyHash = generateKeyHash(k);
-    locator<StorageService>().getBox('cache').delete(keyHash);
+    locator<StorageService>().getBox('offline').delete(keyHash);
   }
 
-  static cacheModule(String module, [bool isIsolate = false]) async {
+  static storeModule(String module, [bool isIsolate = false]) async {
     try {
       var cache = {};
       var deskSideBarItems = await locator<Api>().getDeskSideBarItems();
@@ -95,13 +95,13 @@ class CacheHelper {
 
       for (var doctype in activeDoctypes) {
         f.add(
-          cacheDocListAndDoc(doctype.name),
+          storeDocListAndDoc(doctype.name),
         );
         f.add(
-          cacheLinkFields(doctype.name),
+          storeLinkFields(doctype.name),
         );
         f.add(
-          cacheDoctypeMeta(doctype.name),
+          storeDoctypeMeta(doctype.name),
         );
       }
 
@@ -114,13 +114,13 @@ class CacheHelper {
           };
         },
       );
-      await putAllCache(cache, isIsolate);
+      await putAllItems(cache, isIsolate);
     } catch (e) {
       print(e);
     }
   }
 
-  static Future<Map> cacheDoctypeMeta(String doctype) async {
+  static Future<Map> storeDoctypeMeta(String doctype) async {
     var cache = {};
     try {
       var response = await locator<Api>().getDoctype(doctype);
@@ -132,14 +132,14 @@ class CacheHelper {
     return cache;
   }
 
-  static Future<Map> cacheLinkFields(String doctype) async {
+  static Future<Map> storeLinkFields(String doctype) async {
     var cache = {};
     try {
       var f = <Future>[];
       var linkFieldDoctypes = await getLinkFields(doctype);
 
       for (var doctype in linkFieldDoctypes) {
-        f.add(cacheLinkField(doctype));
+        f.add(storeLinkField(doctype));
       }
 
       var result = await Future.wait(f);
@@ -159,7 +159,7 @@ class CacheHelper {
     return cache;
   }
 
-  static Future<Map> cacheLinkField(String doctype) async {
+  static Future<Map> storeLinkField(String doctype) async {
     var cache = {};
     try {
       var linkData = await locator<Api>().searchLink(
@@ -174,7 +174,7 @@ class CacheHelper {
     return cache;
   }
 
-  static Future<Map> cacheDocListAndDoc(String doctype) async {
+  static Future<Map> storeDocListAndDoc(String doctype) async {
     var cache = {};
     var f = <Future>[];
 
@@ -193,7 +193,7 @@ class CacheHelper {
 
       for (var doc in docList) {
         f.add(
-          cacheDoc(
+          storeDoc(
             doctype,
             doc["name"],
           ),
@@ -217,7 +217,7 @@ class CacheHelper {
     return cache;
   }
 
-  static Future<Map> cacheDoc(String doctype, String docName) async {
+  static Future<Map> storeDoc(String doctype, String docName) async {
     var cache = {};
     try {
       var docForm = await locator<Api>().getdoc(doctype, docName);
@@ -228,15 +228,15 @@ class CacheHelper {
     return cache;
   }
 
-  static Future<bool> shouldCacheApi() async {
-    var cacheApi = await getSharedPrefValue(
-      "cacheApi",
+  static Future<bool> storeApiResponse() async {
+    var storeApiResponse = await getSharedPrefValue(
+      "storeApiResponse",
     );
-    return cacheApi ?? true;
+    return storeApiResponse ?? true;
   }
 
   static Future<DoctypeResponse> getMeta(String doctype) async {
-    var cachedMeta = getCache('${doctype}Meta');
+    var cachedMeta = getItem('${doctype}Meta');
     var isOnline = await verifyOnline();
 
     DoctypeResponse metaResponse;

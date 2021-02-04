@@ -4,7 +4,7 @@ import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/model/queue.dart';
 import 'package:workmanager/workmanager.dart';
 
-import 'utils/cache_helper.dart';
+import 'model/offline_storage.dart';
 import 'utils/http.dart';
 import 'app/locator.dart';
 import 'services/storage_service.dart';
@@ -20,7 +20,7 @@ void callbackDispatcher() {
     await locator<StorageService>().initStorage();
     await locator<StorageService>().initBox('config');
     await locator<StorageService>().initBox('queue');
-    await locator<StorageService>().initBox('cache');
+    await locator<StorageService>().initBox('offline');
 
     await initApiConfig();
 
@@ -47,7 +47,7 @@ void callbackDispatcher() {
       switch (task) {
         case TASK_SYNC_DATA:
           await putSharedPrefValue(
-            "cacheApi",
+            "storeApiResponse",
             false,
           );
 
@@ -61,7 +61,7 @@ void callbackDispatcher() {
             await syncnow();
             print('Sync complete');
             await putSharedPrefValue(
-              "cacheApi",
+              "storeApiResponse",
               true,
             );
             await showNotification(
@@ -71,7 +71,7 @@ void callbackDispatcher() {
             );
           } catch (e) {
             await putSharedPrefValue(
-              "cacheApi",
+              "storeApiResponse",
               true,
             );
             await showNotification(
@@ -181,7 +181,7 @@ Future syncnow() async {
       var runBackgroundTask = await getSharedPrefValue("backgroundTask");
       if (activeModules[module].isNotEmpty && runBackgroundTask) {
         try {
-          await CacheHelper.cacheModule(module, true);
+          await OfflineStorage.storeModule(module, true);
         } catch (e) {
           throw e;
         }
