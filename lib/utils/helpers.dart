@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frappe_app/app/router.gr.dart';
+import 'package:frappe_app/model/offline_storage.dart';
 import 'package:frappe_app/services/storage_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -568,7 +569,7 @@ initDb() async {
   await locator<StorageService>().initBox('config');
 }
 
-initLocatlNotifications() async {
+initLocalNotifications() async {
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('app_icon');
 
@@ -581,4 +582,28 @@ initLocatlNotifications() async {
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
   );
+}
+
+initAwesomeItems() async {
+  var deskSidebarItems = await locator<Api>().getDeskSideBarItems();
+  var moduleDoctypesMapping = {};
+
+  for (var item in deskSidebarItems.message) {
+    var desktopPage = await locator<Api>().getDesktopPage(item.label);
+
+    desktopPage.message.cards.items.forEach(
+      (item) {
+        var doctypes = [];
+        item.links.forEach(
+          (link) {
+            doctypes.add(link.label);
+          },
+        );
+
+        moduleDoctypesMapping[item.label] = doctypes;
+      },
+    );
+  }
+
+  OfflineStorage.putItem('awesomeItems', moduleDoctypesMapping);
 }

@@ -1,11 +1,14 @@
-import 'package:frappe_app/views/base_viewmodel.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../app/locator.dart';
 import '../../services/api/api.dart';
 import '../../model/offline_storage.dart';
+
 import '../../utils/config_helper.dart';
+import '../../utils/helpers.dart';
 import '../../utils/http.dart';
+
+import '../../views/base_viewmodel.dart';
 
 class SavedCredentials {
   String serverURL;
@@ -77,6 +80,7 @@ class LoginViewModel extends BaseViewModel {
       updateConfig(response);
       cacheCreds(data);
       await cacheAllUsers();
+      await initAwesomeItems();
 
       loginButtonLabel = "Success";
       notifyListeners();

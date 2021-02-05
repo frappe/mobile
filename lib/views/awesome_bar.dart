@@ -80,9 +80,9 @@ class AwesomeSearch extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    // TODO
     var awesomeBarItems = [];
-    var activeModules = {};
+    var awesomeItems = OfflineStorage.getItem('awesomeItems');
+    awesomeItems = awesomeItems["data"];
 
     // activeModules.keys.forEach((module) {
     //   awesomeBarItems.add(
@@ -94,8 +94,8 @@ class AwesomeSearch extends SearchDelegate {
     //   );
     // });
 
-    if (activeModules != null) {
-      activeModules.values.forEach(
+    if (awesomeItems != null) {
+      awesomeItems.values.forEach(
         (value) {
           (value as List).forEach(
             (v) {
