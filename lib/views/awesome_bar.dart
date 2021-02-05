@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/config/frappe_icons.dart';
-import 'package:frappe_app/model/offline_storage.dart';
-import 'package:frappe_app/utils/frappe_icon.dart';
 
+import '../model/offline_storage.dart';
+import '../utils/frappe_icon.dart';
 import '../services/navigation_service.dart';
+
+import '../config/frappe_icons.dart';
 import '../config/palette.dart';
 
 import '../app/locator.dart';
 import '../app/router.gr.dart';
-
-import '../utils/config_helper.dart';
 
 class Awesombar extends StatelessWidget {
   @override
@@ -81,8 +80,10 @@ class AwesomeSearch extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    // TODO
     var awesomeBarItems = [];
-    var activeModules = ConfigHelper().activeModules;
+    var activeModules = {};
+
     // activeModules.keys.forEach((module) {
     //   awesomeBarItems.add(
     //     {

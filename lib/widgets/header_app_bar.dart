@@ -33,11 +33,7 @@ class HeaderAppBar extends StatelessWidget {
   void _choiceAction(
     String choice,
   ) async {
-    if (choice == 'activate_modules') {
-      locator<NavigationService>().navigateTo(
-        Routes.activateModules,
-      );
-    } else if (choice == 'queue') {
+    if (choice == 'queue') {
       locator<NavigationService>().navigateTo(
         Routes.queueList,
       );
@@ -73,7 +69,7 @@ class HeaderAppBar extends StatelessWidget {
                     : null,
             actions: [
               Flexible(
-                flex: 7,
+                flex: 6,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Awesombar(),
@@ -87,10 +83,6 @@ class HeaderAppBar extends StatelessWidget {
                   },
                   itemBuilder: (context) {
                     return [
-                      PopupMenuItem(
-                        child: Text('Activate Modules'),
-                        value: "activate_modules",
-                      ),
                       PopupMenuItem(
                         child: Text('Queue'),
                         value: "queue",

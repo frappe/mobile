@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../model/doctype_response.dart';
-import '../views/activate_modules/activate_modules_view.dart';
 import '../views/add_assignees/add_assignees_view.dart';
 import '../views/add_review/add_review_view.dart';
 import '../views/add_tags/add_tags_view.dart';
@@ -38,7 +37,6 @@ class Routes {
   static const String customListView = '/custom-list-view';
   static const String newDoc = '/new-doc';
   static const String formView = '/form-view';
-  static const String activateModules = '/activate-modules';
   static const String sessionExpired = '/session-expired';
   static const String noInternet = '/no-internet';
   static const String commentInput = '/comment-input';
@@ -59,7 +57,6 @@ class Routes {
     customListView,
     newDoc,
     formView,
-    activateModules,
     sessionExpired,
     noInternet,
     commentInput,
@@ -86,7 +83,6 @@ class MyRouter extends RouterBase {
     RouteDef(Routes.customListView, page: CustomListView),
     RouteDef(Routes.newDoc, page: NewDoc),
     RouteDef(Routes.formView, page: FormView),
-    RouteDef(Routes.activateModules, page: ActivateModules),
     RouteDef(Routes.sessionExpired, page: SessionExpired),
     RouteDef(Routes.noInternet, page: NoInternet),
     RouteDef(Routes.commentInput, page: CommentInput),
@@ -149,12 +145,6 @@ class MyRouter extends RouterBase {
           queued: args.queued,
           queuedData: args.queuedData,
         ),
-        settings: data,
-      );
-    },
-    ActivateModules: (data) {
-      return MaterialPageRoute<dynamic>(
-        builder: (context) => ActivateModules(),
         settings: data,
       );
     },

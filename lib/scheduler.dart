@@ -4,6 +4,7 @@ import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/model/queue.dart';
 import 'package:workmanager/workmanager.dart';
 
+import 'model/desk_sidebar_items_response.dart';
 import 'model/offline_storage.dart';
 import 'utils/http.dart';
 import 'app/locator.dart';
@@ -174,14 +175,18 @@ void registerPeriodicTask() {
 Future syncnow() async {
   print("downloading modules2");
 
-  if (ConfigHelper().activeModules != null) {
-    var activeModules = ConfigHelper().activeModules;
+  var deskSidebarItemsCache = await OfflineStorage.getItem('deskSidebarItems');
+  deskSidebarItemsCache = deskSidebarItemsCache["data"];
 
-    for (var module in activeModules.keys) {
+  if (deskSidebarItemsCache != null) {
+    var deskSidebarItems =
+        DeskSidebarItemsResponse.fromJson(deskSidebarItemsCache);
+
+    for (var module in deskSidebarItems.message) {
       var runBackgroundTask = await getSharedPrefValue("backgroundTask");
-      if (activeModules[module].isNotEmpty && runBackgroundTask) {
+      if (runBackgroundTask) {
         try {
-          await OfflineStorage.storeModule(module, true);
+          await OfflineStorage.storeModule(module.label, true);
         } catch (e) {
           throw e;
         }

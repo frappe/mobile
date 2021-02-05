@@ -42,38 +42,20 @@ class Home extends StatelessWidget {
             onRefresh: () async {
               model.refresh(connectionStatus);
             },
-            child: model.currentModule == null
-                ? _activateModules(
-                    model: model,
-                    connectivityStatus: connectionStatus,
+            child: model.state == ViewState.busy
+                ? Center(
+                    child: CircularProgressIndicator(),
                   )
-                : model.state == ViewState.busy
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : Builder(
-                        builder: (
-                          context,
-                        ) {
-                          var filteredActiveDoctypes =
-                              model.filterActiveDoctypes(
-                            desktopPage: model.desktopPage,
-                            module: model.currentModule,
-                          );
-
-                          if (filteredActiveDoctypes
-                                  .message.shortcuts.items.isEmpty &&
-                              filteredActiveDoctypes
-                                  .message.cards.items.isEmpty) {
-                            return _activateDoctypes();
-                          }
-
-                          return ListView(
-                            padding: EdgeInsets.zero,
-                            children: _generateChildren(filteredActiveDoctypes),
-                          );
-                        },
-                      ),
+                : Builder(
+                    builder: (
+                      context,
+                    ) {
+                      return ListView(
+                        padding: EdgeInsets.zero,
+                        children: _generateChildren(model.desktopPage),
+                      );
+                    },
+                  ),
           ),
         ),
       ),
@@ -279,7 +261,7 @@ class Home extends StatelessWidget {
                     title: Text('MODULES'),
                   ),
                 ];
-                model.activeModules.forEach((element) {
+                model.modules.forEach((element) {
                   listItems.add(Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     child: ListTile(
@@ -304,65 +286,6 @@ class Home extends StatelessWidget {
                 );
               },
             ),
-    );
-  }
-
-  Widget _activateModules({
-    HomeViewModel model,
-    ConnectivityStatus connectivityStatus,
-  }) {
-    return Center(
-      child: Container(
-        color: Colors.white,
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Activate Modules'),
-            FrappeFlatButton(
-              onPressed: () async {
-                var nav = await locator<NavigationService>()
-                    .navigateTo(Routes.activateModules);
-
-                if (nav) {
-                  model.getData(connectivityStatus);
-                }
-              },
-              title: 'Activate Modules',
-              buttonType: ButtonType.primary,
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _activateDoctypes() {
-    return Container(
-      margin: EdgeInsets.zero,
-      color: Colors.white,
-      height: double.infinity,
-      width: double.infinity,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            'No Doctypes are yet Activated or you dont have permission',
-          ),
-          FrappeFlatButton(
-            onPressed: () async {
-              var nav = await locator<NavigationService>()
-                  .navigateTo(Routes.activateModules);
-
-              if (nav) {
-                // _refresh();
-              }
-            },
-            title: 'Activate Doctypes',
-            buttonType: ButtonType.primary,
-          )
-        ],
-      ),
     );
   }
 }

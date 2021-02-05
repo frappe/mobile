@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
+import 'package:frappe_app/model/desktop_page_response.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/services/api/api.dart';
 import 'package:frappe_app/utils/constants.dart';
@@ -84,16 +85,20 @@ class OfflineStorage {
   static storeModule(String module, [bool isIsolate = false]) async {
     try {
       var cache = {};
+      List<CardItemLink> doctypes = [];
       var deskSideBarItems = await locator<Api>().getDeskSideBarItems();
-      var doctypes = await locator<Api>().getDesktopPage(module);
-      var activeDoctypes = getActivatedDoctypes(doctypes, module);
+      var desktopPage = await locator<Api>().getDesktopPage(module);
+
+      desktopPage.message.cards.items.forEach((item) {
+        doctypes.addAll(item.links);
+      });
 
       cache["${module}Doctypes"] = doctypes;
       cache['deskSidebarItems'] = deskSideBarItems;
 
       var f = <Future>[];
 
-      for (var doctype in activeDoctypes) {
+      for (var doctype in doctypes) {
         f.add(
           storeDocListAndDoc(doctype.name),
         );

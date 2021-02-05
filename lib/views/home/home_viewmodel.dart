@@ -15,10 +15,8 @@ import 'package:injectable/injectable.dart';
 
 @lazySingleton
 class HomeViewModel extends BaseViewModel {
-  String currentModule = ConfigHelper().activeModules != null
-      ? ConfigHelper().activeModules.keys.first
-      : null;
-  List<DeskMessage> activeModules = [];
+  String currentModule;
+  List<DeskMessage> modules = [];
   DesktopPageResponse desktopPage;
 
   refresh(ConnectivityStatus connectivityStatus) async {
@@ -37,14 +35,8 @@ class HomeViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  Future getActiveModules(ConnectivityStatus connectionStatus) async {
+  Future getDeskSidebarItems(ConnectivityStatus connectionStatus) async {
     DeskSidebarItemsResponse deskSidebarItems;
-    var _activeModules;
-    if (ConfigHelper().activeModules != null) {
-      _activeModules = ConfigHelper().activeModules;
-    } else {
-      _activeModules = {};
-    }
 
     var isOnline = await verifyOnline();
 
@@ -65,40 +57,7 @@ class HomeViewModel extends BaseViewModel {
       deskSidebarItems = await locator<Api>().getDeskSideBarItems();
     }
 
-    var modules = deskSidebarItems.message.where((m) {
-      return _activeModules.keys.contains(m.name) &&
-          _activeModules[m.name].length > 0;
-    }).toList();
-
-    activeModules = modules;
-    currentModule = ConfigHelper().activeModules != null
-        ? ConfigHelper().activeModules.keys.first
-        : null;
-  }
-
-  DesktopPageResponse filterActiveDoctypes({
-    @required DesktopPageResponse desktopPage,
-    @required String module,
-  }) {
-    var activeModules = ConfigHelper().activeModules;
-    desktopPage.message.shortcuts.items =
-        desktopPage.message.shortcuts.items.where((item) {
-      return item.type == "DocType" &&
-          activeModules[module].contains(item.label);
-    }).toList();
-
-    desktopPage.message.cards.items.forEach((item) {
-      item.links = item.links.where((item) {
-        return activeModules[module].contains(item.label);
-      }).toList();
-    });
-
-    desktopPage.message.cards.items =
-        desktopPage.message.cards.items.where((item) {
-      return item.links.isNotEmpty;
-    }).toList();
-
-    return desktopPage;
+    modules = deskSidebarItems.message;
   }
 
   getDesktopPage({
@@ -129,7 +88,9 @@ class HomeViewModel extends BaseViewModel {
 
   getData(ConnectivityStatus connectivityStatus) async {
     setState(ViewState.busy);
-    await getActiveModules(connectivityStatus);
+    await getDeskSidebarItems(connectivityStatus);
+
+    currentModule = modules[0].label;
 
     await getDesktopPage(
       connectionStatus: connectivityStatus,

@@ -12,7 +12,6 @@ import 'package:frappe_app/services/storage_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../model/desktop_page_response.dart';
 import '../model/doctype_response.dart';
 
 import '../services/api/api.dart';
@@ -390,27 +389,6 @@ List sortBy(List data, String orderBy, Order order) {
   }
 
   return data;
-}
-
-List<CardItemLink> getActivatedDoctypes(
-  DesktopPageResponse desktopPage,
-  String module,
-) {
-  if (ConfigHelper().activeModules != null) {
-    var activeModules = ConfigHelper().activeModules;
-    var activeDoctypes = <CardItemLink>[];
-
-    desktopPage.message.cards.items.forEach((item) {
-      activeDoctypes.addAll(item.links);
-    });
-    activeDoctypes = activeDoctypes.where((m) {
-      return activeModules[module].contains(m.label);
-    }).toList();
-
-    return activeDoctypes;
-  } else {
-    return [];
-  }
 }
 
 bool hasTitle(DoctypeDoc meta) {

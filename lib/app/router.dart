@@ -13,7 +13,6 @@ import '../views/add_tags/add_tags_view.dart';
 import '../views/file_picker.dart';
 import '../views/queue.dart';
 import '../views/share/share_view.dart';
-import '../views/activate_modules/activate_modules_view.dart';
 import '../views/comment_input.dart';
 import '../views/email_form.dart';
 import '../views/queue_error.dart';
@@ -31,7 +30,6 @@ import '../views/login/login_view.dart';
     MaterialRoute(page: CustomListView),
     MaterialRoute(page: NewDoc),
     MaterialRoute(page: FormView),
-    MaterialRoute(page: ActivateModules),
     MaterialRoute(page: SessionExpired),
     MaterialRoute(page: NoInternet),
     MaterialRoute(page: CommentInput),

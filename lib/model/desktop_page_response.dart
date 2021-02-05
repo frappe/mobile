@@ -212,10 +212,10 @@ class ShortcutItem {
   int docstatus;
   String type;
   String linkTo;
-  Null docView;
+  String docView;
   String label;
-  Null icon;
-  Null restrictToDomain;
+  dynamic icon;
+  dynamic restrictToDomain;
   String statsFilter;
   String color;
   String format;

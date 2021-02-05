@@ -19,14 +19,6 @@ class SettingsPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CardListTile(
-            title: Text('Activate Modules'),
-            onTap: () {
-              locator<NavigationService>().navigateTo(
-                Routes.activateModules,
-              );
-            },
-          ),
-          CardListTile(
             title: Text('Queue'),
             onTap: () {
               locator<NavigationService>().navigateTo(

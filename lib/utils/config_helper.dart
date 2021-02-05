@@ -10,10 +10,6 @@ class ConfigHelper {
         defaultValue: false,
       );
 
-  Map get activeModules => configContainer.get(
-        "${primaryCacheKey}activeModules",
-      );
-
   String get userId => Uri.decodeFull(configContainer.get(
         'userId',
       ));
