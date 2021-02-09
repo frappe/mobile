@@ -15,10 +15,11 @@ import '../../app/router.gr.dart';
 import '../../services/navigation_service.dart';
 
 import '../../utils/helpers.dart';
-import '../../utils/config_helper.dart';
 import '../../utils/frappe_alert.dart';
 import '../../utils/indicator.dart';
 import '../../utils/enums.dart';
+
+import '../../model/config.dart';
 
 import '../../widgets/custom_form.dart';
 import '../../widgets/frappe_button.dart';
@@ -408,7 +409,7 @@ class FormView extends StatelessWidget {
                   arguments: CommentInputArguments(
                     doctype: doctype,
                     name: name,
-                    authorEmail: ConfigHelper().user,
+                    authorEmail: Config().user,
                     callback: model.refresh,
                   ),
                 );

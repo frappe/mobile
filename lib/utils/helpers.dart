@@ -13,6 +13,7 @@ import 'package:frappe_app/services/storage_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../model/config.dart';
 import '../model/doctype_response.dart';
 
 import '../services/api/api.dart';
@@ -25,7 +26,6 @@ import '../app/locator.dart';
 import '../config/palette.dart';
 import '../services/navigation_service.dart';
 
-import '../utils/config_helper.dart';
 import '../utils/dio_helper.dart';
 import '../utils/enums.dart';
 
@@ -155,7 +155,7 @@ List<Widget> generateLayout({
         : field.defaultValue;
 
     if (val == '__user') {
-      val = ConfigHelper().userId;
+      val = Config().userId;
     }
 
     if (val is List) {
@@ -407,9 +407,9 @@ getTitle(DoctypeDoc meta, Map doc) {
 clearLoginInfo() async {
   await DioHelper.getCookiePath()
     ..delete(
-      ConfigHelper().uri,
+      Config().uri,
     );
-  ConfigHelper.set('isLoggedIn', false);
+  Config.set('isLoggedIn', false);
 }
 
 handle403() async {

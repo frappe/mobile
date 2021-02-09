@@ -4,7 +4,7 @@ import '../services/storage_service.dart';
 import '../services/api/api.dart';
 
 import '../app/locator.dart';
-import '../utils/config_helper.dart';
+import 'config.dart';
 
 class Queue {
   static Box getQueueContainer() {
@@ -16,7 +16,7 @@ class Queue {
     l.remove(index);
     l.insert(index, value);
     getQueueContainer().put(
-      ConfigHelper().primaryCacheKey,
+      Config().primaryCacheKey,
       l,
     );
   }
@@ -27,14 +27,14 @@ class Queue {
     l.add(value);
 
     getQueueContainer().put(
-      ConfigHelper().primaryCacheKey,
+      Config().primaryCacheKey,
       l,
     );
   }
 
   static List getQueueItems() {
     return getQueueContainer().get(
-      ConfigHelper().primaryCacheKey,
+      Config().primaryCacheKey,
       defaultValue: [],
     );
   }
@@ -48,7 +48,7 @@ class Queue {
     List l = getQueueItems();
     l.removeAt(index);
     await getQueueContainer().put(
-      ConfigHelper().primaryCacheKey,
+      Config().primaryCacheKey,
       l,
     );
   }

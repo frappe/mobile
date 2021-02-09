@@ -1,14 +1,16 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:frappe_app/utils/config_helper.dart';
-import 'package:frappe_app/utils/helpers.dart';
-import 'package:frappe_app/model/queue.dart';
 import 'package:workmanager/workmanager.dart';
 
-import 'model/desk_sidebar_items_response.dart';
-import 'model/offline_storage.dart';
-import 'utils/http.dart';
 import 'app/locator.dart';
 import 'services/storage_service.dart';
+
+import 'utils/helpers.dart';
+import 'utils/http.dart';
+
+import 'model/config.dart';
+import 'model/queue.dart';
+import 'model/desk_sidebar_items_response.dart';
+import 'model/offline_storage.dart';
 
 const String TASK_SYNC_DATA = 'downloadModules';
 const String TASK_PROCESS_QUEUE = 'processQueue';
@@ -44,7 +46,7 @@ void callbackDispatcher() {
     var notificationCount = await getActiveNotifications();
     var runBackgroundTask = await getSharedPrefValue("backgroundTask");
 
-    if (ConfigHelper().isLoggedIn && runBackgroundTask) {
+    if (Config().isLoggedIn && runBackgroundTask) {
       switch (task) {
         case TASK_SYNC_DATA:
           await putSharedPrefValue(

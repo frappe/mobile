@@ -12,7 +12,7 @@ import '../../model/offline_storage.dart';
 import '../../services/navigation_service.dart';
 import '../../services/api/api.dart';
 
-import '../../utils/config_helper.dart';
+import '../../model/config.dart';
 import '../../utils/constants.dart';
 import '../../utils/enums.dart';
 import '../../utils/helpers.dart';
@@ -27,7 +27,7 @@ class ListViewViewModel extends BaseViewModel {
   Response error;
   var filters = {};
   bool showLiked = false;
-  var userId = ConfigHelper().userId;
+  var userId = Config().userId;
 
   refresh() {
     pagewiseLoadController.reset();

@@ -8,8 +8,9 @@ import '../app/router.gr.dart';
 import '../services/navigation_service.dart';
 
 import '../utils/frappe_icon.dart';
-import '../utils/config_helper.dart';
 import '../utils/helpers.dart';
+
+import '../model/config.dart';
 
 import '../views/awesome_bar.dart';
 import '../widgets/user_avatar.dart';
@@ -97,7 +98,7 @@ class HeaderAppBar extends StatelessWidget {
                     padding: const EdgeInsets.only(right: 8.0),
                     child: UserAvatar(
                       size: 22,
-                      uid: ConfigHelper().userId,
+                      uid: Config().userId,
                     ),
                   ),
                 ),

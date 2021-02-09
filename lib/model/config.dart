@@ -2,7 +2,7 @@ import '../services/storage_service.dart';
 
 import '../app/locator.dart';
 
-class ConfigHelper {
+class Config {
   static var configContainer = locator<StorageService>().getBox('config');
 
   bool get isLoggedIn => configContainer.get(

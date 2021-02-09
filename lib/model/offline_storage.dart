@@ -3,29 +3,32 @@ import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
-import 'package:frappe_app/model/desktop_page_response.dart';
-import 'package:frappe_app/model/doctype_response.dart';
-import 'package:frappe_app/services/api/api.dart';
-import 'package:frappe_app/utils/constants.dart';
-
-import '../utils/config_helper.dart';
-import '../utils/helpers.dart';
-
-import '../services/storage_service.dart';
 
 import '../app/locator.dart';
 
+import '../model/desktop_page_response.dart';
+import '../model/doctype_response.dart';
+
+import '../services/storage_service.dart';
+import '../services/api/api.dart';
+
+import '../utils/constants.dart';
+import '../utils/helpers.dart';
+import 'config.dart';
+
 class OfflineStorage {
+  static var storage = locator<StorageService>().getBox('offline');
+
   static String generateKeyHash(String key) {
     return sha1.convert(utf8.encode(key)).toString();
   }
 
   static putItem(String secondaryKey, dynamic data) async {
-    if (ConfigHelper().primaryCacheKey == null) {
+    if (Config().primaryCacheKey == null) {
       return;
     }
 
-    var k = ConfigHelper().primaryCacheKey + "#@#" + secondaryKey;
+    var k = Config().primaryCacheKey + "#@#" + secondaryKey;
     var kHash = generateKeyHash(k);
 
     var v = {
@@ -33,11 +36,11 @@ class OfflineStorage {
       'data': data,
     };
 
-    await locator<StorageService>().getBox('offline').put(kHash, v);
+    await storage.put(kHash, v);
   }
 
   static putAllItems(Map data, [bool isIsolate = false]) async {
-    if (ConfigHelper().primaryCacheKey == null) {
+    if (Config().primaryCacheKey == null) {
       return;
     }
 
@@ -45,7 +48,7 @@ class OfflineStorage {
 
     data.forEach(
       (key, value) {
-        v[generateKeyHash(ConfigHelper().primaryCacheKey + "#@#" + key)] = {
+        v[generateKeyHash(Config().primaryCacheKey + "#@#" + key)] = {
           'timestamp': DateTime.now(),
           "data": value,
         };
@@ -55,31 +58,31 @@ class OfflineStorage {
     if (isIsolate) {
       var runBackgroundTask = await getSharedPrefValue("backgroundTask");
       if (runBackgroundTask) {
-        await locator<StorageService>().getBox('offline').putAll(v);
+        await storage.putAll(v);
       }
     } else {
-      await locator<StorageService>().getBox('offline').putAll(v);
+      await storage.putAll(v);
     }
   }
 
   static getItem(String secondaryKey) {
-    if (ConfigHelper().primaryCacheKey == null) {
+    if (Config().primaryCacheKey == null) {
       return {"data": null};
     }
-    var k = ConfigHelper().primaryCacheKey + "#@#" + secondaryKey;
+    var k = Config().primaryCacheKey + "#@#" + secondaryKey;
     var keyHash = generateKeyHash(k);
 
-    if (locator<StorageService>().getBox('offline').get(keyHash) == null) {
+    if (storage.get(keyHash) == null) {
       return {"data": null};
     }
 
-    return locator<StorageService>().getBox('offline').get(keyHash);
+    return storage.get(keyHash);
   }
 
   static Future remove(String secondaryKey) async {
-    var k = ConfigHelper().primaryCacheKey + "#@#" + secondaryKey;
+    var k = Config().primaryCacheKey + "#@#" + secondaryKey;
     var keyHash = generateKeyHash(k);
-    locator<StorageService>().getBox('offline').delete(keyHash);
+    storage.delete(keyHash);
   }
 
   static storeModule(String module, [bool isIsolate = false]) async {

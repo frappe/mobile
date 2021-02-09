@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:frappe_app/model/doctype_response.dart';
-import 'package:frappe_app/utils/config_helper.dart';
-import 'package:frappe_app/views/base_viewmodel.dart';
 import 'package:injectable/injectable.dart';
+
+import '../../views/base_viewmodel.dart';
+
+import '../../model/config.dart';
+import '../../model/doctype_response.dart';
 
 @lazySingleton
 class AddReviewViewModel extends BaseViewModel {
@@ -75,8 +77,7 @@ class AddReviewViewModel extends BaseViewModel {
     return involvedUsers
         .toSet()
         .toList()
-        .where(
-            (user) => !['Administrator', ConfigHelper().userId].contains(user))
+        .where((user) => !['Administrator', Config().userId].contains(user))
         .toList();
   }
 }

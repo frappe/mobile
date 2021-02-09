@@ -4,9 +4,10 @@ import '../../app/locator.dart';
 import '../../services/api/api.dart';
 import '../../model/offline_storage.dart';
 
-import '../../utils/config_helper.dart';
 import '../../utils/helpers.dart';
 import '../../utils/http.dart';
+
+import '../../model/config.dart';
 
 import '../../views/base_viewmodel.dart';
 
@@ -32,7 +33,7 @@ class LoginViewModel extends BaseViewModel {
     loginButtonLabel = "Login";
     var savedUsr = OfflineStorage.getItem('usr');
     var savedPwd = OfflineStorage.getItem('pwd');
-    var serverURL = ConfigHelper().baseUrl;
+    var serverURL = Config().baseUrl;
     savedUsr = savedUsr["data"];
     savedPwd = savedPwd["data"];
 
@@ -44,13 +45,13 @@ class LoginViewModel extends BaseViewModel {
   }
 
   updateConfig(response) {
-    ConfigHelper.set('isLoggedIn', true);
+    Config.set('isLoggedIn', true);
 
-    ConfigHelper.set(
+    Config.set(
       'userId',
       response.userId,
     );
-    ConfigHelper.set(
+    Config.set(
       'user',
       response.fullName,
     );
@@ -90,7 +91,7 @@ class LoginViewModel extends BaseViewModel {
         "message": "Success",
       };
     } catch (e) {
-      ConfigHelper.set('isLoggedIn', false);
+      Config.set('isLoggedIn', false);
       loginButtonLabel = "Login";
       notifyListeners();
       return {

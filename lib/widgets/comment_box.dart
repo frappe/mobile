@@ -4,7 +4,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../app/locator.dart';
-import '../utils/config_helper.dart';
+import '../model/config.dart';
 
 import '../services/api/api.dart';
 import '../services/navigation_service.dart';
@@ -58,7 +58,7 @@ class CommentBox extends StatelessWidget {
           ListTile(
             title: Text('${data["owner"]}'),
             subtitle: Text(time),
-            trailing: ConfigHelper().user == data["owner"]
+            trailing: Config().user == data["owner"]
                 ? PopupMenuButton(
                     onSelected: (choice) {
                       _choiceAction(context, choice);

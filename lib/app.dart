@@ -7,7 +7,7 @@ import 'app/router.gr.dart';
 import 'lifecycle_manager.dart';
 import 'app/locator.dart';
 
-import 'utils/config_helper.dart';
+import 'model/config.dart';
 import 'utils/enums.dart';
 
 import 'services/connectivity_service.dart';
@@ -33,7 +33,7 @@ class _FrappeAppState extends State<FrappeApp> {
 
   void _checkIfLoggedIn() {
     setState(() {
-      _isLoggedIn = ConfigHelper().isLoggedIn;
+      _isLoggedIn = Config().isLoggedIn;
     });
 
     _isLoaded = true;

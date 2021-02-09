@@ -9,7 +9,7 @@ import 'package:timeago/timeago.dart' as timeago;
 
 import '../config/palette.dart';
 
-import '../utils/config_helper.dart';
+import '../model/config.dart';
 
 import '../widgets/user_avatar.dart';
 
@@ -99,8 +99,7 @@ class ViewEmail extends StatelessWidget {
 
     imgs.forEach((img) {
       if (Uri.parse(img.attributes["src"]).hasAbsolutePath) {
-        img.attributes["src"] =
-            "${ConfigHelper().baseUrl}${img.attributes["src"]}";
+        img.attributes["src"] = "${Config().baseUrl}${img.attributes["src"]}";
       }
     });
 

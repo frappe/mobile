@@ -3,11 +3,11 @@ import '../services/api/api.dart';
 
 import '../utils/dio_helper.dart';
 import '../model/offline_storage.dart';
-import '../utils/config_helper.dart';
+import '../model/config.dart';
 
 initApiConfig() async {
-  if (ConfigHelper().baseUrl != null) {
-    await DioHelper.init(ConfigHelper().baseUrl);
+  if (Config().baseUrl != null) {
+    await DioHelper.init(Config().baseUrl);
   }
 }
 
@@ -48,10 +48,10 @@ Future<void> setBaseUrl(url) async {
   if (!url.startsWith('https://')) {
     url = "https://$url";
   }
-  await ConfigHelper.set('baseUrl', url);
+  await Config.set('baseUrl', url);
   await DioHelper.init(url);
 }
 
 String getAbsoluteUrl(String url) {
-  return Uri.encodeFull("${ConfigHelper().baseUrl}$url");
+  return Uri.encodeFull("${Config().baseUrl}$url");
 }

@@ -12,7 +12,7 @@ import '../../views/base_viewmodel.dart';
 import '../../services/api/api.dart';
 
 import '../../model/offline_storage.dart';
-import '../../utils/config_helper.dart';
+import '../../model/config.dart';
 import '../../utils/enums.dart';
 import '../../utils/helpers.dart';
 import '../../model/queue.dart';
@@ -22,7 +22,7 @@ class FormViewViewModel extends BaseViewModel {
   bool editMode = false;
   Response error;
   Map formData;
-  final user = ConfigHelper().user;
+  final user = Config().user;
 
   void refresh() {
     editMode = false;
