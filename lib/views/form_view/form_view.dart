@@ -60,6 +60,7 @@ class FormView extends StatelessWidget {
       },
       onModelClose: (model) {
         model.editMode = false;
+        model.error = null;
       },
       builder: (context, model, child) => model.state == ViewState.busy
           ? Scaffold(
@@ -68,6 +69,9 @@ class FormView extends StatelessWidget {
             ))
           : Builder(
               builder: (context) {
+                if (model.error != null) {
+                  return handleError(model.error);
+                }
                 var docs = model.formData["docs"];
                 var docInfo = model.formData["docinfo"];
 

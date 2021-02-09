@@ -20,6 +20,7 @@ import '../../model/queue.dart';
 @lazySingleton
 class FormViewViewModel extends BaseViewModel {
   bool editMode = false;
+  Response error;
   Map formData;
   final user = ConfigHelper().user;
 
@@ -48,9 +49,7 @@ class FormViewViewModel extends BaseViewModel {
     } else {
       var isOnline = await verifyOnline();
 
-      if ((connectivityStatus == null ||
-              connectivityStatus == ConnectivityStatus.offline) &&
-          !isOnline) {
+      if (!isOnline) {
         var response = await OfflineStorage.getItem(
           '$doctype$name',
         );
@@ -58,7 +57,7 @@ class FormViewViewModel extends BaseViewModel {
         if (response != null) {
           formData = response;
         } else {
-          throw Response(
+          error = Response(
             statusCode: HttpStatus.serviceUnavailable,
           );
         }

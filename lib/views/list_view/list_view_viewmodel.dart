@@ -1,26 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
-
-import 'package:frappe_app/app/router.gr.dart';
-import 'package:frappe_app/model/doctype_response.dart';
-import 'package:frappe_app/services/navigation_service.dart';
-import 'package:frappe_app/utils/config_helper.dart';
-import 'package:frappe_app/utils/constants.dart';
-import 'package:frappe_app/utils/enums.dart';
-import 'package:frappe_app/views/base_viewmodel.dart';
-import 'package:frappe_app/views/filter_list/filter_list_view.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../app/locator.dart';
+import '../../app/router.gr.dart';
+
+import '../../model/doctype_response.dart';
+import '../../model/offline_storage.dart';
+
+import '../../services/navigation_service.dart';
 import '../../services/api/api.dart';
 
-import '../../model/offline_storage.dart';
+import '../../utils/config_helper.dart';
+import '../../utils/constants.dart';
+import '../../utils/enums.dart';
 import '../../utils/helpers.dart';
+
+import '../../views/base_viewmodel.dart';
+import '../../views/filter_list/filter_list_view.dart';
 
 @lazySingleton
 class ListViewViewModel extends BaseViewModel {
   DoctypeResponse meta;
   PagewiseLoadController pagewiseLoadController;
+  Response error;
   var filters = {};
   bool showLiked = false;
   var userId = ConfigHelper().userId;
@@ -31,42 +35,47 @@ class ListViewViewModel extends BaseViewModel {
 
   getData(String doctype) async {
     setState(ViewState.busy);
-    meta = await OfflineStorage.getMeta(doctype);
-    var isOnline = await verifyOnline();
+    try {
+      meta = await OfflineStorage.getMeta(doctype);
+      var isOnline = await verifyOnline();
 
-    if (isOnline) {
-      pagewiseLoadController = PagewiseLoadController(
-        pageSize: Constants.pageSize,
-        pageFuture: (pageIndex) {
-          return locator<Api>().fetchList(
-            filters: FilterList.generateFilters(
-              doctype,
-              filters,
-            ),
-            meta: meta.docs[0],
-            doctype: doctype,
-            fieldnames: generateFieldnames(
-              doctype,
-              meta.docs[0],
-            ),
-            pageLength: Constants.pageSize,
-            offset: pageIndex * Constants.pageSize,
-          );
-        },
-      );
-    } else {
-      pagewiseLoadController = PagewiseLoadController(
-        pageSize: Constants.offlinePageSize,
-        pageFuture: (pageIndex) {
-          return Future.delayed(Duration(seconds: 1), () {
-            var response = OfflineStorage.getItem(
-              '${doctype}List',
+      if (isOnline) {
+        pagewiseLoadController = PagewiseLoadController(
+          pageSize: Constants.pageSize,
+          pageFuture: (pageIndex) {
+            return locator<Api>().fetchList(
+              filters: FilterList.generateFilters(
+                doctype,
+                filters,
+              ),
+              meta: meta.docs[0],
+              doctype: doctype,
+              fieldnames: generateFieldnames(
+                doctype,
+                meta.docs[0],
+              ),
+              pageLength: Constants.pageSize,
+              offset: pageIndex * Constants.pageSize,
             );
-            return response["data"];
-          });
-        },
-      );
+          },
+        );
+      } else {
+        pagewiseLoadController = PagewiseLoadController(
+          pageSize: Constants.offlinePageSize,
+          pageFuture: (pageIndex) {
+            return Future.delayed(Duration(seconds: 1), () {
+              var response = OfflineStorage.getItem(
+                '${doctype}List',
+              );
+              return response["data"];
+            });
+          },
+        );
+      }
+    } catch (e) {
+      error = e;
     }
+
     setState(ViewState.idle);
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/utils/helpers.dart';
 import 'package:provider/provider.dart';
 
 import '../../model/desktop_page_response.dart';
@@ -26,7 +27,7 @@ class Home extends StatelessWidget {
 
     return BaseView<HomeViewModel>(
       onModelReady: (model) {
-        model.getData(connectionStatus);
+        model.getData();
       },
       builder: (context, model, child) => Scaffold(
         backgroundColor: Palette.bgColor,
@@ -50,6 +51,9 @@ class Home extends StatelessWidget {
                     builder: (
                       context,
                     ) {
+                      if (model.error != null) {
+                        return handleError(model.error);
+                      }
                       return ListView(
                         padding: EdgeInsets.zero,
                         children: _generateChildren(model.desktopPage),
@@ -271,8 +275,7 @@ class Home extends StatelessWidget {
                       title: Text(element.label),
                       onTap: () {
                         model.switchModule(
-                          newModule: element.name,
-                          connectivityStatus: connectionStatus,
+                          element.name,
                         );
 
                         locator<NavigationService>().pop();

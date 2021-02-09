@@ -43,6 +43,7 @@ class CustomListView extends StatelessWidget {
         model.filters = {};
         model.meta = null;
         model.showLiked = false;
+        model.error = null;
         model.pagewiseLoadController.dispose();
       },
       builder: (context, model, child) => model.state == ViewState.busy
@@ -53,6 +54,9 @@ class CustomListView extends StatelessWidget {
             )
           : Builder(
               builder: (context) {
+                if (model.error != null) {
+                  return handleError(model.error);
+                }
                 var meta = model.meta;
                 var filters = model.filters;
 
