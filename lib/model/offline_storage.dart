@@ -96,20 +96,20 @@ class OfflineStorage {
         doctypes.addAll(item.links);
       });
 
-      cache["${module}Doctypes"] = doctypes;
-      cache['deskSidebarItems'] = deskSideBarItems;
+      cache["${module}Doctypes"] = desktopPage.toJson();
+      cache['deskSidebarItems'] = deskSideBarItems.toJson();
 
       var f = <Future>[];
 
       for (var doctype in doctypes) {
         f.add(
-          storeDocListAndDoc(doctype.name),
+          storeDocListAndDoc(doctype.label),
         );
         f.add(
-          storeLinkFields(doctype.name),
+          storeLinkFields(doctype.label),
         );
         f.add(
-          storeDoctypeMeta(doctype.name),
+          storeDoctypeMeta(doctype.label),
         );
       }
 
@@ -132,7 +132,7 @@ class OfflineStorage {
     var cache = {};
     try {
       var response = await locator<Api>().getDoctype(doctype);
-      cache['${doctype}Meta'] = response;
+      cache['${doctype}Meta'] = response.toJson();
     } catch (e) {
       print(e);
     }
@@ -244,26 +244,14 @@ class OfflineStorage {
   }
 
   static Future<DoctypeResponse> getMeta(String doctype) async {
-    var cachedMeta = getItem('${doctype}Meta');
     var isOnline = await verifyOnline();
 
     DoctypeResponse metaResponse;
 
     if (isOnline) {
-      if (cachedMeta["data"] != null) {
-        DateTime cacheTime = cachedMeta["timestamp"];
-        var cacheTimeElapsedMins =
-            DateTime.now().difference(cacheTime).inMinutes;
-        if (cacheTimeElapsedMins > 15) {
-          metaResponse = await locator<Api>().getDoctype(doctype);
-        } else {
-          metaResponse = DoctypeResponse.fromJson(
-              Map<String, dynamic>.from(cachedMeta["data"]));
-        }
-      } else {
-        metaResponse = await locator<Api>().getDoctype(doctype);
-      }
+      metaResponse = await locator<Api>().getDoctype(doctype);
     } else {
+      var cachedMeta = getItem('${doctype}Meta');
       if (cachedMeta["data"] != null) {
         metaResponse = DoctypeResponse.fromJson(
             Map<String, dynamic>.from(cachedMeta["data"]));

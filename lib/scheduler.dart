@@ -175,8 +175,6 @@ void registerPeriodicTask() {
 }
 
 Future syncnow() async {
-  print("downloading modules2");
-
   var deskSidebarItemsCache = await OfflineStorage.getItem('deskSidebarItems');
   deskSidebarItemsCache = deskSidebarItemsCache["data"];
 
@@ -188,6 +186,7 @@ Future syncnow() async {
       var runBackgroundTask = await getSharedPrefValue("backgroundTask");
       if (runBackgroundTask) {
         try {
+          print("downloading ${module.label}");
           await OfflineStorage.storeModule(module.label, true);
         } catch (e) {
           throw e;
