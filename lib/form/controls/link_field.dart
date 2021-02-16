@@ -49,8 +49,6 @@ class LinkField extends StatefulWidget {
 }
 
 class _LinkFieldState extends State<LinkField> with Control, ControlInput {
-  final TextEditingController _typeAheadController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     List<String Function(dynamic)> validators = [];
@@ -72,7 +70,6 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
         data: Theme.of(context).copyWith(primaryColor: Colors.black),
         child: FormBuilderTypeAhead(
           key: widget.key,
-          controller: _typeAheadController,
           onSuggestionSelected: (item) {
             if (widget.onSuggestionSelected != null) {
               widget.onSuggestionSelected(item);
@@ -91,16 +88,6 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
               ),
             ),
             prefixIcon: widget.prefixIcon,
-            suffixIcon: widget.allowClear
-                ? _typeAheadController.text != ''
-                    ? IconButton(
-                        icon: Icon(Icons.close, color: Colors.black),
-                        onPressed: () {
-                          _typeAheadController.clear();
-                        },
-                      )
-                    : null
-                : null,
             fillColor: widget.fillColor,
             hintText: widget.withLabel ? null : widget.doctypeField.label,
           ),
