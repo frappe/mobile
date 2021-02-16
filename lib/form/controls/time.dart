@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:intl/intl.dart';
+
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 
@@ -35,7 +37,11 @@ class Time extends StatelessWidget with Control, ControlInput {
 
     return FormBuilderDateTimePicker(
       key: key,
-      initialValue: doc != null ? doc[doctypeField.fieldname] : null,
+      initialValue: doc != null
+          ? DateFormat.Hms().parse(
+              doc[doctypeField.fieldname],
+            )
+          : null,
       inputType: InputType.time,
       valueTransformer: (val) {
         return val != null ? val.toIso8601String() : null;
