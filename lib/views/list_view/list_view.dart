@@ -44,7 +44,6 @@ class CustomListView extends StatelessWidget {
         model.meta = null;
         model.showLiked = false;
         model.error = null;
-        model.pagewiseLoadController.dispose();
       },
       builder: (context, model, child) => model.state == ViewState.busy
           ? Scaffold(
