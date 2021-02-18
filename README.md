@@ -5,9 +5,9 @@ Mobile Version of Frappe built on Flutter.
 
 **Please Note, this Project is still in beta stage and requires latest version of frappe framework v13**
 
-<kbd><img width="288" height="576" src="screenshots/login.png" alt="Frappe Books Preview" /></kbd>
-<kbd><img width="288" height="576" src="screenshots/home.png" alt="Frappe Books Preview" /></kbd>
-<kbd><img width="288" height="576" src="screenshots/list_view.png" alt="Frappe Books Preview" /></kbd>
+<kbd><img width="216" height="432" src="screenshots/login.png" alt="Frappe Books Preview" /></kbd>
+<kbd><img width="216" height="432" src="screenshots/home.png" alt="Frappe Books Preview" /></kbd>
+<kbd><img width="216" height="432" src="screenshots/list_view.png" alt="Frappe Books Preview" /></kbd>
 
 ## Features:
 1) Offline First (Data is automatically fetched in background every 30 mins)
