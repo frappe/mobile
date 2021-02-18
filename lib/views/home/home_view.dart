@@ -61,6 +61,7 @@ class Home extends StatelessWidget {
                         children: _generateChildren(
                           desktopPage: model.desktopPage,
                           model: model,
+                          context: context,
                         ),
                       );
                     },
@@ -101,7 +102,8 @@ class Home extends StatelessWidget {
 
   Widget _shortcut({
     @required ShortcutItem item,
-    HomeViewModel model,
+    @required HomeViewModel model,
+    @required BuildContext context,
   }) {
     return Padding(
       padding: const EdgeInsets.only(
@@ -113,7 +115,8 @@ class Home extends StatelessWidget {
         title: Text(item.label),
         onTap: () {
           model.navigateToView(
-            item.linkTo,
+            doctype: item.linkTo,
+            context: context,
           );
         },
       ),
@@ -123,6 +126,7 @@ class Home extends StatelessWidget {
   Widget _item({
     @required CardItemLink item,
     @required HomeViewModel model,
+    @required BuildContext context,
   }) {
     return ListTile(
       visualDensity: VisualDensity(horizontal: 0, vertical: -4),
@@ -158,7 +162,8 @@ class Home extends StatelessWidget {
       ),
       onTap: () {
         model.navigateToView(
-          item.linkTo,
+          doctype: item.linkTo,
+          context: context,
         );
       },
     );
@@ -167,6 +172,7 @@ class Home extends StatelessWidget {
   List<Widget> _generateChildren({
     @required DesktopPageResponse desktopPage,
     @required HomeViewModel model,
+    @required BuildContext context,
   }) {
     List<Widget> widgets = [];
 
@@ -180,11 +186,14 @@ class Home extends StatelessWidget {
         _heading("Your Shortcuts"),
       );
 
-      widgets.addAll(desktopPage.message.shortcuts.items.map<Widget>(
+      widgets.addAll(desktopPage.message.shortcuts.items.where((item) {
+        return item.type == "DocType";
+      }).map<Widget>(
         (item) {
           return _shortcut(
             item: item,
             model: model,
+            context: context,
           );
         },
       ).toList());
@@ -229,11 +238,14 @@ class Home extends StatelessWidget {
                       _subHeading(
                         item.label,
                       ),
-                      ...item.links.map(
+                      ...item.links.where((item) {
+                        return item.type != "DocType";
+                      }).map(
                         (link) {
                           return _item(
                             item: link,
                             model: model,
+                            context: context,
                           );
                         },
                       ).toList()
