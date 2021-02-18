@@ -12,11 +12,9 @@ import '../../widgets/custom_form.dart';
 import '../../widgets/frappe_button.dart';
 
 class NewDoc extends StatelessWidget {
-  final String doctype;
   final DoctypeResponse meta;
 
   const NewDoc({
-    @required this.doctype,
     @required this.meta,
   });
 

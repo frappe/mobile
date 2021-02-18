@@ -133,20 +133,19 @@ class AwesomeSearch extends SearchDelegate {
         return ListTile(
           title: Text(item["label"]),
           onTap: () async {
+            var meta = await OfflineStorage.getMeta(item["value"]);
             if (item["type"] == "Doctype") {
               locator<NavigationService>().navigateTo(
                 Routes.customListView,
                 arguments: CustomListViewArguments(
-                  doctype: item["value"],
+                  meta: meta,
                 ),
               );
             } else if (item["type"] == "New Doc") {
-              var meta = await OfflineStorage.getMeta(item["value"]);
               locator<NavigationService>().navigateTo(
                 Routes.newDoc,
                 arguments: NewDocArguments(
                   meta: meta,
-                  doctype: item["value"],
                 ),
               );
             } else if (item["type"] == "Module") {

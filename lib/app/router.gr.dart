@@ -121,17 +121,14 @@ class MyRouter extends RouterBase {
     CustomListView: (data) {
       final args = data.getArgs<CustomListViewArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
-        builder: (context) => CustomListView(doctype: args.doctype),
+        builder: (context) => CustomListView(meta: args.meta),
         settings: data,
       );
     },
     NewDoc: (data) {
       final args = data.getArgs<NewDocArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
-        builder: (context) => NewDoc(
-          doctype: args.doctype,
-          meta: args.meta,
-        ),
+        builder: (context) => NewDoc(meta: args.meta),
         settings: data,
       );
     },
@@ -139,7 +136,6 @@ class MyRouter extends RouterBase {
       final args = data.getArgs<FormViewArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
         builder: (context) => FormView(
-          doctype: args.doctype,
           meta: args.meta,
           name: args.name,
           queued: args.queued,
@@ -300,30 +296,24 @@ class MyRouter extends RouterBase {
 
 /// CustomListView arguments holder class
 class CustomListViewArguments {
-  final String doctype;
-  CustomListViewArguments({@required this.doctype});
+  final DoctypeResponse meta;
+  CustomListViewArguments({@required this.meta});
 }
 
 /// NewDoc arguments holder class
 class NewDocArguments {
-  final String doctype;
   final DoctypeResponse meta;
-  NewDocArguments({@required this.doctype, @required this.meta});
+  NewDocArguments({@required this.meta});
 }
 
 /// FormView arguments holder class
 class FormViewArguments {
-  final String doctype;
   final DoctypeResponse meta;
   final String name;
   final bool queued;
   final Map<dynamic, dynamic> queuedData;
   FormViewArguments(
-      {@required this.doctype,
-      @required this.meta,
-      this.name,
-      this.queued = false,
-      this.queuedData});
+      {@required this.meta, this.name, this.queued = false, this.queuedData});
 }
 
 /// NoInternet arguments holder class

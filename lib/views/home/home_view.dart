@@ -9,7 +9,6 @@ import '../../services/navigation_service.dart';
 import '../../config/frappe_palette.dart';
 import '../../config/palette.dart';
 
-import '../../app/router.gr.dart';
 import '../../app/locator.dart';
 
 import '../../utils/enums.dart';
@@ -97,7 +96,10 @@ class Home extends StatelessWidget {
     );
   }
 
-  Widget _shortcut(ShortcutItem item) {
+  Widget _shortcut({
+    @required ShortcutItem item,
+    HomeViewModel model,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(
         left: 10.0,
@@ -107,18 +109,18 @@ class Home extends StatelessWidget {
       child: CardListTile(
         title: Text(item.label),
         onTap: () {
-          locator<NavigationService>().navigateTo(
-            Routes.customListView,
-            arguments: CustomListViewArguments(
-              doctype: item.linkTo,
-            ),
+          model.navigateToView(
+            item.linkTo,
           );
         },
       ),
     );
   }
 
-  Widget _item(CardItemLink item) {
+  Widget _item({
+    @required CardItemLink item,
+    @required HomeViewModel model,
+  }) {
     return ListTile(
       visualDensity: VisualDensity(horizontal: 0, vertical: -4),
       title: Row(
@@ -152,11 +154,8 @@ class Home extends StatelessWidget {
         ],
       ),
       onTap: () {
-        locator<NavigationService>().navigateTo(
-          Routes.customListView,
-          arguments: CustomListViewArguments(
-            doctype: item.linkTo,
-          ),
+        model.navigateToView(
+          item.linkTo,
         );
       },
     );

@@ -43,7 +43,7 @@ Widget buildDecoratedWidget(Widget fieldWidget, bool withLabel,
           Padding(
             padding: Palette.labelPadding,
             child: Text(
-              label,
+              label ?? "",
               style: Palette.secondaryTxtStyle,
             ),
           ),
@@ -423,7 +423,7 @@ handleError(Response error, [bool hideAppBar = false]) {
   } else if (error.statusCode == HttpStatus.serviceUnavailable) {
     return NoInternet(hideAppBar);
   } else {
-    return Text("${error.statusMessage}");
+    return Scaffold(appBar: AppBar(), body: Text("${error.statusMessage}"));
   }
 }
 
@@ -553,6 +553,7 @@ putSharedPrefValue(String key, bool value) async {
 Future<bool> getSharedPrefValue(String key) async {
   var _prefs = await SharedPreferences.getInstance();
   await _prefs.reload();
+  var a = _prefs.getBool(key);
   return _prefs.getBool(key);
 }
 

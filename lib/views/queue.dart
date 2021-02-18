@@ -120,7 +120,6 @@ class _QueueListState extends State<QueueList> {
                     locator<NavigationService>().navigateTo(
                       Routes.formView,
                       arguments: FormViewArguments(
-                        doctype: q['doctype'],
                         queued: true,
                         meta: await OfflineStorage.getMeta(q['doctype']),
                         queuedData: q,

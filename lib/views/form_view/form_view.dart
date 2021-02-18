@@ -28,14 +28,12 @@ import '../../widgets/user_avatar.dart';
 import '../../widgets/like_doc.dart';
 
 class FormView extends StatelessWidget {
-  final String doctype;
   final String name;
   final bool queued;
   final Map queuedData;
   final DoctypeResponse meta;
 
   FormView({
-    @required this.doctype,
     @required this.meta,
     this.name,
     this.queued = false,
@@ -55,7 +53,7 @@ class FormView extends StatelessWidget {
           connectivityStatus: connectionStatus,
           queued: queued,
           queuedData: queuedData,
-          doctype: doctype,
+          doctype: meta.docs[0].name,
           name: name,
         );
       },
@@ -169,7 +167,7 @@ class FormView extends StatelessWidget {
         await model.handleUpdate(
           connectivityStatus: connectionStatus,
           name: name,
-          doctype: doctype,
+          doctype: meta.docs[0].name,
           meta: meta,
           formValue: formValue,
           doc: doc,
@@ -238,7 +236,7 @@ class FormView extends StatelessWidget {
                         meta: meta.docs[0],
                         doc: doc,
                         docInfo: docInfo,
-                        doctype: doctype,
+                        doctype: meta.docs[0].name,
                         name: name,
                         callback: model.refresh,
                       ),
@@ -265,7 +263,8 @@ class FormView extends StatelessWidget {
                 ),
                 Row(
                   children: <Widget>[
-                    Indicator.buildStatusButton(doctype, doc['status']),
+                    Indicator.buildStatusButton(
+                        meta.docs[0].name, doc['status']),
                     VerticalDivider(),
                     if (queued && queuedData["error"] != null)
                       FrappeFlatButton.small(
@@ -292,7 +291,7 @@ class FormView extends StatelessWidget {
                               doc: doc,
                               meta: meta.docs[0],
                               docInfo: docInfo,
-                              doctype: doctype,
+                              doctype: meta.docs[0].name,
                               name: name,
                               callback: model.refresh,
                             ),
@@ -407,7 +406,7 @@ class FormView extends StatelessWidget {
                 locator<NavigationService>().navigateTo(
                   Routes.commentInput,
                   arguments: CommentInputArguments(
-                    doctype: doctype,
+                    doctype: meta.docs[0].name,
                     name: name,
                     authorEmail: Config().user,
                     callback: model.refresh,
@@ -429,7 +428,7 @@ class FormView extends StatelessWidget {
                     subjectField: doc[meta.docs[0].subjectField] ??
                         getTitle(meta.docs[0], doc),
                     senderField: doc[meta.docs[0].senderField],
-                    doctype: doctype,
+                    doctype: meta.docs[0].name,
                     doc: name,
                   ),
                 );

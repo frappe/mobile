@@ -22,7 +22,6 @@ import '../../views/filter_list/filter_list_view.dart';
 
 @lazySingleton
 class ListViewViewModel extends BaseViewModel {
-  DoctypeResponse meta;
   PagewiseLoadController pagewiseLoadController;
   Response error;
   var filters = {};
@@ -33,10 +32,9 @@ class ListViewViewModel extends BaseViewModel {
     pagewiseLoadController.reset();
   }
 
-  getData(String doctype) async {
+  getData(DoctypeDoc meta) async {
     setState(ViewState.busy);
     try {
-      meta = await OfflineStorage.getMeta(doctype);
       var isOnline = await verifyOnline();
 
       if (isOnline) {
@@ -45,14 +43,14 @@ class ListViewViewModel extends BaseViewModel {
           pageFuture: (pageIndex) {
             return locator<Api>().fetchList(
               filters: FilterList.generateFilters(
-                doctype,
+                meta.name,
                 filters,
               ),
-              meta: meta.docs[0],
-              doctype: doctype,
+              meta: meta,
+              doctype: meta.name,
               fieldnames: generateFieldnames(
-                doctype,
-                meta.docs[0],
+                meta.name,
+                meta,
               ),
               pageLength: Constants.pageSize,
               offset: pageIndex * Constants.pageSize,
@@ -63,12 +61,15 @@ class ListViewViewModel extends BaseViewModel {
         pagewiseLoadController = PagewiseLoadController(
           pageSize: Constants.offlinePageSize,
           pageFuture: (pageIndex) {
-            return Future.delayed(Duration(seconds: 1), () {
-              var response = OfflineStorage.getItem(
-                '${doctype}List',
-              );
-              return response["data"];
-            });
+            return Future.delayed(
+              Duration(seconds: 1),
+              () {
+                var response = OfflineStorage.getItem(
+                  '${meta.name}List',
+                );
+                return response["data"];
+              },
+            );
           },
         );
       }
@@ -80,14 +81,13 @@ class ListViewViewModel extends BaseViewModel {
   }
 
   onListTap({
-    @required String doctype,
+    @required DoctypeResponse meta,
     @required String name,
   }) {
     {
       locator<NavigationService>().navigateTo(
         Routes.formView,
         arguments: FormViewArguments(
-          doctype: doctype,
           name: name,
           meta: meta,
         ),

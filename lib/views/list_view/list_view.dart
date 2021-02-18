@@ -27,21 +27,21 @@ import '../../widgets/frappe_button.dart';
 import '../../widgets/list_item.dart';
 
 class CustomListView extends StatelessWidget {
-  final String doctype;
+  final DoctypeResponse meta;
 
   CustomListView({
-    @required this.doctype,
+    @required this.meta,
   });
 
   @override
   Widget build(BuildContext context) {
     return BaseView<ListViewViewModel>(
       onModelReady: (model) {
-        model.getData(doctype);
+        model.getData(meta.docs[0]);
       },
       onModelClose: (model) {
         model.filters = {};
-        model.meta = null;
+
         model.showLiked = false;
         model.error = null;
       },
@@ -56,7 +56,7 @@ class CustomListView extends StatelessWidget {
                 if (model.error != null) {
                   return handleError(model.error);
                 }
-                var meta = model.meta;
+
                 var filters = model.filters;
 
                 return Scaffold(
@@ -66,9 +66,9 @@ class CustomListView extends StatelessWidget {
                     context: context,
                   ),
                   body: HeaderAppBar(
-                    subtitle: doctype,
+                    subtitle: meta.docs[0].name,
                     subActions: <Widget>[
-                      _newDoc(model),
+                      _newDoc(),
                     ],
                     body: RefreshIndicator(
                       onRefresh: () {
@@ -90,7 +90,7 @@ class CustomListView extends StatelessWidget {
     );
   }
 
-  Widget _newDoc(ListViewViewModel model) {
+  Widget _newDoc() {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Container(
@@ -106,7 +106,7 @@ class CustomListView extends StatelessWidget {
           onPressed: () {
             locator<NavigationService>().navigateTo(
               Routes.newDoc,
-              arguments: NewDocArguments(doctype: doctype, meta: model.meta),
+              arguments: NewDocArguments(meta: meta),
             );
           },
         ),
@@ -136,7 +136,7 @@ class CustomListView extends StatelessWidget {
           meta: meta.docs[0],
           onListTap: () {
             model.onListTap(
-              doctype: doctype,
+              meta: meta,
               name: entry["name"],
             );
           },
@@ -166,7 +166,7 @@ class CustomListView extends StatelessWidget {
     var isSeenByUser = seenBy.contains(model.userId);
 
     return ListItem(
-      doctype: doctype,
+      doctype: meta.name,
       onListTap: onListTap,
       isFav: isLikedByUser,
       seen: isSeenByUser,
@@ -214,8 +214,7 @@ class CustomListView extends StatelessWidget {
               locator<NavigationService>().navigateTo(
                 Routes.newDoc,
                 arguments: NewDocArguments(
-                  doctype: doctype,
-                  meta: model.meta,
+                  meta: meta,
                 ),
               );
             },
@@ -245,8 +244,8 @@ class CustomListView extends StatelessWidget {
                     builder: (context) {
                       return FilterList(
                         filters: filters,
-                        doctype: doctype,
-                        meta: model.meta,
+                        doctype: meta.docs[0].name,
+                        meta: meta,
                       );
                     },
                   ),
@@ -279,7 +278,7 @@ class CustomListView extends StatelessWidget {
               minWidth: 120,
               onPressed: () {
                 model.toggleLiked(
-                  doctype,
+                  meta.docs[0].name,
                 );
               },
               title: 'Liked',
