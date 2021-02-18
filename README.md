@@ -1,16 +1,45 @@
-# support_app
 
-A new Flutter project.
+# Frappe Mobile
 
-## Getting Started
+Mobile Version of Frappe built on Flutter.
 
-This project is a starting point for a Flutter application.
+**Please Note, this Project is still in beta stage and requires latest version of frappe framework v13**
 
-A few resources to get you started if this is your first Flutter project:
+<kbd><img width="288" height="576" src="screenshots/login.png" alt="Frappe Books Preview" /></kbd>
+<kbd><img width="288" height="576" src="screenshots/home.png" alt="Frappe Books Preview" /></kbd>
+<kbd><img width="288" height="576" src="screenshots/list_view.png" alt="Frappe Books Preview" /></kbd>
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## Features:
+1) Offline First (Data is automatically fetched in background every 30 mins)
+3) Create/Update Docs (queued when offline and processed automatically when reconnected to internet)
+4) Add/Remove Assignees, Tags
+5) Add/Remove/Download Attachments 
+6) Add Comments, Send Email
+7) Appreciate/Criticize Users involved in specified Doc.
+8) Timeline
+9) Awesombar
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+## Development
+
+0) To run this Project first you need to [Setup Flutter](https://flutter.dev/docs/get-started/install)
+
+1) Install packages<br/>
+```sh
+pub packages get
+```
+2) Run the Project<br/>
+```sh
+flutter run
+```
+
+### Architecture
+
+This Project roughly follows MVVM Architecture where each screen has seperate file and each stateful screen is contained in a folder with 2 files 
+
+1) View file (layout logic) 
+2) View Model File (data processing and state management). 
+
+This Project uses [provider](https://pub.dev/packages/provider) for State Management. 
+[hive](https://pub.dev/packages/hive), [shared_preferences](https://pub.dev/packages/shared_preferences) for storage. 
+[dio](https://pub.dev/packages/dio) for making network requests.
