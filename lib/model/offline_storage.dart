@@ -244,21 +244,25 @@ class OfflineStorage {
   }
 
   static Future<DoctypeResponse> getMeta(String doctype) async {
-    var isOnline = await verifyOnline();
+    try {
+      var isOnline = await verifyOnline();
 
-    DoctypeResponse metaResponse;
+      DoctypeResponse metaResponse;
 
-    if (isOnline) {
-      metaResponse = await locator<Api>().getDoctype(doctype);
-    } else {
-      var cachedMeta = getItem('${doctype}Meta');
-      if (cachedMeta["data"] != null) {
-        metaResponse = DoctypeResponse.fromJson(
-            Map<String, dynamic>.from(cachedMeta["data"]));
+      if (isOnline) {
+        metaResponse = await locator<Api>().getDoctype(doctype);
       } else {
-        throw Response(statusCode: HttpStatus.serviceUnavailable);
+        var cachedMeta = getItem('${doctype}Meta');
+        if (cachedMeta["data"] != null) {
+          metaResponse = DoctypeResponse.fromJson(
+              Map<String, dynamic>.from(cachedMeta["data"]));
+        } else {
+          throw Response(statusCode: HttpStatus.serviceUnavailable);
+        }
       }
+      return metaResponse;
+    } catch (e) {
+      throw e;
     }
-    return metaResponse;
   }
 }

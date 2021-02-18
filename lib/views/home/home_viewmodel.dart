@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:frappe_app/app/router.gr.dart';
 import 'package:frappe_app/services/navigation_service.dart';
+import 'package:frappe_app/utils/frappe_alert.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../app/locator.dart';
@@ -98,22 +101,33 @@ class HomeViewModel extends BaseViewModel {
     setState(ViewState.idle);
   }
 
-  navigateToView(String doctype) async {
-    var meta = await OfflineStorage.getMeta(doctype);
-    if (meta.docs[0].issingle == 1) {
-      locator<NavigationService>().navigateTo(
-        Routes.formView,
-        arguments: FormViewArguments(
-          meta: meta,
-          name: meta.docs[0].name,
-        ),
-      );
-    } else {
-      locator<NavigationService>().navigateTo(
-        Routes.customListView,
-        arguments: CustomListViewArguments(
-          meta: meta,
-        ),
+  navigateToView({
+    @required String doctype,
+    @required BuildContext context,
+  }) async {
+    try {
+      var meta = await OfflineStorage.getMeta(doctype);
+
+      if (meta.docs[0].issingle == 1) {
+        locator<NavigationService>().navigateTo(
+          Routes.formView,
+          arguments: FormViewArguments(
+            meta: meta,
+            name: meta.docs[0].name,
+          ),
+        );
+      } else {
+        locator<NavigationService>().navigateTo(
+          Routes.customListView,
+          arguments: CustomListViewArguments(
+            meta: meta,
+          ),
+        );
+      }
+    } catch (e) {
+      FrappeAlert.errorAlert(
+        context: context,
+        title: "Something went wrong",
       );
     }
   }
