@@ -63,9 +63,13 @@ class ListItem extends StatelessWidget {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  Text(
-                    name,
-                    style: Palette.secondaryTxtStyle,
+                  Flexible(
+                    child: Text(
+                      name,
+                      maxLines: 1,
+                      style: Palette.secondaryTxtStyle,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 6.0, right: 6.0),
@@ -75,7 +79,12 @@ class ListItem extends StatelessWidget {
                       color: Palette.secondaryTxtColor,
                     ),
                   ),
-                  Text(modifiedOn, style: Palette.secondaryTxtStyle),
+                  Flexible(
+                    child: Text(
+                      modifiedOn,
+                      style: Palette.secondaryTxtStyle,
+                    ),
+                  ),
                 ],
               ),
               SizedBox(

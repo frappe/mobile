@@ -58,7 +58,10 @@ class Home extends StatelessWidget {
                       }
                       return ListView(
                         padding: EdgeInsets.zero,
-                        children: _generateChildren(model.desktopPage),
+                        children: _generateChildren(
+                          desktopPage: model.desktopPage,
+                          model: model,
+                        ),
                       );
                     },
                   ),
@@ -161,7 +164,10 @@ class Home extends StatelessWidget {
     );
   }
 
-  List<Widget> _generateChildren(DesktopPageResponse desktopPage) {
+  List<Widget> _generateChildren({
+    @required DesktopPageResponse desktopPage,
+    @required HomeViewModel model,
+  }) {
     List<Widget> widgets = [];
 
     if (desktopPage.message.shortcuts.items.isNotEmpty) {
@@ -177,7 +183,8 @@ class Home extends StatelessWidget {
       widgets.addAll(desktopPage.message.shortcuts.items.map<Widget>(
         (item) {
           return _shortcut(
-            item,
+            item: item,
+            model: model,
           );
         },
       ).toList());
@@ -225,7 +232,8 @@ class Home extends StatelessWidget {
                       ...item.links.map(
                         (link) {
                           return _item(
-                            link,
+                            item: link,
+                            model: model,
                           );
                         },
                       ).toList()
