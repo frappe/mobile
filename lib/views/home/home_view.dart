@@ -97,7 +97,7 @@ class Home extends StatelessWidget {
     );
   }
 
-  Widget _shortcut(String label) {
+  Widget _shortcut(ShortcutItem item) {
     return Padding(
       padding: const EdgeInsets.only(
         left: 10.0,
@@ -105,12 +105,12 @@ class Home extends StatelessWidget {
         top: 8.0,
       ),
       child: CardListTile(
-        title: Text(label),
+        title: Text(item.label),
         onTap: () {
           locator<NavigationService>().navigateTo(
             Routes.customListView,
             arguments: CustomListViewArguments(
-              doctype: label,
+              doctype: item.linkTo,
             ),
           );
         },
@@ -118,7 +118,7 @@ class Home extends StatelessWidget {
     );
   }
 
-  Widget _item(String label) {
+  Widget _item(CardItemLink item) {
     return ListTile(
       visualDensity: VisualDensity(horizontal: 0, vertical: -4),
       title: Row(
@@ -146,7 +146,7 @@ class Home extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              label,
+              item.label,
             ),
           ),
         ],
@@ -155,7 +155,7 @@ class Home extends StatelessWidget {
         locator<NavigationService>().navigateTo(
           Routes.customListView,
           arguments: CustomListViewArguments(
-            doctype: label,
+            doctype: item.linkTo,
           ),
         );
       },
@@ -178,7 +178,7 @@ class Home extends StatelessWidget {
       widgets.addAll(desktopPage.message.shortcuts.items.map<Widget>(
         (item) {
           return _shortcut(
-            item.label,
+            item,
           );
         },
       ).toList());
@@ -226,7 +226,7 @@ class Home extends StatelessWidget {
                       ...item.links.map(
                         (link) {
                           return _item(
-                            link.label,
+                            link,
                           );
                         },
                       ).toList()

@@ -384,7 +384,7 @@ class CardItemLink {
   dynamic isQueryReport;
   dynamic incompleteDependencies;
   String icon;
-  String link;
+  String linkTo;
 
   CardItemLink(
       {this.description,
@@ -398,7 +398,7 @@ class CardItemLink {
       this.isQueryReport,
       this.incompleteDependencies,
       this.icon,
-      this.link});
+      this.linkTo});
 
   CardItemLink.fromJson(Map<dynamic, dynamic> json) {
     description = json['description'];
@@ -412,7 +412,7 @@ class CardItemLink {
     isQueryReport = json['is_query_report'];
     incompleteDependencies = json['incomplete_dependencies'];
     icon = json['icon'];
-    link = json['link'];
+    linkTo = json['link_to'];
   }
 
   Map<String, dynamic> toJson() {
@@ -428,7 +428,7 @@ class CardItemLink {
     data['is_query_report'] = this.isQueryReport;
     data['incomplete_dependencies'] = this.incompleteDependencies;
     data['icon'] = this.icon;
-    data['link'] = this.link;
+    data['link_to'] = this.linkTo;
     return data;
   }
 }
