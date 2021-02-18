@@ -18,7 +18,7 @@ class HomeViewModel extends BaseViewModel {
   String currentModule;
   List<DeskMessage> modules = [];
   DesktopPageResponse desktopPage;
-  Response error;
+  var error;
 
   refresh(ConnectivityStatus connectivityStatus) async {
     getData();
@@ -82,13 +82,17 @@ class HomeViewModel extends BaseViewModel {
 
   getData() async {
     setState(ViewState.busy);
-    await getDeskSidebarItems();
+    try {
+      await getDeskSidebarItems();
 
-    currentModule = modules[0].label;
+      currentModule = modules[0].label;
 
-    await getDesktopPage(
-      currentModule,
-    );
+      await getDesktopPage(
+        currentModule,
+      );
+    } catch (e) {
+      error = e;
+    }
     setState(ViewState.idle);
   }
 }

@@ -29,6 +29,9 @@ class Home extends StatelessWidget {
       onModelReady: (model) {
         model.getData();
       },
+      onModelClose: (model) {
+        model.error = null;
+      },
       builder: (context, model, child) => Scaffold(
         backgroundColor: Palette.bgColor,
         drawer: _buildDrawer(
