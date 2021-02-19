@@ -1,7 +1,7 @@
 
 # Frappe Mobile
 
-**Please Note, this Project is still in beta stage and requires latest version of Frappe Framework v13**
+**Please Note, this Project is still in beta stage and requires latest version(develop) of Frappe Framework v13**
 
 <kbd><img width="216" height="432" src="screenshots/login.png" alt="Frappe Books Preview" /></kbd>
 <kbd><img width="216" height="432" src="screenshots/home.png" alt="Frappe Books Preview" /></kbd>
