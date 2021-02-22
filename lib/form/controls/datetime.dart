@@ -44,7 +44,10 @@ class DatetimeField extends StatelessWidget with Control, ControlInput {
       initialTime: null,
       initialValue: doc != null ? parseDate(doc[doctypeField.fieldname]) : null,
       name: doctypeField.fieldname,
-      decoration: Palette.formFieldDecoration(withLabel, doctypeField.label),
+      decoration: Palette.formFieldDecoration(
+        withLabel: withLabel,
+        label: doctypeField.label,
+      ),
       validator: FormBuilderValidators.compose(validators),
     );
   }

@@ -32,6 +32,7 @@ import '../utils/enums.dart';
 import '../widgets/section.dart';
 import '../widgets/custom_expansion_tile.dart';
 
+// TODO
 Widget buildDecoratedWidget(Widget fieldWidget, bool withLabel,
     [String label = ""]) {
   if (withLabel) {
@@ -553,7 +554,6 @@ putSharedPrefValue(String key, bool value) async {
 Future<bool> getSharedPrefValue(String key) async {
   var _prefs = await SharedPreferences.getInstance();
   await _prefs.reload();
-  var a = _prefs.getBool(key);
   return _prefs.getBool(key);
 }
 

@@ -60,8 +60,8 @@ class Login extends StatelessWidget {
                                 FormBuilderValidators.url(context),
                               ]),
                               decoration: Palette.formFieldDecoration(
-                                true,
-                                "Server URL",
+                                withLabel: true,
+                                label: "Server URL",
                               ),
                             ),
                             true,
@@ -75,8 +75,8 @@ class Login extends StatelessWidget {
                                   FormBuilderValidators.required(context),
                                 ]),
                                 decoration: Palette.formFieldDecoration(
-                                  true,
-                                  "Email Address",
+                                  withLabel: true,
+                                  label: "Email Address",
                                 ),
                               ),
                               true,
@@ -196,17 +196,21 @@ class _PasswordFieldState extends State<PasswordField> {
           ]),
           obscureText: _hidePassword,
           decoration: Palette.formFieldDecoration(
-            true,
-            "Password",
-            FlatButton(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                child: Text(_hidePassword ? "Show" : "Hide"),
-                onPressed: () {
-                  setState(() {
+            withLabel: true,
+            label: "Password",
+            suffixIcon: FlatButton(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              child: Text(_hidePassword ? "Show" : "Hide"),
+              onPressed: () {
+                setState(
+                  () {
+                    // TODO
                     _hidePassword = !_hidePassword;
-                  });
-                }),
+                  },
+                );
+              },
+            ),
           ),
         ),
         true,

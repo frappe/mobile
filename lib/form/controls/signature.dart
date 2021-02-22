@@ -37,8 +37,8 @@ class Signature extends StatelessWidget with Control, ControlInput {
           : null,
       key: key,
       decoration: Palette.formFieldDecoration(
-        withLabel,
-        doctypeField.label,
+        withLabel: withLabel,
+        label: doctypeField.label,
       ),
       name: doctypeField.name,
       validator: FormBuilderValidators.compose(validators),

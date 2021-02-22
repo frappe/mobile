@@ -54,10 +54,10 @@ class Check extends StatelessWidget with Control, ControlInput {
       attribute: doctypeField.fieldname,
       label: Text(doctypeField.label),
       decoration: Palette.formFieldDecoration(
-        withLabel,
-        doctypeField.label,
-        null,
-        false,
+        withLabel: withLabel,
+        label: doctypeField.label,
+        filled: false,
+        field: "check",
       ),
       validators: validators,
     );

@@ -51,8 +51,8 @@ class Select extends StatelessWidget with Control, ControlInput {
       name: doctypeField.fieldname,
       hint: !withLabel ? Text(doctypeField.label) : null,
       decoration: Palette.formFieldDecoration(
-        withLabel,
-        doctypeField.label,
+        withLabel: withLabel,
+        label: doctypeField.label,
       ),
       validator: FormBuilderValidators.compose(validators),
       items: opts.toSet().toList().map<DropdownMenuItem>((option) {

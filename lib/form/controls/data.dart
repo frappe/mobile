@@ -36,7 +36,10 @@ class Data extends StatelessWidget with Control, ControlInput {
       key: key,
       initialValue: doc != null ? doc[doctypeField.fieldname] : null,
       name: doctypeField.fieldname,
-      decoration: Palette.formFieldDecoration(withLabel, doctypeField.label),
+      decoration: Palette.formFieldDecoration(
+        withLabel: withLabel,
+        label: doctypeField.label,
+      ),
       validator: FormBuilderValidators.compose(validators),
     );
   }

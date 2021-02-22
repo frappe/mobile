@@ -49,8 +49,8 @@ class Time extends StatelessWidget with Control, ControlInput {
       keyboardType: TextInputType.number,
       name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(
-        withLabel,
-        doctypeField.label,
+        withLabel: withLabel,
+        label: doctypeField.label,
       ),
       validator: FormBuilderValidators.compose(validators),
     );

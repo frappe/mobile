@@ -38,8 +38,8 @@ class TextEditor extends StatelessWidget with Control, ControlInput {
       initialValue: doc != null ? doc[doctypeField.fieldname] : null,
       name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(
-        withLabel,
-        doctypeField.label,
+        withLabel: withLabel,
+        label: doctypeField.label,
       ),
       validator: FormBuilderValidators.compose(validators),
     );

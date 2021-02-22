@@ -40,10 +40,21 @@ class Palette {
     color: Palette.secondaryTxtColor,
   );
 
-  static InputDecoration formFieldDecoration(bool withLabel, String label,
-      [Widget suffixIcon, bool filled = true]) {
+  // TODO
+  static InputDecoration formFieldDecoration({
+    @required bool withLabel,
+    @required String label,
+    Widget suffixIcon,
+    bool filled = true,
+    String field,
+  }) {
     return InputDecoration(
       suffixIcon: suffixIcon,
+      contentPadding: field == "check"
+          ? EdgeInsets.zero
+          : EdgeInsets.symmetric(
+              horizontal: 10,
+            ),
       border: OutlineInputBorder(
         borderSide: BorderSide.none,
         borderRadius: const BorderRadius.all(

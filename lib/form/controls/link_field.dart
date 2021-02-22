@@ -81,6 +81,9 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
           validator: FormBuilderValidators.compose(validators),
           decoration: InputDecoration(
             filled: true,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 10,
+            ),
             border: OutlineInputBorder(
               borderSide: BorderSide.none,
               borderRadius: const BorderRadius.all(
