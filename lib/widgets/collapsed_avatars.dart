@@ -18,8 +18,9 @@ class CollapsedAvatars extends StatelessWidget {
           (item) {
             return CircleAvatar(
               backgroundColor: FrappePalette.grey[50],
-              radius: 22,
+              radius: 20,
               child: UserAvatar(
+                size: 18,
                 uid: item["owner"],
               ),
             );
@@ -28,9 +29,17 @@ class CollapsedAvatars extends StatelessWidget {
         builder: (context, remaining) {
           return CircleAvatar(
             backgroundColor: FrappePalette.grey[50],
-            radius: 22,
-            child: UserAvatar(
-              uid: '+$remaining',
+            radius: 20,
+            child: CircleAvatar(
+              radius: 18,
+              backgroundColor: FrappePalette.orange[100],
+              child: Text(
+                '+$remaining',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: FrappePalette.orange[600],
+                ),
+              ),
             ),
           );
         },
