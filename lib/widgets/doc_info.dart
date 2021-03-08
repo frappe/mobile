@@ -3,14 +3,23 @@ import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
-import 'package:frappe_app/views/form_view/bottom_sheets/add_assignees/add_assignees_bottom_sheet.dart';
+import 'package:frappe_app/views/form_view/bottom_sheets/assignees/assignees_bottom_sheet.dart';
+import 'package:frappe_app/views/form_view/bottom_sheets/attachments/attachments_bottom_sheet.dart';
 
 import 'collapsed_avatars.dart';
 
 class DocInfo extends StatelessWidget {
-  final Map docInfoData;
+  final Map docInfo;
+  final String doctype;
+  final String name;
+  final Function refreshCallback;
 
-  const DocInfo(this.docInfoData);
+  const DocInfo({
+    @required this.docInfo,
+    @required this.refreshCallback,
+    @required this.doctype,
+    @required this.name,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,22 +37,47 @@ class DocInfo extends StatelessWidget {
             actionTitle: 'Add assignee',
             actionIcon: FrappeIcons.add_user,
             docInfoItemType: DocInfoItemType.assignees,
-            data: docInfoData["assignments"],
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                builder: (context) => AddAssigneesBottomSheet(),
-              );
+            data: docInfo["assignments"],
+            onTap: () async {
+              bool refresh = await showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) => AssigneesBottomSheet(
+                      assignees: docInfo["assignments"],
+                      doctype: doctype,
+                      name: name,
+                    ),
+                  ) ??
+                  false;
+
+              if (refresh) {
+                refreshCallback();
+              }
             },
           ),
-          // DocInfoItem(
-          //   title: 'Attachments',
-          //   actionTitle: 'Attach file',
-          //   docInfoItemType: DocInfoItemType.attachments,
-          //   actionIcon: FrappeIcons.attachment,
-          //   onTap: () {},
-          // ),
+          DocInfoItem(
+            title: 'Attachments',
+            actionTitle: 'Attach file',
+            docInfoItemType: DocInfoItemType.attachments,
+            actionIcon: FrappeIcons.attachment,
+            data: docInfo["attachments"],
+            onTap: () async {
+              bool refresh = await showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) => AttachmentsBottomSheet(
+                      attachments: docInfo["attachments"],
+                      doctype: doctype,
+                      name: name,
+                    ),
+                  ) ??
+                  false;
+
+              if (refresh) {
+                refreshCallback();
+              }
+            },
+          ),
           // DocInfoItem(
           //   title: 'Reviews',
           //   actionTitle: 'Add review',
@@ -97,6 +131,15 @@ class DocInfoItem extends StatelessWidget {
     var filledWidget;
     if (docInfoItemType == DocInfoItemType.assignees) {
       filledWidget = CollapsedAvatars(data);
+    } else if (docInfoItemType == DocInfoItemType.attachments) {
+      filledWidget = Text(
+        '${data.length} Attachments',
+        style: TextStyle(
+          fontSize: 13,
+          color: FrappePalette.grey[600],
+          fontWeight: FontWeight.w400,
+        ),
+      );
     }
     return FlatButton(
       onPressed: onTap,
