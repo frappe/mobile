@@ -393,18 +393,43 @@ class DioApi implements Api {
       're_assign': false
     };
 
-    var response = await DioHelper.dio.post(
-      '/method/frappe.desk.form.assign_to.add',
-      data: data,
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
-    );
+    try {
+      var response = await DioHelper.dio.post(
+        '/method/frappe.desk.form.assign_to.add',
+        data: data,
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+        ),
+      );
 
-    if (response.statusCode == 200) {
-      return;
-    } else {
-      throw Exception('Something went wrong');
+      if (response.statusCode == 200) {
+        return;
+      } else {
+        throw Exception('Something went wrong');
+      }
+    } catch (e) {
+      if (e is DioError) {
+        var error;
+        if (e.response != null) {
+          error = e.response;
+        } else {
+          error = e.error;
+        }
+
+        if (error is SocketException) {
+          throw Response(
+            statusCode: HttpStatus.serviceUnavailable,
+            statusMessage: error.message,
+          );
+        } else {
+          throw Response(
+            statusCode: error.statusCode,
+            statusMessage: error.statusMessage,
+          );
+        }
+      } else {
+        throw e;
+      }
     }
   }
 
