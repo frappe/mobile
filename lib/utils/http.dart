@@ -12,7 +12,7 @@ initApiConfig() async {
 }
 
 Future<void> cacheAllUsers() async {
-  var allUsers = await OfflineStorage.getItem('allUsers');
+  var allUsers = OfflineStorage.getItem('allUsers');
   allUsers = allUsers["data"];
   if (allUsers != null) {
     return;

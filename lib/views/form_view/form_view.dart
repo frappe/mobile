@@ -156,7 +156,20 @@ class FormView extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            DocInfo(docInfo),
+                            DocInfo(
+                              name: name,
+                              doctype: meta.docs[0].name,
+                              docInfo: docInfo,
+                              refreshCallback: () {
+                                model.getData(
+                                  connectivityStatus: connectionStatus,
+                                  queued: queued,
+                                  queuedData: queuedData,
+                                  doctype: meta.docs[0].name,
+                                  name: name,
+                                );
+                              },
+                            ),
                             CustomForm(
                               fields: meta.docs[0].fields,
                               formKey: _fbKey,

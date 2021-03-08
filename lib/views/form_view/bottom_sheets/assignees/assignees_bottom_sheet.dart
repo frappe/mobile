@@ -5,25 +5,47 @@ import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/form/controls/link_field.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/model/offline_storage.dart';
+import 'package:frappe_app/utils/frappe_alert.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/views/base_view.dart';
 
-import 'package:frappe_app/views/form_view/bottom_sheets/add_assignees/add_assignees_bottom_sheet_viewmodel.dart';
+import 'package:frappe_app/views/form_view/bottom_sheets/assignees/assignees_bottom_sheet_viewmodel.dart';
 import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
 import 'package:frappe_app/widgets/user_avatar.dart';
 
-class AddAssigneesBottomSheet extends StatelessWidget {
+class AssigneesBottomSheet extends StatelessWidget {
+  final String doctype;
+  final String name;
+  final List assignees;
+
+  const AssigneesBottomSheet({
+    Key key,
+    @required this.doctype,
+    @required this.name,
+    @required this.assignees,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return BaseView<AddAssigneesBottomSheetViewModel>(
+    return BaseView<AssigneesBottomSheetViewModel>(
       onModelClose: (model) {
         model.selectedUsers = [];
+      },
+      onModelReady: (model) {
+        model.assignedUsers = assignees.map<String>((assignee) {
+          return assignee["owner"];
+        }).toList();
       },
       builder: (context, model, child) => FractionallySizedBox(
         heightFactor: 0.5,
         child: FrappeBottomSheet(
           title: 'Assignees',
-          onActionButtonPress: () {},
+          onActionButtonPress: () {
+            model.addAssignees(
+              doctype: doctype,
+              name: name,
+            );
+          },
           trailing: Row(
             children: [
               FrappeIcon(
@@ -77,19 +99,10 @@ class AddAssigneesBottomSheet extends StatelessWidget {
               Expanded(
                 child: ListView(
                   shrinkWrap: true,
-                  children: model.selectedUsers.asMap().entries.map<Widget>(
-                    (entry) {
-                      var user = entry.value;
-                      var index = entry.key;
-
-                      return UserTile(
-                        userId: user,
-                        onRemove: () {
-                          model.removeUser(index);
-                        },
-                      );
-                    },
-                  ).toList(),
+                  children: _generateChildren(
+                    model: model,
+                    context: context,
+                  ),
                 ),
               )
             ],
@@ -97,6 +110,51 @@ class AddAssigneesBottomSheet extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  List<Widget> _generateChildren({
+    @required AssigneesBottomSheetViewModel model,
+    BuildContext context,
+  }) {
+    var users = <Widget>[];
+
+    users.addAll(model.selectedUsers.asMap().entries.map<Widget>(
+      (entry) {
+        var user = entry.value;
+        var index = entry.key;
+
+        return UserTile(
+          userId: user,
+          onRemove: () {
+            model.removeUser(index);
+          },
+        );
+      },
+    ).toList());
+
+    users.addAll(model.assignedUsers.map<Widget>((user) {
+      return UserTile(
+        userId: user,
+        onRemove: () async {
+          try {
+            await model.removeAssignedUser(
+              doctype: doctype,
+              name: name,
+              user: user,
+            );
+
+            FrappeAlert.infoAlert(
+              context: context,
+              title: "$user has been removed",
+            );
+          } catch (e) {
+            print(e);
+          }
+        },
+      );
+    }).toList());
+
+    return users;
   }
 }
 
