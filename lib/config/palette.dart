@@ -9,6 +9,7 @@ class Palette {
   static Color primaryButtonColor = FrappePalette.blue;
   static Color secondaryButtonColor = FrappePalette.grey[200];
   static Color disabledButonColor = FrappePalette.grey;
+  static const Color iconColor2 = Color(0xFF1F272E);
 
   static Color dangerTxtColor = FrappePalette.red[600];
   static Color dangerBgColor = FrappePalette.red[100];

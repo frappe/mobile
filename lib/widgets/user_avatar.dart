@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
 
 import '../config/palette.dart';
 
@@ -24,26 +26,42 @@ class UserAvatar extends StatelessWidget {
     ImageProvider imageProvider,
     double size,
   }) {
-    return CircleAvatar(
-      radius: size,
-      backgroundColor: Palette.bgColor,
-      backgroundImage: imageProvider,
-      child: txt != null
-          ? Center(
-              child: Text(
-                txt,
-                style: TextStyle(fontSize: 12),
-              ),
-            )
-          : null,
-    );
+    if (imageProvider == null) {
+      var random = Random();
+      var colorIdx = random.nextInt(FrappePalette.colors.length);
+      var backgroundColor = FrappePalette.colors[colorIdx][100];
+      var textColor = FrappePalette.colors[colorIdx][600];
+      return CircleAvatar(
+        radius: size,
+        backgroundColor: backgroundColor,
+        backgroundImage: imageProvider,
+        child: txt != null
+            ? Center(
+                child: Text(
+                  txt,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: textColor,
+                  ),
+                ),
+              )
+            : null,
+      );
+    } else {
+      return CircleAvatar(
+        radius: size,
+        backgroundImage: imageProvider,
+      );
+    }
   }
 
-  Future<Widget> getAvatar(String uid) async {
+  Widget getAvatar(
+    String uid,
+  ) {
     if (uid == null) {
       return Container();
     }
-    var allUsers = await OfflineStorage.getItem('allUsers');
+    var allUsers = OfflineStorage.getItem('allUsers');
     allUsers = allUsers["data"];
     if (allUsers != null) {
       var user = allUsers[uid];
@@ -93,17 +111,6 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: getAvatar(uid),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return snapshot.data;
-        } else if (snapshot.hasError) {
-          return Text(snapshot.error);
-        } else {
-          return Container();
-        }
-      },
-    );
+    return getAvatar(uid);
   }
 }

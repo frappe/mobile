@@ -4,6 +4,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
 
 const Duration _kExpand = Duration(milliseconds: 200);
 
@@ -225,25 +229,47 @@ class _CustomExpansionTileState extends State<CustomExpansionTile>
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           ListTileTheme.merge(
-            iconColor: _iconColor.value,
-            textColor: _headerColor.value,
-            child: ListTile(
-              onTap: _handleTap,
-              contentPadding: widget.tilePadding,
-              leading: widget.leadingArrow
-                  ? RotationTransition(
-                      turns: _iconTurns,
-                      child: const Icon(Icons.expand_more),
+            iconColor: FrappePalette.grey[900],
+            textColor: FrappePalette.grey[900],
+            child: Container(
+              decoration: !_isExpanded
+                  ? BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Color.fromRGBO(17, 43, 66, 0.1),
+                        ),
+                      ),
                     )
-                  : widget.leading,
-              title: widget.title,
-              subtitle: widget.subtitle,
-              trailing: widget.leadingArrow
-                  ? widget.trailing
-                  : RotationTransition(
-                      turns: _iconTurns,
-                      child: const Icon(Icons.expand_more),
+                  : null,
+              child: ListTile(
+                onTap: _handleTap,
+                contentPadding: widget.tilePadding,
+                leading: widget.leadingArrow
+                    ? RotationTransition(
+                        turns: _iconTurns,
+                        child: const Icon(Icons.expand_more),
+                      )
+                    : widget.leading,
+                title: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    widget.title,
+                    SizedBox(
+                      width: 5,
                     ),
+                    widget.leadingArrow
+                        ? widget.trailing
+                        : RotationTransition(
+                            turns: _iconTurns,
+                            child: FrappeIcon(
+                              FrappeIcons.down_arrow,
+                              size: 16,
+                            ),
+                          ),
+                  ],
+                ),
+                subtitle: widget.subtitle,
+              ),
             ),
           ),
           ClipRect(

@@ -58,7 +58,7 @@ class CustomForm extends StatelessWidget {
       key: formKey,
       child: Container(
         color: Colors.white,
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.symmetric(horizontal: 20),
         child: SingleChildScrollView(
           child: Column(
             children: _generateChildren(

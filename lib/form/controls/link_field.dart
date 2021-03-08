@@ -22,12 +22,12 @@ class LinkField extends StatefulWidget {
   final bool showInputBorder;
   final bool allowClear;
   final Function onSuggestionSelected;
-  final Icon prefixIcon;
+  final Widget prefixIcon;
   final Color fillColor;
   final ItemBuilder itemBuilder;
   final SuggestionsCallback suggestionsCallback;
-
-  final List<String Function(dynamic)> validators;
+  final AxisDirection direction;
+  final bool clearTextOnSelection;
 
   LinkField({
     this.key,
@@ -38,10 +38,11 @@ class LinkField extends StatefulWidget {
     this.prefixIcon,
     this.allowClear = true,
     this.onSuggestionSelected,
-    this.validators,
     this.showInputBorder = false,
     this.itemBuilder,
     this.suggestionsCallback,
+    this.clearTextOnSelection = false,
+    this.direction = AxisDirection.down,
   });
 
   @override
@@ -49,10 +50,19 @@ class LinkField extends StatefulWidget {
 }
 
 class _LinkFieldState extends State<LinkField> with Control, ControlInput {
+  final TextEditingController _textEditingController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _textEditingController.text =
+        widget.doc != null ? widget.doc[widget.doctypeField.fieldname] : null;
+  }
+
   @override
   Widget build(BuildContext context) {
     List<String Function(dynamic)> validators = [];
-
     var f = setMandatory(widget.doctypeField);
 
     if (f != null) {
@@ -69,14 +79,18 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
       child: Theme(
         data: Theme.of(context).copyWith(primaryColor: Colors.black),
         child: FormBuilderTypeAhead(
+          controller: _textEditingController,
           key: widget.key,
+          direction: widget.direction,
           onSuggestionSelected: (item) {
-            if (widget.onSuggestionSelected != null) {
-              widget.onSuggestionSelected(item);
+            if (widget.clearTextOnSelection) {
+              setState(() {
+                _textEditingController.text = '';
+              });
             }
-          },
-          onChanged: (_) {
-            setState(() {});
+            if (widget.onSuggestionSelected != null) {
+              widget.onSuggestionSelected(item["value"]);
+            }
           },
           validator: FormBuilderValidators.compose(validators),
           decoration: InputDecoration(
@@ -111,9 +125,6 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
                   ),
                 );
               },
-          initialValue: widget.doc != null
-              ? widget.doc[widget.doctypeField.fieldname]
-              : null,
           suggestionsCallback: widget.suggestionsCallback ??
               (query) async {
                 var lowercaseQuery = query.toLowerCase();

@@ -1,3 +1,11 @@
+enum DocInfoItemType {
+  assignees,
+  attachments,
+  reviews,
+  tags,
+  shared,
+}
+
 enum EventType {
   comment,
   email,

@@ -7,6 +7,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 
+import '../views/form_view/bottom_sheets/add_assignees/add_assignees_bottom_sheet_viewmodel.dart';
 import '../views/add_assignees/add_assignees_viewmodel.dart';
 import '../views/add_review/add_review_viewmodel.dart';
 import '../views/add_tags/add_tags_viewmodel.dart';
@@ -30,6 +31,8 @@ GetIt $initGetIt(
   EnvironmentFilter environmentFilter,
 }) {
   final gh = GetItHelper(get, environment, environmentFilter);
+  gh.lazySingleton<AddAssigneesBottomSheetViewModel>(
+      () => AddAssigneesBottomSheetViewModel());
   gh.lazySingleton<AddAssigneesViewModel>(() => AddAssigneesViewModel());
   gh.lazySingleton<AddReviewViewModel>(() => AddReviewViewModel());
   gh.lazySingleton<AddTagsViewModel>(() => AddTagsViewModel());

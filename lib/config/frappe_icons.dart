@@ -22,4 +22,7 @@ class FrappeIcons {
   static const question = '$_basePath/question.svg';
   static const error = '$_basePath/error.svg';
   static const frappe = '$_basePath/frappe_ico.svg';
+  static const add_user = '$_basePath/add_user.svg';
+  static const down_arrow = '$_basePath/down_arrow.svg';
+  static const close_alt = '$_basePath/close_alt.svg';
 }

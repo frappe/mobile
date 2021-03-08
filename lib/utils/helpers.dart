@@ -137,6 +137,14 @@ List<Widget> generateLayout({
   bool withLabel = true,
   Function onChanged,
 }) {
+  if (viewType == ViewType.form) {
+    fields.insert(
+        0,
+        DoctypeField(
+          fieldtype: "Section Break",
+          label: "Form",
+        ));
+  }
   List<Widget> collapsibles = [];
   List<Widget> sections = [];
   List<Widget> widgets = [];
@@ -144,8 +152,8 @@ List<Widget> generateLayout({
   List<String> collapsibleLabels = [];
   List<String> sectionLabels = [];
 
-  bool isCollapsible = false;
-  bool isSection = false;
+  var isCollapsible = false;
+  var isSection = false;
 
   int cIdx = 0;
   int sIdx = 0;
@@ -185,8 +193,11 @@ List<Widget> generateLayout({
                       maintainState: true,
                       initiallyExpanded: true,
                       title: Text(
-                        sectionLabels[sIdx].toUpperCase(),
-                        style: Palette.secondaryTxtStyle,
+                        sectionLabels[sIdx],
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
                       ),
                       children: [...sections],
                     ),
@@ -216,8 +227,11 @@ List<Widget> generateLayout({
               child: CustomExpansionTile(
                 maintainState: true,
                 title: Text(
-                  collapsibleLabels[cIdx].toUpperCase(),
-                  style: Palette.secondaryTxtStyle,
+                  collapsibleLabels[cIdx],
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
                 ),
                 children: [...collapsibles],
               ),
@@ -235,7 +249,7 @@ List<Widget> generateLayout({
       } else {
         isCollapsible = false;
         isSection = true;
-        sectionLabels.add(field.label != null ? field.label.toUpperCase() : '');
+        sectionLabels.add(field.label != null ? field.label : '');
       }
     } else if (isCollapsible) {
       if (viewType == ViewType.form) {
