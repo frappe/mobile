@@ -162,7 +162,7 @@ class Home extends StatelessWidget {
       ),
       onTap: () {
         model.navigateToView(
-          doctype: item.linkTo,
+          doctype: item.linkTo ?? item.name,
           context: context,
         );
       },
