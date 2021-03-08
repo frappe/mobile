@@ -70,7 +70,16 @@ class DioApi implements Api {
           await OfflineStorage.putItem('deskSidebarItems', response.data);
         }
 
-        return DeskSidebarItemsResponse.fromJson(response.data);
+        try {
+          return DeskSidebarItemsResponse.fromJson(response.data);
+        } catch (e) {
+          response.data["message"] = [
+            ...response.data["message"]["Modules"],
+            ...response.data["message"]["Administration"],
+            ...response.data["message"]["Domains"],
+          ];
+          return DeskSidebarItemsResponse.fromJson(response.data);
+        }
       } else if (response.statusCode == HttpStatus.forbidden) {
         throw response;
       } else {
