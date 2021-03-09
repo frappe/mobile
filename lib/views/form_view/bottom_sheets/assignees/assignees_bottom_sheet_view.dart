@@ -13,12 +13,12 @@ import 'package:frappe_app/views/form_view/bottom_sheets/assignees/assignees_bot
 import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
 import 'package:frappe_app/widgets/user_avatar.dart';
 
-class AssigneesBottomSheet extends StatelessWidget {
+class AssigneesBottomSheetView extends StatelessWidget {
   final String doctype;
   final String name;
   final List assignees;
 
-  const AssigneesBottomSheet({
+  const AssigneesBottomSheetView({
     Key key,
     @required this.doctype,
     @required this.name,

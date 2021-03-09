@@ -25,4 +25,6 @@ class FrappeIcons {
   static const add_user = '$_basePath/add_user.svg';
   static const down_arrow = '$_basePath/down_arrow.svg';
   static const close_alt = '$_basePath/close_alt.svg';
+  static const image_add = '$_basePath/image_add.svg';
+  static const small_file = '$_basePath/small_file.svg';
 }

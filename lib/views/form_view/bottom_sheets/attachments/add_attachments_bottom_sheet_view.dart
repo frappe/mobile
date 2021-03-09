@@ -7,23 +7,16 @@ import 'package:frappe_app/views/base_view.dart';
 
 import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
 
-import 'attachments_bottom_sheet_viewmodel.dart';
+import 'add_attachments_bottom_sheet_viewmodel.dart';
 
-class AttachmentsBottomSheet extends StatelessWidget {
-  final String doctype;
-  final String name;
-  final List attachments;
-
-  const AttachmentsBottomSheet({
+class AddAttachmentsBottomSheetView extends StatelessWidget {
+  const AddAttachmentsBottomSheetView({
     Key key,
-    @required this.doctype,
-    @required this.name,
-    @required this.attachments,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BaseView<AttachmentsBottomSheetViewModel>(
+    return BaseView<AddAttachmentsBottomSheetViewModel>(
       onModelClose: (model) {},
       builder: (context, model, child) => FractionallySizedBox(
         heightFactor: 0.2,

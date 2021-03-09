@@ -6,6 +6,8 @@ enum DocInfoItemType {
   shared,
 }
 
+enum AttachmentsFilter { all, files, links }
+
 enum EventType {
   comment,
   email,

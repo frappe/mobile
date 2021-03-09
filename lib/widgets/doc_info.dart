@@ -3,8 +3,9 @@ import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
-import 'package:frappe_app/views/form_view/bottom_sheets/assignees/assignees_bottom_sheet.dart';
-import 'package:frappe_app/views/form_view/bottom_sheets/attachments/attachments_bottom_sheet.dart';
+import 'package:frappe_app/views/form_view/bottom_sheets/assignees/assignees_bottom_sheet_view.dart';
+import 'package:frappe_app/views/form_view/bottom_sheets/attachments/add_attachments_bottom_sheet_view.dart';
+import 'package:frappe_app/views/form_view/bottom_sheets/attachments/view_attachments_bottom_sheet_view.dart';
 
 import 'collapsed_avatars.dart';
 
@@ -42,7 +43,7 @@ class DocInfo extends StatelessWidget {
               bool refresh = await showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
-                    builder: (context) => AssigneesBottomSheet(
+                    builder: (context) => AssigneesBottomSheetView(
                       assignees: docInfo["assignments"],
                       doctype: doctype,
                       name: name,
@@ -65,10 +66,8 @@ class DocInfo extends StatelessWidget {
               bool refresh = await showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
-                    builder: (context) => AttachmentsBottomSheet(
+                    builder: (context) => ViewAttachmentsBottomSheetView(
                       attachments: docInfo["attachments"],
-                      doctype: doctype,
-                      name: name,
                     ),
                   ) ??
                   false;
