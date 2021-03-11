@@ -23,6 +23,7 @@ import '../views/new_doc/new_doc_viewmodel.dart';
 import '../views/share/share_viewmodel.dart';
 import '../services/storage_service.dart';
 import '../views/form_view/bottom_sheets/attachments/view_attachments_bottom_sheet_viewmodel.dart';
+import '../views/form_view/bottom_sheets/reviews/view_reviews_bottom_sheet_viewmodel.dart';
 
 /// adds generated dependencies
 /// to the provided [GetIt] instance
@@ -52,5 +53,7 @@ GetIt $initGetIt(
   gh.lazySingleton<StorageService>(() => StorageService());
   gh.lazySingleton<ViewAttachmenetsBottomSheetViewModel>(
       () => ViewAttachmenetsBottomSheetViewModel());
+  gh.lazySingleton<ViewReviewsBottomSheetViewModel>(
+      () => ViewReviewsBottomSheetViewModel());
   return get;
 }

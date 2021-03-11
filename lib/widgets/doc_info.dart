@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
-import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/views/form_view/bottom_sheets/assignees/assignees_bottom_sheet_view.dart';
-import 'package:frappe_app/views/form_view/bottom_sheets/attachments/add_attachments_bottom_sheet_view.dart';
 import 'package:frappe_app/views/form_view/bottom_sheets/attachments/view_attachments_bottom_sheet_view.dart';
+import 'package:frappe_app/views/form_view/bottom_sheets/reviews/view_reviews_bottom_sheet_view.dart';
+import 'package:frappe_app/widgets/collapsed_reviews.dart';
 
 import 'collapsed_avatars.dart';
 
@@ -24,83 +24,116 @@ class DocInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: FrappePalette.grey[50],
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        horizontal: 20,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          DocInfoItem(
-            title: 'Assignees',
-            actionTitle: 'Add assignee',
-            actionIcon: FrappeIcons.add_user,
-            docInfoItemType: DocInfoItemType.assignees,
-            data: docInfo["assignments"],
-            onTap: () async {
-              bool refresh = await showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (context) => AssigneesBottomSheetView(
-                      assignees: docInfo["assignments"],
-                      doctype: doctype,
-                      name: name,
-                    ),
-                  ) ??
-                  false;
-
-              if (refresh) {
-                refreshCallback();
-              }
-            },
+    return Builder(
+      builder: (context) {
+        List reviews = docInfo["energy_point_logs"].where((item) {
+          return ["Appreciation", "Criticism"].contains(item["type"]);
+        }).toList();
+        return Container(
+          color: FrappePalette.grey[50],
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: 20,
           ),
-          DocInfoItem(
-            title: 'Attachments',
-            actionTitle: 'Attach file',
-            docInfoItemType: DocInfoItemType.attachments,
-            actionIcon: FrappeIcons.attachment,
-            data: docInfo["attachments"],
-            onTap: () async {
-              bool refresh = await showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (context) => ViewAttachmentsBottomSheetView(
-                      attachments: docInfo["attachments"],
-                    ),
-                  ) ??
-                  false;
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DocInfoItem(
+                title: 'Assignees',
+                actionTitle: 'Add assignee',
+                actionIcon: FrappeIcons.add_user,
+                filledWidget: docInfo["assignments"].isNotEmpty
+                    ? CollapsedAvatars(docInfo["assignments"])
+                    : null,
+                onTap: () async {
+                  bool refresh = await showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (context) => AssigneesBottomSheetView(
+                          assignees: docInfo["assignments"],
+                          doctype: doctype,
+                          name: name,
+                        ),
+                      ) ??
+                      false;
 
-              if (refresh) {
-                refreshCallback();
-              }
-            },
+                  if (refresh) {
+                    refreshCallback();
+                  }
+                },
+              ),
+              DocInfoItem(
+                title: 'Attachments',
+                actionTitle: 'Attach file',
+                filledWidget: docInfo["attachments"].isNotEmpty
+                    ? Text(
+                        '${docInfo["attachments"].length} Attachments',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: FrappePalette.grey[600],
+                          fontWeight: FontWeight.w400,
+                        ),
+                      )
+                    : null,
+                actionIcon: FrappeIcons.attachment,
+                onTap: () async {
+                  bool refresh = await showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (context) => ViewAttachmentsBottomSheetView(
+                          attachments: docInfo["attachments"],
+                        ),
+                      ) ??
+                      false;
+
+                  if (refresh) {
+                    refreshCallback();
+                  }
+                },
+              ),
+              if (docInfo["energy_point_logs"] != null)
+                DocInfoItem(
+                    title: 'Reviews',
+                    actionTitle: 'Add review',
+                    filledWidget: reviews.isNotEmpty
+                        ? CollapsedReviews(
+                            reviews,
+                          )
+                        : null,
+                    actionIcon: FrappeIcons.review,
+                    onTap: () async {
+                      bool refresh = await showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (context) => ViewReviewsBottomSheetView(
+                              reviews: reviews,
+                            ),
+                          ) ??
+                          false;
+
+                      if (refresh) {
+                        refreshCallback();
+                      }
+                    }),
+              // DocInfoItem(
+              //   title: 'Tags',
+              //   actionTitle: 'Add tags',
+              //   docInfoItemType: DocInfoItemType.tags,
+              //   actionIcon: FrappeIcons.tag,
+              //   onTap: () {},
+              // ),
+              // DocInfoItem(
+              //   title: 'Shared',
+              //   actionTitle: 'Shared with',
+              //   docInfoItemType: DocInfoItemType.shared,
+              //   showBorder: false,
+              //   actionIcon: FrappeIcons.share,
+              //   onTap: () {},
+              // ),
+            ],
           ),
-          // DocInfoItem(
-          //   title: 'Reviews',
-          //   actionTitle: 'Add review',
-          //   docInfoItemType: DocInfoItemType.reviews,
-          //   actionIcon: FrappeIcons.review,
-          //   onTap: () {},
-          // ),
-          // DocInfoItem(
-          //   title: 'Tags',
-          //   actionTitle: 'Add tags',
-          //   docInfoItemType: DocInfoItemType.tags,
-          //   actionIcon: FrappeIcons.tag,
-          //   onTap: () {},
-          // ),
-          // DocInfoItem(
-          //   title: 'Shared',
-          //   actionTitle: 'Shared with',
-          //   docInfoItemType: DocInfoItemType.shared,
-          //   showBorder: false,
-          //   actionIcon: FrappeIcons.share,
-          //   onTap: () {},
-          // ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -111,8 +144,7 @@ class DocInfoItem extends StatelessWidget {
   final String actionIcon;
   final Function onTap;
   final bool showBorder;
-  final DocInfoItemType docInfoItemType;
-  final List data;
+  final Widget filledWidget;
 
   const DocInfoItem({
     Key key,
@@ -120,26 +152,12 @@ class DocInfoItem extends StatelessWidget {
     @required this.actionTitle,
     @required this.actionIcon,
     @required this.onTap,
-    @required this.docInfoItemType,
-    @required this.data,
+    this.filledWidget,
     this.showBorder = true,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var filledWidget;
-    if (docInfoItemType == DocInfoItemType.assignees) {
-      filledWidget = CollapsedAvatars(data);
-    } else if (docInfoItemType == DocInfoItemType.attachments) {
-      filledWidget = Text(
-        '${data.length} Attachments',
-        style: TextStyle(
-          fontSize: 13,
-          color: FrappePalette.grey[600],
-          fontWeight: FontWeight.w400,
-        ),
-      );
-    }
     return FlatButton(
       onPressed: onTap,
       shape: showBorder
@@ -162,28 +180,27 @@ class DocInfoItem extends StatelessWidget {
             ),
           ),
           Spacer(),
-          data.isNotEmpty
-              ? filledWidget
-              : Row(
-                  children: [
-                    FrappeIcon(
-                      actionIcon,
+          filledWidget ??
+              Row(
+                children: [
+                  FrappeIcon(
+                    actionIcon,
+                    color: FrappePalette.grey[600],
+                    size: 13,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    actionTitle,
+                    style: TextStyle(
+                      fontSize: 13,
                       color: FrappePalette.grey[600],
-                      size: 13,
+                      fontWeight: FontWeight.w400,
                     ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      actionTitle,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: FrappePalette.grey[600],
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
         ],
       ),
     );

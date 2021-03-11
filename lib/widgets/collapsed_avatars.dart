@@ -6,7 +6,9 @@ import 'package:overflow_view/overflow_view.dart';
 class CollapsedAvatars extends StatelessWidget {
   final List data;
 
-  const CollapsedAvatars(this.data);
+  const CollapsedAvatars(
+    this.data,
+  );
 
   @override
   Widget build(BuildContext context) {

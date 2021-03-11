@@ -1,11 +1,3 @@
-enum DocInfoItemType {
-  assignees,
-  attachments,
-  reviews,
-  tags,
-  shared,
-}
-
 enum AttachmentsFilter { all, files, links }
 
 enum EventType {
