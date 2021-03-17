@@ -20,8 +20,10 @@ import '../views/list_view/list_view_viewmodel.dart';
 import '../views/login/login_viewmodel.dart';
 import '../services/navigation_service.dart';
 import '../views/new_doc/new_doc_viewmodel.dart';
+import '../views/form_view/bottom_sheets/share/share_bottom_sheet_viewmodel.dart';
 import '../views/share/share_viewmodel.dart';
 import '../services/storage_service.dart';
+import '../views/form_view/bottom_sheets/tags/tags_bottom_sheet_viewmodel.dart';
 import '../views/form_view/bottom_sheets/attachments/view_attachments_bottom_sheet_viewmodel.dart';
 import '../views/form_view/bottom_sheets/reviews/view_reviews_bottom_sheet_viewmodel.dart';
 
@@ -49,8 +51,11 @@ GetIt $initGetIt(
   gh.lazySingleton<LoginViewModel>(() => LoginViewModel());
   gh.lazySingleton<NavigationService>(() => NavigationService());
   gh.lazySingleton<NewDocViewModel>(() => NewDocViewModel());
+  gh.lazySingleton<ShareBottomSheetViewModel>(
+      () => ShareBottomSheetViewModel());
   gh.lazySingleton<ShareViewModel>(() => ShareViewModel());
   gh.lazySingleton<StorageService>(() => StorageService());
+  gh.lazySingleton<TagsBottomSheetViewModel>(() => TagsBottomSheetViewModel());
   gh.lazySingleton<ViewAttachmenetsBottomSheetViewModel>(
       () => ViewAttachmenetsBottomSheetViewModel());
   gh.lazySingleton<ViewReviewsBottomSheetViewModel>(

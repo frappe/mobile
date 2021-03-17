@@ -5,6 +5,8 @@ import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/views/form_view/bottom_sheets/assignees/assignees_bottom_sheet_view.dart';
 import 'package:frappe_app/views/form_view/bottom_sheets/attachments/view_attachments_bottom_sheet_view.dart';
 import 'package:frappe_app/views/form_view/bottom_sheets/reviews/view_reviews_bottom_sheet_view.dart';
+import 'package:frappe_app/views/form_view/bottom_sheets/share/share_bottom_sheet_view.dart';
+import 'package:frappe_app/views/form_view/bottom_sheets/tags/tags_bottom_sheet_view.dart';
 import 'package:frappe_app/widgets/collapsed_reviews.dart';
 
 import 'collapsed_avatars.dart';
@@ -29,6 +31,8 @@ class DocInfo extends StatelessWidget {
         List reviews = docInfo["energy_point_logs"].where((item) {
           return ["Appreciation", "Criticism"].contains(item["type"]);
         }).toList();
+        List tags =
+            docInfo["tags"].isNotEmpty ? docInfo["tags"].split(',') : [];
         return Container(
           color: FrappePalette.grey[50],
           width: double.infinity,
@@ -93,43 +97,81 @@ class DocInfo extends StatelessWidget {
               ),
               if (docInfo["energy_point_logs"] != null)
                 DocInfoItem(
-                    title: 'Reviews',
-                    actionTitle: 'Add review',
-                    filledWidget: reviews.isNotEmpty
-                        ? CollapsedReviews(
-                            reviews,
-                          )
-                        : null,
-                    actionIcon: FrappeIcons.review,
-                    onTap: () async {
-                      bool refresh = await showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (context) => ViewReviewsBottomSheetView(
-                              reviews: reviews,
-                            ),
-                          ) ??
-                          false;
+                  title: 'Reviews',
+                  actionTitle: 'Add review',
+                  filledWidget: reviews.isNotEmpty
+                      ? CollapsedReviews(
+                          reviews,
+                        )
+                      : null,
+                  actionIcon: FrappeIcons.review,
+                  onTap: () async {
+                    bool refresh = await showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (context) => ViewReviewsBottomSheetView(
+                            reviews: reviews,
+                          ),
+                        ) ??
+                        false;
 
-                      if (refresh) {
-                        refreshCallback();
-                      }
-                    }),
-              // DocInfoItem(
-              //   title: 'Tags',
-              //   actionTitle: 'Add tags',
-              //   docInfoItemType: DocInfoItemType.tags,
-              //   actionIcon: FrappeIcons.tag,
-              //   onTap: () {},
-              // ),
-              // DocInfoItem(
-              //   title: 'Shared',
-              //   actionTitle: 'Shared with',
-              //   docInfoItemType: DocInfoItemType.shared,
-              //   showBorder: false,
-              //   actionIcon: FrappeIcons.share,
-              //   onTap: () {},
-              // ),
+                    if (refresh) {
+                      refreshCallback();
+                    }
+                  },
+                ),
+              DocInfoItem(
+                title: 'Tags',
+                actionTitle: 'Add tags',
+                actionIcon: FrappeIcons.tag,
+                filledWidget: tags.isNotEmpty
+                    ? Text(
+                        '${tags.length} Tags',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: FrappePalette.grey[600],
+                          fontWeight: FontWeight.w400,
+                        ),
+                      )
+                    : null,
+                onTap: () async {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) => TagsBottomSheetView(
+                      tags: tags,
+                      doctype: doctype,
+                      name: name,
+                      refreshCallback: refreshCallback,
+                    ),
+                  );
+                },
+              ),
+              DocInfoItem(
+                title: 'Shared',
+                actionTitle: 'Shared with',
+                filledWidget: docInfo["shared"].isNotEmpty
+                    ? CollapsedAvatars(docInfo["shared"])
+                    : null,
+                showBorder: false,
+                actionIcon: FrappeIcons.share,
+                onTap: () async {
+                  bool refresh = await showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (context) => ShareBottomSheetView(
+                          shares: docInfo["shared"],
+                          doctype: doctype,
+                          name: name,
+                        ),
+                      ) ??
+                      false;
+
+                  if (refresh) {
+                    refreshCallback();
+                  }
+                },
+              ),
             ],
           ),
         );

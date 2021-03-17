@@ -22,6 +22,7 @@ class LinkField extends StatefulWidget {
   final bool showInputBorder;
   final bool allowClear;
   final Function onSuggestionSelected;
+  final Function noItemsFoundBuilder;
   final Widget prefixIcon;
   final Color fillColor;
   final ItemBuilder itemBuilder;
@@ -38,6 +39,7 @@ class LinkField extends StatefulWidget {
     this.prefixIcon,
     this.allowClear = true,
     this.onSuggestionSelected,
+    this.noItemsFoundBuilder,
     this.showInputBorder = false,
     this.itemBuilder,
     this.suggestionsCallback,
@@ -81,6 +83,8 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
         child: FormBuilderTypeAhead(
           controller: _textEditingController,
           key: widget.key,
+          noItemsFoundBuilder: (context) =>
+              widget.noItemsFoundBuilder(_textEditingController.text),
           direction: widget.direction,
           onSuggestionSelected: (item) {
             if (widget.clearTextOnSelection) {
@@ -89,7 +93,11 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
               });
             }
             if (widget.onSuggestionSelected != null) {
-              widget.onSuggestionSelected(item["value"]);
+              if (item is String) {
+                widget.onSuggestionSelected(item);
+              } else {
+                widget.onSuggestionSelected(item["value"]);
+              }
             }
           },
           validator: FormBuilderValidators.compose(validators),

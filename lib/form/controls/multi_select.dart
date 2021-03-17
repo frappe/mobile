@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
@@ -12,10 +14,16 @@ import 'base_control.dart';
 class MultiSelect extends StatefulWidget {
   final DoctypeField doctypeField;
   final Map doc;
+  final FutureOr<List<dynamic>> Function(String) findSuggestions;
+  final dynamic Function(List<dynamic>) valueTransformer;
+  final Function(List<dynamic>) onChanged;
 
   MultiSelect({
     @required this.doctypeField,
     this.doc,
+    this.findSuggestions,
+    this.valueTransformer,
+    this.onChanged,
   });
   @override
   _MultiSelectState createState() => _MultiSelectState();
@@ -25,41 +33,43 @@ class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
   @override
   Widget build(BuildContext context) {
     return FormBuilderChipsInput(
-      valueTransformer: (l) {
-        return l
-            .map((a) {
-              return a["value"];
-            })
-            .toList()
-            .join(',');
-      },
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Palette.fieldBgColor,
-        enabledBorder: InputBorder.none,
-        hintText: widget.doctypeField.label,
+      onChanged: widget.onChanged,
+      valueTransformer: widget.valueTransformer ??
+          (l) {
+            return l
+                .map((a) {
+                  return a["value"];
+                })
+                .toList()
+                .join(',');
+          },
+      decoration: Palette.formFieldDecoration(
+        label: widget.doctypeField.label,
+        withLabel: false,
       ),
       name: widget.doctypeField.fieldname,
       initialValue:
           widget.doc != null ? widget.doc[widget.doctypeField.fieldname] : [],
-      findSuggestions: (String query) async {
-        if (query.length != 0) {
-          var lowercaseQuery = query.toLowerCase();
-          var response = await locator<Api>().getContactList(lowercaseQuery);
-          var val = response["message"];
-          if (val.length == 0) {
-            val = [
-              {
-                "value": lowercaseQuery,
-                "description": lowercaseQuery,
+      findSuggestions: widget.findSuggestions ??
+          (String query) async {
+            if (query.length != 0) {
+              var lowercaseQuery = query.toLowerCase();
+              var response =
+                  await locator<Api>().getContactList(lowercaseQuery);
+              var val = response["message"];
+              if (val.length == 0) {
+                val = [
+                  {
+                    "value": lowercaseQuery,
+                    "description": lowercaseQuery,
+                  }
+                ];
               }
-            ];
-          }
-          return val;
-        } else {
-          return [];
-        }
-      },
+              return val;
+            } else {
+              return [];
+            }
+          },
       chipBuilder: (context, state, profile) {
         return InputChip(
           label: Text(
@@ -70,7 +80,7 @@ class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
           backgroundColor: Colors.white,
           shape: BeveledRectangleBorder(
             borderRadius: BorderRadius.all(
-              Radius.circular(5),
+              Radius.circular(8),
             ),
           ),
           onDeleted: () => state.deleteChip(profile),

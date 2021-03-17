@@ -27,4 +27,5 @@ class FrappeIcons {
   static const close_alt = '$_basePath/close_alt.svg';
   static const image_add = '$_basePath/image_add.svg';
   static const small_file = '$_basePath/small_file.svg';
+  static const lock = '$_basePath/lock.svg';
 }

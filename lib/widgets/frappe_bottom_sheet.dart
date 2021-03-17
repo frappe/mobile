@@ -9,18 +9,21 @@ class FrappeBottomSheet extends StatelessWidget {
   final String title;
   final Widget trailing;
   final Function onActionButtonPress;
+  final Widget bottomBar;
 
   const FrappeBottomSheet({
     Key key,
     this.body,
     @required this.title,
     this.trailing,
+    this.bottomBar,
     this.onActionButtonPress,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: bottomBar,
       resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xFF737373),
       appBar: AppBar(
