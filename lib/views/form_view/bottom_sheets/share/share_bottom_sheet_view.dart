@@ -3,16 +3,13 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/app/locator.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
-import 'package:frappe_app/form/controls/link_field.dart';
 import 'package:frappe_app/form/controls/multi_select.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/model/offline_storage.dart';
 import 'package:frappe_app/services/api/api.dart';
-import 'package:frappe_app/utils/frappe_alert.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/views/base_view.dart';
 
-import 'package:frappe_app/views/form_view/bottom_sheets/assignees/assignees_bottom_sheet_viewmodel.dart';
 import 'package:frappe_app/views/form_view/bottom_sheets/share/share_bottom_sheet_viewmodel.dart';
 import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
 import 'package:frappe_app/widgets/user_avatar.dart';
@@ -108,9 +105,11 @@ class ShareBottomSheetView extends StatelessWidget {
                 ),
           onActionButtonPress: () {
             model.addShare(
-                // doctype: doctype,
-                // name: name,
-                );
+              doctype: doctype,
+              users: model.newShares,
+              name: name,
+              permission: model.currentPermission,
+            );
           },
           trailing: model.newShares.isEmpty
               ? null
@@ -152,7 +151,7 @@ class ShareBottomSheetView extends StatelessWidget {
                     },
                     doctypeField: DoctypeField(
                       label: 'Add people or emails',
-                      fieldname: 'user',
+                      fieldname: 'users',
                     ),
                   ),
                 ),
@@ -189,6 +188,8 @@ class ShareBottomSheetView extends StatelessWidget {
           share: share,
           user: user,
           model: model,
+          doctype: doctype,
+          name: name,
         );
       }).toList();
     }
@@ -199,12 +200,16 @@ class SharedWithUser extends StatelessWidget {
   final Map user;
   final Map share;
   final ShareBottomSheetViewModel model;
+  final String doctype;
+  final String name;
 
   const SharedWithUser({
     Key key,
     this.user,
     this.share,
     this.model,
+    this.doctype,
+    this.name,
   }) : super(key: key);
 
   @override
@@ -250,12 +255,19 @@ class SharedWithUser extends StatelessWidget {
       ),
       trailing: PopupMenuButton(
         onSelected: (permission) {
-          model.updatePermission();
+          model.updatePermission(
+            currentPermission: userPermission,
+            newPermission: permission,
+            doctype: doctype,
+            name: name,
+            user: share["user"],
+          );
         },
         child: Container(
           height: 50,
-          width: 90,
+          width: 100,
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
                 userPermission,

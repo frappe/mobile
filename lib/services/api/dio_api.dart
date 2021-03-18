@@ -762,14 +762,16 @@ class DioApi implements Api {
     }
   }
 
-  Future setPermission(
-    String doctype,
-    String name,
-    Map shareInfo,
-  ) async {
+  Future setPermission({
+    @required String doctype,
+    @required String name,
+    @required String user,
+    @required Map shareInfo,
+  }) async {
     var data = {
       'doctype': doctype,
       'name': name,
+      'user': user,
       ...shareInfo,
     };
 
@@ -819,6 +821,29 @@ class DioApi implements Api {
         '/method/frappe.email.get_contact_list',
         data: data,
         options: Options(contentType: Headers.formUrlEncodedContentType));
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      throw Exception('Something went wrong');
+    }
+  }
+
+  Future shareGetUsers({
+    @required String doctype,
+    @required String name,
+  }) async {
+    var data = {
+      "doctype": doctype,
+      "name": name,
+    };
+
+    final response = await DioHelper.dio.post(
+      '/method/frappe.share.get_users',
+      data: data,
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
     if (response.statusCode == 200) {
       return response.data;
     } else {

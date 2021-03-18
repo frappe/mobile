@@ -176,16 +176,16 @@ class Share extends StatelessWidget {
                       field: w,
                       value: share[w.fieldname],
                       onChanged: (val) async {
-                        await locator<Api>().setPermission(
-                          doctype,
-                          name,
-                          {
-                            "everyone": 1,
-                            "permission_to": w.fieldname,
-                            "value": val,
-                            "user": ""
-                          },
-                        );
+                        // await locator<Api>().setPermission(
+                        //   doctype,
+                        //   name,
+                        //   {
+                        //     "everyone": 1,
+                        //     "permission_to": w.fieldname,
+                        //     "value": val,
+                        //     "user": ""
+                        //   },
+                        // );
                         model.updateDocInfo(
                           doctype: doctype,
                           name: name,
@@ -210,16 +210,16 @@ class Share extends StatelessWidget {
                       field: w,
                       value: share[w.fieldname],
                       onChanged: (val) async {
-                        await locator<Api>().setPermission(
-                          doctype,
-                          name,
-                          {
-                            "everyone": 0,
-                            "user": share["user"],
-                            "permission_to": w.fieldname,
-                            "value": val,
-                          },
-                        );
+                        // await locator<Api>().setPermission(
+                        //   doctype,
+                        //   name,
+                        //   {
+                        //     "everyone": 0,
+                        //     "user": share["user"],
+                        //     "permission_to": w.fieldname,
+                        //     "value": val,
+                        //   },
+                        // );
                         model.updateDocInfo(
                           doctype: doctype,
                           name: name,

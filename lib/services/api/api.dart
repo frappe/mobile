@@ -94,13 +94,19 @@ abstract class Api {
 
   Future addReview(String doctype, String name, Map reviewData);
 
-  Future setPermission(
-    String doctype,
-    String name,
-    Map shareInfo,
-  );
+  Future setPermission({
+    @required String doctype,
+    @required String name,
+    @required Map shareInfo,
+    @required String user,
+  });
 
   Future shareAdd(String doctype, String name, Map shareInfo);
+
+  Future shareGetUsers({
+    @required String doctype,
+    @required String name,
+  });
 
   Future<Map> getContactList(String query);
 }

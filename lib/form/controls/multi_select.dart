@@ -17,10 +17,12 @@ class MultiSelect extends StatefulWidget {
   final FutureOr<List<dynamic>> Function(String) findSuggestions;
   final dynamic Function(List<dynamic>) valueTransformer;
   final Function(List<dynamic>) onChanged;
+  final Key key;
 
   MultiSelect({
     @required this.doctypeField,
     this.doc,
+    this.key,
     this.findSuggestions,
     this.valueTransformer,
     this.onChanged,
@@ -33,6 +35,7 @@ class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
   @override
   Widget build(BuildContext context) {
     return FormBuilderChipsInput(
+      key: widget.key,
       onChanged: widget.onChanged,
       valueTransformer: widget.valueTransformer ??
           (l) {
