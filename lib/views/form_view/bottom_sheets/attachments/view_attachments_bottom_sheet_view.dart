@@ -1,3 +1,5 @@
+import 'dart:io' as io;
+
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
@@ -5,10 +7,12 @@ import 'package:frappe_app/utils/constants.dart';
 import 'package:frappe_app/utils/enums.dart';
 
 import 'package:frappe_app/utils/frappe_icon.dart';
+import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/views/base_view.dart';
 import 'package:frappe_app/views/form_view/bottom_sheets/attachments/view_attachments_bottom_sheet_viewmodel.dart';
 
 import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
+import 'package:open_file/open_file.dart';
 
 import 'add_attachments_bottom_sheet_view.dart';
 
@@ -158,6 +162,21 @@ class AttachmentsList extends StatelessWidget {
       shrinkWrap: true,
       itemBuilder: (context, index) {
         return ListTile(
+          onTap: () async {
+            var attachment = filteredAttachments[index];
+            var downloadPath = await getDownloadPath();
+            var fileUrlName = attachment["file_url"].split('/').last;
+
+            var filePath = "$downloadPath$fileUrlName";
+
+            var fileExists = await io.File(filePath).exists();
+
+            if (fileExists) {
+              OpenFile.open(filePath);
+            } else {
+              downloadFile(attachment["file_url"], downloadPath);
+            }
+          },
           title: Text(filteredAttachments[index]["file_name"]),
           subtitle: Text('15 Sep, 2020'),
           leading: Container(
@@ -204,44 +223,64 @@ class AttachmentsGrid extends StatelessWidget {
         var ext = (attachments[index]["file_name"] as String).split('.').last;
         var isImage = Constants.imageExtensions.indexOf(ext) != -1;
 
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Container(
-                color: FrappePalette.grey[200],
-                height: itemHeight - 55,
-                width: itemWidth,
-                child: Center(
-                  child: Text(
-                    ext != '' ? ext.toUpperCase() : 'LINK',
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 8,
-              ),
-              Row(
-                children: [
-                  FrappeIcon(
-                    isImage ? FrappeIcons.image_add : FrappeIcons.small_file,
-                    size: 12,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    attachments[index]["file_name"] != ''
-                        ? attachments[index]["file_name"]
-                        : attachments[index]["file_url"],
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
+        return GestureDetector(
+          onTap: () async {
+            var attachment = attachments[index];
+            var downloadPath = await getDownloadPath();
+            var fileUrlName = attachment["file_url"].split('/').last;
+
+            var filePath = "$downloadPath$fileUrlName";
+
+            try {
+              var fileExists = await io.File(filePath).exists();
+              if (fileExists) {
+                OpenFile.open(filePath);
+              } else {
+                downloadFile(attachment["file_url"], downloadPath);
+              }
+            } catch (e) {
+              print(e);
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Container(
+                  color: FrappePalette.grey[200],
+                  height: itemHeight - 55,
+                  width: itemWidth,
+                  child: Center(
+                    child: Text(
+                      ext != '' ? ext.toUpperCase() : 'LINK',
                     ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Row(
+                  children: [
+                    FrappeIcon(
+                      isImage ? FrappeIcons.image_add : FrappeIcons.small_file,
+                      size: 12,
+                    ),
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Text(
+                      attachments[index]["file_name"] != ''
+                          ? attachments[index]["file_name"]
+                          : attachments[index]["file_url"],
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },

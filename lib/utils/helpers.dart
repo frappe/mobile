@@ -11,6 +11,7 @@ import 'package:frappe_app/app/router.gr.dart';
 import 'package:frappe_app/model/offline_storage.dart';
 import 'package:frappe_app/services/storage_service.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/config.dart';
@@ -91,24 +92,15 @@ downloadFile(String fileUrl, String downloadPath) async {
 
 Future<bool> _checkPermission() async {
   // TODO
-  return true;
-  // if (Platform.isAndroid) {
-  //   PermissionStatus permission = await PermissionHandler()
-  //       .checkPermissionStatus(PermissionGroup.storage);
-  //   if (permission != PermissionStatus.granted) {
-  //     Map<PermissionGroup, PermissionStatus> permissions =
-  //         await PermissionHandler()
-  //             .requestPermissions([PermissionGroup.storage]);
-  //     if (permissions[PermissionGroup.storage] == PermissionStatus.granted) {
-  //       return true;
-  //     }
-  //   } else {
-  //     return true;
-  //   }
-  // } else {
-  //   return true;
-  // }
-  // return false;
+  // return true;
+  if (Platform.isAndroid) {
+    if (await Permission.storage.request().isGranted) {
+      return true;
+    }
+  } else {
+    return true;
+  }
+  return false;
 }
 
 String toTitleCase(String str) {
