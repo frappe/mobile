@@ -21,7 +21,7 @@ class CollapsedReviews extends StatelessWidget {
     var widgets = displayedReviews.map<Widget>(
       (item) {
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          padding: const EdgeInsets.symmetric(horizontal: 2.0),
           child: ReviewPill(
             review: item,
           ),

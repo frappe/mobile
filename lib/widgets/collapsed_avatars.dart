@@ -15,7 +15,7 @@ class CollapsedAvatars extends StatelessWidget {
     return Container(
       width: data.length > 3 ? 120 : null,
       child: OverflowView(
-        spacing: -16,
+        spacing: -18,
         children: data.map<Widget>(
           (item) {
             return CircleAvatar(
