@@ -13,7 +13,7 @@ class CollapsedAvatars extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: data.length > 3 ? 120 : null,
+      width: data.length > 3 ? 106 : null,
       child: OverflowView(
         spacing: -18,
         children: data.map<Widget>(

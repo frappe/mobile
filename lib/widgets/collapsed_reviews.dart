@@ -55,7 +55,7 @@ class CollapsedReviews extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 203,
+      width: 194,
       child: Row(
         children: _genearateChildren(),
       ),
