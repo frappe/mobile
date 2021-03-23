@@ -167,12 +167,11 @@ class CustomListView extends StatelessWidget {
 
     return ListItem(
       doctype: meta.name,
+      likeCount: likedBy.length,
       onListTap: onListTap,
       isFav: isLikedByUser,
       seen: isSeenByUser,
-      assignee: assignee != null && assignee.length > 0
-          ? ['_assign', assignee[0]]
-          : null,
+      assignee: assignee != null && assignee.length > 0 ? assignee : null,
       onButtonTap: onButtonTap,
       title: getTitle(meta, data),
       modifiedOn: "${timeago.format(

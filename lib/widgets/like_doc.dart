@@ -10,11 +10,13 @@ class LikeDoc extends StatefulWidget {
   bool isFav;
   final String doctype;
   final String name;
+  final Color iconColor;
 
   LikeDoc({
     @required this.isFav,
     @required this.doctype,
     @required this.name,
+    this.iconColor,
   });
 
   @override
@@ -52,7 +54,7 @@ class _LikeDocState extends State<LikeDoc> {
               ? FrappeIcons.favourite_active
               : FrappeIcons.favourite_resting,
           size: 18,
-          color: widget.isFav ? null : Palette.iconColor,
+          color: widget.iconColor ?? Palette.iconColor,
         ),
       ),
       onTap: _toggleFav,

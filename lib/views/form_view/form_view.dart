@@ -248,7 +248,13 @@ class DocInfo extends StatelessWidget {
                 actionTitle: 'Add assignee',
                 actionIcon: FrappeIcons.add_user,
                 filledWidget: docInfo["assignments"].isNotEmpty
-                    ? CollapsedAvatars(docInfo["assignments"])
+                    ? CollapsedAvatars(
+                        docInfo["assignments"].map(
+                          (assignment) {
+                            return assignment["owner"];
+                          },
+                        ).toList(),
+                      )
                     : null,
                 onTap: () async {
                   bool refresh = await showModalBottomSheet(
@@ -352,7 +358,13 @@ class DocInfo extends StatelessWidget {
                 title: 'Shared',
                 actionTitle: 'Shared with',
                 filledWidget: docInfo["shared"].isNotEmpty
-                    ? CollapsedAvatars(docInfo["shared"])
+                    ? CollapsedAvatars(
+                        docInfo["shared"].map(
+                          (share) {
+                            return share["owner"];
+                          },
+                        ).toList(),
+                      )
                     : null,
                 showBorder: false,
                 actionIcon: FrappeIcons.share,

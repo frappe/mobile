@@ -23,7 +23,7 @@ class CollapsedAvatars extends StatelessWidget {
               radius: 20,
               child: UserAvatar(
                 size: 18,
-                uid: item["owner"],
+                uid: item,
               ),
             );
           },
