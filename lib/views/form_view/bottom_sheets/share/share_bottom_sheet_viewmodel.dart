@@ -1,13 +1,14 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/services/api/api.dart';
 import 'package:frappe_app/views/base_viewmodel.dart';
 import 'package:injectable/injectable.dart';
 
 @lazySingleton
 class ShareBottomSheetViewModel extends BaseViewModel {
-  var currentShares = [];
-  var newShares = [];
+  List<Shared> currentShares = [];
+  var shareWithUsers = [];
   var permissionLevels = [
     "Can Read",
     "Can Write",
@@ -54,7 +55,7 @@ class ShareBottomSheetViewModel extends BaseViewModel {
   }
 
   updateNewShares(List l) {
-    newShares = l;
+    shareWithUsers = l;
     notifyListeners();
   }
 

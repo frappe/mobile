@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/widgets/review_pill.dart';
 
 class CollapsedReviews extends StatelessWidget {
-  final List data;
+  final List<EnergyPointLogs> data;
 
   const CollapsedReviews(
     this.data,

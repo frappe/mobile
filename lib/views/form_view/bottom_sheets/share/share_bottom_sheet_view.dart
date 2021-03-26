@@ -5,6 +5,7 @@ import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/form/controls/multi_select.dart';
 import 'package:frappe_app/model/doctype_response.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/model/offline_storage.dart';
 import 'package:frappe_app/services/api/api.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
@@ -17,7 +18,7 @@ import 'package:frappe_app/widgets/user_avatar.dart';
 class ShareBottomSheetView extends StatelessWidget {
   final String doctype;
   final String name;
-  final List shares;
+  final List<Shared> shares;
 
   const ShareBottomSheetView({
     Key key,
@@ -30,7 +31,7 @@ class ShareBottomSheetView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BaseView<ShareBottomSheetViewModel>(
       onModelClose: (model) {
-        model.newShares = [];
+        model.shareWithUsers = [];
       },
       onModelReady: (model) {
         model.currentShares = shares;
@@ -39,7 +40,7 @@ class ShareBottomSheetView extends StatelessWidget {
         heightFactor: 0.9,
         child: FrappeBottomSheet(
           title: 'Shared With',
-          bottomBar: model.newShares.isEmpty
+          bottomBar: model.shareWithUsers.isEmpty
               ? null
               : Container(
                   decoration: BoxDecoration(
@@ -106,12 +107,12 @@ class ShareBottomSheetView extends StatelessWidget {
           onActionButtonPress: () {
             model.addShare(
               doctype: doctype,
-              users: model.newShares,
+              users: model.shareWithUsers,
               name: name,
               permission: model.currentPermission,
             );
           },
-          trailing: model.newShares.isEmpty
+          trailing: model.shareWithUsers.isEmpty
               ? null
               : Row(
                   children: [
@@ -183,7 +184,7 @@ class ShareBottomSheetView extends StatelessWidget {
     allUsers = allUsers["data"];
     if (allUsers != null) {
       return model.currentShares.map((share) {
-        var user = allUsers[share["user"]];
+        var user = allUsers[share.user];
         return SharedWithUser(
           share: share,
           user: user,
@@ -198,7 +199,7 @@ class ShareBottomSheetView extends StatelessWidget {
 
 class SharedWithUser extends StatelessWidget {
   final Map user;
-  final Map share;
+  final Shared share;
   final ShareBottomSheetViewModel model;
   final String doctype;
   final String name;
@@ -220,23 +221,23 @@ class SharedWithUser extends StatelessWidget {
 
     if (user != null) {
       title = user["full_name"];
-    } else if (share["user"] == null && share["everyone"] == 1) {
+    } else if (share.user == null && share.everyone == 1) {
       title = "Everyone";
     } else {
-      title = share["user"];
+      title = share.user;
     }
 
     if (user != null) {
-      subtitle = share["user"];
+      subtitle = share.user;
     }
 
-    if (share["read"] == 1 && share["write"] == 1 && share["share"] == 1) {
+    if (share.read == 1 && share.write == 1 && share.share == 1) {
       userPermission = "Full Access";
-    } else if (share["write"] == 1) {
+    } else if (share.write == 1) {
       userPermission = "Can Write";
-    } else if (share["share"] == 1) {
+    } else if (share.share == 1) {
       userPermission = "Can Share";
-    } else if (share["read"] == 1) {
+    } else if (share.read == 1) {
       userPermission = "Can Read";
     }
     return ListTile(
@@ -245,7 +246,7 @@ class SharedWithUser extends StatelessWidget {
       ),
       visualDensity: VisualDensity(horizontal: 0, vertical: -4),
       leading: UserAvatar(
-        uid: share["user"] ?? "E",
+        uid: share.user ?? "E",
       ),
       title: Text(
         title,
@@ -260,7 +261,7 @@ class SharedWithUser extends StatelessWidget {
             newPermission: permission,
             doctype: doctype,
             name: name,
-            user: share["user"],
+            user: share.user,
           );
         },
         child: Container(

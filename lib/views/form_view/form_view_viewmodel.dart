@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../app/locator.dart';
@@ -21,7 +22,7 @@ import '../../model/queue.dart';
 class FormViewViewModel extends BaseViewModel {
   bool editMode = false;
   Response error;
-  Map formData;
+  GetDocResponse formData;
   final user = Config().user;
 
   void refresh() {
@@ -43,9 +44,9 @@ class FormViewViewModel extends BaseViewModel {
   }) async {
     setState(ViewState.busy);
     if (queued) {
-      formData = {
-        "docs": queuedData["data"],
-      };
+      formData = GetDocResponse(
+        docs: queuedData["data"],
+      );
     } else {
       var isOnline = await verifyOnline();
 

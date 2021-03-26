@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
 
 import '../../model/doctype_response.dart';
 import '../../model/desktop_page_response.dart';
@@ -32,7 +33,7 @@ abstract class Api {
     offset,
   });
 
-  Future getdoc(String doctype, String name);
+  Future<GetDocResponse> getdoc(String doctype, String name);
 
   Future postComment(
     String refDocType,

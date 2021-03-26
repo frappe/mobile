@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
 
 import '../../model/doctype_response.dart';
 import '../../model/desktop_page_response.dart';
@@ -284,7 +285,7 @@ class DioApi implements Api {
     }
   }
 
-  Future getdoc(String doctype, String name) async {
+  Future<GetDocResponse> getdoc(String doctype, String name) async {
     var queryParams = {
       'doctype': doctype,
       'name': name,
@@ -305,7 +306,7 @@ class DioApi implements Api {
         if (await OfflineStorage.storeApiResponse()) {
           await OfflineStorage.putItem('$doctype$name', response.data);
         }
-        return response.data;
+        return GetDocResponse.fromJson(response.data);
       } else if (response.statusCode == 403) {
         throw response;
       } else {

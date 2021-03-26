@@ -4,6 +4,7 @@ import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/form/controls/link_field.dart';
 import 'package:frappe_app/model/doctype_response.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/model/offline_storage.dart';
 import 'package:frappe_app/utils/frappe_alert.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
@@ -16,7 +17,7 @@ import 'package:frappe_app/widgets/user_avatar.dart';
 class AssigneesBottomSheetView extends StatelessWidget {
   final String doctype;
   final String name;
-  final List assignees;
+  final List<Assignments> assignees;
 
   const AssigneesBottomSheetView({
     Key key,
@@ -33,7 +34,7 @@ class AssigneesBottomSheetView extends StatelessWidget {
       },
       onModelReady: (model) {
         model.assignedUsers = assignees.map<String>((assignee) {
-          return assignee["owner"];
+          return assignee.owner;
         }).toList();
       },
       builder: (context, model, child) => FractionallySizedBox(

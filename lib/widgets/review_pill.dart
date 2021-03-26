@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/widgets/user_avatar.dart';
 
 class ReviewPill extends StatelessWidget {
-  final Map review;
+  final EnergyPointLogs review;
 
   const ReviewPill({Key key, this.review}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var reviewType = review["type"];
+    var reviewType = review.type;
     var points;
     var tooltipMsg;
     if (reviewType == "Appreciation") {
-      points = "+${review["points"]}";
+      points = "+${review.points}";
       tooltipMsg =
-          "${review['points']} appreciation points for ${review['user']} for ${review['reason']}";
+          "${review.points} appreciation points for ${review.user} for ${review.reason}";
     } else {
-      points = "${review["points"]}";
+      points = "${review.points}";
       tooltipMsg =
-          "${review['points']} criticism points for ${review['user']} for ${review['reason']}";
+          "${review.points} criticism points for ${review.user} for ${review.reason}";
     }
 
     return Tooltip(
@@ -27,7 +28,7 @@ class ReviewPill extends StatelessWidget {
       child: Chip(
         labelPadding: EdgeInsets.symmetric(horizontal: 2),
         avatar: UserAvatar(
-          uid: review["owner"],
+          uid: review.owner,
           size: 100,
         ),
         shape: RoundedRectangleBorder(

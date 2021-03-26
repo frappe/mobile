@@ -3,6 +3,7 @@ import 'dart:io' as io;
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/utils/constants.dart';
 import 'package:frappe_app/utils/enums.dart';
 
@@ -17,7 +18,7 @@ import 'package:open_file/open_file.dart';
 import 'add_attachments_bottom_sheet_view.dart';
 
 class ViewAttachmentsBottomSheetView extends StatelessWidget {
-  final List attachments;
+  final List<Attachments> attachments;
 
   const ViewAttachmentsBottomSheetView({
     Key key,
@@ -126,7 +127,7 @@ class ViewAttachmentsBottomSheetView extends StatelessWidget {
 
 class AttachmentsList extends StatelessWidget {
   final AttachmentsFilter attachmentsFilter;
-  final List attachments;
+  final List<Attachments> attachments;
 
   const AttachmentsList({
     Key key,
@@ -134,15 +135,14 @@ class AttachmentsList extends StatelessWidget {
     @required this.attachments,
   }) : super(key: key);
 
-  bool isFile(Map attachment) {
-    var ext = (attachment["file_name"] as String).split('.').last;
+  bool isFile(Attachments attachment) {
+    var ext = attachment.fileName.split('.').last;
     return Constants.imageExtensions.indexOf(ext) == -1 && !isLink(attachment);
   }
 
-  bool isLink(Map attachment) {
-    var scheme = Uri.parse(attachment["file_url"]).scheme;
-    return attachment["file_name"] == '' &&
-        (scheme == 'http' || scheme == 'https');
+  bool isLink(Attachments attachment) {
+    var scheme = Uri.parse(attachment.fileUrl).scheme;
+    return attachment.fileName == '' && (scheme == 'http' || scheme == 'https');
   }
 
   @override
@@ -208,7 +208,7 @@ class AttachmentsGrid extends StatelessWidget {
 
   final double itemWidth;
   final double itemHeight;
-  final List attachments;
+  final List<Attachments> attachments;
 
   @override
   Widget build(BuildContext context) {
@@ -220,14 +220,14 @@ class AttachmentsGrid extends StatelessWidget {
       itemCount: attachments.length,
       shrinkWrap: true,
       itemBuilder: (context, index) {
-        var ext = (attachments[index]["file_name"] as String).split('.').last;
+        var ext = attachments[index].fileName.split('.').last;
         var isImage = Constants.imageExtensions.indexOf(ext) != -1;
 
         return GestureDetector(
           onTap: () async {
             var attachment = attachments[index];
             var downloadPath = await getDownloadPath();
-            var fileUrlName = attachment["file_url"].split('/').last;
+            var fileUrlName = attachment.fileUrl.split('/').last;
 
             var filePath = "$downloadPath$fileUrlName";
 
@@ -236,7 +236,7 @@ class AttachmentsGrid extends StatelessWidget {
               if (fileExists) {
                 OpenFile.open(filePath);
               } else {
-                downloadFile(attachment["file_url"], downloadPath);
+                downloadFile(attachment.fileUrl, downloadPath);
               }
             } catch (e) {
               print(e);
@@ -269,9 +269,9 @@ class AttachmentsGrid extends StatelessWidget {
                       width: 8,
                     ),
                     Text(
-                      attachments[index]["file_name"] != ''
-                          ? attachments[index]["file_name"]
-                          : attachments[index]["file_url"],
+                      attachments[index].fileName != ''
+                          ? attachments[index].fileName
+                          : attachments[index].fileUrl,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,

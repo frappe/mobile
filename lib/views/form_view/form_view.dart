@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/views/base_view.dart';
 import 'package:frappe_app/views/form_view/form_view_viewmodel.dart';
@@ -71,8 +72,8 @@ class FormView extends StatelessWidget {
                 if (model.error != null) {
                   return handleError(model.error);
                 }
-                var docs = model.formData["docs"];
-                var docInfo = model.formData["docinfo"];
+                var docs = model.formData.docs;
+                var docInfo = model.formData.docinfo;
 
                 var builderContext;
                 var likedBy = docs[0]['_liked_by'] != null
@@ -213,7 +214,7 @@ class FormView extends StatelessWidget {
 }
 
 class DocInfo extends StatelessWidget {
-  final Map docInfo;
+  final Docinfo docInfo;
   final String doctype;
   final String name;
   final Function refreshCallback;
@@ -229,11 +230,10 @@ class DocInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Builder(
       builder: (context) {
-        List reviews = docInfo["energy_point_logs"].where((item) {
-          return ["Appreciation", "Criticism"].contains(item["type"]);
+        var reviews = docInfo.energyPointLogs.where((item) {
+          return ["Appreciation", "Criticism"].contains(item.type);
         }).toList();
-        List tags =
-            docInfo["tags"].isNotEmpty ? docInfo["tags"].split(',') : [];
+        List tags = docInfo.tags.isNotEmpty ? docInfo.tags.split(',') : [];
         return Container(
           color: FrappePalette.grey[50],
           width: double.infinity,
@@ -247,11 +247,11 @@ class DocInfo extends StatelessWidget {
                 title: 'Assignees',
                 actionTitle: 'Add assignee',
                 actionIcon: FrappeIcons.add_user,
-                filledWidget: docInfo["assignments"].isNotEmpty
+                filledWidget: docInfo.assignments.isNotEmpty
                     ? CollapsedAvatars(
-                        docInfo["assignments"].map(
+                        docInfo.assignments.map(
                           (assignment) {
-                            return assignment["owner"];
+                            return assignment.owner;
                           },
                         ).toList(),
                       )
@@ -261,7 +261,7 @@ class DocInfo extends StatelessWidget {
                         context: context,
                         isScrollControlled: true,
                         builder: (context) => AssigneesBottomSheetView(
-                          assignees: docInfo["assignments"],
+                          assignees: docInfo.assignments,
                           doctype: doctype,
                           name: name,
                         ),
@@ -276,9 +276,9 @@ class DocInfo extends StatelessWidget {
               DocInfoItem(
                 title: 'Attachments',
                 actionTitle: 'Attach file',
-                filledWidget: docInfo["attachments"].isNotEmpty
+                filledWidget: docInfo.attachments.isNotEmpty
                     ? Text(
-                        '${docInfo["attachments"].length} Attachments',
+                        '${docInfo.attachments.length} Attachments',
                         style: TextStyle(
                           fontSize: 13,
                           color: FrappePalette.grey[600],
@@ -292,7 +292,7 @@ class DocInfo extends StatelessWidget {
                         context: context,
                         isScrollControlled: true,
                         builder: (context) => ViewAttachmentsBottomSheetView(
-                          attachments: docInfo["attachments"],
+                          attachments: docInfo.attachments,
                         ),
                       ) ??
                       false;
@@ -302,7 +302,7 @@ class DocInfo extends StatelessWidget {
                   }
                 },
               ),
-              if (docInfo["energy_point_logs"] != null)
+              if (docInfo.energyPointLogs != null)
                 DocInfoItem(
                   title: 'Reviews',
                   actionTitle: 'Add review',
@@ -357,11 +357,11 @@ class DocInfo extends StatelessWidget {
               DocInfoItem(
                 title: 'Shared',
                 actionTitle: 'Shared with',
-                filledWidget: docInfo["shared"].isNotEmpty
+                filledWidget: docInfo.shared.isNotEmpty
                     ? CollapsedAvatars(
-                        docInfo["shared"].map(
+                        docInfo.shared.map(
                           (share) {
-                            return share["owner"];
+                            return share.owner;
                           },
                         ).toList(),
                       )
@@ -373,7 +373,7 @@ class DocInfo extends StatelessWidget {
                         context: context,
                         isScrollControlled: true,
                         builder: (context) => ShareBottomSheetView(
-                          shares: docInfo["shared"],
+                          shares: docInfo.shared,
                           doctype: doctype,
                           name: name,
                         ),
