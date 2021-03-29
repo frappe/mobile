@@ -137,8 +137,10 @@ class _CustomFormBuilderCheckboxState extends State<CustomFormBuilderCheckbox> {
             dense: true,
             isThreeLine: false,
             contentPadding: widget.contentPadding,
-            title: widget.label,
-            leading: _leading(field),
+            title: Row(children: [
+              _leading(field),
+              widget.label,
+            ]),
             trailing: _trailing(field),
             onTap: _readOnly
                 ? null
