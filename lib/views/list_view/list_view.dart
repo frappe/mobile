@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/views/base_view.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -37,7 +38,9 @@ class CustomListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BaseView<ListViewViewModel>(
       onModelReady: (model) {
+        model.meta = meta;
         model.getData(meta.docs[0]);
+        model.getDesktopPage(meta.docs[0].module);
       },
       onModelClose: (model) {
         model.filters = {};
@@ -65,22 +68,33 @@ class CustomListView extends StatelessWidget {
                     filters: filters,
                     context: context,
                   ),
-                  body: HeaderAppBar(
-                    subtitle: meta.docs[0].name,
-                    subActions: <Widget>[
+                  appBar: buildAppBar(
+                    title: model.meta.docs[0].name,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ShowSiblingDoctypes(
+                            model: model,
+                            title: model.meta.docs[0].name,
+                          ),
+                        ),
+                      );
+                    },
+                    actions: <Widget>[
                       _newDoc(),
                     ],
-                    body: RefreshIndicator(
-                      onRefresh: () {
-                        return Future.value(model.refresh());
-                      },
-                      child: Container(
-                        color: Palette.bgColor,
-                        child: _generateList(
-                          model: model,
-                          filters: filters,
-                          meta: meta,
-                        ),
+                  ),
+                  body: RefreshIndicator(
+                    onRefresh: () {
+                      return Future.value(model.refresh());
+                    },
+                    child: Container(
+                      color: Palette.bgColor,
+                      child: _generateList(
+                        model: model,
+                        filters: filters,
+                        meta: meta,
                       ),
                     ),
                   ),
@@ -133,7 +147,6 @@ class CustomListView extends StatelessWidget {
         return _generateItem(
           model: model,
           data: entry,
-          meta: meta.docs[0],
           onListTap: () {
             model.onListTap(
               meta: meta,
@@ -152,7 +165,6 @@ class CustomListView extends StatelessWidget {
     @required Map data,
     @required Function onListTap,
     @required Function onButtonTap,
-    @required DoctypeDoc meta,
     @required ListViewViewModel model,
   }) {
     var assignee =
@@ -166,14 +178,14 @@ class CustomListView extends StatelessWidget {
     var isSeenByUser = seenBy.contains(model.userId);
 
     return ListItem(
-      doctype: meta.name,
+      doctype: model.meta.docs[0].name,
       likeCount: likedBy.length,
       onListTap: onListTap,
       isFav: isLikedByUser,
       seen: isSeenByUser,
       assignee: assignee != null && assignee.length > 0 ? assignee : null,
       onButtonTap: onButtonTap,
-      title: getTitle(meta, data),
+      title: getTitle(model.meta.docs[0], data),
       modifiedOn: "${timeago.format(
         DateTime.parse(
           data['modified'],
@@ -243,27 +255,12 @@ class CustomListView extends StatelessWidget {
                     builder: (context) {
                       return FilterList(
                         filters: filters,
-                        doctype: meta.docs[0].name,
+                        doctype: model.meta.docs[0].name,
                         meta: meta,
                       );
                     },
                   ),
                 );
-
-                // Map newFilters = await showModalBottomSheet(
-                //   context: context,
-                //   isScrollControlled: true,
-                //   builder: (BuildContext context) {
-                //     return FractionallySizedBox(
-                //       heightFactor: 0.96,
-                //       child: FilterList(
-                //         filters: filters,
-                //         doctype: doctype,
-                //         meta: model.meta,
-                //       ),
-                //     );
-                //   },
-                // );
 
                 model.applyFilters(newFilters);
               },
@@ -277,7 +274,7 @@ class CustomListView extends StatelessWidget {
               minWidth: 120,
               onPressed: () {
                 model.toggleLiked(
-                  meta.docs[0].name,
+                  model.meta.docs[0].name,
                 );
               },
               title: 'Liked',
@@ -290,6 +287,93 @@ class CustomListView extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class ShowSiblingDoctypes extends StatelessWidget {
+  final ListViewViewModel model;
+  final String title;
+
+  const ShowSiblingDoctypes({
+    Key key,
+    this.model,
+    this.title,
+  }) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: buildAppBar(
+        title: title,
+        expanded: true,
+        onPressed: () {
+          locator<NavigationService>().pop();
+        },
+      ),
+      body: model.state == ViewState.busy
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Builder(
+              builder: (context) {
+                List<Widget> listItems = [];
+
+                model.desktopPageResponse.message.cards.items.forEach(
+                  (item) {
+                    listItems.add(Column(
+                      children: [
+                        ListTile(
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                          ),
+                          title: Text(
+                            item.label,
+                            style: TextStyle(
+                              color: FrappePalette.grey[600],
+                              fontWeight: FontWeight.w600,
+                              fontSize: 11,
+                            ),
+                          ),
+                          visualDensity: VisualDensity(
+                            vertical: -4,
+                          ),
+                        ),
+                        ...item.links.where((link) {
+                          return link.type != "DocType";
+                        }).map(
+                          (link) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0,
+                              ),
+                              child: ListTile(
+                                visualDensity: VisualDensity(
+                                  vertical: -4,
+                                ),
+                                tileColor: title == link.label
+                                    ? Palette.bgColor
+                                    : Colors.white,
+                                title: Text(link.label),
+                                onTap: () {
+                                  model.switchDoctype(
+                                    link.label,
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ).toList()
+                      ],
+                    ));
+                  },
+                );
+
+                return ListView(
+                  children: listItems,
+                );
+              },
+            ),
     );
   }
 }

@@ -33,40 +33,45 @@ class Home extends StatelessWidget {
       },
       builder: (context, model, child) => Scaffold(
         backgroundColor: Palette.bgColor,
-        drawer: _buildDrawer(
-          connectionStatus: connectionStatus,
-          model: model,
+        appBar: buildAppBar(
+          title: model.currentModule ?? "",
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ShowModules(
+                  model: model,
+                  title: model.currentModule ?? "",
+                ),
+              ),
+            );
+          },
         ),
-        body: HeaderAppBar(
-          isRoot: true,
-          subtitle: model.currentModule ?? "",
-          showSecondaryLeading: true,
-          body: RefreshIndicator(
-            onRefresh: () async {
-              model.refresh(connectionStatus);
-            },
-            child: model.state == ViewState.busy
-                ? Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : Builder(
-                    builder: (
-                      context,
-                    ) {
-                      if (model.error != null) {
-                        return handleError(model.error);
-                      }
-                      return ListView(
-                        padding: EdgeInsets.zero,
-                        children: _generateChildren(
-                          desktopPage: model.desktopPage,
-                          model: model,
-                          context: context,
-                        ),
-                      );
-                    },
-                  ),
-          ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            model.refresh(connectionStatus);
+          },
+          child: model.state == ViewState.busy
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Builder(
+                  builder: (
+                    context,
+                  ) {
+                    if (model.error != null) {
+                      return handleError(model.error);
+                    }
+                    return ListView(
+                      padding: EdgeInsets.zero,
+                      children: _generateChildren(
+                        desktopPage: model.desktopPage,
+                        model: model,
+                        context: context,
+                      ),
+                    );
+                  },
+                ),
         ),
       ),
     );
@@ -267,44 +272,77 @@ class Home extends StatelessWidget {
 
     return widgets;
   }
+}
 
-  Drawer _buildDrawer({
-    @required ConnectivityStatus connectionStatus,
-    @required HomeViewModel model,
-  }) {
-    return Drawer(
-      child: model.state == ViewState.busy
+class ShowModules extends StatelessWidget {
+  final HomeViewModel model;
+  final String title;
+
+  const ShowModules({
+    Key key,
+    this.model,
+    this.title,
+  }) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: buildAppBar(
+        title: title,
+        expanded: true,
+        onPressed: () {
+          locator<NavigationService>().pop();
+        },
+      ),
+      body: model.state == ViewState.busy
           ? Center(
               child: CircularProgressIndicator(),
             )
           : Builder(
               builder: (context) {
                 List<Widget> listItems = [
-                  Container(
-                    height: 30,
-                  ),
                   ListTile(
-                    title: Text('MODULES'),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                    ),
+                    title: Text(
+                      'MODULE',
+                      style: TextStyle(
+                        color: FrappePalette.grey[600],
+                        fontWeight: FontWeight.w600,
+                        fontSize: 11,
+                      ),
+                    ),
+                    visualDensity: VisualDensity(
+                      vertical: -4,
+                    ),
                   ),
                 ];
-                model.modules.forEach((element) {
-                  listItems.add(Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: ListTile(
-                      tileColor: model.currentModule == element.name
-                          ? Palette.bgColor
-                          : Colors.white,
-                      title: Text(element.label),
-                      onTap: () {
-                        model.switchModule(
-                          element.name,
-                        );
+                model.modules.forEach(
+                  (element) {
+                    listItems.add(
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: ListTile(
+                          visualDensity: VisualDensity(
+                            vertical: -4,
+                          ),
+                          tileColor: model.currentModule == element.name
+                              ? Palette.bgColor
+                              : Colors.white,
+                          title: Text(element.label),
+                          onTap: () {
+                            model.switchModule(
+                              element.name,
+                            );
 
-                        locator<NavigationService>().pop();
-                      },
-                    ),
-                  ));
-                });
+                            locator<NavigationService>().pop();
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                );
 
                 return ListView(
                   children: listItems,

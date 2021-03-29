@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:frappe_app/model/desktop_page_response.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../app/locator.dart';
@@ -23,10 +24,12 @@ import '../../views/filter_list/filter_list_view.dart';
 @lazySingleton
 class ListViewViewModel extends BaseViewModel {
   PagewiseLoadController pagewiseLoadController;
+  DoctypeResponse meta;
   Response error;
   var filters = {};
   bool showLiked = false;
   var userId = Config().userId;
+  DesktopPageResponse desktopPageResponse;
 
   refresh() {
     pagewiseLoadController.reset();
@@ -121,6 +124,30 @@ class ListViewViewModel extends BaseViewModel {
 
       pagewiseLoadController.reset();
       notifyListeners();
+    }
+  }
+
+  getDesktopPage(String module) async {
+    setState(ViewState.busy);
+    desktopPageResponse = await locator<Api>().getDesktopPage(module);
+    setState(ViewState.idle);
+  }
+
+  switchDoctype(String doctype) async {
+    var _meta = await OfflineStorage.getMeta(doctype);
+
+    if (_meta.docs[0].issingle == 1) {
+      locator<NavigationService>().navigateTo(
+        Routes.formView,
+        arguments: FormViewArguments(
+          meta: _meta,
+          name: _meta.docs[0].name,
+        ),
+      );
+    } else {
+      locator<NavigationService>().pop();
+      meta = _meta;
+      getData(_meta.docs[0]);
     }
   }
 
