@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
+
 import 'package:frappe_app/utils/helpers.dart';
+
 import 'package:provider/provider.dart';
 
 import '../../model/desktop_page_response.dart';
-import '../../views/home/home_viewmodel.dart';
-import '../../services/navigation_service.dart';
 
 import '../../config/frappe_palette.dart';
 import '../../config/palette.dart';
-
-import '../../app/locator.dart';
 
 import '../../utils/enums.dart';
 
 import '../../widgets/header_app_bar.dart';
 import '../../widgets/card_list_tile.dart';
 import '../base_view.dart';
+import 'desk_viewmodel.dart';
 
-class Home extends StatelessWidget {
+class DeskView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var connectionStatus = Provider.of<ConnectivityStatus>(
       context,
     );
 
-    return BaseView<HomeViewModel>(
+    return BaseView<DeskViewModel>(
       onModelReady: (model) {
         model.getData();
       },
@@ -34,6 +33,7 @@ class Home extends StatelessWidget {
       builder: (context, model, child) => Scaffold(
         backgroundColor: Palette.bgColor,
         appBar: buildAppBar(
+          context: context,
           title: model.currentModule ?? "",
           onPressed: () {
             Navigator.push(
@@ -107,7 +107,7 @@ class Home extends StatelessWidget {
 
   Widget _shortcut({
     @required ShortcutItem item,
-    @required HomeViewModel model,
+    @required DeskViewModel model,
     @required BuildContext context,
   }) {
     return Padding(
@@ -118,7 +118,7 @@ class Home extends StatelessWidget {
       ),
       child: CardListTile(
         title: Text(item.label),
-        onTap: () {
+        onTap: () async {
           model.navigateToView(
             doctype: item.linkTo,
             context: context,
@@ -130,7 +130,7 @@ class Home extends StatelessWidget {
 
   Widget _item({
     @required CardItemLink item,
-    @required HomeViewModel model,
+    @required DeskViewModel model,
     @required BuildContext context,
   }) {
     return ListTile(
@@ -176,7 +176,7 @@ class Home extends StatelessWidget {
 
   List<Widget> _generateChildren({
     @required DesktopPageResponse desktopPage,
-    @required HomeViewModel model,
+    @required DeskViewModel model,
     @required BuildContext context,
   }) {
     List<Widget> widgets = [];
@@ -275,7 +275,7 @@ class Home extends StatelessWidget {
 }
 
 class ShowModules extends StatelessWidget {
-  final HomeViewModel model;
+  final DeskViewModel model;
   final String title;
 
   const ShowModules({
@@ -288,10 +288,11 @@ class ShowModules extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: buildAppBar(
+        context: context,
         title: title,
         expanded: true,
         onPressed: () {
-          locator<NavigationService>().pop();
+          Navigator.of(context).pop();
         },
       ),
       body: model.state == ViewState.busy
@@ -336,7 +337,7 @@ class ShowModules extends StatelessWidget {
                               element.name,
                             );
 
-                            locator<NavigationService>().pop();
+                            Navigator.of(context).pop();
                           },
                         ),
                       ),

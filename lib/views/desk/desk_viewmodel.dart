@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:frappe_app/app/router.gr.dart';
 import 'package:frappe_app/services/navigation_service.dart';
 import 'package:frappe_app/utils/frappe_alert.dart';
+import 'package:frappe_app/views/form_view/form_view.dart';
+import 'package:frappe_app/views/list_view/list_view.dart';
 import 'package:injectable/injectable.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
 import '../../app/locator.dart';
 import '../../services/api/api.dart';
@@ -19,7 +22,7 @@ import '../../utils/enums.dart';
 import '../../utils/helpers.dart';
 
 @lazySingleton
-class HomeViewModel extends BaseViewModel {
+class DeskViewModel extends BaseViewModel {
   String currentModule;
   List<DeskMessage> modules = [];
   DesktopPageResponse desktopPage;
@@ -116,12 +119,23 @@ class HomeViewModel extends BaseViewModel {
             name: meta.docs[0].name,
           ),
         );
+        pushNewScreenWithRouteSettings(
+          context,
+          settings: RouteSettings(name: Routes.formView),
+          screen: FormView(
+            meta: meta,
+            name: meta.docs[0].name,
+          ),
+          withNavBar: true,
+        );
       } else {
-        locator<NavigationService>().navigateTo(
-          Routes.customListView,
-          arguments: CustomListViewArguments(
+        pushNewScreenWithRouteSettings(
+          context,
+          settings: RouteSettings(name: Routes.customListView),
+          screen: CustomListView(
             meta: meta,
           ),
+          withNavBar: true,
         );
       }
     } catch (e) {
