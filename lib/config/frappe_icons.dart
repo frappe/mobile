@@ -28,4 +28,6 @@ class FrappeIcons {
   static const image_add = '$_basePath/image_add.svg';
   static const small_file = '$_basePath/small_file.svg';
   static const lock = '$_basePath/lock.svg';
+  static const home_filled = '$_basePath/home_filled.svg';
+  static const home_outlined = '$_basePath/home_outlined.svg';
 }
