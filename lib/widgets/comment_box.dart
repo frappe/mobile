@@ -29,7 +29,7 @@ class CommentBox extends StatelessWidget {
               FlatButton(
                 child: Text('Yes'),
                 onPressed: () async {
-                  locator<NavigationService>().pop();
+                  Navigator.of(context).pop();
                   locator<Api>().deleteComment(data["name"]);
                   callback();
                 },
@@ -37,7 +37,7 @@ class CommentBox extends StatelessWidget {
               FlatButton(
                 child: Text('No'),
                 onPressed: () {
-                  locator<NavigationService>().pop();
+                  Navigator.of(context).pop();
                 },
               )
             ],

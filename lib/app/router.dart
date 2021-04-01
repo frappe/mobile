@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route_annotations.dart';
+import 'package:frappe_app/views/home_view.dart';
 
 import '../widgets/email_box.dart';
 import '../app.dart';
@@ -6,7 +7,7 @@ import '../app.dart';
 import '../views/form_view/form_view.dart';
 import '../views/new_doc/new_doc_view.dart';
 import '../views/list_view/list_view.dart';
-import '../views/home/home_view.dart';
+import '../views/desk/desk_view.dart';
 import '../views/add_assignees/add_assignees_view.dart';
 import '../views/add_review/add_review_view.dart';
 import '../views/add_tags/add_tags_view.dart';
@@ -26,7 +27,7 @@ import '../views/login/login_view.dart';
     // initial route is named "/"
     MaterialRoute(page: FrappeApp, initial: true),
     MaterialRoute(page: Login),
-    MaterialRoute(page: Home),
+    MaterialRoute(page: DeskView),
     MaterialRoute(page: CustomListView),
     MaterialRoute(page: NewDoc),
     MaterialRoute(page: FormView),
@@ -43,6 +44,7 @@ import '../views/login/login_view.dart';
     MaterialRoute(page: AddReview),
     MaterialRoute(page: Share),
     MaterialRoute(page: AddTags),
+    MaterialRoute(page: HomeView),
   ],
 )
 class $MyRouter {}

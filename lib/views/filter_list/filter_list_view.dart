@@ -49,7 +49,7 @@ class FilterList extends StatelessWidget {
                     filters: filters,
                     model: model,
                   ),
-                  appBar: _appBar(),
+                  appBar: _appBar(context),
                   body: CustomForm(
                     fields: model.filterFields,
                     formKey: _fbKey,
@@ -108,7 +108,7 @@ class FilterList extends StatelessWidget {
     );
   }
 
-  Widget _appBar() {
+  Widget _appBar(BuildContext context) {
     return AppBar(
       elevation: 0.5,
       leading: IconButton(
@@ -116,7 +116,7 @@ class FilterList extends StatelessWidget {
           Icons.close,
         ),
         onPressed: () {
-          locator<NavigationService>().pop();
+          Navigator.of(context).pop();
         },
       ),
     );

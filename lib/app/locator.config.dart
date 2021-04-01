@@ -13,9 +13,9 @@ import '../views/add_review/add_review_viewmodel.dart';
 import '../views/add_tags/add_tags_viewmodel.dart';
 import '../views/form_view/bottom_sheets/assignees/assignees_bottom_sheet_viewmodel.dart';
 import '../services/connectivity_service.dart';
+import '../views/desk/desk_viewmodel.dart';
 import '../views/filter_list/filter_list_viewmodel.dart';
 import '../views/form_view/form_view_viewmodel.dart';
-import '../views/home/home_viewmodel.dart';
 import '../views/list_view/list_view_viewmodel.dart';
 import '../views/login/login_viewmodel.dart';
 import '../services/navigation_service.dart';
@@ -44,9 +44,9 @@ GetIt $initGetIt(
   gh.lazySingleton<AssigneesBottomSheetViewModel>(
       () => AssigneesBottomSheetViewModel());
   gh.lazySingleton<ConnectivityService>(() => ConnectivityService());
+  gh.lazySingleton<DeskViewModel>(() => DeskViewModel());
   gh.lazySingleton<FilterListViewModel>(() => FilterListViewModel());
   gh.lazySingleton<FormViewViewModel>(() => FormViewViewModel());
-  gh.lazySingleton<HomeViewModel>(() => HomeViewModel());
   gh.lazySingleton<ListViewViewModel>(() => ListViewViewModel());
   gh.lazySingleton<LoginViewModel>(() => LoginViewModel());
   gh.lazySingleton<NavigationService>(() => NavigationService());

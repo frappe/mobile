@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:frappe_app/model/desktop_page_response.dart';
+import 'package:frappe_app/views/form_view/form_view.dart';
 import 'package:injectable/injectable.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
 import '../../app/locator.dart';
 import '../../app/router.gr.dart';
@@ -86,14 +88,17 @@ class ListViewViewModel extends BaseViewModel {
   onListTap({
     @required DoctypeResponse meta,
     @required String name,
+    @required BuildContext context,
   }) {
     {
-      locator<NavigationService>().navigateTo(
-        Routes.formView,
-        arguments: FormViewArguments(
+      pushNewScreenWithRouteSettings(
+        context,
+        settings: RouteSettings(name: Routes.formView),
+        screen: FormView(
           name: name,
           meta: meta,
         ),
+        withNavBar: true,
       );
     }
   }
@@ -133,19 +138,24 @@ class ListViewViewModel extends BaseViewModel {
     setState(ViewState.idle);
   }
 
-  switchDoctype(String doctype) async {
+  switchDoctype({
+    @required String doctype,
+    @required BuildContext context,
+  }) async {
     var _meta = await OfflineStorage.getMeta(doctype);
 
     if (_meta.docs[0].issingle == 1) {
-      locator<NavigationService>().navigateTo(
-        Routes.formView,
-        arguments: FormViewArguments(
+      pushNewScreenWithRouteSettings(
+        context,
+        settings: RouteSettings(name: Routes.formView),
+        screen: FormView(
           meta: _meta,
           name: _meta.docs[0].name,
         ),
+        withNavBar: true,
       );
     } else {
-      locator<NavigationService>().pop();
+      Navigator.of(context).pop();
       meta = _meta;
       getData(_meta.docs[0]);
     }

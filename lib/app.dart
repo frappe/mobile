@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/views/home_view.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +14,6 @@ import 'utils/enums.dart';
 import 'services/connectivity_service.dart';
 import 'services/navigation_service.dart';
 
-import 'views/home/home_view.dart';
 import 'views/login/login_view.dart';
 
 class FrappeApp extends StatefulWidget {
@@ -68,7 +68,7 @@ class _FrappeAppState extends State<FrappeApp> {
             child: Scaffold(
               body: _isLoaded
                   ? _isLoggedIn
-                      ? Home()
+                      ? HomeView()
                       : Login()
                   : Center(
                       child: CircularProgressIndicator(),

@@ -39,7 +39,7 @@ class CommentInput extends StatelessWidget {
                 authorEmail,
               );
               callback();
-              locator<NavigationService>().pop();
+              Navigator.of(context).pop();
             },
           )
         ],

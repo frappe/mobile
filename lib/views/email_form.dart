@@ -115,7 +115,7 @@ class EmailForm extends StatelessWidget {
                   doctypeName: doc,
                 );
                 callback();
-                locator<NavigationService>().pop();
+                Navigator.of(context).pop();
               }
             },
             child: Text('Send'),

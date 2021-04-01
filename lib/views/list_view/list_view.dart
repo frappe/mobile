@@ -12,7 +12,6 @@ import '../../app/locator.dart';
 import '../../app/router.gr.dart';
 
 import '../../views/list_view/list_view_viewmodel.dart';
-import '../../views/filter_list/filter_list_view.dart';
 
 import '../../services/navigation_service.dart';
 
@@ -63,12 +62,8 @@ class CustomListView extends StatelessWidget {
                 var filters = model.filters;
 
                 return Scaffold(
-                  bottomNavigationBar: _bottomBar(
-                    model: model,
-                    filters: filters,
-                    context: context,
-                  ),
                   appBar: buildAppBar(
+                    context: context,
                     title: model.meta.docs[0].name,
                     onPressed: () {
                       Navigator.push(
@@ -149,6 +144,7 @@ class CustomListView extends StatelessWidget {
           data: entry,
           onListTap: () {
             model.onListTap(
+              context: buildContext,
               meta: meta,
               name: entry["name"],
             );
@@ -234,61 +230,6 @@ class CustomListView extends StatelessWidget {
       ),
     );
   }
-
-  Widget _bottomBar({
-    @required Map filters,
-    @required BuildContext context,
-    @required ListViewViewModel model,
-  }) {
-    return Container(
-      height: 60,
-      child: BottomAppBar(
-        color: Colors.white,
-        child: Row(
-          children: <Widget>[
-            Spacer(),
-            FrappeRaisedButton(
-              minWidth: 120,
-              onPressed: () async {
-                Map newFilters = await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return FilterList(
-                        filters: filters,
-                        doctype: model.meta.docs[0].name,
-                        meta: meta,
-                      );
-                    },
-                  ),
-                );
-
-                model.applyFilters(newFilters);
-              },
-              title: 'Filters (${model.filters.length})',
-              icon: FrappeIcons.filter,
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            FrappeRaisedButton(
-              minWidth: 120,
-              onPressed: () {
-                model.toggleLiked(
-                  model.meta.docs[0].name,
-                );
-              },
-              title: 'Liked',
-              icon: model.showLiked
-                  ? FrappeIcons.favourite_active
-                  : FrappeIcons.favourite_resting,
-              iconSize: 16.0,
-            ),
-            Spacer()
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 class ShowSiblingDoctypes extends StatelessWidget {
@@ -305,10 +246,11 @@ class ShowSiblingDoctypes extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: buildAppBar(
+        context: context,
         title: title,
         expanded: true,
         onPressed: () {
-          locator<NavigationService>().pop();
+          Navigator.of(context).pop();
         },
       ),
       body: model.state == ViewState.busy
@@ -357,7 +299,8 @@ class ShowSiblingDoctypes extends StatelessWidget {
                                 title: Text(link.label),
                                 onTap: () {
                                   model.switchDoctype(
-                                    link.label,
+                                    doctype: link.label,
+                                    context: context,
                                   );
                                 },
                               ),

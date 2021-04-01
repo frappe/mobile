@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:frappe_app/app/locator.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
-import 'package:frappe_app/services/navigation_service.dart';
 
 AppBar buildAppBar({
   @required String title,
   bool expanded = false,
   List<Widget> actions,
   Function onPressed,
+  @required BuildContext context,
 }) {
-  bool canPop = locator<NavigationService>().canPop();
+  bool canPop = Navigator.of(context).canPop();
   double titleSpacing;
 
   if (!canPop || expanded) {

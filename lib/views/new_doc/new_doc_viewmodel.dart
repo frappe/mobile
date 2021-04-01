@@ -55,7 +55,7 @@ class NewDocViewModel extends BaseViewModel {
           subtitle: 'Added to Queue',
           context: context,
         );
-        locator<NavigationService>().pop();
+        Navigator.of(context).pop();
       } else {
         try {
           var response = await locator<Api>().saveDocs(

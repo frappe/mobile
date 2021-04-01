@@ -103,7 +103,7 @@ class Login extends StatelessWidget {
 
                                 if (response["success"] == true) {
                                   locator<NavigationService>().pushReplacement(
-                                    Routes.home,
+                                    Routes.deskView,
                                   );
                                 } else {
                                   if (response["statusCode"] ==

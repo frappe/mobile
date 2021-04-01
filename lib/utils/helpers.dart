@@ -484,7 +484,7 @@ showErrorDialog(e, BuildContext context) {
           FlatButton(
             child: Text('Ok'),
             onPressed: () async {
-              locator<NavigationService>().pop();
+              Navigator.of(context).pop();
             },
           ),
         ],

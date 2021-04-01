@@ -15,10 +15,11 @@ import '../views/add_assignees/add_assignees_view.dart';
 import '../views/add_review/add_review_view.dart';
 import '../views/add_tags/add_tags_view.dart';
 import '../views/comment_input.dart';
+import '../views/desk/desk_view.dart';
 import '../views/email_form.dart';
 import '../views/file_picker.dart';
 import '../views/form_view/form_view.dart';
-import '../views/home/home_view.dart';
+import '../views/home_view.dart';
 import '../views/list_view/list_view.dart';
 import '../views/login/login_view.dart';
 import '../views/new_doc/new_doc_view.dart';
@@ -33,7 +34,7 @@ import '../widgets/email_box.dart';
 class Routes {
   static const String frappeApp = '/';
   static const String login = '/Login';
-  static const String home = '/Home';
+  static const String deskView = '/desk-view';
   static const String customListView = '/custom-list-view';
   static const String newDoc = '/new-doc';
   static const String formView = '/form-view';
@@ -50,10 +51,11 @@ class Routes {
   static const String addReview = '/add-review';
   static const String share = '/Share';
   static const String addTags = '/add-tags';
+  static const String homeView = '/home-view';
   static const all = <String>{
     frappeApp,
     login,
-    home,
+    deskView,
     customListView,
     newDoc,
     formView,
@@ -70,6 +72,7 @@ class Routes {
     addReview,
     share,
     addTags,
+    homeView,
   };
 }
 
@@ -79,7 +82,7 @@ class MyRouter extends RouterBase {
   final _routes = <RouteDef>[
     RouteDef(Routes.frappeApp, page: FrappeApp),
     RouteDef(Routes.login, page: Login),
-    RouteDef(Routes.home, page: Home),
+    RouteDef(Routes.deskView, page: DeskView),
     RouteDef(Routes.customListView, page: CustomListView),
     RouteDef(Routes.newDoc, page: NewDoc),
     RouteDef(Routes.formView, page: FormView),
@@ -96,6 +99,7 @@ class MyRouter extends RouterBase {
     RouteDef(Routes.addReview, page: AddReview),
     RouteDef(Routes.share, page: Share),
     RouteDef(Routes.addTags, page: AddTags),
+    RouteDef(Routes.homeView, page: HomeView),
   ];
   @override
   Map<Type, AutoRouteFactory> get pagesMap => _pagesMap;
@@ -112,9 +116,9 @@ class MyRouter extends RouterBase {
         settings: data,
       );
     },
-    Home: (data) {
+    DeskView: (data) {
       return MaterialPageRoute<dynamic>(
-        builder: (context) => Home(),
+        builder: (context) => DeskView(),
         settings: data,
       );
     },
@@ -284,6 +288,12 @@ class MyRouter extends RouterBase {
           doctype: args.doctype,
           name: args.name,
         ),
+        settings: data,
+      );
+    },
+    HomeView: (data) {
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => HomeView(),
         settings: data,
       );
     },

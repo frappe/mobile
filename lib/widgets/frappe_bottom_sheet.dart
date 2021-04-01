@@ -49,7 +49,7 @@ class FrappeBottomSheet extends StatelessWidget {
               padding: EdgeInsets.zero,
               minWidth: 70,
               onPressed: () {
-                locator<NavigationService>().pop();
+                Navigator.of(context).pop();
               },
             ),
             Padding(
