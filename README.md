@@ -24,7 +24,7 @@
 
 1) Install packages<br/>
 ```sh
-pub packages get
+pub get packages
 ```
 2) Run the Project<br/>
 ```sh
