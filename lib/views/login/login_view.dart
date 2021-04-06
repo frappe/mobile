@@ -102,9 +102,8 @@ class Login extends StatelessWidget {
                                 );
 
                                 if (response["success"] == true) {
-                                  locator<NavigationService>().pushReplacement(
-                                    Routes.deskView,
-                                  );
+                                  locator<NavigationService>()
+                                      .pushReplacement(Routes.homeView);
                                 } else {
                                   if (response["statusCode"] ==
                                       HttpStatus.unauthorized) {
