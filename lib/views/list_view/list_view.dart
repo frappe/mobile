@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/views/base_view.dart';
+import 'package:frappe_app/views/list_view/bottom_sheets/filters_bottom_sheet_view.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../model/doctype_response.dart';
@@ -62,6 +63,72 @@ class CustomListView extends StatelessWidget {
                 var filters = model.filters;
 
                 return Scaffold(
+                  floatingActionButtonLocation:
+                      FloatingActionButtonLocation.centerFloat,
+                  floatingActionButton: FlatButton(
+                    color: FrappePalette.grey[700],
+                    padding: EdgeInsets.all(8),
+                    shape: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.transparent,
+                      ),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(8),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FrappeIcon(
+                          FrappeIcons.filter,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          'Add filter',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(
+                              4,
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '3',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    onPressed: () async {
+                      bool refresh = await showModalBottomSheet(
+                            useRootNavigator: true,
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (context) => FiltersBottomSheetView(
+                              meta: meta,
+                            ),
+                          ) ??
+                          false;
+
+                      if (refresh) {
+                        // refreshCallback();
+                      }
+                    },
+                  ),
                   appBar: buildAppBar(
                     context: context,
                     title: model.meta.docs[0].name,
