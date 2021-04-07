@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/views/base_view.dart';
 import 'package:frappe_app/views/list_view/bottom_sheets/filters_bottom_sheet_view.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -43,9 +44,6 @@ class CustomListView extends StatelessWidget {
         model.getDesktopPage(meta.docs[0].module);
       },
       onModelClose: (model) {
-        model.filters = {};
-
-        model.showLiked = false;
         model.error = null;
       },
       builder: (context, model, child) => model.state == ViewState.busy
@@ -59,8 +57,6 @@ class CustomListView extends StatelessWidget {
                 if (model.error != null) {
                   return handleError(model.error);
                 }
-
-                var filters = model.filters;
 
                 return Scaffold(
                   floatingActionButtonLocation:
@@ -107,25 +103,52 @@ class CustomListView extends StatelessWidget {
                           ),
                           child: Center(
                             child: Text(
-                              '3',
+                              model.filters.length.toString(),
                             ),
                           ),
                         ),
                       ],
                     ),
                     onPressed: () async {
-                      bool refresh = await showModalBottomSheet(
-                            useRootNavigator: true,
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (context) => FiltersBottomSheetView(
-                              meta: meta,
-                            ),
-                          ) ??
-                          false;
+                      var fields = meta.docs[0].fields.where((field) {
+                        return field.fieldtype != "Section Break" &&
+                            field.fieldtype != "Column Break" &&
+                            field.hidden != 1;
+                      }).toList();
 
-                      if (refresh) {
-                        // refreshCallback();
+                      List<Filter> appliedFilters = await showModalBottomSheet(
+                        useRootNavigator: true,
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (context) => FiltersBottomSheetView(
+                          fields: fields,
+                          filters: model.filters,
+                        ),
+                      );
+
+                      if (appliedFilters != null) {
+                        if (appliedFilters.isNotEmpty) {
+                          List<Filter> appliedFilterClone = [];
+                          appliedFilters.forEach(
+                            (appliedFilter) {
+                              appliedFilterClone.add(
+                                Filter.fromJson(
+                                  json.decode(
+                                    json.encode(
+                                      appliedFilter,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+
+                          model.filters = appliedFilterClone;
+                          model.getData(meta.docs[0]);
+                        } else {
+                          model.filters = [];
+                          model.getData(meta.docs[0]);
+                        }
                       }
                     },
                   ),
@@ -155,7 +178,7 @@ class CustomListView extends StatelessWidget {
                       color: Palette.bgColor,
                       child: _generateList(
                         model: model,
-                        filters: filters,
+                        filters: model.filters,
                         meta: meta,
                       ),
                     ),
@@ -191,7 +214,7 @@ class CustomListView extends StatelessWidget {
   }
 
   Widget _generateList({
-    @required Map filters,
+    @required List<Filter> filters,
     @required DoctypeResponse meta,
     @required ListViewViewModel model,
   }) {
@@ -217,7 +240,7 @@ class CustomListView extends StatelessWidget {
             );
           },
           onButtonTap: (k, v) {
-            model.onButtonTap(key: k, value: v);
+            // model.onButtonTap(key: k, value: v);
           },
         );
       }),
@@ -261,7 +284,7 @@ class CustomListView extends StatelessWidget {
   }
 
   Widget _noItemsFoundBuilder({
-    @required Map filters,
+    @required List<Filter> filters,
     @required BuildContext context,
     @required ListViewViewModel model,
   }) {

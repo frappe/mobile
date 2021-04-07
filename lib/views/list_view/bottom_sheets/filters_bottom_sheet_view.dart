@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
@@ -13,24 +14,24 @@ import 'package:frappe_app/widgets/frappe_button.dart';
 import 'filters_bottom_sheet_viewmodel.dart';
 
 class FiltersBottomSheetView extends StatelessWidget {
-  final DoctypeResponse meta;
+  final List<DoctypeField> fields;
+  final List<Filter> filters;
 
   const FiltersBottomSheetView({
     Key key,
-    @required this.meta,
+    @required this.fields,
+    this.filters,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BaseView<FiltersBottomSheetViewModel>(
       onModelReady: (model) {
-        model.filtersToApply.add(
-          [
-            null,
-            "Equals",
-            "",
-          ],
-        );
+        if (filters.isEmpty) {
+          model.addFilter();
+        } else {
+          model.filtersToApply = filters;
+        }
       },
       onModelClose: (model) {
         model.filtersToApply.clear();
@@ -67,7 +68,9 @@ class FiltersBottomSheetView extends StatelessWidget {
                   ),
                   child: FrappeFlatButton(
                     buttonType: ButtonType.primary,
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pop(model.filtersToApply);
+                    },
                     title: 'Apply',
                   ),
                 ),
@@ -96,10 +99,16 @@ class FiltersBottomSheetView extends StatelessWidget {
                 var idx = entry.key;
 
                 return AddFilter(
-                  meta: meta,
-                  model: model,
+                  fields: fields,
+                  filter: filter,
                   onDelete: () {
                     model.removeFilter(idx);
+                  },
+                  onUpdate: (Filter filter) {
+                    model.updateFilter(
+                      filter: filter,
+                      index: idx,
+                    );
                   },
                 );
               },
@@ -112,15 +121,17 @@ class FiltersBottomSheetView extends StatelessWidget {
 }
 
 class AddFilter extends StatelessWidget {
-  final DoctypeResponse meta;
-  final FiltersBottomSheetViewModel model;
+  final List<DoctypeField> fields;
   final Function onDelete;
+  final Function onUpdate;
+  final Filter filter;
 
   const AddFilter({
     Key key,
-    @required this.meta,
-    @required this.model,
-    this.onDelete,
+    @required this.fields,
+    @required this.onDelete,
+    @required this.onUpdate,
+    @required this.filter,
   }) : super(key: key);
 
   @override
@@ -135,19 +146,19 @@ class AddFilter extends StatelessWidget {
               FlatButton(
                 padding: EdgeInsets.zero,
                 onPressed: () async {
-                  List val = await showModalBottomSheet(
-                        useRootNavigator: true,
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (context) => EditFilterBottomSheetView(
-                          page: 1,
-                          meta: meta,
-                        ),
-                      ) ??
-                      false;
+                  Filter _filter = await showModalBottomSheet(
+                    useRootNavigator: true,
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) => EditFilterBottomSheetView(
+                      page: 1,
+                      fields: fields,
+                      filter: filter,
+                    ),
+                  );
 
-                  if (val.isNotEmpty) {
-                    // refreshCallback();
+                  if (_filter != null && _filter.fieldname != null) {
+                    onUpdate(_filter);
                   }
                 },
                 child: Container(
@@ -165,7 +176,7 @@ class AddFilter extends StatelessWidget {
                             maxWidth: MediaQuery.of(context).size.width - 110,
                           ),
                           child: Text(
-                            'name',
+                            filter.fieldname ?? fields[0].label,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: FrappePalette.grey[600],
@@ -196,18 +207,18 @@ class AddFilter extends StatelessWidget {
               ),
               FlatButton(
                 onPressed: () async {
-                  bool refresh = await showModalBottomSheet(
-                        useRootNavigator: true,
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (context) => EditFilterBottomSheetView(
-                          page: 2,
-                        ),
-                      ) ??
-                      false;
+                  Filter _filter = await showModalBottomSheet(
+                    useRootNavigator: true,
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) => EditFilterBottomSheetView(
+                      page: 2,
+                      filter: filter,
+                    ),
+                  );
 
-                  if (refresh) {
-                    // refreshCallback();
+                  if (_filter != null && _filter.filterOperator != null) {
+                    onUpdate(_filter);
                   }
                 },
                 padding: EdgeInsets.zero,
@@ -222,7 +233,7 @@ class AddFilter extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Equals',
+                          filter.filterOperator.label,
                           style: TextStyle(
                             color: FrappePalette.grey[600],
                           ),
@@ -251,18 +262,18 @@ class AddFilter extends StatelessWidget {
                   ),
                   child: GestureDetector(
                     onTap: () async {
-                      bool refresh = await showModalBottomSheet(
-                            useRootNavigator: true,
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (context) => EditFilterBottomSheetView(
-                              page: 3,
-                            ),
-                          ) ??
-                          false;
+                      Filter _filter = await showModalBottomSheet(
+                        useRootNavigator: true,
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (context) => EditFilterBottomSheetView(
+                          page: 3,
+                          filter: filter,
+                        ),
+                      );
 
-                      if (refresh) {
-                        // refreshCallback();
+                      if (_filter != null && _filter.value != null) {
+                        onUpdate(_filter);
                       }
                     },
                     child: ConstrainedBox(
@@ -270,7 +281,7 @@ class AddFilter extends StatelessWidget {
                         maxWidth: MediaQuery.of(context).size.width - 110,
                       ),
                       child: Text(
-                        'value',
+                        filter.value ?? "value",
                         style: TextStyle(
                           color: FrappePalette.grey[600],
                         ),
@@ -284,7 +295,7 @@ class AddFilter extends StatelessWidget {
         ),
         GestureDetector(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: FrappeIcon(
               FrappeIcons.close_alt,
               size: 16,

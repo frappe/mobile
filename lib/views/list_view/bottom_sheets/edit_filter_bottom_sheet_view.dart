@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/doctype_response.dart';
+import 'package:frappe_app/utils/constants.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/views/base_view.dart';
 import 'package:frappe_app/views/list_view/bottom_sheets/edit_filter_bottom_sheet_viewmodel.dart';
@@ -11,11 +13,13 @@ import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
 
 class EditFilterBottomSheetView extends StatelessWidget {
   final int page;
-  final DoctypeResponse meta;
+  final List<DoctypeField> fields;
+  final Filter filter;
 
   const EditFilterBottomSheetView({
     @required this.page,
-    this.meta,
+    this.fields,
+    this.filter,
     Key key,
   }) : super(key: key);
 
@@ -24,16 +28,13 @@ class EditFilterBottomSheetView extends StatelessWidget {
     return BaseView<EditFilterBottomSheetViewModel>(
       onModelReady: (model) {
         model.pageNumber = page;
-        model.filter = [null, "Equals", ""];
-      },
-      onModelClose: (model) {
-        model.filter.clear();
+        model.filter = filter;
       },
       builder: (context, model, child) {
         Widget widget;
         if (model.pageNumber == 1) {
           widget = SelectFilterField(
-            meta: meta,
+            fields: fields,
             model: model,
             onActionButtonPress: () {
               model.moveToPage(2);
@@ -55,8 +56,8 @@ class EditFilterBottomSheetView extends StatelessWidget {
             leadingOnPressed: () {
               model.moveToPage(2);
             },
-            onActionButtonPress: (dynamic val) {
-              Navigator.of(context).pop(val);
+            onActionButtonPress: (Filter filter) {
+              Navigator.of(context).pop(filter);
             },
           );
         }
@@ -99,7 +100,7 @@ class _EditValueState extends State<EditValue> {
         ),
       ),
       onActionButtonPress: () {
-        widget.model.addFilterValue(page: 3, value: textEditingController.text);
+        widget.model.updateValue(textEditingController.text);
         widget.onActionButtonPress(widget.model.filter);
       },
       body: Column(
@@ -121,23 +122,18 @@ class _EditValueState extends State<EditValue> {
 class SelectFilterField extends StatelessWidget {
   final Function onActionButtonPress;
   final Function leadingOnPressed;
-  final DoctypeResponse meta;
+  final List<DoctypeField> fields;
   final EditFilterBottomSheetViewModel model;
 
   SelectFilterField({
     this.onActionButtonPress,
     this.leadingOnPressed,
-    @required this.meta,
+    @required this.fields,
     @required this.model,
   });
 
   @override
   Widget build(BuildContext context) {
-    var fields = meta.docs[0].fields.where((field) {
-      return field.fieldtype == "Section Break" || field.hidden != 1;
-    }).map((field) {
-      return field.fieldname;
-    });
     return FrappeBottomSheet(
       title: 'Choose filter field',
       showLeading: false,
@@ -152,12 +148,12 @@ class SelectFilterField extends StatelessWidget {
           children: fields.map((field) {
         return ListTile(
           onTap: () {
-            model.addFilterValue(page: 1, value: field);
+            model.updateFieldName(field.fieldname);
             model.moveToPage(2);
           },
           visualDensity: VisualDensity(vertical: -4),
           title: Text(
-            field,
+            field.label,
             style: TextStyle(
               color: FrappePalette.grey[700],
             ),
@@ -197,25 +193,27 @@ class SelectFilterOperator extends StatelessWidget {
       onActionButtonPress: onActionButtonPress,
       title: 'Choose filter operator',
       body: ListView(
-          children: model.operators.map((opt) {
-        return ListTile(
-          onTap: () {
-            model.addFilterValue(page: 2, value: opt);
-            model.moveToPage(3);
-          },
-          visualDensity: VisualDensity(vertical: -4),
-          title: Text(
-            opt,
-            style: TextStyle(
-              color: FrappePalette.grey[700],
+          children: Constants.filterOperators.map(
+        (opt) {
+          return ListTile(
+            onTap: () {
+              model.updateFilterOperator(opt);
+              model.moveToPage(3);
+            },
+            visualDensity: VisualDensity(vertical: -4),
+            title: Text(
+              opt.label,
+              style: TextStyle(
+                color: FrappePalette.grey[700],
+              ),
             ),
-          ),
-          trailing: FrappeIcon(
-            FrappeIcons.arrow_right,
-            size: 18,
-          ),
-        );
-      }).toList()),
+            trailing: FrappeIcon(
+              FrappeIcons.arrow_right,
+              size: 18,
+            ),
+          );
+        },
+      ).toList()),
     );
   }
 }

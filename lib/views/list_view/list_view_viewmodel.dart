@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/desktop_page_response.dart';
 import 'package:frappe_app/views/form_view/form_view.dart';
 import 'package:injectable/injectable.dart';
@@ -12,7 +13,6 @@ import '../../app/router.gr.dart';
 import '../../model/doctype_response.dart';
 import '../../model/offline_storage.dart';
 
-import '../../services/navigation_service.dart';
 import '../../services/api/api.dart';
 
 import '../../model/config.dart';
@@ -21,14 +21,13 @@ import '../../utils/enums.dart';
 import '../../utils/helpers.dart';
 
 import '../../views/base_viewmodel.dart';
-import '../../views/filter_list/filter_list_view.dart';
 
 @lazySingleton
 class ListViewViewModel extends BaseViewModel {
   PagewiseLoadController pagewiseLoadController;
   DoctypeResponse meta;
   Response error;
-  var filters = {};
+  List<Filter> filters = [];
   bool showLiked = false;
   var userId = Config().userId;
   DesktopPageResponse desktopPageResponse;
@@ -46,11 +45,17 @@ class ListViewViewModel extends BaseViewModel {
         pagewiseLoadController = PagewiseLoadController(
           pageSize: Constants.pageSize,
           pageFuture: (pageIndex) {
-            return locator<Api>().fetchList(
-              filters: FilterList.generateFilters(
+            var transformedFilters = filters.map((filter) {
+              return [
                 meta.name,
-                filters,
-              ),
+                filter.fieldname,
+                filter.filterOperator.value,
+                filter.value
+              ];
+            }).toList();
+
+            return locator<Api>().fetchList(
+              filters: transformedFilters,
               meta: meta,
               doctype: meta.name,
               fieldnames: generateFieldnames(
@@ -103,34 +108,14 @@ class ListViewViewModel extends BaseViewModel {
     }
   }
 
-  onButtonTap({
-    @required String key,
-    @required String value,
-  }) {
-    filters[key] = value;
-    pagewiseLoadController.reset();
-    notifyListeners();
-  }
-
-  toggleLiked(String doctype) {
-    if (!showLiked) {
-      filters["_liked_by"] = userId;
-    } else {
-      filters.remove('_liked_by');
-    }
-    showLiked = !showLiked;
-    pagewiseLoadController.reset();
-    notifyListeners();
-  }
-
-  applyFilters(Map newFilters) {
-    if (newFilters != null) {
-      filters = newFilters;
-
-      pagewiseLoadController.reset();
-      notifyListeners();
-    }
-  }
+  // onButtonTap({
+  //   @required String key,
+  //   @required String value,
+  // }) {
+  //   filters[key] = value;
+  //   pagewiseLoadController.reset();
+  //   notifyListeners();
+  // }
 
   getDesktopPage(String module) async {
     setState(ViewState.busy);
