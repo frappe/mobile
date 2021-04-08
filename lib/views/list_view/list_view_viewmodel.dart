@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
@@ -48,7 +49,7 @@ class ListViewViewModel extends BaseViewModel {
             var transformedFilters = filters.map((filter) {
               return [
                 meta.name,
-                filter.fieldname,
+                filter.field.fieldname,
                 filter.filterOperator.value,
                 filter.value
               ];
@@ -146,9 +147,49 @@ class ListViewViewModel extends BaseViewModel {
     }
   }
 
+  removeFilter(int index) {
+    filters.removeAt(index);
+    getData(meta.docs[0]);
+  }
+
   clearFilters() {
     filters.clear();
     pagewiseLoadController.reset();
     notifyListeners();
+  }
+
+  applyFilters(List<Filter> appliedFilters) {
+    if (appliedFilters != null) {
+      if (appliedFilters.isNotEmpty) {
+        List<Filter> appliedFiltersClone = [];
+        appliedFilters.forEach(
+          (appliedFilter) {
+            appliedFiltersClone.add(
+              Filter.fromJson(
+                json.decode(
+                  json.encode(
+                    appliedFilter,
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+
+        filters = appliedFiltersClone;
+        getData(meta.docs[0]);
+      } else {
+        filters = [];
+        getData(meta.docs[0]);
+      }
+    }
+  }
+
+  List<DoctypeField> getFilterableFields(List<DoctypeField> fields) {
+    return fields.where((field) {
+      return field.fieldtype != "Section Break" &&
+          field.fieldtype != "Column Break" &&
+          field.hidden != 1;
+    }).toList();
   }
 }

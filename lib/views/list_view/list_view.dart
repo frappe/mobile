@@ -61,60 +61,12 @@ class CustomListView extends StatelessWidget {
                 return Scaffold(
                   floatingActionButtonLocation:
                       FloatingActionButtonLocation.centerFloat,
-                  floatingActionButton: FlatButton(
-                    color: FrappePalette.grey[700],
-                    padding: EdgeInsets.all(8),
-                    shape: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.transparent,
-                      ),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(8),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FrappeIcon(
-                          FrappeIcons.filter,
-                          color: Colors.white,
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          'Add filter',
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(
-                              4,
-                            ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              model.filters.length.toString(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  floatingActionButton: AddFilterButton(
+                    appliedFilters: model.filters.length,
                     onPressed: () async {
-                      var fields = meta.docs[0].fields.where((field) {
-                        return field.fieldtype != "Section Break" &&
-                            field.fieldtype != "Column Break" &&
-                            field.hidden != 1;
-                      }).toList();
+                      var fields = model.getFilterableFields(
+                        meta.docs[0].fields,
+                      );
 
                       List<Filter> appliedFilters = await showModalBottomSheet(
                         useRootNavigator: true,
@@ -126,34 +78,10 @@ class CustomListView extends StatelessWidget {
                         ),
                       );
 
-                      if (appliedFilters != null) {
-                        if (appliedFilters.isNotEmpty) {
-                          List<Filter> appliedFilterClone = [];
-                          appliedFilters.forEach(
-                            (appliedFilter) {
-                              appliedFilterClone.add(
-                                Filter.fromJson(
-                                  json.decode(
-                                    json.encode(
-                                      appliedFilter,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-
-                          model.filters = appliedFilterClone;
-                          model.getData(meta.docs[0]);
-                        } else {
-                          model.filters = [];
-                          model.getData(meta.docs[0]);
-                        }
-                      }
+                      model.applyFilters(appliedFilters);
                     },
                   ),
                   appBar: buildAppBar(
-                    context: context,
                     title: model.meta.docs[0].name,
                     onPressed: () {
                       Navigator.push(
@@ -176,10 +104,57 @@ class CustomListView extends StatelessWidget {
                     },
                     child: Container(
                       color: Palette.bgColor,
-                      child: _generateList(
-                        model: model,
-                        filters: model.filters,
-                        meta: meta,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (model.filters.isNotEmpty)
+                            Container(
+                              height: 50,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: model.filters.length,
+                                itemBuilder: (context, index) {
+                                  var filter = model.filters[index];
+                                  var txt =
+                                      "${filter.field.label} ${filter.filterOperator.label} ${filter.value}";
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0,
+                                      vertical: 10,
+                                    ),
+                                    child: InputChip(
+                                      label: Text(
+                                        txt,
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                      deleteIcon: FrappeIcon(
+                                        FrappeIcons.close_alt,
+                                        size: 14,
+                                      ),
+                                      backgroundColor: FrappePalette.grey[200],
+                                      shape: BeveledRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(6),
+                                        ),
+                                      ),
+                                      onDeleted: () {
+                                        model.removeFilter(index);
+                                      },
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          Expanded(
+                            child: _generateList(
+                              model: model,
+                              filters: model.filters,
+                              meta: meta,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -322,6 +297,71 @@ class CustomListView extends StatelessWidget {
   }
 }
 
+class AddFilterButton extends StatelessWidget {
+  final int appliedFilters;
+  final Function onPressed;
+
+  const AddFilterButton({
+    Key key,
+    @required this.appliedFilters,
+    @required this.onPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      color: FrappePalette.grey[700],
+      padding: EdgeInsets.all(8),
+      shape: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Colors.transparent,
+        ),
+        borderRadius: BorderRadius.all(
+          Radius.circular(8),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          FrappeIcon(
+            FrappeIcons.filter,
+            color: Colors.white,
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Text(
+            'Add filter',
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(
+                4,
+              ),
+            ),
+            child: Center(
+              child: Text(
+                appliedFilters.toString(),
+              ),
+            ),
+          ),
+        ],
+      ),
+      onPressed: onPressed,
+    );
+  }
+}
+
 class ShowSiblingDoctypes extends StatelessWidget {
   final ListViewViewModel model;
   final String title;
@@ -336,7 +376,6 @@ class ShowSiblingDoctypes extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: buildAppBar(
-        context: context,
         title: title,
         expanded: true,
         onPressed: () {

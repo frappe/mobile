@@ -148,7 +148,7 @@ class SelectFilterField extends StatelessWidget {
           children: fields.map((field) {
         return ListTile(
           onTap: () {
-            model.updateFieldName(field.fieldname);
+            model.updateFieldName(field);
             model.moveToPage(2);
           },
           visualDensity: VisualDensity(vertical: -4),

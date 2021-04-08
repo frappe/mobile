@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/utils/constants.dart';
 import 'package:frappe_app/views/base_viewmodel.dart';
 import 'package:injectable/injectable.dart';
@@ -7,6 +8,7 @@ import 'package:injectable/injectable.dart';
 @lazySingleton
 class FiltersBottomSheetViewModel extends BaseViewModel {
   List<Filter> filtersToApply = [];
+  List<DoctypeField> fields;
 
   removeFilter(int index) {
     filtersToApply.removeAt(index);
@@ -28,7 +30,10 @@ class FiltersBottomSheetViewModel extends BaseViewModel {
 
   addFilter() {
     filtersToApply.add(
-      Filter(filterOperator: Constants.filterOperators[0]),
+      Filter(
+        filterOperator: Constants.filterOperators[0],
+        field: fields[0],
+      ),
     );
     notifyListeners();
   }

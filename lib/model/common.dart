@@ -1,3 +1,5 @@
+import 'package:frappe_app/model/doctype_response.dart';
+
 class FilterOperator {
   String label;
   String value;
@@ -18,27 +20,30 @@ class FilterOperator {
 }
 
 class Filter {
-  String doctype;
-  String fieldname;
+  DoctypeField field;
   FilterOperator filterOperator;
   String value;
 
-  Filter({this.doctype, this.fieldname, this.filterOperator, this.value});
+  Filter({
+    this.filterOperator,
+    this.value,
+    this.field,
+  });
 
   Filter.fromJson(Map<String, dynamic> json) {
-    doctype = json['doctype'];
-    fieldname = json['fieldname'];
     filterOperator = FilterOperator.fromJson(
       json['filterOperator'],
+    );
+    field = DoctypeField.fromJson(
+      json['field'],
     );
     value = json['value'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['doctype'] = this.doctype;
-    data['fieldname'] = this.fieldname;
     data['filterOperator'] = this.filterOperator.toJson();
+    data['field'] = this.field.toJson();
     data['value'] = this.value;
     return data;
   }

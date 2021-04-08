@@ -6,12 +6,11 @@ AppBar buildAppBar({
   bool expanded = false,
   List<Widget> actions,
   Function onPressed,
-  @required BuildContext context,
+  bool isRoot = false,
 }) {
-  bool canPop = Navigator.of(context).canPop();
   double titleSpacing;
 
-  if (!canPop || expanded) {
+  if (isRoot || expanded) {
     titleSpacing = NavigationToolbar.kMiddleSpacing;
   } else {
     titleSpacing = 0.0;

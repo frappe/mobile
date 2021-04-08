@@ -33,7 +33,7 @@ class DeskView extends StatelessWidget {
       builder: (context, model, child) => Scaffold(
         backgroundColor: Palette.bgColor,
         appBar: buildAppBar(
-          context: context,
+          isRoot: true,
           title: model.currentModule ?? "",
           onPressed: () {
             Navigator.push(
@@ -288,7 +288,6 @@ class ShowModules extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: buildAppBar(
-        context: context,
         title: title,
         expanded: true,
         onPressed: () {

@@ -3,7 +3,7 @@ import 'package:frappe_app/config/frappe_palette.dart';
 
 // Color palette for the unthemed pages
 class Palette {
-  static Color bgColor = FrappePalette.grey[100];
+  static Color bgColor = FrappePalette.grey[50];
   static Color fieldBgColor = FrappePalette.grey[100];
   static Color iconColor = FrappePalette.grey[700];
   static Color primaryButtonColor = FrappePalette.blue;

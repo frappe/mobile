@@ -27,6 +27,7 @@ class FiltersBottomSheetView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BaseView<FiltersBottomSheetViewModel>(
       onModelReady: (model) {
+        model.fields = fields;
         if (filters.isEmpty) {
           model.addFilter();
         } else {
@@ -157,7 +158,7 @@ class AddFilter extends StatelessWidget {
                     ),
                   );
 
-                  if (_filter != null && _filter.fieldname != null) {
+                  if (_filter != null && _filter.field != null) {
                     onUpdate(_filter);
                   }
                 },
@@ -176,7 +177,7 @@ class AddFilter extends StatelessWidget {
                             maxWidth: MediaQuery.of(context).size.width - 110,
                           ),
                           child: Text(
-                            filter.fieldname ?? fields[0].label,
+                            filter.field.label,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: FrappePalette.grey[600],

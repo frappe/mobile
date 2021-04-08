@@ -1,4 +1,5 @@
 import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/views/base_viewmodel.dart';
 import 'package:injectable/injectable.dart';
 
@@ -12,8 +13,8 @@ class EditFilterBottomSheetViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  updateFieldName(String fieldName) {
-    filter.fieldname = fieldName;
+  updateFieldName(DoctypeField field) {
+    filter.field = field;
   }
 
   updateFilterOperator(FilterOperator filterOperator) {
