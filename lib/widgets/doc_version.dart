@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/style.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 
@@ -14,19 +15,19 @@ import '../utils/helpers.dart';
 import '../utils/http.dart';
 
 class DocVersion extends StatelessWidget {
-  final Map data;
+  final Version version;
 
-  DocVersion(this.data);
+  DocVersion(this.version);
 
   @override
   Widget build(BuildContext context) {
     String txt;
 
-    var time = timeago.format(DateTime.parse(data["creation"]));
-    if (data["data"] != null) {
-      final decoded = json.decode(data["data"]);
+    var time = timeago.format(DateTime.parse(version.creation));
+    if (version.data != null) {
+      final decoded = json.decode(version.data);
       var changed = decoded["changed"];
-      var author = data["owner"];
+      var author = version.owner;
       var createdBy = decoded["created_by"];
 
       if (changed != null) {
@@ -52,12 +53,6 @@ class DocVersion extends StatelessWidget {
       } else if (createdBy != null) {
         txt = "<div><b>$createdBy</b> created";
       }
-    } else if (data["comment_type"] == "Attachment") {
-      txt = "<div><b>${data["owner"]}</b> ${data["content"]}";
-    } else if (data["comment_type"] == "Like") {
-      txt = "<div>${data["content"]} by ${data["owner"]}";
-    } else {
-      txt = "<div>${data["content"]}";
     }
 
     txt += "<span> - $time</span></div>";

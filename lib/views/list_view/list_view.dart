@@ -45,6 +45,7 @@ class CustomListView extends StatelessWidget {
       },
       onModelClose: (model) {
         model.error = null;
+        model.filters.clear();
       },
       builder: (context, model, child) => model.state == ViewState.busy
           ? Scaffold(

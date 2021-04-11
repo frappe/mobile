@@ -27,20 +27,24 @@ Future<void> cacheAllUsers() async {
       ["User", "enabled", "=", 1]
     ];
 
-    var meta = await locator<Api>().getDoctype('User');
+    try {
+      var meta = await locator<Api>().getDoctype('User');
 
-    var res = await locator<Api>().fetchList(
-      fieldnames: fieldNames,
-      doctype: 'User',
-      filters: filters,
-      meta: meta.docs[0],
-    );
+      var res = await locator<Api>().fetchList(
+        fieldnames: fieldNames,
+        doctype: 'User',
+        filters: filters,
+        meta: meta.docs[0],
+      );
 
-    var usr = {};
-    res.forEach((element) {
-      usr[element["name"]] = element;
-    });
-    OfflineStorage.putItem('allUsers', usr);
+      var usr = {};
+      res.forEach((element) {
+        usr[element["name"]] = element;
+      });
+      OfflineStorage.putItem('allUsers', usr);
+    } catch (e) {
+      throw e;
+    }
   }
 }
 

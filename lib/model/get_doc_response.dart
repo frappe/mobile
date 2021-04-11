@@ -30,23 +30,23 @@ class GetDocResponse {
 class Docinfo {
   List<Attachments> attachments;
   List<AttachmentLogs> attachmentLogs;
-  List communications;
-  List comments;
+  List<Communication> communications;
+  List<Comment> comments;
   int totalComments;
-  List<Versions> versions;
+  List<Version> versions;
   List<Assignments> assignments;
   List assignmentLogs;
   Permissions permissions;
   List<Shared> shared;
   List shareLogs;
   List likeLogs;
-  List views;
+  List<View> views;
   List<EnergyPointLogs> energyPointLogs;
   List additionalTimelineContent;
   List milestones;
   Null isDocumentFollowed;
   String tags;
-  Null documentEmail;
+  String documentEmail;
 
   Docinfo(
       {this.attachments,
@@ -83,22 +83,22 @@ class Docinfo {
       });
     }
     if (json['communications'] != null) {
-      communications = new List();
+      communications = new List<Communication>();
       json['communications'].forEach((v) {
-        communications.add(v);
+        communications.add(Communication.fromJson(v));
       });
     }
     if (json['comments'] != null) {
-      comments = new List();
+      comments = new List<Comment>();
       json['comments'].forEach((v) {
-        comments.add(v);
+        comments.add(Comment.fromJson(v));
       });
     }
     totalComments = json['total_comments'];
     if (json['versions'] != null) {
-      versions = new List<Versions>();
+      versions = new List<Version>();
       json['versions'].forEach((v) {
-        versions.add(new Versions.fromJson(v));
+        versions.add(new Version.fromJson(v));
       });
     }
     if (json['assignments'] != null) {
@@ -137,7 +137,7 @@ class Docinfo {
     if (json['views'] != null) {
       views = new List();
       json['views'].forEach((v) {
-        views.add(v);
+        views.add(View.fromJson(v));
       });
     }
     if (json['energy_point_logs'] != null) {
@@ -173,10 +173,11 @@ class Docinfo {
           this.attachmentLogs.map((v) => v.toJson()).toList();
     }
     if (this.communications != null) {
-      data['communications'] = this.communications.map((v) => v).toList();
+      data['communications'] =
+          this.communications.map((v) => v.toJson()).toList();
     }
     if (this.comments != null) {
-      data['comments'] = this.comments.map((v) => v).toList();
+      data['comments'] = this.comments.map((v) => v.toJson()).toList();
     }
     data['total_comments'] = this.totalComments;
     if (this.versions != null) {
@@ -202,7 +203,7 @@ class Docinfo {
       data['like_logs'] = this.likeLogs.map((v) => v).toList();
     }
     if (this.views != null) {
-      data['views'] = this.views.map((v) => v).toList();
+      data['views'] = this.views.map((v) => v.toJson()).toList();
     }
     if (this.energyPointLogs != null) {
       data['energy_point_logs'] =
@@ -276,15 +277,133 @@ class AttachmentLogs {
   }
 }
 
-class Versions {
+class Communication {
+  String name;
+  String communicationType;
+  String communicationMedium;
+  String commentType;
+  String communicationDate;
+  String content;
+  String sender;
+  String senderFullName;
+  Null cc;
+  Null bcc;
+  String creation;
+  String subject;
+  String deliveryStatus;
+  String sLikedBy;
+  String referenceDoctype;
+  String referenceName;
+  int readByRecipient;
+  int rating;
+  String attachments;
+
+  Communication(
+      {this.name,
+      this.communicationType,
+      this.communicationMedium,
+      this.commentType,
+      this.communicationDate,
+      this.content,
+      this.sender,
+      this.senderFullName,
+      this.cc,
+      this.bcc,
+      this.creation,
+      this.subject,
+      this.deliveryStatus,
+      this.sLikedBy,
+      this.referenceDoctype,
+      this.referenceName,
+      this.readByRecipient,
+      this.rating,
+      this.attachments});
+
+  Communication.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    communicationType = json['communication_type'];
+    communicationMedium = json['communication_medium'];
+    commentType = json['comment_type'];
+    communicationDate = json['communication_date'];
+    content = json['content'];
+    sender = json['sender'];
+    senderFullName = json['sender_full_name'];
+    cc = json['cc'];
+    bcc = json['bcc'];
+    creation = json['creation'];
+    subject = json['subject'];
+    deliveryStatus = json['delivery_status'];
+    sLikedBy = json['_liked_by'];
+    referenceDoctype = json['reference_doctype'];
+    referenceName = json['reference_name'];
+    readByRecipient = json['read_by_recipient'];
+    rating = json['rating'];
+    attachments = json['attachments'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['name'] = this.name;
+    data['communication_type'] = this.communicationType;
+    data['communication_medium'] = this.communicationMedium;
+    data['comment_type'] = this.commentType;
+    data['communication_date'] = this.communicationDate;
+    data['content'] = this.content;
+    data['sender'] = this.sender;
+    data['sender_full_name'] = this.senderFullName;
+    data['cc'] = this.cc;
+    data['bcc'] = this.bcc;
+    data['creation'] = this.creation;
+    data['subject'] = this.subject;
+    data['delivery_status'] = this.deliveryStatus;
+    data['_liked_by'] = this.sLikedBy;
+    data['reference_doctype'] = this.referenceDoctype;
+    data['reference_name'] = this.referenceName;
+    data['read_by_recipient'] = this.readByRecipient;
+    data['rating'] = this.rating;
+    data['attachments'] = this.attachments;
+    return data;
+  }
+}
+
+class Comment {
+  String name;
+  String creation;
+  String content;
+  String owner;
+  String commentType;
+
+  Comment(
+      {this.name, this.creation, this.content, this.owner, this.commentType});
+
+  Comment.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    creation = json['creation'];
+    content = json['content'];
+    owner = json['owner'];
+    commentType = json['comment_type'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['name'] = this.name;
+    data['creation'] = this.creation;
+    data['content'] = this.content;
+    data['owner'] = this.owner;
+    data['comment_type'] = this.commentType;
+    return data;
+  }
+}
+
+class Version {
   String name;
   String owner;
   String creation;
   String data;
 
-  Versions({this.name, this.owner, this.creation, this.data});
+  Version({this.name, this.owner, this.creation, this.data});
 
-  Versions.fromJson(Map<String, dynamic> json) {
+  Version.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     owner = json['owner'];
     creation = json['creation'];
@@ -297,6 +416,28 @@ class Versions {
     data['owner'] = this.owner;
     data['creation'] = this.creation;
     data['data'] = this.data;
+    return data;
+  }
+}
+
+class View {
+  String name;
+  String creation;
+  String owner;
+
+  View({this.name, this.creation, this.owner});
+
+  View.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    creation = json['creation'];
+    owner = json['owner'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['name'] = this.name;
+    data['creation'] = this.creation;
+    data['owner'] = this.owner;
     return data;
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:frappe_app/app/locator.dart';
 import 'package:frappe_app/app/router.gr.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/services/navigation_service.dart';
 
 import 'package:html/parser.dart';
@@ -14,15 +15,15 @@ import '../model/config.dart';
 import '../widgets/user_avatar.dart';
 
 class EmailBox extends StatelessWidget {
-  final Map data;
+  final Communication data;
 
   EmailBox(this.data);
 
   @override
   Widget build(BuildContext context) {
-    var time = timeago.format(DateTime.parse(data["creation"]));
+    var time = timeago.format(DateTime.parse(data.creation));
 
-    var document = parse(data["content"]);
+    var document = parse(data.content);
     String parsedContent = parse(document.body.text).documentElement.text;
 
     return Card(
@@ -35,10 +36,10 @@ class EmailBox extends StatelessWidget {
               Routes.viewEmail,
               arguments: ViewEmailArguments(
                 time: time,
-                title: data["subject"],
-                senderFullName: data["sender_full_name"],
-                sender: data["sender"],
-                content: data["content"],
+                title: data.subject,
+                senderFullName: data.senderFullName,
+                sender: data.sender,
+                content: data.content,
               ),
             );
           },
@@ -47,7 +48,7 @@ class EmailBox extends StatelessWidget {
             Container(
               padding: const EdgeInsets.only(bottom: 8.0, top: 4.0),
               child: Text(
-                data["subject"],
+                data.subject,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: Colors.black),
@@ -61,7 +62,7 @@ class EmailBox extends StatelessWidget {
           ]),
           title: Row(
             children: [
-              Text('${data["sender_full_name"]}'),
+              Text('${data.senderFullName}'),
               Spacer(),
               Text(
                 time,

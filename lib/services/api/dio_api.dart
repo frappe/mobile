@@ -471,7 +471,7 @@ class DioApi implements Api {
     );
 
     if (response.statusCode == 200) {
-      return response.data;
+      return Docinfo.fromJson(response.data["docinfo"]);
     } else {
       throw Exception('Something went wrong');
     }

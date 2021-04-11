@@ -9,6 +9,7 @@ import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/views/base_view.dart';
 import 'package:frappe_app/views/form_view/form_view_viewmodel.dart';
 import 'package:frappe_app/widgets/collapsed_avatars.dart';
+import 'package:frappe_app/widgets/smart_widgets/timeline_view.dart';
 import 'package:provider/provider.dart';
 
 import 'package:frappe_app/views/form_view/bottom_sheets/assignees/assignees_bottom_sheet_view.dart';
@@ -171,6 +172,19 @@ class FormView extends StatelessWidget {
                               viewType: ViewType.form,
                               editMode: model.editMode,
                             ),
+                            TimelineView(
+                              docinfo: docInfo,
+                              doctype: meta.docs[0].name,
+                              name: name,
+                              emailSubjectField:
+                                  docs[0][meta.docs[0].subjectField] ??
+                                      getTitle(
+                                        meta.docs[0],
+                                        docs[0],
+                                      ),
+                              emailSenderField: docs[0]
+                                  [meta.docs[0].senderField],
+                            ),
                           ],
                         ),
                       );
@@ -259,6 +273,7 @@ class DocInfo extends StatelessWidget {
                 onTap: () async {
                   bool refresh = await showModalBottomSheet(
                         context: context,
+                        useRootNavigator: true,
                         isScrollControlled: true,
                         builder: (context) => AssigneesBottomSheetView(
                           assignees: docInfo.assignments,
@@ -290,6 +305,7 @@ class DocInfo extends StatelessWidget {
                 onTap: () async {
                   bool refresh = await showModalBottomSheet(
                         context: context,
+                        useRootNavigator: true,
                         isScrollControlled: true,
                         builder: (context) => ViewAttachmentsBottomSheetView(
                           attachments: docInfo.attachments,
@@ -315,6 +331,7 @@ class DocInfo extends StatelessWidget {
                   onTap: () async {
                     bool refresh = await showModalBottomSheet(
                           context: context,
+                          useRootNavigator: true,
                           isScrollControlled: true,
                           builder: (context) => ViewReviewsBottomSheetView(
                             reviews: reviews,
@@ -344,6 +361,7 @@ class DocInfo extends StatelessWidget {
                 onTap: () async {
                   showModalBottomSheet(
                     context: context,
+                    useRootNavigator: true,
                     isScrollControlled: true,
                     builder: (context) => TagsBottomSheetView(
                       tags: tags,
@@ -371,6 +389,7 @@ class DocInfo extends StatelessWidget {
                 onTap: () async {
                   bool refresh = await showModalBottomSheet(
                         context: context,
+                        useRootNavigator: true,
                         isScrollControlled: true,
                         builder: (context) => ShareBottomSheetView(
                           shares: docInfo.shared,
