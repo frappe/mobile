@@ -147,7 +147,7 @@ class AttachmentsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List filteredAttachments;
+    List<Attachments> filteredAttachments;
     if (attachmentsFilter == AttachmentsFilter.files) {
       filteredAttachments = attachments.where((attachment) {
         return isFile(attachment);
@@ -165,7 +165,7 @@ class AttachmentsList extends StatelessWidget {
           onTap: () async {
             var attachment = filteredAttachments[index];
             var downloadPath = await getDownloadPath();
-            var fileUrlName = attachment["file_url"].split('/').last;
+            var fileUrlName = attachment.fileUrl.split('/').last;
 
             var filePath = "$downloadPath$fileUrlName";
 
@@ -174,10 +174,10 @@ class AttachmentsList extends StatelessWidget {
             if (fileExists) {
               OpenFile.open(filePath);
             } else {
-              downloadFile(attachment["file_url"], downloadPath);
+              downloadFile(attachment.fileUrl, downloadPath);
             }
           },
-          title: Text(filteredAttachments[index]["file_name"]),
+          title: Text(filteredAttachments[index].fileName),
           subtitle: Text('15 Sep, 2020'),
           leading: Container(
             height: 50,
@@ -188,7 +188,7 @@ class AttachmentsList extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                filteredAttachments[index]["file_name"].split('.').last,
+                filteredAttachments[index].fileName.split('.').last,
               ),
             ),
           ),
@@ -249,7 +249,6 @@ class AttachmentsGrid extends StatelessWidget {
                 Container(
                   color: FrappePalette.grey[200],
                   height: itemHeight - 55,
-                  width: itemWidth,
                   child: Center(
                     child: Text(
                       ext != '' ? ext.toUpperCase() : 'LINK',
@@ -272,6 +271,7 @@ class AttachmentsGrid extends StatelessWidget {
                       attachments[index].fileName != ''
                           ? attachments[index].fileName
                           : attachments[index].fileUrl,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
