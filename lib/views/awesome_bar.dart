@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
 
 import '../model/offline_storage.dart';
 import '../utils/frappe_icon.dart';
 import '../services/navigation_service.dart';
 
 import '../config/frappe_icons.dart';
-import '../config/palette.dart';
 
 import '../app/locator.dart';
 import '../app/router.gr.dart';
@@ -15,42 +15,61 @@ class Awesombar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
+        elevation: 0.8,
+        toolbarHeight: 90,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Search'),
+            SizedBox(
+              height: 8,
+            ),
+            Container(
+              height: 40,
+              child: TextField(
+                onTap: () {
+                  showSearch(context: context, delegate: AwesomeSearch());
+                },
+                readOnly: true,
+                decoration: InputDecoration(
+                  filled: true,
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.circular(
+                      6,
+                    ),
+                  ),
+                  fillColor: FrappePalette.grey[100],
+                  prefixIcon: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: FrappeIcon(
+                          FrappeIcons.search,
+                          color: FrappePalette.grey[700],
+                          size: 21,
+                        ),
+                      ),
+                      Text(
+                        'Search',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: FrappePalette.grey[600],
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ],
+                  ),
+                  prefixIconConstraints: BoxConstraints(
+                    minHeight: 42,
+                    maxHeight: 42,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-      body: TextField(
-          onTap: () {
-            showSearch(context: context, delegate: AwesomeSearch());
-          },
-          readOnly: true,
-          decoration: InputDecoration(
-            filled: true,
-            border: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: BorderRadius.circular(
-                6,
-              ),
-            ),
-            fillColor: Palette.bgColor,
-            prefixIcon: Row(children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: FrappeIcon(
-                  FrappeIcons.search,
-                  size: 21,
-                ),
-              ),
-              Text(
-                'Search',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-            ]),
-            prefixIconConstraints: BoxConstraints(
-              minHeight: 42,
-              maxHeight: 42,
-            ),
-          )),
     );
   }
 }
