@@ -2,52 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
+import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
-import 'package:frappe_app/views/base_view.dart';
+import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/views/email_form.dart';
 import 'package:frappe_app/widgets/doc_version.dart';
 import 'package:frappe_app/widgets/email_box.dart';
-import 'package:frappe_app/widgets/smart_widgets/timeline_viewmodel.dart';
 
-import '../../config/palette.dart';
-import '../comment_box.dart';
+import '../config/palette.dart';
+import 'comment_box.dart';
 
-class TimelineView extends StatelessWidget {
+class Timeline extends StatelessWidget {
   final Docinfo docinfo;
   final String doctype;
   final String name;
   final String emailSubjectField;
   final String emailSenderField;
+  final bool communicationOnly;
+  final Function switchCallback;
+  final Function refreshCallback;
 
-  TimelineView({
+  Timeline({
     @required this.docinfo,
     @required this.doctype,
     @required this.name,
     @required this.emailSenderField,
     @required this.emailSubjectField,
+    @required this.communicationOnly,
+    @required this.switchCallback,
+    @required this.refreshCallback,
   });
 
   @override
   Widget build(BuildContext context) {
-    return BaseView<TimelineViewModel>(
-      onModelReady: (model) {
-        model.docinfo = docinfo;
-        model.doctype = doctype;
-        model.name = name;
-        model.communicationOnly = true;
-        model.processData();
-      },
-      builder: (context, model, child) {
+    return Builder(
+      builder: (context) {
         List<Widget> children = [
           Row(
             children: [
               Text('Activity'),
               Spacer(),
               Switch.adaptive(
-                value: model.communicationOnly,
+                value: communicationOnly,
                 activeColor: Colors.blue,
                 onChanged: (val) {
-                  model.toggleSwitch(val);
+                  switchCallback(val);
                 },
               ),
               Text("Communication Only"),
@@ -86,7 +85,7 @@ class TimelineView extends StatelessWidget {
                       builder: (context) {
                         return EmailForm(
                           callback: () {
-                            model.refreshDocinfo();
+                            refreshCallback();
                           },
                           subjectField: emailSubjectField,
                           senderField: emailSenderField,
@@ -102,7 +101,7 @@ class TimelineView extends StatelessWidget {
           ),
         );
 
-        for (var event in model.events) {
+        for (var event in _processData()) {
           if (event["_category"] == "versions") {
             event = Version.fromJson(event);
           } else if (event["_category"] == "communications") {
@@ -118,12 +117,12 @@ class TimelineView extends StatelessWidget {
               CommentBox(
                 event,
                 () {
-                  model.refreshDocinfo();
+                  refreshCallback();
                 },
               ),
             );
           } else {
-            if (model.communicationOnly) {
+            if (communicationOnly) {
               continue;
             }
             children.add(DocVersion(event));
@@ -149,5 +148,34 @@ class TimelineView extends StatelessWidget {
         );
       },
     );
+  }
+
+  List _processData() {
+    var _events = [
+      ...docinfo.comments.map(
+        (comment) {
+          var c = comment.toJson();
+          c["_category"] = "comments";
+          return c;
+        },
+      ).toList(),
+      ...docinfo.communications.map((communication) {
+        var c = communication.toJson();
+        c["_category"] = "communications";
+        return c;
+      }).toList(),
+      ...docinfo.versions.map((version) {
+        var v = version.toJson();
+        v["_category"] = "versions";
+        return v;
+      }).toList(),
+      ...docinfo.views.map((view) {
+        var v = view.toJson();
+        v["_category"] = "views";
+        return v;
+      }).toList(),
+    ];
+    var events = sortBy(_events, "creation", Order.desc);
+    return events;
   }
 }

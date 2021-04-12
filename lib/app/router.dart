@@ -14,7 +14,6 @@ import '../views/add_tags/add_tags_view.dart';
 import '../views/file_picker.dart';
 import '../views/queue.dart';
 import '../views/share/share_view.dart';
-import '../views/comment_input.dart';
 import '../views/email_form.dart';
 import '../views/queue_error.dart';
 import '../views/view_docinfo.dart';
@@ -33,7 +32,6 @@ import '../views/login/login_view.dart';
     MaterialRoute(page: FormView),
     MaterialRoute(page: SessionExpired),
     MaterialRoute(page: NoInternet),
-    MaterialRoute(page: CommentInput),
     MaterialRoute(page: EmailForm),
     MaterialRoute(page: ViewDocInfo),
     MaterialRoute(page: QueueError),

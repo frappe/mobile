@@ -327,22 +327,6 @@ List<Widget> generateLayout({
     }
   });
 
-  widgets.add(ListTileTheme(
-    contentPadding: EdgeInsets.all(0),
-    child: CustomExpansionTile(
-      maintainState: true,
-      initiallyExpanded: false,
-      title: Text(
-        "Add a comment",
-        style: TextStyle(
-          fontWeight: FontWeight.w700,
-          fontSize: 16,
-        ),
-      ),
-      children: [TextField()],
-    ),
-  ));
-
   return widgets;
 }
 

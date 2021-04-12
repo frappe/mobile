@@ -7,9 +7,11 @@ import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/views/base_view.dart';
+import 'package:frappe_app/views/comment_input.dart';
 import 'package:frappe_app/views/form_view/form_view_viewmodel.dart';
 import 'package:frappe_app/widgets/collapsed_avatars.dart';
-import 'package:frappe_app/widgets/smart_widgets/timeline_view.dart';
+import 'package:frappe_app/widgets/custom_expansion_tile.dart';
+import 'package:frappe_app/widgets/timeline.dart';
 import 'package:provider/provider.dart';
 
 import 'package:frappe_app/views/form_view/bottom_sheets/assignees/assignees_bottom_sheet_view.dart';
@@ -51,6 +53,7 @@ class FormView extends StatelessWidget {
     );
     return BaseView<FormViewViewModel>(
       onModelReady: (model) {
+        model.communicationOnly = true;
         model.getData(
           connectivityStatus: connectionStatus,
           queued: queued,
@@ -74,7 +77,6 @@ class FormView extends StatelessWidget {
                   return handleError(model.error);
                 }
                 var docs = model.formData.docs;
-                var docInfo = model.formData.docinfo;
 
                 var builderContext;
                 var likedBy = docs[0]['_liked_by'] != null
@@ -154,7 +156,7 @@ class FormView extends StatelessWidget {
                             DocInfo(
                               name: name,
                               doctype: meta.docs[0].name,
-                              docInfo: docInfo,
+                              docInfo: model.docinfo,
                               refreshCallback: () {
                                 model.getData(
                                   connectivityStatus: connectionStatus,
@@ -172,10 +174,46 @@ class FormView extends StatelessWidget {
                               viewType: ViewType.form,
                               editMode: model.editMode,
                             ),
-                            TimelineView(
-                              docinfo: docInfo,
+                            ListTileTheme(
+                              tileColor: Colors.white,
+                              child: CustomExpansionTile(
+                                maintainState: true,
+                                initiallyExpanded: false,
+                                title: Text(
+                                  "Add a comment",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                children: [
+                                  CommentInput(
+                                    name: name,
+                                    doctype: meta.docs[0].name,
+                                    callback: () {
+                                      model.updateDocinfo(
+                                        doctype: meta.docs[0].name,
+                                        name: name,
+                                      );
+                                    },
+                                  )
+                                ],
+                              ),
+                            ),
+                            Timeline(
+                              docinfo: model.docinfo,
                               doctype: meta.docs[0].name,
                               name: name,
+                              communicationOnly: model.communicationOnly,
+                              switchCallback: (val) {
+                                model.toggleSwitch(val);
+                              },
+                              refreshCallback: () {
+                                model.updateDocinfo(
+                                  doctype: meta.docs[0].name,
+                                  name: name,
+                                );
+                              },
                               emailSubjectField:
                                   docs[0][meta.docs[0].subjectField] ??
                                       getTitle(

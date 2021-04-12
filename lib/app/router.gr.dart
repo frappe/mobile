@@ -14,7 +14,6 @@ import '../model/doctype_response.dart';
 import '../views/add_assignees/add_assignees_view.dart';
 import '../views/add_review/add_review_view.dart';
 import '../views/add_tags/add_tags_view.dart';
-import '../views/comment_input.dart';
 import '../views/desk/desk_view.dart';
 import '../views/email_form.dart';
 import '../views/file_picker.dart';
@@ -40,7 +39,6 @@ class Routes {
   static const String formView = '/form-view';
   static const String sessionExpired = '/session-expired';
   static const String noInternet = '/no-internet';
-  static const String commentInput = '/comment-input';
   static const String emailForm = '/email-form';
   static const String viewDocInfo = '/view-doc-info';
   static const String queueError = '/queue-error';
@@ -61,7 +59,6 @@ class Routes {
     formView,
     sessionExpired,
     noInternet,
-    commentInput,
     emailForm,
     viewDocInfo,
     queueError,
@@ -88,7 +85,6 @@ class MyRouter extends RouterBase {
     RouteDef(Routes.formView, page: FormView),
     RouteDef(Routes.sessionExpired, page: SessionExpired),
     RouteDef(Routes.noInternet, page: NoInternet),
-    RouteDef(Routes.commentInput, page: CommentInput),
     RouteDef(Routes.emailForm, page: EmailForm),
     RouteDef(Routes.viewDocInfo, page: ViewDocInfo),
     RouteDef(Routes.queueError, page: QueueError),
@@ -158,18 +154,6 @@ class MyRouter extends RouterBase {
       final args = data.getArgs<NoInternetArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
         builder: (context) => NoInternet(args.hideAppBar),
-        settings: data,
-      );
-    },
-    CommentInput: (data) {
-      final args = data.getArgs<CommentInputArguments>(nullOk: false);
-      return MaterialPageRoute<dynamic>(
-        builder: (context) => CommentInput(
-          doctype: args.doctype,
-          name: args.name,
-          authorEmail: args.authorEmail,
-          callback: args.callback,
-        ),
         settings: data,
       );
     },
@@ -330,19 +314,6 @@ class FormViewArguments {
 class NoInternetArguments {
   final bool hideAppBar;
   NoInternetArguments({@required this.hideAppBar = false});
-}
-
-/// CommentInput arguments holder class
-class CommentInputArguments {
-  final String doctype;
-  final String name;
-  final String authorEmail;
-  final Function callback;
-  CommentInputArguments(
-      {@required this.doctype,
-      @required this.name,
-      @required this.authorEmail,
-      @required this.callback});
 }
 
 /// EmailForm arguments holder class

@@ -24,9 +24,16 @@ class FormViewViewModel extends BaseViewModel {
   Response error;
   GetDocResponse formData;
   final user = Config().user;
+  Docinfo docinfo;
+  bool communicationOnly;
 
   void refresh() {
     editMode = false;
+    notifyListeners();
+  }
+
+  toggleSwitch(bool newVal) {
+    communicationOnly = newVal;
     notifyListeners();
   }
 
@@ -56,7 +63,8 @@ class FormViewViewModel extends BaseViewModel {
         );
         response = response["data"];
         if (response != null) {
-          formData = response;
+          formData = GetDocResponse.fromJson(response);
+          docinfo = formData.docinfo;
         } else {
           error = Response(
             statusCode: HttpStatus.serviceUnavailable,
@@ -67,9 +75,15 @@ class FormViewViewModel extends BaseViewModel {
           doctype,
           name,
         );
+        docinfo = formData.docinfo;
       }
     }
     setState(ViewState.idle);
+  }
+
+  updateDocinfo({@required String name, @required String doctype}) async {
+    docinfo = await locator<Api>().getDocinfo(doctype, name);
+    notifyListeners();
   }
 
   Future handleUpdate({

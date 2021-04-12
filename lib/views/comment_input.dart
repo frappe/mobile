@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/model/config.dart';
+import 'package:frappe_app/utils/enums.dart';
+import 'package:frappe_app/widgets/frappe_button.dart';
 
 import '../app/locator.dart';
 
 import '../services/api/api.dart';
-import '../services/navigation_service.dart';
 
 class CommentInput extends StatelessWidget {
   final String doctype;
   final String name;
-  final String authorEmail;
   final Function callback;
 
   CommentInput({
     @required this.doctype,
     @required this.name,
-    @required this.authorEmail,
     @required this.callback,
   });
 
@@ -23,33 +24,36 @@ class CommentInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextEditingController _input = TextEditingController();
-    return Scaffold(
-      appBar: AppBar(
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.send),
-            onPressed: () async {
-              if (_input.text.isEmpty) {
-                return;
-              }
-              await locator<Api>().postComment(
-                doctype,
-                name,
-                _input.text,
-                authorEmail,
-              );
-              callback();
-              Navigator.of(context).pop();
-            },
-          )
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: TextField(
-          autofocus: true,
-          controller: _input,
-          maxLines: 9999999,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.0),
+      child: Container(
+        color: Colors.white,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              autofocus: true,
+              controller: _input,
+              maxLines: null,
+              decoration:
+                  Palette.formFieldDecoration(label: "", withLabel: true),
+            ),
+            FrappeFlatButton(
+              buttonType: ButtonType.primary,
+              onPressed: () async {
+                if (_input.text.isNotEmpty) {
+                  await locator<Api>().postComment(
+                    doctype,
+                    name,
+                    _input.text,
+                    Config().user,
+                  );
+                  callback();
+                }
+              },
+              title: "comment",
+            )
+          ],
         ),
       ),
     );

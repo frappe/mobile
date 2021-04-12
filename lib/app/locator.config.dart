@@ -26,7 +26,6 @@ import '../views/form_view/bottom_sheets/share/share_bottom_sheet_viewmodel.dart
 import '../views/share/share_viewmodel.dart';
 import '../services/storage_service.dart';
 import '../views/form_view/bottom_sheets/tags/tags_bottom_sheet_viewmodel.dart';
-import '../widgets/smart_widgets/timeline_viewmodel.dart';
 import '../views/form_view/bottom_sheets/attachments/view_attachments_bottom_sheet_viewmodel.dart';
 import '../views/form_view/bottom_sheets/reviews/view_reviews_bottom_sheet_viewmodel.dart';
 
@@ -63,7 +62,6 @@ GetIt $initGetIt(
   gh.lazySingleton<ShareViewModel>(() => ShareViewModel());
   gh.lazySingleton<StorageService>(() => StorageService());
   gh.lazySingleton<TagsBottomSheetViewModel>(() => TagsBottomSheetViewModel());
-  gh.lazySingleton<TimelineViewModel>(() => TimelineViewModel());
   gh.lazySingleton<ViewAttachmenetsBottomSheetViewModel>(
       () => ViewAttachmenetsBottomSheetViewModel());
   gh.lazySingleton<ViewReviewsBottomSheetViewModel>(
