@@ -9,7 +9,8 @@ import 'package:frappe_app/views/email_form.dart';
 import 'package:frappe_app/widgets/doc_version.dart';
 import 'package:frappe_app/widgets/email_box.dart';
 
-import '../config/palette.dart';
+import 'package:timelines/timelines.dart' as timeline;
+
 import 'comment_box.dart';
 
 class Timeline extends StatelessWidget {
@@ -40,7 +41,14 @@ class Timeline extends StatelessWidget {
         List<Widget> children = [
           Row(
             children: [
-              Text('Activity'),
+              Text(
+                'Activity',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 18,
+                  color: FrappePalette.grey[900],
+                ),
+              ),
               Spacer(),
               Switch.adaptive(
                 value: communicationOnly,
@@ -49,7 +57,14 @@ class Timeline extends StatelessWidget {
                   switchCallback(val);
                 },
               ),
-              Text("Communication Only"),
+              Text(
+                "Communication Only",
+                style: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 13,
+                  color: FrappePalette.grey[700],
+                ),
+              ),
             ],
           ),
         ];
@@ -129,21 +144,46 @@ class Timeline extends StatelessWidget {
           }
         }
 
-        return Container(
-          color: Palette.bgColor,
-          child: ListView.separated(
+        return Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: timeline.Timeline.tileBuilder(
+            theme: timeline.TimelineThemeData(
+              connectorTheme: timeline.ConnectorThemeData(
+                space: 51,
+                thickness: 2,
+                color: FrappePalette.grey[200],
+              ),
+              nodePosition: 0,
+            ),
             physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            padding: EdgeInsets.all(8),
-            itemCount: children.length,
-            itemBuilder: (BuildContext context, int index) {
-              return children[index];
-            },
-            separatorBuilder: (BuildContext context, int index) {
-              return Padding(
-                padding: EdgeInsets.all(4),
-              );
-            },
+            builder: timeline.TimelineTileBuilder.connected(
+              indicatorBuilder: (context, idx) {
+                return CircleAvatar(
+                  radius: 10,
+                  backgroundColor: FrappePalette.grey[300],
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    radius: 8,
+                    child: Icon(
+                      Icons.lens,
+                      size: 6,
+                      color: FrappePalette.grey[600],
+                    ),
+                  ),
+                );
+              },
+              connectorBuilder: (_, index, __) {
+                return timeline.SolidLineConnector();
+              },
+              itemCount: children.length,
+              contentsBuilder: (context, idx) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: children[idx],
+                );
+              },
+            ),
           ),
         );
       },

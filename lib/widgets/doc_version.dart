@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/style.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
@@ -55,7 +56,7 @@ class DocVersion extends StatelessWidget {
       }
     }
 
-    txt += "<span> - $time</span></div>";
+    txt += "</br><span>$time</span></div>";
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 4.0, top: 4.0),
@@ -65,7 +66,9 @@ class DocVersion extends StatelessWidget {
           "div": Style(
             fontSize: FontSize(12),
           ),
-          "span": Style(color: Palette.secondaryTxtColor)
+          "span": Style(
+            color: FrappePalette.grey[600],
+          ),
         },
         onImageError: (a, b) {
           // TODO

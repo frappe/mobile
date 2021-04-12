@@ -21,8 +21,8 @@ class CommentBox extends StatelessWidget {
   Widget build(BuildContext context) {
     var time = timeago.format(DateTime.parse(data.creation));
 
-    return Card(
-      elevation: 0,
+    return Container(
+      color: Colors.white,
       child: Column(
         children: [
           ListTile(
@@ -40,6 +40,7 @@ class CommentBox extends StatelessWidget {
             ),
             trailing: Config().userId == data.owner
                 ? IconButton(
+                    padding: EdgeInsets.zero,
                     icon: FrappeIcon(
                       FrappeIcons.close_alt,
                       size: 16,

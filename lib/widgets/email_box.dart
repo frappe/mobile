@@ -26,8 +26,8 @@ class EmailBox extends StatelessWidget {
     var document = parse(data.content);
     String parsedContent = parse(document.body.text).documentElement.text;
 
-    return Card(
-      elevation: 0,
+    return Container(
+      color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: ListTile(
