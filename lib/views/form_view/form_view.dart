@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
@@ -79,10 +77,11 @@ class FormView extends StatelessWidget {
                 var docs = model.formData.docs;
 
                 var builderContext;
-                var likedBy = docs[0]['_liked_by'] != null
-                    ? json.decode(docs[0]['_liked_by'])
-                    : [];
-                var isLikedByUser = likedBy.contains(model.user);
+
+                // var likedBy = docs[0]['_liked_by'] != null
+                //     ? json.decode(docs[0]['_liked_by'])
+                //     : [];
+                // var isLikedByUser = likedBy.contains(model.user);
 
                 return Scaffold(
                   backgroundColor: Palette.bgColor,

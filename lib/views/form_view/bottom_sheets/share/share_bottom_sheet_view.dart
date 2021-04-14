@@ -193,6 +193,8 @@ class ShareBottomSheetView extends StatelessWidget {
           name: name,
         );
       }).toList();
+    } else {
+      return [Container()];
     }
   }
 }

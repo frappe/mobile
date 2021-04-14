@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
-import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 
 const Duration _kExpand = Duration(milliseconds: 200);

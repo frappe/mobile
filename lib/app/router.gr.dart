@@ -11,9 +11,6 @@ import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../model/doctype_response.dart';
-import '../views/add_assignees/add_assignees_view.dart';
-import '../views/add_review/add_review_view.dart';
-import '../views/add_tags/add_tags_view.dart';
 import '../views/desk/desk_view.dart';
 import '../views/email_form.dart';
 import '../views/file_picker.dart';
@@ -26,8 +23,6 @@ import '../views/no_internet.dart';
 import '../views/queue.dart';
 import '../views/queue_error.dart';
 import '../views/session_expired.dart';
-import '../views/share/share_view.dart';
-import '../views/view_docinfo.dart';
 import '../widgets/email_box.dart';
 
 class Routes {
@@ -40,15 +35,10 @@ class Routes {
   static const String sessionExpired = '/session-expired';
   static const String noInternet = '/no-internet';
   static const String emailForm = '/email-form';
-  static const String viewDocInfo = '/view-doc-info';
   static const String queueError = '/queue-error';
   static const String queueList = '/queue-list';
-  static const String addAssignees = '/add-assignees';
   static const String customFilePicker = '/custom-file-picker';
   static const String viewEmail = '/view-email';
-  static const String addReview = '/add-review';
-  static const String share = '/Share';
-  static const String addTags = '/add-tags';
   static const String homeView = '/home-view';
   static const all = <String>{
     frappeApp,
@@ -60,15 +50,10 @@ class Routes {
     sessionExpired,
     noInternet,
     emailForm,
-    viewDocInfo,
     queueError,
     queueList,
-    addAssignees,
     customFilePicker,
     viewEmail,
-    addReview,
-    share,
-    addTags,
     homeView,
   };
 }
@@ -86,15 +71,10 @@ class MyRouter extends RouterBase {
     RouteDef(Routes.sessionExpired, page: SessionExpired),
     RouteDef(Routes.noInternet, page: NoInternet),
     RouteDef(Routes.emailForm, page: EmailForm),
-    RouteDef(Routes.viewDocInfo, page: ViewDocInfo),
     RouteDef(Routes.queueError, page: QueueError),
     RouteDef(Routes.queueList, page: QueueList),
-    RouteDef(Routes.addAssignees, page: AddAssignees),
     RouteDef(Routes.customFilePicker, page: CustomFilePicker),
     RouteDef(Routes.viewEmail, page: ViewEmail),
-    RouteDef(Routes.addReview, page: AddReview),
-    RouteDef(Routes.share, page: Share),
-    RouteDef(Routes.addTags, page: AddTags),
     RouteDef(Routes.homeView, page: HomeView),
   ];
   @override
@@ -170,20 +150,6 @@ class MyRouter extends RouterBase {
         settings: data,
       );
     },
-    ViewDocInfo: (data) {
-      final args = data.getArgs<ViewDocInfoArguments>(nullOk: false);
-      return MaterialPageRoute<dynamic>(
-        builder: (context) => ViewDocInfo(
-          doctype: args.doctype,
-          name: args.name,
-          docInfo: args.docInfo,
-          callback: args.callback,
-          meta: args.meta,
-          doc: args.doc,
-        ),
-        settings: data,
-      );
-    },
     QueueError: (data) {
       final args = data.getArgs<QueueErrorArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
@@ -198,17 +164,6 @@ class MyRouter extends RouterBase {
     QueueList: (data) {
       return MaterialPageRoute<dynamic>(
         builder: (context) => QueueList(),
-        settings: data,
-      );
-    },
-    AddAssignees: (data) {
-      final args = data.getArgs<AddAssigneesArguments>(nullOk: false);
-      return MaterialPageRoute<dynamic>(
-        builder: (context) => AddAssignees(
-          key: args.key,
-          doctype: args.doctype,
-          name: args.name,
-        ),
         settings: data,
       );
     },
@@ -234,43 +189,6 @@ class MyRouter extends RouterBase {
           senderFullName: args.senderFullName,
           sender: args.sender,
           content: args.content,
-        ),
-        settings: data,
-      );
-    },
-    AddReview: (data) {
-      final args = data.getArgs<AddReviewArguments>(nullOk: false);
-      return MaterialPageRoute<dynamic>(
-        builder: (context) => AddReview(
-          key: args.key,
-          doctype: args.doctype,
-          name: args.name,
-          meta: args.meta,
-          doc: args.doc,
-          docInfo: args.docInfo,
-        ),
-        settings: data,
-      );
-    },
-    Share: (data) {
-      final args = data.getArgs<ShareArguments>(nullOk: false);
-      return MaterialPageRoute<dynamic>(
-        builder: (context) => Share(
-          key: args.key,
-          doctype: args.doctype,
-          docInfo: args.docInfo,
-          name: args.name,
-        ),
-        settings: data,
-      );
-    },
-    AddTags: (data) {
-      final args = data.getArgs<AddTagsArguments>(nullOk: false);
-      return MaterialPageRoute<dynamic>(
-        builder: (context) => AddTags(
-          key: args.key,
-          doctype: args.doctype,
-          name: args.name,
         ),
         settings: data,
       );
@@ -331,23 +249,6 @@ class EmailFormArguments {
       @required this.callback});
 }
 
-/// ViewDocInfo arguments holder class
-class ViewDocInfoArguments {
-  final String doctype;
-  final String name;
-  final Map<dynamic, dynamic> docInfo;
-  final Function callback;
-  final DoctypeDoc meta;
-  final Map<dynamic, dynamic> doc;
-  ViewDocInfoArguments(
-      {@required this.doctype,
-      @required this.name,
-      @required this.docInfo,
-      this.callback,
-      @required this.meta,
-      @required this.doc});
-}
-
 /// QueueError arguments holder class
 class QueueErrorArguments {
   final Key key;
@@ -355,15 +256,6 @@ class QueueErrorArguments {
   final Map<dynamic, dynamic> dataToUpdate;
   QueueErrorArguments(
       {this.key, @required this.error, @required this.dataToUpdate});
-}
-
-/// AddAssignees arguments holder class
-class AddAssigneesArguments {
-  final Key key;
-  final String doctype;
-  final String name;
-  AddAssigneesArguments(
-      {this.key, @required this.doctype, @required this.name});
 }
 
 /// CustomFilePicker arguments holder class
@@ -387,42 +279,4 @@ class ViewEmailArguments {
       @required this.senderFullName,
       @required this.sender,
       @required this.content});
-}
-
-/// AddReview arguments holder class
-class AddReviewArguments {
-  final Key key;
-  final String doctype;
-  final String name;
-  final DoctypeDoc meta;
-  final Map<dynamic, dynamic> doc;
-  final Map<dynamic, dynamic> docInfo;
-  AddReviewArguments(
-      {this.key,
-      @required this.doctype,
-      @required this.name,
-      @required this.meta,
-      @required this.doc,
-      @required this.docInfo});
-}
-
-/// Share arguments holder class
-class ShareArguments {
-  final Key key;
-  final String doctype;
-  final Map<dynamic, dynamic> docInfo;
-  final String name;
-  ShareArguments(
-      {this.key,
-      @required this.doctype,
-      @required this.docInfo,
-      @required this.name});
-}
-
-/// AddTags arguments holder class
-class AddTagsArguments {
-  final Key key;
-  final String doctype;
-  final String name;
-  AddTagsArguments({this.key, @required this.doctype, @required this.name});
 }

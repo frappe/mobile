@@ -9,8 +9,6 @@ import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 
-import '../config/palette.dart';
-
 import '../utils/dio_helper.dart';
 import '../utils/helpers.dart';
 import '../utils/http.dart';
