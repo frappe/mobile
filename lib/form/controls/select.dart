@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
 
 import '../../config/palette.dart';
 import '../../model/doctype_response.dart';
@@ -45,6 +47,9 @@ class Select extends StatelessWidget with Control, ControlInput {
 
     return FormBuilderDropdown(
       key: key,
+      icon: FrappeIcon(
+        FrappeIcons.select,
+      ),
       initialValue:
           doc != null ? doc[doctypeField.fieldname] : doctypeField.defaultValue,
       allowClear: allowClear,
