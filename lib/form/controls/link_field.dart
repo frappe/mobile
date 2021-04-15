@@ -85,7 +85,7 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
           key: widget.key,
           noItemsFoundBuilder: (context) =>
               widget.noItemsFoundBuilder(_textEditingController.text),
-          direction: widget.direction,
+          direction: AxisDirection.up,
           onSuggestionSelected: (item) {
             if (widget.clearTextOnSelection) {
               setState(() {

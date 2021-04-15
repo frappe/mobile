@@ -32,11 +32,13 @@ class CommentInput extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
-              autofocus: true,
               controller: _input,
               maxLines: null,
               decoration:
                   Palette.formFieldDecoration(label: "", withLabel: true),
+            ),
+            SizedBox(
+              height: 10,
             ),
             FrappeFlatButton(
               buttonType: ButtonType.primary,

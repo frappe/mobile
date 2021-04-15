@@ -286,8 +286,8 @@ class Communication {
   String content;
   String sender;
   String senderFullName;
-  Null cc;
-  Null bcc;
+  dynamic cc;
+  dynamic bcc;
   String creation;
   String subject;
   String deliveryStatus;
@@ -593,9 +593,9 @@ class EnergyPointLogs {
   String modifiedBy;
   String owner;
   int docstatus;
-  Null parent;
-  Null parentfield;
-  Null parenttype;
+  dynamic parent;
+  dynamic parentfield;
+  dynamic parenttype;
   int idx;
   String user;
   String type;
@@ -604,13 +604,13 @@ class EnergyPointLogs {
   String referenceDoctype;
   String referenceName;
   int reverted;
-  Null revertOf;
+  dynamic revertOf;
   String reason;
   int seen;
-  Null nUserTags;
-  Null nComments;
-  Null nAssign;
-  Null nLikedBy;
+  dynamic nUserTags;
+  dynamic nComments;
+  dynamic nAssign;
+  dynamic nLikedBy;
 
   EnergyPointLogs(
       {this.name,

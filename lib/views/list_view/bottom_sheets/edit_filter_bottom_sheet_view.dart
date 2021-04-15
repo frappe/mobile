@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/form/controls/control.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/utils/constants.dart';
@@ -86,7 +88,7 @@ class EditValue extends StatefulWidget {
 }
 
 class _EditValueState extends State<EditValue> {
-  TextEditingController textEditingController = TextEditingController();
+  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   @override
   Widget build(BuildContext context) {
     return FrappeBottomSheet(
@@ -100,19 +102,19 @@ class _EditValueState extends State<EditValue> {
         ),
       ),
       onActionButtonPress: () {
-        widget.model.updateValue(textEditingController.text);
+        _fbKey.currentState.save();
+        var v = _fbKey.currentState.value[widget.model.filter.field.fieldname];
+        widget.model.updateValue(v);
         widget.onActionButtonPress(widget.model.filter);
       },
       body: Column(
         children: [
-          TextField(
-            controller: textEditingController,
-            autofocus: true,
-            decoration: Palette.formFieldDecoration(
-              label: "",
-              withLabel: false,
+          FormBuilder(
+            key: _fbKey,
+            child: makeControl(
+              field: widget.model.filter.field,
             ),
-          ),
+          )
         ],
       ),
     );

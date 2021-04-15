@@ -136,7 +136,7 @@ class Timeline extends StatelessWidget {
                 },
               ),
             );
-          } else {
+          } else if (event is Version) {
             if (communicationOnly) {
               continue;
             }

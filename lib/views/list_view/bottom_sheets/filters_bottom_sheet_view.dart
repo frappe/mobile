@@ -196,16 +196,6 @@ class AddFilter extends StatelessWidget {
               SizedBox(
                 width: 8,
               ),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: 4,
-                ),
-                child: Text('field'),
-              ),
-              SizedBox(
-                width: 8,
-              ),
               FlatButton(
                 onPressed: () async {
                   Filter _filter = await showModalBottomSheet(
