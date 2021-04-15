@@ -66,11 +66,11 @@ class _FilePickerState extends State<CustomFilePicker> {
                 buttonType: ButtonType.primary,
                 onPressed: _files != null && _files.isNotEmpty
                     ? () async {
-                        await locator<Api>().uploadFile(
-                          widget.doctype,
-                          widget.name,
-                          _files,
-                        );
+                        // await locator<Api>().uploadFile(
+                        //   widget.doctype,
+                        //   widget.name,
+                        //   _files,
+                        // );
                         locator<NavigationService>().pop(true);
                         widget.callback();
                       }

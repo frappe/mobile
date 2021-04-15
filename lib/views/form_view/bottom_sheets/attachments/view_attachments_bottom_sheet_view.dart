@@ -1,8 +1,11 @@
 import 'dart:io' as io;
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/utils/constants.dart';
 import 'package:frappe_app/utils/enums.dart';
@@ -13,17 +16,36 @@ import 'package:frappe_app/views/base_view.dart';
 import 'package:frappe_app/views/form_view/bottom_sheets/attachments/view_attachments_bottom_sheet_viewmodel.dart';
 
 import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
+import 'package:frappe_app/widgets/frappe_button.dart';
 import 'package:open_file/open_file.dart';
 
 import 'add_attachments_bottom_sheet_view.dart';
 
 class ViewAttachmentsBottomSheetView extends StatelessWidget {
   final List<Attachments> attachments;
+  final String doctype;
+  final String name;
 
   const ViewAttachmentsBottomSheetView({
     Key key,
     @required this.attachments,
+    @required this.doctype,
+    @required this.name,
   }) : super(key: key);
+
+  _triggerFilePicker(Function addFiles) async {
+    FilePickerResult _files = await FilePicker.platform.pickFiles(
+      type: FileType.any,
+      allowMultiple: true,
+    );
+
+    if (_files != null) {
+      var _frappeFiles = _files.files.map((file) {
+        return FrappeFile(file: file, isPrivate: true);
+      }).toList();
+      addFiles(_frappeFiles);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,17 +56,59 @@ class ViewAttachmentsBottomSheetView extends StatelessWidget {
     final double itemWidth = size.width / 2;
 
     return BaseView<ViewAttachmenetsBottomSheetViewModel>(
-      onModelClose: (model) {},
+      onModelReady: (model) {
+        model.filesToUpload = [];
+        model.doctype = doctype;
+        model.name = name;
+        model.allFilesPrivate = true;
+
+        if (attachments.isEmpty) {
+          _triggerFilePicker(model.addFilesToUpload);
+        }
+      },
       builder: (context, model, child) => FractionallySizedBox(
         heightFactor: 0.9,
         child: FrappeBottomSheet(
           title: 'Attachments',
-          onActionButtonPress: () {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (context) => AddAttachmentsBottomSheetView(),
-            );
+          bottomBar: model.filesToUpload.isNotEmpty
+              ? Container(
+                  color: Colors.white,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      FrappeFlatButton(
+                        buttonType: ButtonType.secondary,
+                        title: model.allFilesPrivate
+                            ? 'Set all public'
+                            : 'Set all private',
+                        onPressed: () {
+                          model.toggleAllPrivate();
+                        },
+                      ),
+                      FrappeFlatButton(
+                        buttonType: ButtonType.primary,
+                        title: 'Upload',
+                        onPressed: () async {
+                          await model.uploadFiles();
+                          Navigator.of(context).pop(true);
+                        },
+                      ),
+                    ],
+                  ),
+                )
+              : null,
+          onActionButtonPress: () async {
+            // showModalBottomSheet(
+            //   context: context,
+            //   isScrollControlled: true,
+            //   builder: (context) => AddAttachmentsBottomSheetView(),
+            // );
+
+            try {
+              await _triggerFilePicker(model.addFilesToUpload);
+            } on PlatformException catch (e) {
+              print("Unsupported operation" + e.toString());
+            }
           },
           trailing: Row(
             children: [
@@ -63,64 +127,168 @@ class ViewAttachmentsBottomSheetView extends StatelessWidget {
               ),
             ],
           ),
-          body: Scaffold(
-            appBar: AppBar(
-              automaticallyImplyLeading: false,
-              titleSpacing: 10,
-              elevation: 0,
-              title: Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        model.changeTab(AttachmentsFilter.all);
-                      },
-                      child: Tab(
-                        title: 'All',
-                        selected: model.selectedFilter == AttachmentsFilter.all,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        model.changeTab(AttachmentsFilter.files);
-                      },
-                      child: Tab(
-                        title: 'Files',
-                        selected:
-                            model.selectedFilter == AttachmentsFilter.files,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        model.changeTab(AttachmentsFilter.links);
-                      },
-                      child: Tab(
-                        title: 'Links',
-                        selected:
-                            model.selectedFilter == AttachmentsFilter.links,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            body: model.selectedFilter == AttachmentsFilter.all
-                ? AttachmentsGrid(
-                    itemWidth: itemWidth,
-                    itemHeight: itemHeight,
-                    attachments: attachments,
-                  )
-                : AttachmentsList(
-                    attachmentsFilter: model.selectedFilter,
-                    attachments: attachments,
-                  ),
-          ),
+          body: model.filesToUpload.isEmpty
+              ? ViewAttachedFiles(
+                  itemWidth: itemWidth,
+                  itemHeight: itemHeight,
+                  attachments: attachments,
+                  selectedFilter: model.selectedFilter,
+                  changeTab: model.changeTab,
+                )
+              : ViewFilesToAttach(
+                  filesToUpload: model.filesToUpload,
+                  togglePrivate: (int idx) {
+                    model.togglePrivate(idx);
+                  },
+                  removeFileToUpload: (int idx) {
+                    model.removeFileToUpload(idx);
+                  },
+                ),
         ),
       ),
+    );
+  }
+}
+
+class ViewFilesToAttach extends StatelessWidget {
+  final List<FrappeFile> filesToUpload;
+  final Function removeFileToUpload;
+  final Function togglePrivate;
+
+  const ViewFilesToAttach({
+    Key key,
+    @required this.filesToUpload,
+    @required this.removeFileToUpload,
+    @required this.togglePrivate,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: filesToUpload.length,
+      itemBuilder: (context, idx) {
+        return ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Row(
+            children: [
+              FrappeIcon(
+                FrappeIcons.small_file,
+                size: 20,
+              ),
+              SizedBox(
+                width: 12,
+              ),
+              Text(
+                filesToUpload[idx].file.name,
+              )
+            ],
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  togglePrivate(idx);
+                },
+                icon: filesToUpload[idx].isPrivate
+                    ? FrappeIcon(
+                        FrappeIcons.lock,
+                        size: 20,
+                      )
+                    : FrappeIcon(
+                        FrappeIcons.unlock,
+                        size: 20,
+                      ),
+              ),
+              InkWell(
+                onTap: () => removeFileToUpload(idx),
+                child: Text(
+                  'Remove',
+                  style: TextStyle(
+                    color: FrappePalette.red[600],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class ViewAttachedFiles extends StatelessWidget {
+  const ViewAttachedFiles({
+    Key key,
+    @required this.itemWidth,
+    @required this.itemHeight,
+    @required this.attachments,
+    @required this.changeTab,
+    @required this.selectedFilter,
+  }) : super(key: key);
+
+  final double itemWidth;
+  final double itemHeight;
+  final List<Attachments> attachments;
+  final Function changeTab;
+  final AttachmentsFilter selectedFilter;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        titleSpacing: 10,
+        elevation: 0,
+        title: Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  changeTab(AttachmentsFilter.all);
+                },
+                child: Tab(
+                  title: 'All',
+                  selected: selectedFilter == AttachmentsFilter.all,
+                ),
+              ),
+            ),
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  changeTab(AttachmentsFilter.files);
+                },
+                child: Tab(
+                  title: 'Files',
+                  selected: selectedFilter == AttachmentsFilter.files,
+                ),
+              ),
+            ),
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  changeTab(AttachmentsFilter.links);
+                },
+                child: Tab(
+                  title: 'Links',
+                  selected: selectedFilter == AttachmentsFilter.links,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: selectedFilter == AttachmentsFilter.all
+          ? AttachmentsGrid(
+              itemWidth: itemWidth,
+              itemHeight: itemHeight,
+              attachments: attachments,
+            )
+          : AttachmentsList(
+              attachmentsFilter: selectedFilter,
+              attachments: attachments,
+            ),
     );
   }
 }
@@ -267,14 +435,16 @@ class AttachmentsGrid extends StatelessWidget {
                     SizedBox(
                       width: 8,
                     ),
-                    Text(
-                      attachments[index].fileName != ''
-                          ? attachments[index].fileName
-                          : attachments[index].fileUrl,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400,
+                    Flexible(
+                      child: Text(
+                        attachments[index].fileName != ''
+                            ? attachments[index].fileName
+                            : attachments[index].fileUrl,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ),
                   ],

@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 
 class FilterOperator {
@@ -47,4 +48,14 @@ class Filter {
     data['value'] = this.value;
     return data;
   }
+}
+
+class FrappeFile {
+  bool isPrivate;
+  PlatformFile file;
+
+  FrappeFile({
+    this.isPrivate = true,
+    this.file,
+  });
 }

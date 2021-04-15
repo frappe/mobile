@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
 
 import '../../model/doctype_response.dart';
@@ -74,7 +76,11 @@ abstract class Api {
 
   Future deleteComment(String name);
 
-  Future uploadFile(String doctype, String name, List<File> files);
+  Future uploadFiles({
+    @required String doctype,
+    @required String name,
+    @required List<FrappeFile> files,
+  });
 
   Future saveDocs(String doctype, Map formValue);
 

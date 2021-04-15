@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
 
 import '../../model/doctype_response.dart';
@@ -521,22 +523,28 @@ class DioApi implements Api {
     }
   }
 
-  Future uploadFile(String doctype, String name, List<File> files) async {
-    for (File file in files) {
-      String fileName = file.path.split('/').last;
+  Future uploadFiles({
+    @required String doctype,
+    @required String name,
+    @required List<FrappeFile> files,
+  }) async {
+    for (FrappeFile frappeFile in files) {
+      String fileName = frappeFile.file.path.split('/').last;
       FormData formData = FormData.fromMap({
         "file": await MultipartFile.fromFile(
-          file.path,
+          frappeFile.file.path,
           filename: fileName,
         ),
         "docname": name,
         "doctype": doctype,
-        "is_private": 1,
+        "is_private": frappeFile.isPrivate ? 1 : 0,
         "folder": "Home/Attachments"
       });
 
-      var response =
-          await DioHelper.dio.post("/method/upload_file", data: formData);
+      var response = await DioHelper.dio.post(
+        "/method/upload_file",
+        data: formData,
+      );
       if (response.statusCode != 200) {
         throw Exception('Something went wrong');
       }

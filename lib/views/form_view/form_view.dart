@@ -346,6 +346,8 @@ class DocInfo extends StatelessWidget {
                         isScrollControlled: true,
                         builder: (context) => ViewAttachmentsBottomSheetView(
                           attachments: docInfo.attachments,
+                          name: name,
+                          doctype: doctype,
                         ),
                       ) ??
                       false;
