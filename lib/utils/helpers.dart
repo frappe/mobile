@@ -33,34 +33,6 @@ import '../utils/enums.dart';
 import '../widgets/section.dart';
 import '../widgets/custom_expansion_tile.dart';
 
-// TODO
-Widget buildDecoratedWidget(Widget fieldWidget, bool withLabel,
-    [String label = ""]) {
-  if (withLabel) {
-    return Padding(
-      padding: Palette.fieldPadding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: Palette.labelPadding,
-            child: Text(
-              label ?? "",
-              style: Palette.secondaryTxtStyle,
-            ),
-          ),
-          fieldWidget
-        ],
-      ),
-    );
-  } else {
-    return Padding(
-      padding: Palette.fieldPadding,
-      child: fieldWidget,
-    );
-  }
-}
-
 getDownloadPath() async {
   // TODO
   if (Platform.isAndroid) {
@@ -127,7 +99,6 @@ List<Widget> generateLayout({
   Map doc,
   bool editMode = true,
   bool withLabel = true,
-  Function onChanged,
 }) {
   if (viewType == ViewType.form) {
     fields.insert(
@@ -250,11 +221,9 @@ List<Widget> generateLayout({
             visible: editMode ? true : val != null && val != '',
             child: makeControl(
               field: field,
-              value: val,
               doc: doc,
               withLabel: withLabel,
               editMode: editMode,
-              onChanged: onChanged,
             ),
           ),
         );
@@ -263,10 +232,8 @@ List<Widget> generateLayout({
           makeControl(
             doc: doc,
             field: field,
-            value: val,
             withLabel: withLabel,
             editMode: editMode,
-            onChanged: onChanged,
           ),
         );
       }
@@ -278,10 +245,8 @@ List<Widget> generateLayout({
             child: makeControl(
               doc: doc,
               field: field,
-              value: val,
               withLabel: withLabel,
               editMode: editMode,
-              onChanged: onChanged,
             ),
           ),
         );
@@ -290,10 +255,8 @@ List<Widget> generateLayout({
           makeControl(
             field: field,
             doc: doc,
-            value: val,
             withLabel: withLabel,
             editMode: editMode,
-            onChanged: onChanged,
           ),
         );
       }
@@ -305,10 +268,8 @@ List<Widget> generateLayout({
             child: makeControl(
               doc: doc,
               field: field,
-              value: val,
               withLabel: withLabel,
               editMode: editMode,
-              onChanged: onChanged,
             ),
           ),
         );
@@ -316,11 +277,9 @@ List<Widget> generateLayout({
         widgets.add(
           makeControl(
             field: field,
-            value: val,
             doc: doc,
             withLabel: withLabel,
             editMode: editMode,
-            onChanged: onChanged,
           ),
         );
       }

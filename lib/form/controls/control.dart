@@ -5,7 +5,6 @@ import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/form/controls/barcode.dart';
 
 import '../../config/palette.dart';
-import '../../utils/helpers.dart';
 
 import './custom_table.dart';
 import './check.dart';
@@ -25,262 +24,217 @@ import './signature.dart' as customSignature;
 
 Widget makeControl({
   @required DoctypeField field,
-  dynamic value,
   Map doc,
   bool withLabel = true,
   bool editMode = true,
-  Function onChanged,
+  bool decorateControl = true,
 }) {
-  Widget fieldWidget;
+  Widget control;
 
   switch (field.fieldtype) {
     case "Link":
       {
-        fieldWidget = buildDecoratedWidget(
-            LinkField(
-              key: Key(value),
-              doctypeField: field,
-              doc: doc,
-              fillColor: Palette.fieldBgColor,
-              allowClear: editMode,
-              withLabel: withLabel,
-            ),
-            withLabel,
-            field.label);
+        control = LinkField(
+          doctypeField: field,
+          doc: doc,
+          fillColor: Palette.fieldBgColor,
+          allowClear: editMode,
+          withLabel: withLabel,
+        );
       }
       break;
 
     case "Autocomplete":
       {
-        fieldWidget = buildDecoratedWidget(
-          AutoComplete(
-            key: Key(value),
-            fillColor: Palette.fieldBgColor,
-            allowClear: editMode,
-            doctypeField: field,
-            doc: doc,
-          ),
-          withLabel,
-          field.label,
+        control = AutoComplete(
+          fillColor: Palette.fieldBgColor,
+          allowClear: editMode,
+          doctypeField: field,
+          doc: doc,
         );
       }
       break;
 
     case "Table":
       {
-        fieldWidget = buildDecoratedWidget(
-          CustomTable(
-            doctypeField: field,
-            doc: doc,
-          ),
-          withLabel,
-          field.label,
+        control = CustomTable(
+          doctypeField: field,
+          doc: doc,
         );
       }
       break;
 
     case "Select":
       {
-        fieldWidget = buildDecoratedWidget(
-            Select(
-              key: Key(value),
-              allowClear: editMode,
-              doc: doc,
-              doctypeField: field,
-              withLabel: withLabel,
-            ),
-            withLabel,
-            field.label);
+        control = Select(
+          allowClear: editMode,
+          doc: doc,
+          doctypeField: field,
+          withLabel: withLabel,
+        );
       }
       break;
 
     case "MultiSelect":
       {
-        if (value != null) {
-          value = [
-            {
-              "value": value,
-              "description": value,
-            }
-          ];
-        }
-
-        fieldWidget = buildDecoratedWidget(
-          MultiSelect(
-            doctypeField: field,
-            doc: doc,
-          ),
-          withLabel,
-          field.label,
+        control = MultiSelect(
+          doctypeField: field,
+          doc: doc,
         );
       }
       break;
 
     case "Small Text":
       {
-        fieldWidget = buildDecoratedWidget(
-          SmallText(
-            key: Key(value),
-            doctypeField: field,
-            doc: doc,
-            withLabel: withLabel,
-          ),
-          withLabel,
-          field.label,
+        control = SmallText(
+          doctypeField: field,
+          doc: doc,
+          withLabel: withLabel,
         );
       }
       break;
 
     case "Data":
       {
-        fieldWidget = buildDecoratedWidget(
-            Data(
-              key: Key(value),
-              doc: doc,
-              doctypeField: field,
-              withLabel: withLabel,
-            ),
-            withLabel,
-            field.label);
+        control = Data(
+          doc: doc,
+          doctypeField: field,
+          withLabel: withLabel,
+        );
       }
       break;
 
     case "Check":
       {
-        fieldWidget = buildDecoratedWidget(
-            Check(
-              key: UniqueKey(),
-              doctypeField: field,
-              doc: doc,
-              onChanged: onChanged,
-              withLabel: withLabel,
-            ),
-            false);
+        control = Check(
+          doctypeField: field,
+          doc: doc,
+          withLabel: withLabel,
+        );
       }
       break;
 
     case "Text Editor":
       {
-        fieldWidget = buildDecoratedWidget(
-          TextEditor(
-            doctypeField: field,
-            doc: doc,
-            withLabel: withLabel,
-          ),
-          withLabel,
-          field.label,
+        control = TextEditor(
+          doctypeField: field,
+          doc: doc,
+          withLabel: withLabel,
         );
       }
       break;
 
     case "Datetime":
       {
-        fieldWidget = buildDecoratedWidget(
-          DatetimeField(
-            key: Key(value),
-            doctypeField: field,
-            doc: doc,
-            withLabel: withLabel,
-            editMode: editMode,
-          ),
-          withLabel,
-          field.label,
+        control = DatetimeField(
+          doctypeField: field,
+          doc: doc,
+          withLabel: withLabel,
+          editMode: editMode,
         );
       }
       break;
 
     case "Float":
       {
-        fieldWidget = buildDecoratedWidget(
-          Float(
-            key: Key(value.toString()),
-            doctypeField: field,
-            doc: doc,
-            withLabel: withLabel,
-          ),
-          withLabel,
-          field.label,
+        control = Float(
+          doctypeField: field,
+          doc: doc,
+          withLabel: withLabel,
         );
       }
       break;
 
     case "Int":
       {
-        fieldWidget = buildDecoratedWidget(
-          Int(
-            key: Key(value.toString()),
-            doctypeField: field,
-            doc: doc,
-            withLabel: withLabel,
-          ),
-          withLabel,
-          field.label,
+        control = Int(
+          doctypeField: field,
+          doc: doc,
+          withLabel: withLabel,
         );
       }
       break;
 
     case "Time":
       {
-        fieldWidget = buildDecoratedWidget(
-          Time(
-            key: Key(value),
-            doctypeField: field,
-            doc: doc,
-            withLabel: withLabel,
-          ),
-          withLabel,
-          field.label,
+        control = Time(
+          doctypeField: field,
+          doc: doc,
+          withLabel: withLabel,
         );
       }
       break;
 
     case "Date":
       {
-        fieldWidget = buildDecoratedWidget(
-          Date(
-            key: Key(value),
-            doctypeField: field,
-            doc: doc,
-            withLabel: withLabel,
-          ),
-          withLabel,
-          field.label,
+        control = Date(
+          doctypeField: field,
+          doc: doc,
+          withLabel: withLabel,
         );
       }
       break;
 
     // case "Signature":
     //   {
-    //     fieldWidget = buildDecoratedWidget(
-    //       customSignature.Signature(
-    //         key: Key(value),
-    //         doc: doc,
-    //         doctypeField: field,
-    //         withLabel: withLabel,
-    //       ),
-    //       withLabel,
-    //       field.label,
+    //     control = customSignature.Signature(
+    //       doc: doc,
+    //       doctypeField: field,
+    //       withLabel: withLabel,
     //     );
     //   }
     //   break;
 
     // case "Barcode":
     //   {
-    //     fieldWidget = buildDecoratedWidget(
-    //       FormBuilderBarcode(
-    //         key: Key(value),
-    //         doctypeField: field,
-    //         doc: doc,
-    //       ),
-    //       withLabel,
-    //       field.label,
+    //     control = FormBuilderBarcode(
+    //       doctypeField: field,
+    //       doc: doc,
     //     );
     //   }
     //   break;
 
     default:
-      fieldWidget = Container();
+      control = Container();
       break;
   }
-  return fieldWidget;
+  if (decorateControl) {
+    return buildDecoratedControl(
+      control: control,
+      withLabel: withLabel,
+      label: field.label,
+    );
+  } else {
+    return control;
+  }
+}
+
+Widget buildDecoratedControl({
+  @required Widget control,
+  @required bool withLabel,
+  String label = "",
+}) {
+  if (withLabel) {
+    return Padding(
+      padding: Palette.fieldPadding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: Palette.labelPadding,
+            child: Text(
+              label ?? "",
+              style: Palette.secondaryTxtStyle,
+            ),
+          ),
+          control
+        ],
+      ),
+    );
+  } else {
+    return Padding(
+      padding: Palette.fieldPadding,
+      child: control,
+    );
+  }
 }

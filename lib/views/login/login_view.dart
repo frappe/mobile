@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/form/controls/control.dart';
 
 import 'login_viewmodel.dart';
 
@@ -16,7 +17,6 @@ import '../../services/navigation_service.dart';
 
 import '../../utils/frappe_alert.dart';
 import '../../utils/enums.dart';
-import '../../utils/helpers.dart';
 
 class Login extends StatelessWidget {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
@@ -51,8 +51,8 @@ class Login extends StatelessWidget {
                       key: _fbKey,
                       child: Column(
                         children: <Widget>[
-                          buildDecoratedWidget(
-                            FormBuilderTextField(
+                          buildDecoratedControl(
+                            control: FormBuilderTextField(
                               name: 'serverURL',
                               initialValue: model.savedCreds.serverURL,
                               validator: FormBuilderValidators.compose([
@@ -64,11 +64,11 @@ class Login extends StatelessWidget {
                                 label: "Server URL",
                               ),
                             ),
-                            true,
-                            "Server URL",
+                            withLabel: true,
+                            label: "Server URL",
                           ),
-                          buildDecoratedWidget(
-                              FormBuilderTextField(
+                          buildDecoratedControl(
+                              control: FormBuilderTextField(
                                 name: 'usr',
                                 initialValue: model.savedCreds.usr,
                                 validator: FormBuilderValidators.compose([
@@ -79,8 +79,8 @@ class Login extends StatelessWidget {
                                   label: "Email Address",
                                 ),
                               ),
-                              true,
-                              "Email Address"),
+                              withLabel: true,
+                              label: "Email Address"),
                           PasswordField(
                             savedPassword: model.savedCreds.pwd,
                           ),
@@ -185,34 +185,35 @@ class _PasswordFieldState extends State<PasswordField> {
   bool _hidePassword = true;
   @override
   Widget build(BuildContext context) {
-    return buildDecoratedWidget(
-        FormBuilderTextField(
-          maxLines: 1,
-          name: 'pwd',
-          initialValue: widget.savedPassword,
-          validator: FormBuilderValidators.compose([
-            FormBuilderValidators.required(context),
-          ]),
-          obscureText: _hidePassword,
-          decoration: Palette.formFieldDecoration(
-            withLabel: true,
-            label: "Password",
-            suffixIcon: FlatButton(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              child: Text(_hidePassword ? "Show" : "Hide"),
-              onPressed: () {
-                setState(
-                  () {
-                    // TODO
-                    _hidePassword = !_hidePassword;
-                  },
-                );
-              },
-            ),
+    return buildDecoratedControl(
+      control: FormBuilderTextField(
+        maxLines: 1,
+        name: 'pwd',
+        initialValue: widget.savedPassword,
+        validator: FormBuilderValidators.compose([
+          FormBuilderValidators.required(context),
+        ]),
+        obscureText: _hidePassword,
+        decoration: Palette.formFieldDecoration(
+          withLabel: true,
+          label: "Password",
+          suffixIcon: FlatButton(
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            child: Text(_hidePassword ? "Show" : "Hide"),
+            onPressed: () {
+              setState(
+                () {
+                  // TODO
+                  _hidePassword = !_hidePassword;
+                },
+              );
+            },
           ),
         ),
-        true,
-        "Password");
+      ),
+      withLabel: true,
+      label: "Password",
+    );
   }
 }
