@@ -13,7 +13,6 @@ import '../app.dart';
 import '../model/doctype_response.dart';
 import '../views/desk/desk_view.dart';
 import '../views/email_form.dart';
-import '../views/file_picker.dart';
 import '../views/form_view/form_view.dart';
 import '../views/home_view.dart';
 import '../views/list_view/list_view.dart';
@@ -37,7 +36,6 @@ class Routes {
   static const String emailForm = '/email-form';
   static const String queueError = '/queue-error';
   static const String queueList = '/queue-list';
-  static const String customFilePicker = '/custom-file-picker';
   static const String viewEmail = '/view-email';
   static const String homeView = '/home-view';
   static const all = <String>{
@@ -52,7 +50,6 @@ class Routes {
     emailForm,
     queueError,
     queueList,
-    customFilePicker,
     viewEmail,
     homeView,
   };
@@ -73,7 +70,6 @@ class MyRouter extends RouterBase {
     RouteDef(Routes.emailForm, page: EmailForm),
     RouteDef(Routes.queueError, page: QueueError),
     RouteDef(Routes.queueList, page: QueueList),
-    RouteDef(Routes.customFilePicker, page: CustomFilePicker),
     RouteDef(Routes.viewEmail, page: ViewEmail),
     RouteDef(Routes.homeView, page: HomeView),
   ];
@@ -167,19 +163,6 @@ class MyRouter extends RouterBase {
         settings: data,
       );
     },
-    CustomFilePicker: (data) {
-      final args = data.getArgs<CustomFilePickerArguments>(
-        orElse: () => CustomFilePickerArguments(),
-      );
-      return MaterialPageRoute<dynamic>(
-        builder: (context) => CustomFilePicker(
-          doctype: args.doctype,
-          name: args.name,
-          callback: args.callback,
-        ),
-        settings: data,
-      );
-    },
     ViewEmail: (data) {
       final args = data.getArgs<ViewEmailArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
@@ -256,14 +239,6 @@ class QueueErrorArguments {
   final Map<dynamic, dynamic> dataToUpdate;
   QueueErrorArguments(
       {this.key, @required this.error, @required this.dataToUpdate});
-}
-
-/// CustomFilePicker arguments holder class
-class CustomFilePickerArguments {
-  final String doctype;
-  final String name;
-  final Function callback;
-  CustomFilePickerArguments({this.doctype, this.name, this.callback});
 }
 
 /// ViewEmail arguments holder class

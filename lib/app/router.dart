@@ -8,7 +8,6 @@ import '../views/form_view/form_view.dart';
 import '../views/new_doc/new_doc_view.dart';
 import '../views/list_view/list_view.dart';
 import '../views/desk/desk_view.dart';
-import '../views/file_picker.dart';
 import '../views/queue.dart';
 import '../views/email_form.dart';
 import '../views/queue_error.dart';
@@ -30,7 +29,6 @@ import '../views/login/login_view.dart';
     MaterialRoute(page: EmailForm),
     MaterialRoute(page: QueueError),
     MaterialRoute(page: QueueList),
-    MaterialRoute(page: CustomFilePicker),
     MaterialRoute(page: ViewEmail),
     MaterialRoute(page: HomeView),
   ],
