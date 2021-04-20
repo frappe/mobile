@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'dart:io';
 
 import 'package:connectivity/connectivity.dart';
@@ -7,9 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:frappe_app/app/router.gr.dart';
 import 'package:frappe_app/model/offline_storage.dart';
 import 'package:frappe_app/services/storage_service.dart';
+import 'package:frappe_app/views/session_expired.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,8 +25,6 @@ import 'http.dart';
 import '../main.dart';
 import '../form/controls/control.dart';
 import '../app/locator.dart';
-import '../config/palette.dart';
-import '../services/navigation_service.dart';
 
 import '../utils/dio_helper.dart';
 import '../utils/enums.dart';
@@ -378,14 +377,23 @@ clearLoginInfo() async {
   Config.set('isLoggedIn', false);
 }
 
-handle403() async {
+handle403(BuildContext context) async {
   await clearLoginInfo();
-  locator<NavigationService>().clearAllAndNavigateTo(Routes.sessionExpired);
+
+  Navigator.of(context).pushAndRemoveUntil(
+    MaterialPageRoute(builder: (context) {
+      return SessionExpired();
+    }),
+    (_) => false,
+  );
 }
 
-handleError(Response error, [bool hideAppBar = false]) {
+handleError(
+    {@required Response error,
+    @required BuildContext context,
+    bool hideAppBar = false}) {
   if (error.statusCode == HttpStatus.forbidden) {
-    handle403();
+    handle403(context);
   } else if (error.statusCode == HttpStatus.serviceUnavailable) {
     return NoInternet(hideAppBar);
   } else {

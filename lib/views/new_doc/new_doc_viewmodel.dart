@@ -1,15 +1,15 @@
+// @dart=2.9
 import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:frappe_app/views/form_view/form_view.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../app/locator.dart';
-import '../../app/router.gr.dart';
 import '../../model/doctype_response.dart';
 import '../../services/api/api.dart';
-import '../../services/navigation_service.dart';
 import '../../utils/enums.dart';
 import '../../utils/frappe_alert.dart';
 import '../../utils/helpers.dart';
@@ -62,11 +62,14 @@ class NewDocViewModel extends BaseViewModel {
             meta.docs[0].name,
             formValue,
           );
-          locator<NavigationService>().pushReplacement(
-            Routes.formView,
-            arguments: FormViewArguments(
-              meta: meta,
-              name: response.data["docs"][0]["name"],
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) {
+                return FormView(
+                  meta: meta,
+                  name: response.data["docs"][0]["name"],
+                );
+              },
             ),
           );
         } catch (e) {

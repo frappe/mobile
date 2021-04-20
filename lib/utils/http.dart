@@ -1,3 +1,4 @@
+// @dart=2.9
 import '../app/locator.dart';
 import '../services/api/api.dart';
 

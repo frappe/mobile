@@ -1,11 +1,11 @@
+// @dart=2.9
 import 'package:flutter/material.dart';
-import 'package:frappe_app/app/router.gr.dart';
+import 'package:frappe_app/views/queue.dart';
 
-import '../services/navigation_service.dart';
 import '../config/palette.dart';
-import '../app/locator.dart';
 import '../utils/helpers.dart';
 import '../widgets/card_list_tile.dart';
+import 'login/login_view.dart';
 
 class SettingsPage extends StatelessWidget {
   @override
@@ -21,8 +21,12 @@ class SettingsPage extends StatelessWidget {
           CardListTile(
             title: Text('Queue'),
             onTap: () {
-              locator<NavigationService>().navigateTo(
-                Routes.queueList,
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return QueueList();
+                  },
+                ),
               );
             },
           ),
@@ -30,7 +34,12 @@ class SettingsPage extends StatelessWidget {
             title: Text('Logout'),
             onTap: () async {
               await clearLoginInfo();
-              locator<NavigationService>().clearAllAndNavigateTo(Routes.login);
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) {
+                  return Login();
+                }),
+                (_) => false,
+              );
             },
           ),
         ],

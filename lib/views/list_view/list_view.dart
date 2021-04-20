@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -6,16 +7,14 @@ import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/views/base_view.dart';
 import 'package:frappe_app/views/list_view/bottom_sheets/filters_bottom_sheet_view.dart';
+import 'package:frappe_app/views/new_doc/new_doc_view.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../model/doctype_response.dart';
 
 import '../../app/locator.dart';
-import '../../app/router.gr.dart';
 
 import '../../views/list_view/list_view_viewmodel.dart';
-
-import '../../services/navigation_service.dart';
 
 import '../../config/palette.dart';
 import '../../config/frappe_icons.dart';
@@ -56,7 +55,10 @@ class CustomListView extends StatelessWidget {
           : Builder(
               builder: (context) {
                 if (model.error != null) {
-                  return handleError(model.error);
+                  return handleError(
+                    error: model.error,
+                    context: context,
+                  );
                 }
 
                 return Scaffold(
@@ -96,7 +98,7 @@ class CustomListView extends StatelessWidget {
                       );
                     },
                     actions: <Widget>[
-                      _newDoc(),
+                      _newDoc(context),
                     ],
                   ),
                   body: RefreshIndicator(
@@ -165,7 +167,7 @@ class CustomListView extends StatelessWidget {
     );
   }
 
-  Widget _newDoc() {
+  Widget _newDoc(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Container(
@@ -179,9 +181,12 @@ class CustomListView extends StatelessWidget {
             color: Colors.white,
           ),
           onPressed: () {
-            locator<NavigationService>().navigateTo(
-              Routes.newDoc,
-              arguments: NewDocArguments(meta: meta),
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) {
+                  return NewDoc(meta: meta);
+                },
+              ),
             );
           },
         ),
@@ -284,10 +289,11 @@ class CustomListView extends StatelessWidget {
             buttonType: ButtonType.primary,
             title: 'Create New',
             onPressed: () {
-              locator<NavigationService>().navigateTo(
-                Routes.newDoc,
-                arguments: NewDocArguments(
-                  meta: meta,
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return NewDoc(meta: meta);
+                  },
                 ),
               );
             },
@@ -310,15 +316,17 @@ class AddFilterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
-      color: FrappePalette.grey[700],
-      padding: EdgeInsets.all(8),
-      shape: OutlineInputBorder(
-        borderSide: BorderSide(
-          color: Colors.transparent,
-        ),
-        borderRadius: BorderRadius.all(
-          Radius.circular(8),
+    return TextButton(
+      style: TextButton.styleFrom(
+        backgroundColor: FrappePalette.grey[700],
+        padding: EdgeInsets.all(8),
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            color: Colors.transparent,
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(5),
+          ),
         ),
       ),
       child: Row(

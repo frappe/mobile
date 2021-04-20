@@ -1,3 +1,5 @@
+// @dart=2.9
+
 class GetDocResponse {
   List docs;
   Docinfo docinfo;

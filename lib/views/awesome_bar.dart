@@ -1,14 +1,15 @@
+// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/views/new_doc/new_doc_view.dart';
 
 import '../model/offline_storage.dart';
 import '../utils/frappe_icon.dart';
-import '../services/navigation_service.dart';
 
 import '../config/frappe_icons.dart';
 
 import '../app/locator.dart';
-import '../app/router.gr.dart';
+import 'list_view/list_view.dart';
 
 class Awesombar extends StatelessWidget {
   @override
@@ -159,17 +160,19 @@ class AwesomeSearch extends SearchDelegate {
           onTap: () async {
             var meta = await OfflineStorage.getMeta(item["value"]);
             if (item["type"] == "Doctype") {
-              locator<NavigationService>().navigateTo(
-                Routes.customListView,
-                arguments: CustomListViewArguments(
-                  meta: meta,
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return CustomListView(meta: meta);
+                  },
                 ),
               );
             } else if (item["type"] == "New Doc") {
-              locator<NavigationService>().navigateTo(
-                Routes.newDoc,
-                arguments: NewDocArguments(
-                  meta: meta,
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return NewDoc(meta: meta);
+                  },
                 ),
               );
             } else if (item["type"] == "Module") {
@@ -179,6 +182,7 @@ class AwesomeSearch extends SearchDelegate {
               //     module: item["value"],
               //   ),
               // );
+              // TODO
             }
           },
         );

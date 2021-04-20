@@ -1,6 +1,10 @@
+// @dart=2.9
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:frappe_app/widgets/form_builder_typeahead.dart';
 
 import '../../model/doctype_response.dart';
 

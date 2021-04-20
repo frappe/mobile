@@ -1,8 +1,11 @@
+// @dart=2.9
+
 import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../model/config.dart';
 
@@ -27,17 +30,14 @@ class DioHelper {
   static Future<PersistCookieJar> getCookiePath() async {
     Directory appDocDir = await getApplicationSupportDirectory();
     String appDocPath = appDocDir.path;
-
     return PersistCookieJar(
-      dir: appDocPath,
-      ignoreExpires: true,
-    );
+        ignoreExpires: true, storage: FileStorage(appDocPath));
   }
 
   static Future<String> getCookies() async {
     var cookieJar = await getCookiePath();
 
-    var cookies = cookieJar.loadForRequest(Config().uri);
+    var cookies = await cookieJar.loadForRequest(Config().uri);
 
     var cookie = CookieManager.getCookies(cookies);
 

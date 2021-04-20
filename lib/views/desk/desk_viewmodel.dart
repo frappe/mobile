@@ -1,9 +1,10 @@
+// @dart=2.9
+
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:frappe_app/app/router.gr.dart';
-import 'package:frappe_app/services/navigation_service.dart';
+
 import 'package:frappe_app/utils/frappe_alert.dart';
 import 'package:frappe_app/views/form_view/form_view.dart';
 import 'package:frappe_app/views/list_view/list_view.dart';
@@ -55,8 +56,6 @@ class DeskViewModel extends BaseViewModel {
       if (deskSidebarItemsCache != null) {
         deskSidebarItems =
             DeskSidebarItemsResponse.fromJson(deskSidebarItemsCache);
-      } else {
-        error = Response(statusCode: HttpStatus.serviceUnavailable);
       }
     } else {
       deskSidebarItems = await locator<Api>().getDeskSideBarItems();
@@ -78,8 +77,6 @@ class DeskViewModel extends BaseViewModel {
 
       if (moduleDoctypes != null) {
         _desktopPage = DesktopPageResponse.fromJson(moduleDoctypes);
-      } else {
-        error = Response(statusCode: HttpStatus.serviceUnavailable);
       }
     } else {
       _desktopPage = await locator<Api>().getDesktopPage(currentModule);
@@ -112,16 +109,8 @@ class DeskViewModel extends BaseViewModel {
       var meta = await OfflineStorage.getMeta(doctype);
 
       if (meta.docs[0].issingle == 1) {
-        locator<NavigationService>().navigateTo(
-          Routes.formView,
-          arguments: FormViewArguments(
-            meta: meta,
-            name: meta.docs[0].name,
-          ),
-        );
-        pushNewScreenWithRouteSettings(
+        pushNewScreen(
           context,
-          settings: RouteSettings(name: Routes.formView),
           screen: FormView(
             meta: meta,
             name: meta.docs[0].name,
@@ -129,9 +118,8 @@ class DeskViewModel extends BaseViewModel {
           withNavBar: true,
         );
       } else {
-        pushNewScreenWithRouteSettings(
+        pushNewScreen(
           context,
-          settings: RouteSettings(name: Routes.customListView),
           screen: CustomListView(
             meta: meta,
           ),

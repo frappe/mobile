@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
@@ -9,7 +10,6 @@ import 'package:injectable/injectable.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
 import '../../app/locator.dart';
-import '../../app/router.gr.dart';
 
 import '../../model/doctype_response.dart';
 import '../../model/offline_storage.dart';
@@ -97,9 +97,8 @@ class ListViewViewModel extends BaseViewModel {
     @required BuildContext context,
   }) {
     {
-      pushNewScreenWithRouteSettings(
+      pushNewScreen(
         context,
-        settings: RouteSettings(name: Routes.formView),
         screen: FormView(
           name: name,
           meta: meta,
@@ -131,9 +130,8 @@ class ListViewViewModel extends BaseViewModel {
     var _meta = await OfflineStorage.getMeta(doctype);
 
     if (_meta.docs[0].issingle == 1) {
-      pushNewScreenWithRouteSettings(
+      pushNewScreen(
         context,
-        settings: RouteSettings(name: Routes.formView),
         screen: FormView(
           meta: _meta,
           name: _meta.docs[0].name,

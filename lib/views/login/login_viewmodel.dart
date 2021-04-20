@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'package:injectable/injectable.dart';
 
 import '../../app/locator.dart';

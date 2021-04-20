@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
@@ -41,11 +43,13 @@ class AssigneesBottomSheetView extends StatelessWidget {
         heightFactor: 0.5,
         child: FrappeBottomSheet(
           title: 'Assignees',
-          onActionButtonPress: () {
-            model.addAssignees(
+          onActionButtonPress: () async {
+            await model.addAssignees(
               doctype: doctype,
               name: name,
             );
+
+            Navigator.of(context).pop(true);
           },
           trailing: Row(
             children: [

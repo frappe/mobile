@@ -1,3 +1,5 @@
+// @dart=2.9
+
 class DeskSidebarItemsResponse {
   List<DeskMessage> message;
 

@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:file_picker/file_picker.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 

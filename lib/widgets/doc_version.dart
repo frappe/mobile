@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'dart:convert';
 import 'dart:io';
 
@@ -73,17 +74,25 @@ class DocVersion extends StatelessWidget {
           print(a);
           print(b);
         },
-        onLinkTap: (url) async {
-          final absoluteUrl = getAbsoluteUrl(url);
-          if (await canLaunch(absoluteUrl)) {
-            await launch(
-              absoluteUrl,
-              headers: {HttpHeaders.cookieHeader: await DioHelper.getCookies()},
-            );
-          } else {
-            throw 'Could not launch $url';
-          }
+        onLinkTap: (a, b, c, d) async {
+          print("a $a");
+          print("b $b");
+          print("c $c");
+          print("d $d");
+          // TODO
+          // final absoluteUrl = getAbsoluteUrl(url);
+          // if (await canLaunch(absoluteUrl)) {
+          //   await launch(
+          //     absoluteUrl,
+          //     headers: {HttpHeaders.cookieHeader: await DioHelper.getCookies()},
+          //   );
+          // } else {
+          //   throw 'Could not launch $url';
+          // }
         },
+        // onLinkTap: (url, context, __) {
+
+        // },
       ),
     );
   }

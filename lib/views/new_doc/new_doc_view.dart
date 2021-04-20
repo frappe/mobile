@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'package:frappe_app/views/base_view.dart';
 import 'package:frappe_app/views/new_doc/new_doc_viewmodel.dart';
 import 'package:provider/provider.dart';

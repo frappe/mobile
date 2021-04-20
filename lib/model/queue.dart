@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:hive/hive.dart';
 
 import '../services/storage_service.dart';

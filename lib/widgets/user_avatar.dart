@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'dart:io';
 import 'dart:math';
 
@@ -15,7 +16,7 @@ class UserAvatar extends StatelessWidget {
   final double size;
 
   UserAvatar({
-    this.uid,
+    @required this.uid,
     this.size,
   });
 

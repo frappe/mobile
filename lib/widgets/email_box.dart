@@ -1,9 +1,7 @@
+// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:frappe_app/app/locator.dart';
-import 'package:frappe_app/app/router.gr.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
-import 'package:frappe_app/services/navigation_service.dart';
 
 import 'package:html/parser.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -32,14 +30,17 @@ class EmailBox extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: ListTile(
           onTap: () {
-            locator<NavigationService>().navigateTo(
-              Routes.viewEmail,
-              arguments: ViewEmailArguments(
-                time: time,
-                title: data.subject,
-                senderFullName: data.senderFullName,
-                sender: data.sender,
-                content: data.content,
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) {
+                  return ViewEmail(
+                    time: time,
+                    title: data.subject,
+                    senderFullName: data.senderFullName,
+                    sender: data.sender,
+                    content: data.content,
+                  );
+                },
               ),
             );
           },

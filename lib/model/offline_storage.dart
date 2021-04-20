@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -257,7 +259,7 @@ class OfflineStorage {
           metaResponse = DoctypeResponse.fromJson(
               Map<String, dynamic>.from(cachedMeta["data"]));
         } else {
-          throw Response(statusCode: HttpStatus.serviceUnavailable);
+          // throw Response(statusCode: HttpStatus.serviceUnavailable);
         }
       }
       return metaResponse;

@@ -1,18 +1,15 @@
+// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:frappe_app/views/home_view.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import 'app/router.gr.dart';
-
 import 'lifecycle_manager.dart';
-import 'app/locator.dart';
 
 import 'model/config.dart';
 import 'utils/enums.dart';
 
 import 'services/connectivity_service.dart';
-import 'services/navigation_service.dart';
 
 import 'views/login/login_view.dart';
 
@@ -43,14 +40,12 @@ class _FrappeAppState extends State<FrappeApp> {
   Widget build(BuildContext context) {
     return LifeCycleManager(
       child: StreamProvider<ConnectivityStatus>(
+        initialData: ConnectivityStatus.offline,
         create: (context) =>
             ConnectivityService().connectionStatusController.stream,
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Frappe',
-          navigatorKey: locator<NavigationService>().navigatorKey,
-          onGenerateRoute: MyRouter().onGenerateRoute,
-          initialRoute: Routes.frappeApp,
           theme: new ThemeData(
             textTheme: GoogleFonts.interTextTheme(
               Theme.of(context).textTheme.apply(

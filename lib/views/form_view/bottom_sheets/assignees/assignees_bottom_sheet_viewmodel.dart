@@ -1,7 +1,8 @@
+// @dart=2.9
+
 import 'package:flutter/foundation.dart';
 import 'package:frappe_app/app/locator.dart';
 import 'package:frappe_app/services/api/api.dart';
-import 'package:frappe_app/services/navigation_service.dart';
 import 'package:frappe_app/views/base_viewmodel.dart';
 import 'package:injectable/injectable.dart';
 
@@ -24,7 +25,6 @@ class AssigneesBottomSheetViewModel extends BaseViewModel {
       name,
       selectedUsers,
     );
-    locator<NavigationService>().pop(true);
   }
 
   removeUser(int index) {

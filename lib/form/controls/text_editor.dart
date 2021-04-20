@@ -1,5 +1,6 @@
+// @dart=2.9
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/widgets/form_builder_text_editor.dart';
 
 import '../../config/palette.dart';
 import '../../model/doctype_response.dart';
@@ -11,12 +12,14 @@ class TextEditor extends StatelessWidget with Control, ControlInput {
   final Key key;
   final DoctypeField doctypeField;
   final Map doc;
+  final bool readOnly;
 
   final bool withLabel;
 
   const TextEditor({
     this.key,
     @required this.doctypeField,
+    this.readOnly,
     this.doc,
     this.withLabel,
   });
@@ -25,23 +28,48 @@ class TextEditor extends StatelessWidget with Control, ControlInput {
   Widget build(BuildContext context) {
     List<String Function(dynamic)> validators = [];
 
-    var f = setMandatory(doctypeField);
+    String Function(dynamic) Function(BuildContext, {String errorText}) f =
+        setMandatory(doctypeField);
 
     if (f != null) {
       validators.add(
         f(context),
       );
     }
-    return FormBuilderTextField(
+    return FormBuilderTextEditor(
+      onTap: (field) async {
+        var v = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) {
+              var _controller = TextEditingController();
+              return Scaffold(
+                appBar: AppBar(
+                  actions: [
+                    FlatButton(
+                      child: Text('save'),
+                      onPressed: () {
+                        Navigator.of(context).pop(_controller.text);
+                      },
+                    ),
+                  ],
+                ),
+                body: TextField(
+                  controller: _controller,
+                ),
+              );
+            },
+          ),
+        );
+
+        if (v != null) {
+          field.didChange(v);
+        }
+      },
       key: key,
-      maxLines: 10,
       initialValue: doc != null ? doc[doctypeField.fieldname] : null,
       name: doctypeField.fieldname,
-      decoration: Palette.formFieldDecoration(
-        withLabel: withLabel,
-        label: doctypeField.label,
-      ),
-      validator: FormBuilderValidators.compose(validators),
+      enabled: !readOnly,
+      // validator: FormBuilderValidators.compose(validators),
     );
   }
 }

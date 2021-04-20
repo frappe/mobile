@@ -1,3 +1,5 @@
+// @dart=2.9
+
 class DoctypeResponse {
   List<DoctypeDoc> docs;
   String userSettings;

@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:flutter/material.dart';
 
 import 'package:frappe_app/utils/helpers.dart';
@@ -60,7 +62,10 @@ class DeskView extends StatelessWidget {
                     context,
                   ) {
                     if (model.error != null) {
-                      return handleError(model.error);
+                      return handleError(
+                        error: model.error,
+                        context: context,
+                      );
                     }
                     return ListView(
                       padding: EdgeInsets.zero,
