@@ -39,7 +39,10 @@ class DioApi implements Api {
             response.headers.map["set-cookie"][3].split(';')[0].split('=')[1];
         return LoginResponse.fromJson(response.data);
       } else {
-        throw response;
+        throw ErrorResponse(
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
+        );
       }
     } catch (e) {
       if (e is DioError) {

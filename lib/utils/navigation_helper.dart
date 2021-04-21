@@ -4,8 +4,9 @@ class NavigationHelper {
   static clearAllAndNavigateTo({
     required BuildContext context,
     required Widget page,
+    bool withNavBar = false,
   }) {
-    Navigator.of(context).pushAndRemoveUntil(
+    Navigator.of(context, rootNavigator: !withNavBar).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) {
         return page;
       }),

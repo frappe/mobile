@@ -182,12 +182,12 @@ Future syncnow() async {
     var deskSidebarItems =
         DeskSidebarItemsResponse.fromJson(deskSidebarItemsCache);
 
-    for (var module in deskSidebarItems.message) {
+    for (var module in deskSidebarItems.message!) {
       var runBackgroundTask = await getSharedPrefValue("backgroundTask");
       if (runBackgroundTask) {
         try {
           print("downloading ${module.label}");
-          await OfflineStorage.storeModule(module.label, true);
+          await OfflineStorage.storeModule(module.label!, true);
         } catch (e) {
           throw e;
         }

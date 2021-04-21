@@ -92,8 +92,8 @@ class OfflineStorage {
       var deskSideBarItems = await locator<Api>().getDeskSideBarItems();
       var desktopPage = await locator<Api>().getDesktopPage(module);
 
-      desktopPage.message.cards.items.forEach((item) {
-        doctypes.addAll(item.links);
+      desktopPage.message?.cards?.items?.forEach((item) {
+        doctypes.addAll(item.links!);
       });
 
       cache["${module}Doctypes"] = desktopPage.toJson();
@@ -103,13 +103,13 @@ class OfflineStorage {
 
       for (var doctype in doctypes) {
         f.add(
-          storeDocListAndDoc(doctype.label),
+          storeDocListAndDoc(doctype.label!),
         );
         f.add(
-          storeLinkFields(doctype.label),
+          storeLinkFields(doctype.label!),
         );
         f.add(
-          storeDoctypeMeta(doctype.label),
+          storeDoctypeMeta(doctype.label!),
         );
       }
 

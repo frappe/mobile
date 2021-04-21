@@ -1,15 +1,13 @@
-// @dart=2.9
-
 class DeskSidebarItemsResponse {
-  List<DeskMessage> message;
+  late List<DeskMessage>? message;
 
   DeskSidebarItemsResponse({this.message});
 
   DeskSidebarItemsResponse.fromJson(Map<dynamic, dynamic> json) {
     if (json['message'] != null) {
-      message = new List<DeskMessage>();
+      message = [];
       json['message'].forEach((v) {
-        message.add(new DeskMessage.fromJson(v));
+        message?.add(new DeskMessage.fromJson(v));
       });
     }
   }
@@ -17,18 +15,18 @@ class DeskSidebarItemsResponse {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.message != null) {
-      data['message'] = this.message.map((v) => v.toJson()).toList();
+      data['message'] = this.message?.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class DeskMessage {
-  String name;
-  String category;
-  String icon;
-  String module;
-  String label;
+  late String? name;
+  late String? category;
+  late String? icon;
+  late String? module;
+  late String? label;
 
   DeskMessage({this.name, this.category, this.icon, this.module, this.label});
 

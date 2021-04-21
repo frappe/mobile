@@ -1,9 +1,9 @@
-// @dart=2.9
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/form/controls/control.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/utils/navigation_helper.dart';
 import 'package:frappe_app/views/home_view.dart';
 
@@ -93,32 +93,37 @@ class Login extends StatelessWidget {
                                 FocusNode(),
                               );
 
-                              if (_fbKey.currentState.saveAndValidate()) {
-                                var formValue = _fbKey.currentState.value;
+                              if (_fbKey.currentState != null) {
+                                if (_fbKey.currentState!.saveAndValidate()) {
+                                  var formValue = _fbKey.currentState?.value;
 
-                                var response = await model.login(
-                                  formValue,
-                                );
+                                  try {
+                                    await model.login(
+                                      formValue,
+                                    );
 
-                                if (response["success"] == true) {
-                                  NavigationHelper.pushReplacement(
-                                    context: context,
-                                    page: HomeView(),
-                                  );
-                                } else {
-                                  if (response["statusCode"] ==
-                                      HttpStatus.unauthorized) {
-                                    FrappeAlert.errorAlert(
-                                      title: "Not Authorized",
-                                      subtitle: 'Invalid Username or Password',
+                                    NavigationHelper.pushReplacement(
                                       context: context,
+                                      page: HomeView(),
                                     );
-                                  } else {
-                                    FrappeAlert.errorAlert(
-                                      title: "Error",
-                                      subtitle: response["message"],
-                                      context: context,
-                                    );
+                                  } catch (e) {
+                                    var _e = e as ErrorResponse;
+
+                                    if (_e.statusCode ==
+                                        HttpStatus.unauthorized) {
+                                      FrappeAlert.errorAlert(
+                                        title: "Not Authorized",
+                                        subtitle:
+                                            'Invalid Username or Password',
+                                        context: context,
+                                      );
+                                    } else {
+                                      FrappeAlert.errorAlert(
+                                        title: "Error",
+                                        subtitle: _e.statusMessage,
+                                        context: context,
+                                      );
+                                    }
                                   }
                                 }
                               }
@@ -139,10 +144,6 @@ class Login extends StatelessWidget {
 }
 
 class Title extends StatelessWidget {
-  const Title({
-    Key key,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Text(
@@ -156,10 +157,6 @@ class Title extends StatelessWidget {
 }
 
 class FrappeLogo extends StatelessWidget {
-  const FrappeLogo({
-    Key key,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Image(
@@ -171,12 +168,11 @@ class FrappeLogo extends StatelessWidget {
 }
 
 class PasswordField extends StatefulWidget {
-  final String savedPassword;
+  final String? savedPassword;
 
   const PasswordField({
-    Key key,
     this.savedPassword,
-  }) : super(key: key);
+  });
 
   @override
   _PasswordFieldState createState() => _PasswordFieldState();

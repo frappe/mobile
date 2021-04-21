@@ -1,4 +1,4 @@
-// @dart=2.9
+import 'package:frappe_app/model/login_response.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../app/locator.dart';
@@ -13,14 +13,14 @@ import '../../model/config.dart';
 import '../../views/base_viewmodel.dart';
 
 class SavedCredentials {
-  String serverURL;
-  String usr;
-  String pwd;
+  String? serverURL;
+  String? usr;
+  String? pwd;
 
   SavedCredentials({
-    this.serverURL = "",
-    this.usr = "",
-    this.pwd = "",
+    this.serverURL,
+    this.usr,
+    this.pwd,
   });
 }
 
@@ -28,7 +28,7 @@ class SavedCredentials {
 class LoginViewModel extends BaseViewModel {
   var savedCreds = SavedCredentials();
 
-  String loginButtonLabel;
+  String? loginButtonLabel;
 
   init() {
     loginButtonLabel = "Login";
@@ -69,7 +69,7 @@ class LoginViewModel extends BaseViewModel {
     );
   }
 
-  login(data) async {
+  Future<LoginResponse> login(data) async {
     loginButtonLabel = "Verifying...";
     notifyListeners();
     await setBaseUrl(data["serverURL"]);
@@ -87,19 +87,12 @@ class LoginViewModel extends BaseViewModel {
       loginButtonLabel = "Success";
       notifyListeners();
 
-      return {
-        "success": true,
-        "message": "Success",
-      };
+      return response;
     } catch (e) {
       Config.set('isLoggedIn', false);
       loginButtonLabel = "Login";
       notifyListeners();
-      return {
-        "success": false,
-        "message": e.statusMessage,
-        "statusCode": e.statusCode,
-      };
+      throw e;
     }
   }
 }
