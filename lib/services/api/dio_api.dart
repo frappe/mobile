@@ -45,12 +45,12 @@ class DioApi implements Api {
       if (e is DioError) {
         var error = e.error;
         if (error is SocketException) {
-          throw Response(
+          throw ErrorResponse(
             statusCode: HttpStatus.serviceUnavailable,
             statusMessage: error.message,
           );
         } else {
-          throw Response(statusMessage: error.message, statusCode: error);
+          throw ErrorResponse(statusMessage: error.message, statusCode: error);
         }
       } else {
         throw e;
@@ -87,18 +87,18 @@ class DioApi implements Api {
       } else if (response.statusCode == HttpStatus.forbidden) {
         throw response;
       } else {
-        throw Response(statusMessage: 'Something went wrong');
+        throw ErrorResponse(statusMessage: 'Something went wrong');
       }
     } catch (e) {
       if (e is DioError) {
         var error = e.error;
         if (error is SocketException) {
-          throw Response(
+          throw ErrorResponse(
             statusCode: HttpStatus.serviceUnavailable,
             statusMessage: error.message,
           );
         } else {
-          throw Response(statusMessage: error.message);
+          throw ErrorResponse(statusMessage: error.message);
         }
       } else {
         throw e;
@@ -129,18 +129,18 @@ class DioApi implements Api {
       } else if (response.statusCode == 403) {
         throw response;
       } else {
-        throw Response(statusMessage: 'Something went wrong');
+        throw ErrorResponse(statusMessage: 'Something went wrong');
       }
     } catch (e) {
       if (e is DioError) {
         var error = e.error;
         if (error is SocketException) {
-          throw Response(
+          throw ErrorResponse(
             statusCode: HttpStatus.serviceUnavailable,
             statusMessage: error.message,
           );
         } else {
-          throw Response(statusMessage: error.message);
+          throw ErrorResponse(statusMessage: error.message);
         }
       } else {
         throw e;
@@ -178,18 +178,18 @@ class DioApi implements Api {
       } else if (response.statusCode == HttpStatus.forbidden) {
         throw response;
       } else {
-        throw Response(statusMessage: 'Something went wrong');
+        throw ErrorResponse(statusMessage: 'Something went wrong');
       }
     } catch (e) {
       if (e is DioError) {
         var error = e.error;
         if (error is SocketException) {
-          throw Response(
+          throw ErrorResponse(
             statusCode: HttpStatus.serviceUnavailable,
             statusMessage: error.message,
           );
         } else {
-          throw Response(statusMessage: error.message);
+          throw ErrorResponse(statusMessage: error.message);
         }
       } else {
         throw e;
@@ -269,18 +269,18 @@ class DioApi implements Api {
       } else if (response.statusCode == HttpStatus.forbidden) {
         throw response;
       } else {
-        throw Response(statusMessage: 'Something went wrong');
+        throw ErrorResponse(statusMessage: 'Something went wrong');
       }
     } catch (e) {
       if (e is DioError) {
         var error = e.error;
         if (error is SocketException) {
-          throw Response(
+          throw ErrorResponse(
             statusCode: HttpStatus.serviceUnavailable,
             statusMessage: error.message,
           );
         } else {
-          throw Response(statusMessage: error.message);
+          throw ErrorResponse(statusMessage: error.message);
         }
       } else {
         throw e;
@@ -313,18 +313,18 @@ class DioApi implements Api {
       } else if (response.statusCode == 403) {
         throw response;
       } else {
-        throw Response(statusMessage: 'Something went wrong');
+        throw ErrorResponse(statusMessage: 'Something went wrong');
       }
     } catch (e) {
       if (e is DioError) {
         var error = e.error;
         if (error is SocketException) {
-          throw Response(
+          throw ErrorResponse(
             statusCode: HttpStatus.serviceUnavailable,
             statusMessage: error.message,
           );
         } else {
-          throw Response(statusMessage: error.message);
+          throw ErrorResponse(statusMessage: error.message);
         }
       } else {
         throw e;
@@ -421,12 +421,12 @@ class DioApi implements Api {
         }
 
         if (error is SocketException) {
-          throw Response(
+          throw ErrorResponse(
             statusCode: HttpStatus.serviceUnavailable,
             statusMessage: error.message,
           );
         } else {
-          throw Response(
+          throw ErrorResponse(
             statusCode: error.statusCode,
             statusMessage: error.statusMessage,
           );
@@ -569,7 +569,7 @@ class DioApi implements Api {
       if (response.statusCode == 200) {
         return response;
       } else {
-        throw Response(statusMessage: 'Something went wrong');
+        throw ErrorResponse(statusMessage: 'Something went wrong');
       }
     } catch (e) {
       if (e is DioError) {
@@ -581,12 +581,12 @@ class DioApi implements Api {
         }
 
         if (error is SocketException) {
-          throw Response(
+          throw ErrorResponse(
             statusCode: HttpStatus.serviceUnavailable,
             statusMessage: error.message,
           );
         } else {
-          throw Response(
+          throw ErrorResponse(
             statusCode: error.statusCode,
             statusMessage: error.statusMessage,
           );
@@ -637,18 +637,18 @@ class DioApi implements Api {
       } else if (response.statusCode == HttpStatus.forbidden) {
         throw response;
       } else {
-        throw Response(statusMessage: 'Something went wrong');
+        throw ErrorResponse(statusMessage: 'Something went wrong');
       }
     } catch (e) {
       if (e is DioError) {
         var error = e.error;
         if (error is SocketException) {
-          throw Response(
+          throw ErrorResponse(
             statusCode: HttpStatus.serviceUnavailable,
             statusMessage: error.message,
           );
         } else {
-          throw Response(statusMessage: error.message);
+          throw ErrorResponse(statusMessage: error.message);
         }
       } else {
         throw e;

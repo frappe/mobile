@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import '../services/storage_service.dart';
 
 import '../app/locator.dart';
@@ -12,7 +10,7 @@ class Config {
         defaultValue: false,
       );
 
-  String get userId => Uri.decodeFull(configContainer.get(
+  String? get userId => Uri.decodeFull(configContainer.get(
         'userId',
       ));
 
@@ -20,7 +18,7 @@ class Config {
         'user',
       );
 
-  String get primaryCacheKey {
+  String? get primaryCacheKey {
     if (baseUrl != null && userId != null) {
       return "$baseUrl$userId";
     } else {
@@ -32,11 +30,17 @@ class Config {
         'version',
       );
 
-  String get baseUrl => configContainer.get(
+  String? get baseUrl => configContainer.get(
         'baseUrl',
       );
 
-  Uri get uri => Uri.parse(baseUrl);
+  Uri? get uri {
+    if (baseUrl != null) {
+      Uri.parse(baseUrl!);
+    } else {
+      return null;
+    }
+  }
 
   static Future set(String k, dynamic v) async {
     configContainer.put(k, v);

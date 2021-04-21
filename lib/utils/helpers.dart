@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/offline_storage.dart';
 import 'package:frappe_app/services/storage_service.dart';
 import 'package:frappe_app/views/session_expired.dart';
@@ -370,10 +371,13 @@ getTitle(DoctypeDoc meta, Map doc) {
 }
 
 clearLoginInfo() async {
-  await DioHelper.getCookiePath()
-    ..delete(
+  var cookie = await DioHelper.getCookiePath();
+  if (Config().uri != null) {
+    cookie.delete(
       Config().uri,
     );
+  }
+
   Config.set('isLoggedIn', false);
 }
 
@@ -388,10 +392,11 @@ handle403(BuildContext context) async {
   );
 }
 
-handleError(
-    {@required Response error,
-    @required BuildContext context,
-    bool hideAppBar = false}) {
+handleError({
+  @required ErrorResponse error,
+  @required BuildContext context,
+  bool hideAppBar = false,
+}) {
   if (error.statusCode == HttpStatus.forbidden) {
     handle403(context);
   } else if (error.statusCode == HttpStatus.serviceUnavailable) {

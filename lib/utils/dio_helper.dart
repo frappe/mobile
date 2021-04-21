@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -10,8 +8,8 @@ import 'package:path_provider/path_provider.dart';
 import '../model/config.dart';
 
 class DioHelper {
-  static Dio dio;
-  static String cookies;
+  static Dio? dio;
+  static String? cookies;
 
   static Future init(String baseUrl) async {
     var cookieJar = await getCookiePath();
@@ -22,8 +20,8 @@ class DioHelper {
     )..interceptors.add(
         CookieManager(cookieJar),
       );
-    dio.options.connectTimeout = 60 * 1000;
-    dio.options.receiveTimeout = 60 * 1000;
+    dio?.options.connectTimeout = 60 * 1000;
+    dio?.options.receiveTimeout = 60 * 1000;
     cookies = await getCookies();
   }
 
@@ -34,13 +32,16 @@ class DioHelper {
         ignoreExpires: true, storage: FileStorage(appDocPath));
   }
 
-  static Future<String> getCookies() async {
+  static Future<String?> getCookies() async {
     var cookieJar = await getCookiePath();
+    if (Config().uri != null) {
+      var cookies = await cookieJar.loadForRequest(Config().uri!);
 
-    var cookies = await cookieJar.loadForRequest(Config().uri);
+      var cookie = CookieManager.getCookies(cookies);
 
-    var cookie = CookieManager.getCookies(cookies);
-
-    return cookie;
+      return cookie;
+    } else {
+      return null;
+    }
   }
 }

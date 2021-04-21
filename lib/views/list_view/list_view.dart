@@ -361,6 +361,9 @@ class AddFilterButton extends StatelessWidget {
             child: Center(
               child: Text(
                 appliedFilters.toString(),
+                style: TextStyle(
+                  color: Colors.black,
+                ),
               ),
             ),
           ),

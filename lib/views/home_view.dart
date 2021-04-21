@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
@@ -57,7 +56,7 @@ class _HomeViewState extends State<HomeView> {
         icon: FrappeIcon(
           FrappeIcons.home_filled,
         ),
-        activeColorPrimary: FrappePalette.grey[800],
+        activeColorPrimary: FrappePalette.grey[800]!,
         inactiveColorPrimary: FrappePalette.grey[500],
       ),
       PersistentBottomNavBarItem(
@@ -70,7 +69,7 @@ class _HomeViewState extends State<HomeView> {
           FrappeIcons.search,
           color: FrappePalette.grey[500],
         ),
-        activeColorPrimary: FrappePalette.grey[800],
+        activeColorPrimary: FrappePalette.grey[800]!,
         inactiveColorPrimary: FrappePalette.grey[500],
       ),
       PersistentBottomNavBarItem(
@@ -79,7 +78,7 @@ class _HomeViewState extends State<HomeView> {
           uid: Config().userId,
           size: 12,
         ),
-        activeColorPrimary: FrappePalette.grey[800],
+        activeColorPrimary: FrappePalette.grey[800]!,
         inactiveColorPrimary: FrappePalette.grey[500],
       ),
     ];
@@ -92,10 +91,9 @@ class CustomNavBarWidget extends StatelessWidget {
   final ValueChanged<int> onItemSelected;
 
   CustomNavBarWidget({
-    Key key,
-    this.selectedIndex,
-    @required this.items,
-    this.onItemSelected,
+    required this.selectedIndex,
+    required this.items,
+    required this.onItemSelected,
   });
 
   Widget _buildItem(PersistentBottomNavBarItem item, bool isSelected) {
@@ -127,7 +125,7 @@ class CustomNavBarWidget extends StatelessWidget {
               type: MaterialType.transparency,
               child: FittedBox(
                   child: Text(
-                item.title,
+                item.title!,
                 style: TextStyle(
                     color: isSelected
                         ? (item.activeColorSecondary == null
@@ -155,9 +153,10 @@ class CustomNavBarWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: items.map((item) {
             int index = items.indexOf(item);
-            return FlatButton(
-              highlightColor: Colors.transparent,
-              splashColor: Colors.transparent,
+            return TextButton(
+              style: ButtonStyle(
+                overlayColor: MaterialStateProperty.all(Colors.transparent),
+              ),
               onPressed: () {
                 this.onItemSelected(index);
               },

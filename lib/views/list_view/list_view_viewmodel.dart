@@ -1,7 +1,5 @@
-// @dart=2.9
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/desktop_page_response.dart';
@@ -25,16 +23,16 @@ import '../../views/base_viewmodel.dart';
 
 @lazySingleton
 class ListViewViewModel extends BaseViewModel {
-  PagewiseLoadController pagewiseLoadController;
-  DoctypeResponse meta;
-  Response error;
+  PagewiseLoadController? pagewiseLoadController;
+  DoctypeResponse? meta;
+  ErrorResponse? error;
   List<Filter> filters = [];
   bool showLiked = false;
   var userId = Config().userId;
-  DesktopPageResponse desktopPageResponse;
+  DesktopPageResponse? desktopPageResponse;
 
   refresh() {
-    pagewiseLoadController.reset();
+    pagewiseLoadController?.reset();
   }
 
   getData(DoctypeDoc meta) async {
@@ -58,13 +56,13 @@ class ListViewViewModel extends BaseViewModel {
             return locator<Api>().fetchList(
               filters: transformedFilters,
               meta: meta,
-              doctype: meta.name,
+              doctype: meta.name!,
               fieldnames: generateFieldnames(
                 meta.name,
                 meta,
               ),
               pageLength: Constants.pageSize,
-              offset: pageIndex * Constants.pageSize,
+              offset: pageIndex! * Constants.pageSize,
             );
           },
         );
@@ -85,16 +83,16 @@ class ListViewViewModel extends BaseViewModel {
         );
       }
     } catch (e) {
-      error = e;
+      error = e as ErrorResponse;
     }
 
     setState(ViewState.idle);
   }
 
   onListTap({
-    @required DoctypeResponse meta,
-    @required String name,
-    @required BuildContext context,
+    required DoctypeResponse meta,
+    required String name,
+    required BuildContext context,
   }) {
     {
       pushNewScreen(
@@ -124,39 +122,39 @@ class ListViewViewModel extends BaseViewModel {
   }
 
   switchDoctype({
-    @required String doctype,
-    @required BuildContext context,
+    required String doctype,
+    required BuildContext context,
   }) async {
     var _meta = await OfflineStorage.getMeta(doctype);
 
-    if (_meta.docs[0].issingle == 1) {
+    if (_meta.docs![0].issingle == 1) {
       pushNewScreen(
         context,
         screen: FormView(
           meta: _meta,
-          name: _meta.docs[0].name,
+          name: _meta.docs![0].name,
         ),
         withNavBar: true,
       );
     } else {
       Navigator.of(context).pop();
       meta = _meta;
-      getData(_meta.docs[0]);
+      getData(_meta.docs![0]);
     }
   }
 
   removeFilter(int index) {
     filters.removeAt(index);
-    getData(meta.docs[0]);
+    getData(meta!.docs![0]);
   }
 
   clearFilters() {
     filters.clear();
-    pagewiseLoadController.reset();
+    pagewiseLoadController?.reset();
     notifyListeners();
   }
 
-  applyFilters(List<Filter> appliedFilters) {
+  applyFilters(List<Filter>? appliedFilters) {
     if (appliedFilters != null) {
       if (appliedFilters.isNotEmpty) {
         List<Filter> appliedFiltersClone = [];
@@ -175,10 +173,10 @@ class ListViewViewModel extends BaseViewModel {
         );
 
         filters = appliedFiltersClone;
-        getData(meta.docs[0]);
+        getData(meta!.docs![0]);
       } else {
         filters = [];
-        getData(meta.docs[0]);
+        getData(meta!.docs![0]);
       }
     }
   }

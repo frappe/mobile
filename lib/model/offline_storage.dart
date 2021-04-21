@@ -1,10 +1,7 @@
-// @dart=2.9
-
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
-import 'package:dio/dio.dart';
 
 import '../app/locator.dart';
 
@@ -16,6 +13,7 @@ import '../services/api/api.dart';
 
 import '../utils/constants.dart';
 import '../utils/helpers.dart';
+import 'common.dart';
 import 'config.dart';
 
 class OfflineStorage {
@@ -30,7 +28,7 @@ class OfflineStorage {
       return;
     }
 
-    var k = Config().primaryCacheKey + "#@#" + secondaryKey;
+    var k = Config().primaryCacheKey! + "#@#" + secondaryKey;
     var kHash = generateKeyHash(k);
 
     var v = {
@@ -50,7 +48,7 @@ class OfflineStorage {
 
     data.forEach(
       (key, value) {
-        v[generateKeyHash(Config().primaryCacheKey + "#@#" + key)] = {
+        v[generateKeyHash(Config().primaryCacheKey! + "#@#" + key)] = {
           'timestamp': DateTime.now(),
           "data": value,
         };
@@ -71,7 +69,7 @@ class OfflineStorage {
     if (Config().primaryCacheKey == null) {
       return {"data": null};
     }
-    var k = Config().primaryCacheKey + "#@#" + secondaryKey;
+    var k = Config().primaryCacheKey! + "#@#" + secondaryKey;
     var keyHash = generateKeyHash(k);
 
     if (storage.get(keyHash) == null) {
@@ -82,7 +80,7 @@ class OfflineStorage {
   }
 
   static Future remove(String secondaryKey) async {
-    var k = Config().primaryCacheKey + "#@#" + secondaryKey;
+    var k = Config().primaryCacheKey! + "#@#" + secondaryKey;
     var keyHash = generateKeyHash(k);
     storage.delete(keyHash);
   }
@@ -193,10 +191,10 @@ class OfflineStorage {
 
       var docList = await locator<Api>().fetchList(
         doctype: doctype,
-        fieldnames: generateFieldnames(doctype, docMeta.docs[0]),
+        fieldnames: generateFieldnames(doctype, docMeta.docs![0]),
         pageLength: Constants.offlinePageSize,
         offset: 0,
-        meta: docMeta.docs[0],
+        meta: docMeta.docs![0],
       );
 
       cache['${doctype}List'] = docList;
@@ -259,7 +257,7 @@ class OfflineStorage {
           metaResponse = DoctypeResponse.fromJson(
               Map<String, dynamic>.from(cachedMeta["data"]));
         } else {
-          // throw Response(statusCode: HttpStatus.serviceUnavailable);
+          throw ErrorResponse(statusCode: HttpStatus.serviceUnavailable);
         }
       }
       return metaResponse;

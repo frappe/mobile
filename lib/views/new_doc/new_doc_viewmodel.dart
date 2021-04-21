@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:frappe_app/utils/navigation_helper.dart';
 import 'package:frappe_app/views/form_view/form_view.dart';
 import 'package:injectable/injectable.dart';
 
@@ -62,14 +63,11 @@ class NewDocViewModel extends BaseViewModel {
             meta.docs[0].name,
             formValue,
           );
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) {
-                return FormView(
-                  meta: meta,
-                  name: response.data["docs"][0]["name"],
-                );
-              },
+          NavigationHelper.pushReplacement(
+            context: context,
+            page: FormView(
+              meta: meta,
+              name: response.data["docs"][0]["name"],
             ),
           );
         } catch (e) {

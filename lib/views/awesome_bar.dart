@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/views/new_doc/new_doc_view.dart';

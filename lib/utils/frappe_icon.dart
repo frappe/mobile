@@ -1,11 +1,9 @@
-// @dart=2.9
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class FrappeIcon extends StatelessWidget {
   final String path;
-  final Color color;
+  final Color? color;
   final double size;
 
   const FrappeIcon(

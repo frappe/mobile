@@ -53,6 +53,7 @@ class FormView extends StatelessWidget {
     return BaseView<FormViewViewModel>(
       onModelReady: (model) {
         model.communicationOnly = true;
+        model.editMode = false;
         model.getData(
           connectivityStatus: connectionStatus,
           queued: queued,
@@ -62,7 +63,6 @@ class FormView extends StatelessWidget {
         );
       },
       onModelClose: (model) {
-        model.editMode = false;
         model.error = null;
       },
       builder: (context, model, child) => model.state == ViewState.busy

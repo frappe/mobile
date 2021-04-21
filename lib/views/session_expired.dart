@@ -1,5 +1,6 @@
 // @dart=2.9
 import 'package:flutter/material.dart';
+import 'package:frappe_app/utils/navigation_helper.dart';
 import 'package:frappe_app/views/login/login_view.dart';
 
 import '../utils/enums.dart';
@@ -30,11 +31,9 @@ class SessionExpired extends StatelessWidget {
             buttonType: ButtonType.primary,
             title: 'Login',
             onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) {
-                  return Login();
-                }),
-                (_) => false,
+              NavigationHelper.clearAllAndNavigateTo(
+                context: context,
+                page: Login(),
               );
             },
           )

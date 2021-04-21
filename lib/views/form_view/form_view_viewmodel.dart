@@ -1,10 +1,8 @@
-// @dart=2.9
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:injectable/injectable.dart';
 
@@ -21,12 +19,12 @@ import '../../model/queue.dart';
 
 @lazySingleton
 class FormViewViewModel extends BaseViewModel {
-  bool editMode = false;
-  Response error;
-  GetDocResponse formData;
+  bool? editMode;
+  ErrorResponse? error;
+  GetDocResponse? formData;
   final user = Config().user;
-  Docinfo docinfo;
-  bool communicationOnly;
+  Docinfo? docinfo;
+  bool? communicationOnly;
 
   void refresh() {
     editMode = false;
@@ -39,16 +37,20 @@ class FormViewViewModel extends BaseViewModel {
   }
 
   void toggleEdit() {
-    editMode = !editMode;
+    if (editMode != null) {
+      editMode = !editMode!;
+    } else {
+      editMode = true;
+    }
     notifyListeners();
   }
 
   Future getData({
-    @required bool queued,
-    @required String doctype,
-    @required String name,
-    @required Map queuedData,
-    @required ConnectivityStatus connectivityStatus,
+    required bool queued,
+    required String doctype,
+    required String name,
+    required Map queuedData,
+    required ConnectivityStatus connectivityStatus,
   }) async {
     setState(ViewState.busy);
     if (queued) {
@@ -65,9 +67,9 @@ class FormViewViewModel extends BaseViewModel {
         response = response["data"];
         if (response != null) {
           formData = GetDocResponse.fromJson(response);
-          docinfo = formData.docinfo;
+          docinfo = formData?.docinfo;
         } else {
-          error = Response(
+          error = ErrorResponse(
             statusCode: HttpStatus.serviceUnavailable,
           );
         }
@@ -76,25 +78,25 @@ class FormViewViewModel extends BaseViewModel {
           doctype,
           name,
         );
-        docinfo = formData.docinfo;
+        docinfo = formData?.docinfo;
       }
     }
     setState(ViewState.idle);
   }
 
-  updateDocinfo({@required String name, @required String doctype}) async {
+  updateDocinfo({required String name, required String doctype}) async {
     docinfo = await locator<Api>().getDocinfo(doctype, name);
     notifyListeners();
   }
 
   Future handleUpdate({
-    @required String name,
-    @required String doctype,
-    @required DoctypeResponse meta,
-    @required Map formValue,
-    @required ConnectivityStatus connectivityStatus,
-    @required Map doc,
-    @required Map queuedData,
+    required String name,
+    required String doctype,
+    required DoctypeResponse meta,
+    required Map formValue,
+    required ConnectivityStatus connectivityStatus,
+    required Map doc,
+    required Map? queuedData,
   }) async {
     formValue.forEach((key, value) {
       if (value is Uint8List) {
@@ -104,9 +106,7 @@ class FormViewViewModel extends BaseViewModel {
       }
     });
     var isOnline = await verifyOnline();
-    if ((connectivityStatus == null ||
-            connectivityStatus == ConnectivityStatus.offline) &&
-        !isOnline) {
+    if (connectivityStatus == ConnectivityStatus.offline && !isOnline) {
       if (queuedData != null) {
         queuedData["data"] = [
           {
@@ -122,7 +122,7 @@ class FormViewViewModel extends BaseViewModel {
           )
         };
         queuedData["title"] = getTitle(
-          meta.docs[0],
+          meta.docs![0],
           formValue,
         );
 
@@ -135,7 +135,7 @@ class FormViewViewModel extends BaseViewModel {
           "type": "Update",
           "name": name,
           "doctype": doctype,
-          "title": getTitle(meta.docs[0], formValue),
+          "title": getTitle(meta.docs![0], formValue),
           "updated_keys": extractChangedValues(doc, formValue),
           "data": [
             {

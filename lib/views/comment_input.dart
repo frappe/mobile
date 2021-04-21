@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/model/config.dart';
@@ -16,9 +14,9 @@ class CommentInput extends StatelessWidget {
   final Function callback;
 
   CommentInput({
-    @required this.doctype,
-    @required this.name,
-    @required this.callback,
+    required this.doctype,
+    required this.name,
+    required this.callback,
   });
 
   final TextEditingController input = TextEditingController();

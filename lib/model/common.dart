@@ -1,13 +1,25 @@
-// @dart=2.9
-
 import 'package:file_picker/file_picker.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 
-class FilterOperator {
-  String label;
-  String value;
+class ErrorResponse {
+  late String? statusMessage;
+  late String? userMessage;
+  late int? statusCode;
+  late String? stackTrace;
 
-  FilterOperator({this.label, this.value});
+  ErrorResponse({
+    this.stackTrace,
+    this.statusCode,
+    this.statusMessage,
+    this.userMessage,
+  });
+}
+
+class FilterOperator {
+  late String label;
+  late String value;
+
+  FilterOperator({required this.label, required this.value});
 
   FilterOperator.fromJson(Map<String, dynamic> json) {
     label = json['label'];
@@ -23,14 +35,14 @@ class FilterOperator {
 }
 
 class Filter {
-  DoctypeField field;
-  FilterOperator filterOperator;
-  String value;
+  late DoctypeField field;
+  late FilterOperator filterOperator;
+  late String? value;
 
   Filter({
-    this.filterOperator,
+    required this.filterOperator,
+    required this.field,
     this.value,
-    this.field,
   });
 
   Filter.fromJson(Map<String, dynamic> json) {
@@ -58,6 +70,6 @@ class FrappeFile {
 
   FrappeFile({
     this.isPrivate = true,
-    this.file,
+    required this.file,
   });
 }
