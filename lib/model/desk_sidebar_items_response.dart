@@ -1,34 +1,38 @@
 class DeskSidebarItemsResponse {
-  late List<DeskMessage>? message;
+  late List<DeskMessage> message;
 
-  DeskSidebarItemsResponse({this.message});
+  DeskSidebarItemsResponse({required this.message});
 
   DeskSidebarItemsResponse.fromJson(Map<dynamic, dynamic> json) {
     if (json['message'] != null) {
       message = [];
       json['message'].forEach((v) {
-        message?.add(new DeskMessage.fromJson(v));
+        message.add(new DeskMessage.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.message != null) {
-      data['message'] = this.message?.map((v) => v.toJson()).toList();
-    }
+    data['message'] = this.message.map((v) => v.toJson()).toList();
     return data;
   }
 }
 
 class DeskMessage {
-  late String? name;
+  late String name;
   late String? category;
   late String? icon;
   late String? module;
-  late String? label;
+  late String label;
 
-  DeskMessage({this.name, this.category, this.icon, this.module, this.label});
+  DeskMessage({
+    required this.name,
+    this.category,
+    this.icon,
+    this.module,
+    required this.label,
+  });
 
   DeskMessage.fromJson(Map<dynamic, dynamic> json) {
     name = json['name'];

@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:flutter/material.dart';
 
 import 'package:frappe_app/config/palette.dart';
@@ -23,8 +21,8 @@ import './link_field.dart';
 import './multi_select.dart';
 
 Widget makeControl({
-  @required DoctypeField field,
-  Map doc,
+  required DoctypeField field,
+  Map? doc,
   bool withLabel = true,
   bool editMode = true,
   bool decorateControl = true,
@@ -124,6 +122,17 @@ Widget makeControl({
       }
       break;
 
+    // TODO: temp fix
+    case "Text Editor2":
+      {
+        control = TextEditor2(
+          doctypeField: field,
+          doc: doc,
+          withLabel: withLabel,
+        );
+      }
+      break;
+
     case "Datetime":
       {
         control = DatetimeField(
@@ -210,9 +219,9 @@ Widget makeControl({
 }
 
 Widget buildDecoratedControl({
-  @required Widget control,
-  @required bool withLabel,
-  String label = "",
+  required Widget control,
+  required bool withLabel,
+  String? label = "",
 }) {
   if (withLabel) {
     return Padding(

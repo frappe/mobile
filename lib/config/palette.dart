@@ -46,11 +46,13 @@ class Palette {
     required bool withLabel,
     required String label,
     Widget? suffixIcon,
+    Widget? prefixIcon,
     bool filled = true,
     String? field,
   }) {
     return InputDecoration(
       suffixIcon: suffixIcon,
+      prefixIcon: prefixIcon,
       contentPadding: field == "check"
           ? EdgeInsets.zero
           : EdgeInsets.symmetric(

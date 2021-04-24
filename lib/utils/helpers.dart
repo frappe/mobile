@@ -11,10 +11,11 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/offline_storage.dart';
 import 'package:frappe_app/services/storage_service.dart';
+import 'package:frappe_app/utils/navigation_helper.dart';
 import 'package:frappe_app/views/session_expired.dart';
+import 'package:frappe_app/widgets/frappe_button.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/config.dart';
 import '../model/doctype_response.dart';
@@ -63,8 +64,6 @@ downloadFile(String fileUrl, String downloadPath) async {
 }
 
 Future<bool> _checkPermission() async {
-  // TODO
-  // return true;
   if (Platform.isAndroid) {
     if (await Permission.storage.request().isGranted) {
       return true;
@@ -83,14 +82,6 @@ String toTitleCase(String str) {
           (Match m) =>
               "${m[0][0].toUpperCase()}${m[0].substring(1).toLowerCase()}")
       .replaceAll(RegExp(r'(_|-)+'), ' ');
-}
-
-void showSnackBar(String txt, context) {
-  Scaffold.of(context).showSnackBar(
-    SnackBar(
-      content: Text(txt),
-    ),
-  );
 }
 
 List<Widget> generateLayout({
@@ -384,17 +375,16 @@ clearLoginInfo() async {
 handle403(BuildContext context) async {
   await clearLoginInfo();
 
-  Navigator.of(context).pushAndRemoveUntil(
-    MaterialPageRoute(builder: (context) {
-      return SessionExpired();
-    }),
-    (_) => false,
+  NavigationHelper.clearAllAndNavigateTo(
+    context: context,
+    page: SessionExpired(),
   );
 }
 
 handleError({
   @required ErrorResponse error,
   @required BuildContext context,
+  @required Function onRetry,
   bool hideAppBar = false,
 }) {
   if (error.statusCode == HttpStatus.forbidden) {
@@ -402,7 +392,21 @@ handleError({
   } else if (error.statusCode == HttpStatus.serviceUnavailable) {
     return NoInternet(hideAppBar);
   } else {
-    return Scaffold(appBar: AppBar(), body: Text("${error.statusMessage}"));
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("${error.statusMessage}"),
+            FrappeFlatButton(
+              onPressed: () => onRetry(),
+              buttonType: ButtonType.primary,
+              title: "Retry",
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -524,28 +528,19 @@ getLinkFields(String doctype) async {
   return linkFieldDoctypes;
 }
 
-putSharedPrefValue(String key, bool value) async {
-  var _prefs = await SharedPreferences.getInstance();
-  await _prefs.setBool(key, value);
-}
-
-Future<bool> getSharedPrefValue(String key) async {
-  var _prefs = await SharedPreferences.getInstance();
-  await _prefs.reload();
-  return _prefs.getBool(key);
-}
-
 resetValues() async {
-  await putSharedPrefValue("backgroundTask", false);
-  await putSharedPrefValue("storeApiResponse", true);
+  await locator<StorageService>()
+      .putSharedPrefBoolValue("backgroundTask", false);
+  await locator<StorageService>()
+      .putSharedPrefBoolValue("storeApiResponse", true);
 }
 
 initDb() async {
-  await locator<StorageService>().initStorage();
+  await locator<StorageService>().initHiveStorage();
 
-  await locator<StorageService>().initBox('queue');
-  await locator<StorageService>().initBox('offline');
-  await locator<StorageService>().initBox('config');
+  await locator<StorageService>().initHiveBox('queue');
+  await locator<StorageService>().initHiveBox('offline');
+  await locator<StorageService>().initHiveBox('config');
 }
 
 initLocalNotifications() async {

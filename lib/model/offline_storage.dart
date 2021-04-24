@@ -17,7 +17,7 @@ import 'common.dart';
 import 'config.dart';
 
 class OfflineStorage {
-  static var storage = locator<StorageService>().getBox('offline');
+  static var storage = locator<StorageService>().getHiveBox('offline');
 
   static String generateKeyHash(String key) {
     return sha1.convert(utf8.encode(key)).toString();
@@ -56,8 +56,9 @@ class OfflineStorage {
     );
 
     if (isIsolate) {
-      var runBackgroundTask = await getSharedPrefValue("backgroundTask");
-      if (runBackgroundTask) {
+      var runBackgroundTask = await locator<StorageService>()
+          .getSharedPrefBoolValue("backgroundTask");
+      if (runBackgroundTask ?? false) {
         await storage.putAll(v);
       }
     } else {
@@ -92,8 +93,8 @@ class OfflineStorage {
       var deskSideBarItems = await locator<Api>().getDeskSideBarItems();
       var desktopPage = await locator<Api>().getDesktopPage(module);
 
-      desktopPage.message?.cards?.items?.forEach((item) {
-        doctypes.addAll(item.links!);
+      desktopPage.message.cards.items.forEach((item) {
+        doctypes.addAll(item.links);
       });
 
       cache["${module}Doctypes"] = desktopPage.toJson();
@@ -103,13 +104,13 @@ class OfflineStorage {
 
       for (var doctype in doctypes) {
         f.add(
-          storeDocListAndDoc(doctype.label!),
+          storeDocListAndDoc(doctype.label),
         );
         f.add(
-          storeLinkFields(doctype.label!),
+          storeLinkFields(doctype.label),
         );
         f.add(
-          storeDoctypeMeta(doctype.label!),
+          storeDoctypeMeta(doctype.label),
         );
       }
 
@@ -191,10 +192,10 @@ class OfflineStorage {
 
       var docList = await locator<Api>().fetchList(
         doctype: doctype,
-        fieldnames: generateFieldnames(doctype, docMeta.docs![0]),
+        fieldnames: generateFieldnames(doctype, docMeta.docs[0]),
         pageLength: Constants.offlinePageSize,
         offset: 0,
-        meta: docMeta.docs![0],
+        meta: docMeta.docs[0],
       );
 
       cache['${doctype}List'] = docList;
@@ -237,7 +238,8 @@ class OfflineStorage {
   }
 
   static Future<bool> storeApiResponse() async {
-    var storeApiResponse = await getSharedPrefValue(
+    var storeApiResponse =
+        await locator<StorageService>().getSharedPrefBoolValue(
       "storeApiResponse",
     );
     return storeApiResponse ?? true;
@@ -255,7 +257,10 @@ class OfflineStorage {
         var cachedMeta = getItem('${doctype}Meta');
         if (cachedMeta["data"] != null) {
           metaResponse = DoctypeResponse.fromJson(
-              Map<String, dynamic>.from(cachedMeta["data"]));
+            Map<String, dynamic>.from(
+              cachedMeta["data"],
+            ),
+          );
         } else {
           throw ErrorResponse(statusCode: HttpStatus.serviceUnavailable);
         }

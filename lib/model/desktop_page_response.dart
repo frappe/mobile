@@ -1,56 +1,46 @@
 class DesktopPageResponse {
-  late DesktopPageMessage? message;
+  late DesktopPageMessage message;
 
-  DesktopPageResponse({this.message});
+  DesktopPageResponse({required this.message});
 
   DesktopPageResponse.fromJson(Map<dynamic, dynamic> json) {
-    message = json['message'] != null
-        ? new DesktopPageMessage.fromJson(json['message'])
-        : null;
+    message = DesktopPageMessage.fromJson(json['message']);
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.message != null) {
-      data['message'] = this.message?.toJson();
-    }
+    data['message'] = this.message.toJson();
     return data;
   }
 }
 
 class DesktopPageMessage {
-  late DesktopPageCharts? charts;
-  late DesktopPageShortcuts? shortcuts;
-  late DesktopPageCards? cards;
-  late bool? allowCustomization;
+  late DesktopPageCharts charts;
+  late DesktopPageShortcuts shortcuts;
+  late DesktopPageCards cards;
+  late bool allowCustomization;
 
-  DesktopPageMessage(
-      {this.charts, this.shortcuts, this.cards, this.allowCustomization});
+  DesktopPageMessage({
+    required this.charts,
+    required this.shortcuts,
+    required this.cards,
+    required this.allowCustomization,
+  });
 
   DesktopPageMessage.fromJson(Map<dynamic, dynamic> json) {
-    charts = json['charts'] != null
-        ? new DesktopPageCharts.fromJson(json['charts'])
-        : null;
-    shortcuts = json['shortcuts'] != null
-        ? new DesktopPageShortcuts.fromJson(json['shortcuts'])
-        : null;
-    cards = json['cards'] != null
-        ? new DesktopPageCards.fromJson(json['cards'])
-        : null;
+    charts = DesktopPageCharts.fromJson(json['charts']);
+
+    shortcuts = DesktopPageShortcuts.fromJson(json['shortcuts']);
+    cards = DesktopPageCards.fromJson(json['cards']);
+
     allowCustomization = json['allow_customization'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.charts != null) {
-      data['charts'] = this.charts?.toJson();
-    }
-    if (this.shortcuts != null) {
-      data['shortcuts'] = this.shortcuts?.toJson();
-    }
-    if (this.cards != null) {
-      data['cards'] = this.cards?.toJson();
-    }
+    data['charts'] = this.charts.toJson();
+    data['shortcuts'] = this.shortcuts.toJson();
+    data['cards'] = this.cards.toJson();
     data['allow_customization'] = this.allowCustomization;
     return data;
   }
@@ -83,17 +73,20 @@ class DesktopPageCharts {
 }
 
 class DesktopPageShortcuts {
-  late String? label;
-  late List<ShortcutItem>? items;
+  late String label;
+  late List<ShortcutItem> items;
 
-  DesktopPageShortcuts({this.label, this.items});
+  DesktopPageShortcuts({
+    required this.label,
+    required this.items,
+  });
 
   DesktopPageShortcuts.fromJson(Map<dynamic, dynamic> json) {
     label = json['label'];
     if (json['items'] != null) {
       items = [];
       json['items'].forEach((v) {
-        items?.add(new ShortcutItem.fromJson(v));
+        items.add(new ShortcutItem.fromJson(v));
       });
     }
   }
@@ -101,25 +94,26 @@ class DesktopPageShortcuts {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['label'] = this.label;
-    if (this.items != null) {
-      data['items'] = this.items?.map((v) => v.toJson()).toList();
-    }
+    data['items'] = this.items.map((v) => v.toJson()).toList();
     return data;
   }
 }
 
 class DesktopPageCards {
-  late String? label;
-  late List<CardItem>? items;
+  late String label;
+  late List<CardItem> items;
 
-  DesktopPageCards({this.label, this.items});
+  DesktopPageCards({
+    required this.label,
+    required this.items,
+  });
 
   DesktopPageCards.fromJson(Map<dynamic, dynamic> json) {
     label = json['label'];
     if (json['items'] != null) {
       items = [];
       json['items'].forEach((v) {
-        items?.add(new CardItem.fromJson(v));
+        items.add(CardItem.fromJson(v));
       });
     }
   }
@@ -127,9 +121,7 @@ class DesktopPageCards {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['label'] = this.label;
-    if (this.items != null) {
-      data['items'] = this.items?.map((v) => v.toJson()).toList();
-    }
+    data['items'] = this.items.map((v) => v.toJson()).toList();
     return data;
   }
 }
@@ -211,9 +203,9 @@ class ShortcutItem {
   late int? idx;
   late int? docstatus;
   late String? type;
-  late String? linkTo;
+  late String linkTo;
   late String? docView;
-  late String? label;
+  late String label;
   late dynamic? icon;
   late dynamic? restrictToDomain;
   late String? statsFilter;
@@ -234,9 +226,9 @@ class ShortcutItem {
       this.idx,
       this.docstatus,
       this.type,
-      this.linkTo,
+      required this.linkTo,
       this.docView,
-      this.label,
+      required this.label,
       this.icon,
       this.restrictToDomain,
       this.statsFilter,
@@ -307,9 +299,9 @@ class CardItem {
   late String? parenttype;
   late int? idx;
   late int? docstatus;
-  late String? label;
+  late String label;
   late int? hidden;
-  late List<CardItemLink>? links;
+  late List<CardItemLink> links;
   late String? doctype;
 
   CardItem(
@@ -323,9 +315,9 @@ class CardItem {
       this.parenttype,
       this.idx,
       this.docstatus,
-      this.label,
+      required this.label,
       this.hidden,
-      this.links,
+      required this.links,
       this.doctype});
 
   CardItem.fromJson(Map<dynamic, dynamic> json) {
@@ -344,7 +336,7 @@ class CardItem {
     if (json['links'] != null) {
       links = [];
       json['links'].forEach((v) {
-        links?.add(new CardItemLink.fromJson(v));
+        links.add(CardItemLink.fromJson(v));
       });
     }
     doctype = json['doctype'];
@@ -364,9 +356,7 @@ class CardItem {
     data['docstatus'] = this.docstatus;
     data['label'] = this.label;
     data['hidden'] = this.hidden;
-    if (this.links != null) {
-      data['links'] = this.links?.map((v) => v.toJson()).toList();
-    }
+    data['links'] = this.links.map((v) => v.toJson()).toList();
     data['doctype'] = this.doctype;
     return data;
   }
@@ -374,8 +364,8 @@ class CardItem {
 
 class CardItemLink {
   late String? description;
-  late String? label;
-  late String? name;
+  late String label;
+  late String name;
   late int? onboard;
   late String? type;
   late dynamic? count;
@@ -388,8 +378,8 @@ class CardItemLink {
 
   CardItemLink(
       {this.description,
-      this.label,
-      this.name,
+      required this.label,
+      required this.name,
       this.onboard,
       this.type,
       this.count,

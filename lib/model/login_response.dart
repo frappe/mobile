@@ -1,12 +1,15 @@
-// @dart=2.9
-
 class LoginResponse {
-  String message;
-  String homePage;
-  String fullName;
-  String userId;
+  late String message;
+  late String homePage;
+  late String fullName;
+  late String userId;
 
-  LoginResponse({this.message, this.homePage, this.fullName, this.userId});
+  LoginResponse({
+    required this.message,
+    required this.homePage,
+    required this.fullName,
+    required this.userId,
+  });
 
   LoginResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];

@@ -10,7 +10,7 @@ import 'config.dart';
 
 class Queue {
   static Box getQueueContainer() {
-    return locator<StorageService>().getBox('queue');
+    return locator<StorageService>().getHiveBox('queue');
   }
 
   static putAt(int index, dynamic value) {

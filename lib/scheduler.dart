@@ -18,12 +18,12 @@ const String SYNC_DATA_TASK_UNIQUE_NAME = '101';
 const String PROCESS_QUEUE_UNIQUE_NAME = '102';
 
 void callbackDispatcher() {
-  Workmanager.executeTask((task, inputData) async {
+  Workmanager().executeTask((task, inputData) async {
     setupLocator();
-    await locator<StorageService>().initStorage();
-    await locator<StorageService>().initBox('config');
-    await locator<StorageService>().initBox('queue');
-    await locator<StorageService>().initBox('offline');
+    await locator<StorageService>().initHiveStorage();
+    await locator<StorageService>().initHiveBox('config');
+    await locator<StorageService>().initHiveBox('queue');
+    await locator<StorageService>().initHiveBox('offline');
 
     await initApiConfig();
 
@@ -44,12 +44,14 @@ void callbackDispatcher() {
     );
 
     var notificationCount = await getActiveNotifications();
-    var runBackgroundTask = await getSharedPrefValue("backgroundTask");
+    var runBackgroundTask = await locator<StorageService>()
+            .getSharedPrefBoolValue("backgroundTask") ??
+        false;
 
     if (Config().isLoggedIn && runBackgroundTask) {
       switch (task) {
         case TASK_SYNC_DATA:
-          await putSharedPrefValue(
+          await locator<StorageService>().putSharedPrefBoolValue(
             "storeApiResponse",
             false,
           );
@@ -63,7 +65,7 @@ void callbackDispatcher() {
           try {
             await syncnow();
             print('Sync complete');
-            await putSharedPrefValue(
+            await locator<StorageService>().putSharedPrefBoolValue(
               "storeApiResponse",
               true,
             );
@@ -73,7 +75,7 @@ void callbackDispatcher() {
               index: notificationCount,
             );
           } catch (e) {
-            await putSharedPrefValue(
+            await locator<StorageService>().putSharedPrefBoolValue(
               "storeApiResponse",
               true,
             );
@@ -141,7 +143,7 @@ void callbackDispatcher() {
 }
 
 initAutoSync({bool debug = false}) async {
-  await Workmanager.initialize(
+  await Workmanager().initialize(
     callbackDispatcher,
     isInDebugMode: debug,
   );
@@ -149,7 +151,7 @@ initAutoSync({bool debug = false}) async {
 }
 
 void registerPeriodicTask() {
-  Workmanager.registerPeriodicTask(
+  Workmanager().registerPeriodicTask(
     SYNC_DATA_TASK_UNIQUE_NAME,
     TASK_SYNC_DATA,
     frequency: Duration(minutes: 30),
@@ -161,7 +163,7 @@ void registerPeriodicTask() {
     backoffPolicy: BackoffPolicy.linear,
   );
 
-  Workmanager.registerPeriodicTask(
+  Workmanager().registerPeriodicTask(
     PROCESS_QUEUE_UNIQUE_NAME,
     TASK_PROCESS_QUEUE,
     frequency: Duration(minutes: 30),
@@ -182,12 +184,14 @@ Future syncnow() async {
     var deskSidebarItems =
         DeskSidebarItemsResponse.fromJson(deskSidebarItemsCache);
 
-    for (var module in deskSidebarItems.message!) {
-      var runBackgroundTask = await getSharedPrefValue("backgroundTask");
+    for (var module in deskSidebarItems.message) {
+      var runBackgroundTask = await locator<StorageService>()
+              .getSharedPrefBoolValue("backgroundTask") ??
+          false;
       if (runBackgroundTask) {
         try {
           print("downloading ${module.label}");
-          await OfflineStorage.storeModule(module.label!, true);
+          await OfflineStorage.storeModule(module.label, true);
         } catch (e) {
           throw e;
         }

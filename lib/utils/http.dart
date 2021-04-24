@@ -1,4 +1,3 @@
-// @dart=2.9
 import '../app/locator.dart';
 import '../services/api/api.dart';
 
@@ -8,7 +7,7 @@ import '../model/config.dart';
 
 initApiConfig() async {
   if (Config().baseUrl != null) {
-    await DioHelper.init(Config().baseUrl);
+    await DioHelper.init(Config().baseUrl!);
   }
 }
 
@@ -39,9 +38,11 @@ Future<void> cacheAllUsers() async {
       );
 
       var usr = {};
-      res.forEach((element) {
-        usr[element["name"]] = element;
-      });
+      res.forEach(
+        (element) {
+          usr[element["name"]] = element;
+        },
+      );
       OfflineStorage.putItem('allUsers', usr);
     } catch (e) {
       throw e;

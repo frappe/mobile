@@ -1,8 +1,8 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/views/base_view.dart';
@@ -31,13 +31,13 @@ import '../../widgets/custom_form.dart';
 import '../../widgets/frappe_button.dart';
 
 class FormView extends StatelessWidget {
-  final String name;
+  final String? name;
   final bool queued;
-  final Map queuedData;
+  final Map? queuedData;
   final DoctypeResponse meta;
 
   FormView({
-    @required this.meta,
+    required this.meta,
     this.name,
     this.queued = false,
     this.queuedData,
@@ -74,9 +74,19 @@ class FormView extends StatelessWidget {
               builder: (context) {
                 if (model.error != null) {
                   return handleError(
-                    error: model.error,
-                    context: context,
-                  );
+                      error: model.error,
+                      context: context,
+                      onRetry: () {
+                        model.communicationOnly = true;
+                        model.editMode = false;
+                        model.getData(
+                          connectivityStatus: connectionStatus,
+                          queued: queued,
+                          queuedData: queuedData,
+                          doctype: meta.docs[0].name,
+                          name: name,
+                        );
+                      });
                 }
                 var docs = model.formData.docs;
 
@@ -104,7 +114,7 @@ class FormView extends StatelessWidget {
                             buttonType: ButtonType.secondary,
                             title: 'Cancel',
                             onPressed: () {
-                              _fbKey.currentState.reset();
+                              _fbKey.currentState?.reset();
                               model.toggleEdit();
                             },
                           ),
@@ -156,20 +166,21 @@ class FormView extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            DocInfo(
-                              name: name,
-                              doctype: meta.docs[0].name,
-                              docInfo: model.docinfo,
-                              refreshCallback: () {
-                                model.getData(
-                                  connectivityStatus: connectionStatus,
-                                  queued: queued,
-                                  queuedData: queuedData,
-                                  doctype: meta.docs[0].name,
-                                  name: name,
-                                );
-                              },
-                            ),
+                            if (!queued)
+                              DocInfo(
+                                name: name!,
+                                doctype: meta.docs[0].name,
+                                docInfo: model.docinfo!,
+                                refreshCallback: () {
+                                  model.getData(
+                                    connectivityStatus: connectionStatus,
+                                    queued: queued,
+                                    queuedData: queuedData,
+                                    doctype: meta.docs[0].name,
+                                    name: name,
+                                  );
+                                },
+                              ),
                             CustomForm(
                               fields: meta.docs[0].fields,
                               formKey: _fbKey,
@@ -177,55 +188,57 @@ class FormView extends StatelessWidget {
                               viewType: ViewType.form,
                               editMode: model.editMode,
                             ),
-                            ListTileTheme(
-                              tileColor: Colors.white,
-                              child: CustomExpansionTile(
-                                maintainState: true,
-                                initiallyExpanded: false,
-                                title: Text(
-                                  "Add a comment",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 16,
+                            if (!queued)
+                              ListTileTheme(
+                                tileColor: Colors.white,
+                                child: CustomExpansionTile(
+                                  maintainState: true,
+                                  initiallyExpanded: false,
+                                  title: Text(
+                                    "Add a comment",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                    ),
                                   ),
+                                  children: [
+                                    CommentInput(
+                                      name: name!,
+                                      doctype: meta.docs[0].name,
+                                      callback: () {
+                                        model.updateDocinfo(
+                                          doctype: meta.docs[0].name,
+                                          name: name!,
+                                        );
+                                      },
+                                    )
+                                  ],
                                 ),
-                                children: [
-                                  CommentInput(
-                                    name: name,
-                                    doctype: meta.docs[0].name,
-                                    callback: () {
-                                      model.updateDocinfo(
-                                        doctype: meta.docs[0].name,
-                                        name: name,
-                                      );
-                                    },
-                                  )
-                                ],
                               ),
-                            ),
-                            Timeline(
-                              docinfo: model.docinfo,
-                              doctype: meta.docs[0].name,
-                              name: name,
-                              communicationOnly: model.communicationOnly,
-                              switchCallback: (val) {
-                                model.toggleSwitch(val);
-                              },
-                              refreshCallback: () {
-                                model.updateDocinfo(
-                                  doctype: meta.docs[0].name,
-                                  name: name,
-                                );
-                              },
-                              emailSubjectField:
-                                  docs[0][meta.docs[0].subjectField] ??
-                                      getTitle(
-                                        meta.docs[0],
-                                        docs[0],
-                                      ),
-                              emailSenderField: docs[0]
-                                  [meta.docs[0].senderField],
-                            ),
+                            if (!queued)
+                              Timeline(
+                                docinfo: model.docinfo,
+                                doctype: meta.docs[0].name,
+                                name: name,
+                                communicationOnly: model.communicationOnly,
+                                switchCallback: (val) {
+                                  model.toggleSwitch(val);
+                                },
+                                refreshCallback: () {
+                                  model.updateDocinfo(
+                                    doctype: meta.docs[0].name,
+                                    name: name!,
+                                  );
+                                },
+                                emailSubjectField:
+                                    docs[0][meta.docs[0].subjectField] ??
+                                        getTitle(
+                                          meta.docs[0],
+                                          docs[0],
+                                        ),
+                                emailSenderField: docs[0]
+                                    [meta.docs[0].senderField],
+                              ),
                           ],
                         ),
                       );
@@ -238,31 +251,36 @@ class FormView extends StatelessWidget {
   }
 
   _handleUpdate({
-    @required Map doc,
-    @required ConnectivityStatus connectionStatus,
-    @required DoctypeResponse meta,
-    @required FormViewViewModel model,
-    @required BuildContext context,
+    required Map doc,
+    required ConnectivityStatus connectionStatus,
+    required DoctypeResponse meta,
+    required FormViewViewModel model,
+    required BuildContext context,
   }) async {
-    if (_fbKey.currentState.saveAndValidate()) {
-      var formValue = _fbKey.currentState.value;
+    if (_fbKey.currentState != null) {
+      if (_fbKey.currentState!.saveAndValidate()) {
+        var formValue = _fbKey.currentState!.value;
 
-      try {
-        await model.handleUpdate(
-          connectivityStatus: connectionStatus,
-          name: name,
-          doctype: meta.docs[0].name,
-          meta: meta,
-          formValue: formValue,
-          doc: doc,
-          queuedData: queuedData,
-        );
-        FrappeAlert.infoAlert(
-          title: 'Changes Saved',
-          context: context,
-        );
-      } catch (e) {
-        showErrorDialog(e, context);
+        try {
+          await model.handleUpdate(
+            connectivityStatus: connectionStatus,
+            name: name!,
+            doctype: meta.docs[0].name,
+            meta: meta,
+            formValue: formValue,
+            doc: doc,
+            queuedData: queuedData,
+          );
+          FrappeAlert.infoAlert(
+            title: 'Changes Saved',
+            context: context,
+          );
+        } catch (e) {
+          FrappeAlert.errorAlert(
+            title: (e as ErrorResponse).statusMessage,
+            context: context,
+          );
+        }
       }
     }
   }
@@ -275,10 +293,10 @@ class DocInfo extends StatelessWidget {
   final Function refreshCallback;
 
   const DocInfo({
-    @required this.docInfo,
-    @required this.refreshCallback,
-    @required this.doctype,
-    @required this.name,
+    required this.docInfo,
+    required this.refreshCallback,
+    required this.doctype,
+    required this.name,
   });
 
   @override
@@ -459,19 +477,18 @@ class DocInfoItem extends StatelessWidget {
   final String title;
   final String actionTitle;
   final String actionIcon;
-  final Function onTap;
+  final void Function()? onTap;
   final bool showBorder;
-  final Widget filledWidget;
+  final Widget? filledWidget;
 
   const DocInfoItem({
-    Key key,
-    @required this.title,
-    @required this.actionTitle,
-    @required this.actionIcon,
-    @required this.onTap,
+    required this.title,
+    required this.actionTitle,
+    required this.actionIcon,
+    required this.onTap,
     this.filledWidget,
     this.showBorder = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -482,7 +499,7 @@ class DocInfoItem extends StatelessWidget {
         shape: showBorder
             ? Border(
                 bottom: BorderSide(
-                  color: FrappePalette.grey[200],
+                  color: FrappePalette.grey[200]!,
                   width: 2,
                 ),
               )

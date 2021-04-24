@@ -24,16 +24,18 @@ import '../../views/base_viewmodel.dart';
 @lazySingleton
 class ListViewViewModel extends BaseViewModel {
   PagewiseLoadController? pagewiseLoadController;
-  DoctypeResponse? meta;
+  late DoctypeResponse meta;
   ErrorResponse? error;
   List<Filter> filters = [];
   bool showLiked = false;
   var userId = Config().userId;
-  DesktopPageResponse? desktopPageResponse;
+  late DesktopPageResponse desktopPageResponse;
 
   refresh() {
     pagewiseLoadController?.reset();
   }
+
+  bool get hasError => error != null;
 
   getData(DoctypeDoc meta) async {
     setState(ViewState.busy);
@@ -56,7 +58,7 @@ class ListViewViewModel extends BaseViewModel {
             return locator<Api>().fetchList(
               filters: transformedFilters,
               meta: meta,
-              doctype: meta.name!,
+              doctype: meta.name,
               fieldnames: generateFieldnames(
                 meta.name,
                 meta,
@@ -82,6 +84,7 @@ class ListViewViewModel extends BaseViewModel {
           },
         );
       }
+      error = null;
     } catch (e) {
       error = e as ErrorResponse;
     }
@@ -117,7 +120,11 @@ class ListViewViewModel extends BaseViewModel {
 
   getDesktopPage(String module) async {
     setState(ViewState.busy);
-    desktopPageResponse = await locator<Api>().getDesktopPage(module);
+    try {
+      desktopPageResponse = await locator<Api>().getDesktopPage(module);
+    } catch (e) {
+      error = e as ErrorResponse;
+    }
     setState(ViewState.idle);
   }
 
@@ -127,25 +134,25 @@ class ListViewViewModel extends BaseViewModel {
   }) async {
     var _meta = await OfflineStorage.getMeta(doctype);
 
-    if (_meta.docs![0].issingle == 1) {
+    if (_meta.docs[0].issingle == 1) {
       pushNewScreen(
         context,
         screen: FormView(
           meta: _meta,
-          name: _meta.docs![0].name,
+          name: _meta.docs[0].name,
         ),
         withNavBar: true,
       );
     } else {
       Navigator.of(context).pop();
       meta = _meta;
-      getData(_meta.docs![0]);
+      getData(_meta.docs[0]);
     }
   }
 
   removeFilter(int index) {
     filters.removeAt(index);
-    getData(meta!.docs![0]);
+    getData(meta.docs[0]);
   }
 
   clearFilters() {
@@ -173,10 +180,10 @@ class ListViewViewModel extends BaseViewModel {
         );
 
         filters = appliedFiltersClone;
-        getData(meta!.docs![0]);
+        getData(meta.docs[0]);
       } else {
         filters = [];
-        getData(meta!.docs![0]);
+        getData(meta.docs[0]);
       }
     }
   }

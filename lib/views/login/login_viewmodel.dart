@@ -15,12 +15,10 @@ import '../../views/base_viewmodel.dart';
 class SavedCredentials {
   String? serverURL;
   String? usr;
-  String? pwd;
 
   SavedCredentials({
     this.serverURL,
     this.usr,
-    this.pwd,
   });
 }
 
@@ -28,24 +26,18 @@ class SavedCredentials {
 class LoginViewModel extends BaseViewModel {
   var savedCreds = SavedCredentials();
 
-  String? loginButtonLabel;
+  late String loginButtonLabel;
 
   init() {
     loginButtonLabel = "Login";
-    var savedUsr = OfflineStorage.getItem('usr');
-    var savedPwd = OfflineStorage.getItem('pwd');
-    var serverURL = Config().baseUrl;
-    savedUsr = savedUsr["data"];
-    savedPwd = savedPwd["data"];
 
     savedCreds = SavedCredentials(
-      serverURL: serverURL,
-      usr: savedUsr,
-      pwd: savedPwd,
+      serverURL: Config().baseUrl,
+      usr: OfflineStorage.getItem('usr')["data"],
     );
   }
 
-  updateConfig(response) {
+  updateUserDetails(LoginResponse response) {
     Config.set('isLoggedIn', true);
 
     Config.set(
@@ -55,17 +47,6 @@ class LoginViewModel extends BaseViewModel {
     Config.set(
       'user',
       response.fullName,
-    );
-  }
-
-  cacheCreds(data) {
-    OfflineStorage.putItem(
-      'usr',
-      data["usr"].trimRight(),
-    );
-    OfflineStorage.putItem(
-      'pwd',
-      data["pwd"],
     );
   }
 
@@ -79,8 +60,11 @@ class LoginViewModel extends BaseViewModel {
         data["usr"].trimRight(),
         data["pwd"],
       );
-      updateConfig(response);
-      cacheCreds(data);
+      updateUserDetails(response);
+      OfflineStorage.putItem(
+        'usr',
+        data["usr"].trimRight(),
+      );
       await cacheAllUsers();
       await initAwesomeItems();
 

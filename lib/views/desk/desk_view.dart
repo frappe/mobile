@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:flutter/material.dart';
 
 import 'package:frappe_app/utils/helpers.dart';
@@ -21,7 +19,7 @@ import 'desk_viewmodel.dart';
 class DeskView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var connectionStatus = Provider.of<ConnectivityStatus>(
+    Provider.of<ConnectivityStatus>(
       context,
     );
 
@@ -32,53 +30,55 @@ class DeskView extends StatelessWidget {
       onModelClose: (model) {
         model.error = null;
       },
-      builder: (context, model, child) => Scaffold(
-        backgroundColor: Palette.bgColor,
-        appBar: buildAppBar(
-          isRoot: true,
-          title: model.currentModule ?? "",
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ShowModules(
-                  model: model,
-                  title: model.currentModule ?? "",
-                ),
-              ),
-            );
-          },
-        ),
-        body: RefreshIndicator(
-          onRefresh: () async {
-            model.refresh(connectionStatus);
-          },
-          child: model.state == ViewState.busy
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : Builder(
-                  builder: (
-                    context,
-                  ) {
-                    if (model.error != null) {
-                      return handleError(
-                        error: model.error,
-                        context: context,
-                      );
-                    }
-                    return ListView(
-                      padding: EdgeInsets.zero,
-                      children: _generateChildren(
-                        desktopPage: model.desktopPage,
-                        model: model,
-                        context: context,
-                      ),
-                    );
+      builder: (context, model, child) => model.state == ViewState.busy
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : model.hasError
+              ? handleError(
+                  onRetry: () {
+                    model.getData();
                   },
+                  error: model.error,
+                  context: context,
+                )
+              : Scaffold(
+                  backgroundColor: Palette.bgColor,
+                  appBar: buildAppBar(
+                    isRoot: true,
+                    title: model.currentModule,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ShowModules(
+                            model: model,
+                            title: model.currentModule,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  body: RefreshIndicator(
+                    onRefresh: () async {
+                      model.getData();
+                    },
+                    child: Builder(
+                      builder: (
+                        context,
+                      ) {
+                        return ListView(
+                          padding: EdgeInsets.zero,
+                          children: _generateChildren(
+                            desktopPage: model.desktopPage,
+                            model: model,
+                            context: context,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
-        ),
-      ),
     );
   }
 
@@ -111,9 +111,9 @@ class DeskView extends StatelessWidget {
   }
 
   Widget _shortcut({
-    @required ShortcutItem item,
-    @required DeskViewModel model,
-    @required BuildContext context,
+    required ShortcutItem item,
+    required DeskViewModel model,
+    required BuildContext context,
   }) {
     return Padding(
       padding: const EdgeInsets.only(
@@ -134,9 +134,9 @@ class DeskView extends StatelessWidget {
   }
 
   Widget _item({
-    @required CardItemLink item,
-    @required DeskViewModel model,
-    @required BuildContext context,
+    required CardItemLink item,
+    required DeskViewModel model,
+    required BuildContext context,
   }) {
     return ListTile(
       visualDensity: VisualDensity(horizontal: 0, vertical: -4),
@@ -180,9 +180,9 @@ class DeskView extends StatelessWidget {
   }
 
   List<Widget> _generateChildren({
-    @required DesktopPageResponse desktopPage,
-    @required DeskViewModel model,
-    @required BuildContext context,
+    required DesktopPageResponse desktopPage,
+    required DeskViewModel model,
+    required BuildContext context,
   }) {
     List<Widget> widgets = [];
 
@@ -233,7 +233,7 @@ class DeskView extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   side: BorderSide(
                     width: 0.5,
-                    color: FrappePalette.grey[400],
+                    color: FrappePalette.grey[400]!,
                   ),
                   borderRadius: BorderRadius.circular(
                     6.0,
@@ -283,11 +283,10 @@ class ShowModules extends StatelessWidget {
   final DeskViewModel model;
   final String title;
 
-  const ShowModules({
-    Key key,
-    this.model,
-    this.title,
-  }) : super(key: key);
+  ShowModules({
+    required this.model,
+    required this.title,
+  });
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,14 +1,14 @@
 class DoctypeResponse {
-  late List<DoctypeDoc>? docs;
+  late List<DoctypeDoc> docs;
   late String? userSettings;
 
-  DoctypeResponse({this.docs, this.userSettings});
+  DoctypeResponse({required this.docs, this.userSettings});
 
   DoctypeResponse.fromJson(Map<dynamic, dynamic> json) {
     if (json['docs'] != null) {
       docs = [];
       json['docs'].forEach((v) {
-        docs?.add(new DoctypeDoc.fromJson(Map<dynamic, dynamic>.from(v)));
+        docs.add(new DoctypeDoc.fromJson(Map<dynamic, dynamic>.from(v)));
       });
     }
     userSettings = json['user_settings'];
@@ -16,9 +16,7 @@ class DoctypeResponse {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.docs != null) {
-      data['docs'] = this.docs?.map((v) => v.toJson()).toList();
-    }
+    data['docs'] = this.docs.map((v) => v.toJson()).toList();
     data['user_settings'] = this.userSettings;
     return data;
   }
@@ -26,7 +24,7 @@ class DoctypeResponse {
 
 class DoctypeDoc {
   late String? doctype;
-  late String? name;
+  late String name;
   late String? owner;
   late String? creation;
   late String? modified;
@@ -34,11 +32,11 @@ class DoctypeDoc {
   late int? idx;
   late int? docstatus;
   late String? searchFields;
-  late int? issingle;
+  late int issingle;
   late int? istable;
   late int? editableGrid;
   late int? trackChanges;
-  late String? module;
+  late String module;
   late String? autoname;
   late String? nameCase;
   late String? titleField;
@@ -73,12 +71,12 @@ class DoctypeDoc {
   late int? isTree;
   late int? emailAppendTo;
   late int? indexWebPagesForSearch;
-  late List<DoctypeField>? fields;
+  late List<DoctypeField> fields;
   late Map? fieldsMap;
 
   DoctypeDoc(
       {this.doctype,
-      this.name,
+      required this.name,
       this.owner,
       this.creation,
       this.modified,
@@ -86,11 +84,11 @@ class DoctypeDoc {
       this.idx,
       this.docstatus,
       this.searchFields,
-      this.issingle,
+      required this.issingle,
       this.istable,
       this.editableGrid,
       this.trackChanges,
-      this.module,
+      required this.module,
       this.autoname,
       this.nameCase,
       this.titleField,
@@ -125,7 +123,7 @@ class DoctypeDoc {
       this.isTree,
       this.emailAppendTo,
       this.indexWebPagesForSearch,
-      this.fields,
+      required this.fields,
       this.fieldsMap});
 
   DoctypeDoc.fromJson(Map<dynamic, dynamic> json) {
@@ -181,7 +179,7 @@ class DoctypeDoc {
     if (json['fields'] != null) {
       fields = [];
       json['fields'].forEach((v) {
-        fields?.add(new DoctypeField.fromJson(Map<dynamic, dynamic>.from(v)));
+        fields.add(new DoctypeField.fromJson(Map<dynamic, dynamic>.from(v)));
       });
     }
   }
@@ -237,9 +235,7 @@ class DoctypeDoc {
     data['email_append_to'] = this.emailAppendTo;
     data['index_web_pages_for_search'] = this.indexWebPagesForSearch;
     data['fields_map'] = this.fieldsMap;
-    if (this.fields != null) {
-      data['fields'] = this.fields?.map((v) => v.toJson()).toList();
-    }
+    data['fields'] = this.fields.map((v) => v.toJson()).toList();
     return data;
   }
 }

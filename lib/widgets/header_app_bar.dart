@@ -1,13 +1,11 @@
-// @dart=2.9
-
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 
 AppBar buildAppBar({
-  @required String title,
+  required String title,
   bool expanded = false,
-  List<Widget> actions,
-  Function onPressed,
+  List<Widget>? actions,
+  void Function()? onPressed,
   bool isRoot = false,
 }) {
   double titleSpacing;

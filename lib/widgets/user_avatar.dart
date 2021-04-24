@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'dart:io';
 import 'dart:math';
 
@@ -13,17 +12,17 @@ import '../utils/http.dart';
 
 class UserAvatar extends StatelessWidget {
   final String uid;
-  final double size;
+  final double? size;
 
   UserAvatar({
-    @required this.uid,
+    required this.uid,
     this.size,
   });
 
   static Widget renderShape({
-    String txt,
-    ImageProvider imageProvider,
-    double size,
+    String? txt,
+    ImageProvider? imageProvider,
+    double? size,
   }) {
     if (imageProvider == null) {
       var random = Random();
@@ -55,7 +54,7 @@ class UserAvatar extends StatelessWidget {
   }
 
   Widget getAvatar(
-    String uid,
+    String? uid,
   ) {
     if (uid == null) {
       return Container();
@@ -72,7 +71,7 @@ class UserAvatar extends StatelessWidget {
         return CachedNetworkImage(
           imageUrl: imageUrl,
           httpHeaders: {
-            HttpHeaders.cookieHeader: DioHelper.cookies,
+            // HttpHeaders.cookieHeader: DioHelper.cookies!,
           },
           imageBuilder: (context, imageProvider) => UserAvatar.renderShape(
             imageProvider: imageProvider,

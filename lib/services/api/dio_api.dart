@@ -88,7 +88,12 @@ class DioApi implements Api {
           return DeskSidebarItemsResponse.fromJson(response.data);
         }
       } else if (response.statusCode == HttpStatus.forbidden) {
-        throw response;
+        throw ErrorResponse(
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
+          stackTrace: response.data,
+        );
+        // response;
       } else {
         throw ErrorResponse(statusMessage: 'Something went wrong');
       }
@@ -130,7 +135,11 @@ class DioApi implements Api {
 
         return DesktopPageResponse.fromJson(response.data);
       } else if (response.statusCode == 403) {
-        throw response;
+        throw ErrorResponse(
+          stackTrace: response.data,
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
+        );
       } else {
         throw ErrorResponse(statusMessage: 'Something went wrong');
       }
@@ -179,9 +188,17 @@ class DioApi implements Api {
         }
         return DoctypeResponse.fromJson(response.data);
       } else if (response.statusCode == HttpStatus.forbidden) {
-        throw response;
+        throw ErrorResponse(
+          stackTrace: response.data,
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
+        );
       } else {
-        throw ErrorResponse(statusMessage: 'Something went wrong');
+        throw ErrorResponse(
+          statusMessage: response.statusMessage,
+          statusCode: response.statusCode,
+          stackTrace: response.data,
+        );
       }
     } catch (e) {
       if (e is DioError) {
@@ -195,7 +212,7 @@ class DioApi implements Api {
           throw ErrorResponse(statusMessage: error.message);
         }
       } else {
-        throw e;
+        throw ErrorResponse(statusMessage: 'Something went wrong');
       }
     }
   }
@@ -270,7 +287,11 @@ class DioApi implements Api {
 
         return newL;
       } else if (response.statusCode == HttpStatus.forbidden) {
-        throw response;
+        throw ErrorResponse(
+          stackTrace: response.data,
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
+        );
       } else {
         throw ErrorResponse(statusMessage: 'Something went wrong');
       }
@@ -286,7 +307,7 @@ class DioApi implements Api {
           throw ErrorResponse(statusMessage: error.message);
         }
       } else {
-        throw e;
+        throw ErrorResponse();
       }
     }
   }
@@ -314,7 +335,11 @@ class DioApi implements Api {
         }
         return GetDocResponse.fromJson(response.data);
       } else if (response.statusCode == 403) {
-        throw response;
+        throw ErrorResponse(
+          stackTrace: response.data,
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
+        );
       } else {
         throw ErrorResponse(statusMessage: 'Something went wrong');
       }
@@ -638,7 +663,11 @@ class DioApi implements Api {
         }
         return response.data;
       } else if (response.statusCode == HttpStatus.forbidden) {
-        throw response;
+        throw ErrorResponse(
+          stackTrace: response.data,
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
+        );
       } else {
         throw ErrorResponse(statusMessage: 'Something went wrong');
       }

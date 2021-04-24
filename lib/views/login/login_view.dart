@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/form/controls/control.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/utils/navigation_helper.dart';
@@ -67,22 +68,21 @@ class Login extends StatelessWidget {
                             label: "Server URL",
                           ),
                           buildDecoratedControl(
-                              control: FormBuilderTextField(
-                                name: 'usr',
-                                initialValue: model.savedCreds.usr,
-                                validator: FormBuilderValidators.compose([
-                                  FormBuilderValidators.required(context),
-                                ]),
-                                decoration: Palette.formFieldDecoration(
-                                  withLabel: true,
-                                  label: "Email Address",
-                                ),
+                            control: FormBuilderTextField(
+                              name: 'usr',
+                              initialValue: model.savedCreds.usr,
+                              validator: FormBuilderValidators.compose([
+                                FormBuilderValidators.required(context),
+                              ]),
+                              decoration: Palette.formFieldDecoration(
+                                withLabel: true,
+                                label: "Email Address",
                               ),
-                              withLabel: true,
-                              label: "Email Address"),
-                          PasswordField(
-                            savedPassword: model.savedCreds.pwd,
+                            ),
+                            withLabel: true,
+                            label: "Email Address",
                           ),
+                          PasswordField(),
                           FrappeFlatButton(
                             title: model.loginButtonLabel,
                             fullWidth: true,
@@ -168,46 +168,52 @@ class FrappeLogo extends StatelessWidget {
 }
 
 class PasswordField extends StatefulWidget {
-  final String? savedPassword;
-
-  const PasswordField({
-    this.savedPassword,
-  });
-
   @override
   _PasswordFieldState createState() => _PasswordFieldState();
 }
 
 class _PasswordFieldState extends State<PasswordField> {
   bool _hidePassword = true;
+
   @override
   Widget build(BuildContext context) {
     return buildDecoratedControl(
-      control: FormBuilderTextField(
-        maxLines: 1,
-        name: 'pwd',
-        initialValue: widget.savedPassword,
-        validator: FormBuilderValidators.compose([
-          FormBuilderValidators.required(context),
-        ]),
-        obscureText: _hidePassword,
-        decoration: Palette.formFieldDecoration(
-          withLabel: true,
-          label: "Password",
-          suffixIcon: FlatButton(
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            child: Text(_hidePassword ? "Show" : "Hide"),
+      control: Stack(
+        alignment: Alignment.centerRight,
+        children: [
+          FormBuilderTextField(
+            maxLines: 1,
+            name: 'pwd',
+            validator: FormBuilderValidators.compose([
+              FormBuilderValidators.required(context),
+            ]),
+            obscureText: _hidePassword,
+            decoration: Palette.formFieldDecoration(
+              withLabel: true,
+              label: "Password",
+            ),
+          ),
+          TextButton(
+            style: ButtonStyle(
+              overlayColor: MaterialStateProperty.all(
+                Colors.transparent,
+              ),
+            ),
+            child: Text(
+              _hidePassword ? "Show" : "Hide",
+              style: TextStyle(
+                color: FrappePalette.grey[600],
+              ),
+            ),
             onPressed: () {
               setState(
                 () {
-                  // TODO
                   _hidePassword = !_hidePassword;
                 },
               );
             },
-          ),
-        ),
+          )
+        ],
       ),
       withLabel: true,
       label: "Password",

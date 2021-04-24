@@ -19,12 +19,12 @@ import '../../model/queue.dart';
 
 @lazySingleton
 class FormViewViewModel extends BaseViewModel {
-  bool? editMode;
+  late bool editMode;
   ErrorResponse? error;
-  GetDocResponse? formData;
+  late GetDocResponse formData;
   final user = Config().user;
   Docinfo? docinfo;
-  bool? communicationOnly;
+  late bool communicationOnly;
 
   void refresh() {
     editMode = false;
@@ -37,23 +37,20 @@ class FormViewViewModel extends BaseViewModel {
   }
 
   void toggleEdit() {
-    if (editMode != null) {
-      editMode = !editMode!;
-    } else {
-      editMode = true;
-    }
+    editMode = !editMode;
+
     notifyListeners();
   }
 
   Future getData({
     required bool queued,
     required String doctype,
-    required String name,
-    required Map queuedData,
+    required String? name,
+    required Map? queuedData,
     required ConnectivityStatus connectivityStatus,
   }) async {
     setState(ViewState.busy);
-    if (queued) {
+    if (queued && queuedData != null) {
       formData = GetDocResponse(
         docs: queuedData["data"],
       );
@@ -67,7 +64,7 @@ class FormViewViewModel extends BaseViewModel {
         response = response["data"];
         if (response != null) {
           formData = GetDocResponse.fromJson(response);
-          docinfo = formData?.docinfo;
+          docinfo = formData.docinfo;
         } else {
           error = ErrorResponse(
             statusCode: HttpStatus.serviceUnavailable,
@@ -76,9 +73,9 @@ class FormViewViewModel extends BaseViewModel {
       } else {
         formData = await locator<Api>().getdoc(
           doctype,
-          name,
+          name!,
         );
-        docinfo = formData?.docinfo;
+        docinfo = formData.docinfo;
       }
     }
     setState(ViewState.idle);
@@ -122,7 +119,7 @@ class FormViewViewModel extends BaseViewModel {
           )
         };
         queuedData["title"] = getTitle(
-          meta.docs![0],
+          meta.docs[0],
           formValue,
         );
 
@@ -135,7 +132,7 @@ class FormViewViewModel extends BaseViewModel {
           "type": "Update",
           "name": name,
           "doctype": doctype,
-          "title": getTitle(meta.docs![0], formValue),
+          "title": getTitle(meta.docs[0], formValue),
           "updated_keys": extractChangedValues(doc, formValue),
           "data": [
             {

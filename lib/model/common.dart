@@ -2,7 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 
 class ErrorResponse {
-  late String? statusMessage;
+  late String statusMessage;
   late String? userMessage;
   late int? statusCode;
   late String? stackTrace;
@@ -10,7 +10,7 @@ class ErrorResponse {
   ErrorResponse({
     this.stackTrace,
     this.statusCode,
-    this.statusMessage,
+    this.statusMessage = "Something went wrong",
     this.userMessage,
   });
 }

@@ -1,9 +1,6 @@
-// @dart=2.9
-
 import 'dart:io';
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:frappe_app/model/common.dart';
 
 import 'package:frappe_app/utils/frappe_alert.dart';
 import 'package:frappe_app/views/form_view/form_view.dart';
@@ -24,14 +21,10 @@ import '../../utils/helpers.dart';
 
 @lazySingleton
 class DeskViewModel extends BaseViewModel {
-  String currentModule;
+  late String currentModule;
   List<DeskMessage> modules = [];
-  DesktopPageResponse desktopPage;
-  var error;
-
-  refresh(ConnectivityStatus connectivityStatus) async {
-    getData();
-  }
+  late DesktopPageResponse desktopPage;
+  ErrorResponse? error;
 
   switchModule(
     String newModule,
@@ -43,6 +36,8 @@ class DeskViewModel extends BaseViewModel {
     notifyListeners();
   }
 
+  bool get hasError => error != null;
+
   Future getDeskSidebarItems() async {
     DeskSidebarItemsResponse deskSidebarItems;
 
@@ -50,15 +45,20 @@ class DeskViewModel extends BaseViewModel {
 
     if (!isOnline) {
       var deskSidebarItemsCache =
-          await OfflineStorage.getItem('deskSidebarItems');
-      deskSidebarItemsCache = deskSidebarItemsCache["data"];
+          OfflineStorage.getItem('deskSidebarItems')["data"];
 
       if (deskSidebarItemsCache != null) {
         deskSidebarItems =
             DeskSidebarItemsResponse.fromJson(deskSidebarItemsCache);
+      } else {
+        throw ErrorResponse(statusCode: HttpStatus.serviceUnavailable);
       }
     } else {
-      deskSidebarItems = await locator<Api>().getDeskSideBarItems();
+      try {
+        deskSidebarItems = await locator<Api>().getDeskSideBarItems();
+      } catch (e) {
+        throw e as ErrorResponse;
+      }
     }
 
     modules = deskSidebarItems.message;
@@ -72,14 +72,20 @@ class DeskViewModel extends BaseViewModel {
     var isOnline = await verifyOnline();
 
     if (!isOnline) {
-      var moduleDoctypes = OfflineStorage.getItem('${currentModule}Doctypes');
-      moduleDoctypes = moduleDoctypes["data"];
+      var moduleDoctypes =
+          OfflineStorage.getItem('${currentModule}Doctypes')["data"];
 
       if (moduleDoctypes != null) {
         _desktopPage = DesktopPageResponse.fromJson(moduleDoctypes);
+      } else {
+        throw ErrorResponse(statusCode: HttpStatus.serviceUnavailable);
       }
     } else {
-      _desktopPage = await locator<Api>().getDesktopPage(currentModule);
+      try {
+        _desktopPage = await locator<Api>().getDesktopPage(currentModule);
+      } catch (e) {
+        throw e as ErrorResponse;
+      }
     }
 
     desktopPage = _desktopPage;
@@ -95,15 +101,16 @@ class DeskViewModel extends BaseViewModel {
       await getDesktopPage(
         currentModule,
       );
+      error = null;
     } catch (e) {
-      error = e;
+      error = e as ErrorResponse;
     }
     setState(ViewState.idle);
   }
 
   navigateToView({
-    @required String doctype,
-    @required BuildContext context,
+    required String doctype,
+    required BuildContext context,
   }) async {
     try {
       var meta = await OfflineStorage.getMeta(doctype);
@@ -129,7 +136,7 @@ class DeskViewModel extends BaseViewModel {
     } catch (e) {
       FrappeAlert.errorAlert(
         context: context,
-        title: "Something went wrong",
+        title: e is ErrorResponse ? e.statusMessage : "Something went wrong",
       );
     }
   }

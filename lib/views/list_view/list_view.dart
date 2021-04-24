@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -31,7 +30,7 @@ class CustomListView extends StatelessWidget {
   final DoctypeResponse meta;
 
   CustomListView({
-    @required this.meta,
+    required this.meta,
   });
 
   @override
@@ -52,60 +51,62 @@ class CustomListView extends StatelessWidget {
                 child: CircularProgressIndicator(),
               ),
             )
-          : Builder(
-              builder: (context) {
-                if (model.error != null) {
-                  return handleError(
-                    error: model.error,
-                    context: context,
-                  );
-                }
+          : model.hasError
+              ? handleError(
+                  error: model.error,
+                  context: context,
+                  onRetry: () {
+                    model.meta = meta;
+                    model.getData(meta.docs[0]);
+                    model.getDesktopPage(meta.docs[0].module);
+                  },
+                )
+              : RefreshIndicator(
+                  onRefresh: () {
+                    return Future.value(model.refresh());
+                  },
+                  child: Scaffold(
+                    floatingActionButtonLocation:
+                        FloatingActionButtonLocation.centerFloat,
+                    floatingActionButton: AddFilterButton(
+                      appliedFilters: model.filters.length,
+                      onPressed: () async {
+                        var fields = model.getFilterableFields(
+                          meta.docs[0].fields,
+                        );
 
-                return Scaffold(
-                  floatingActionButtonLocation:
-                      FloatingActionButtonLocation.centerFloat,
-                  floatingActionButton: AddFilterButton(
-                    appliedFilters: model.filters.length,
-                    onPressed: () async {
-                      var fields = model.getFilterableFields(
-                        meta.docs[0].fields,
-                      );
-
-                      List<Filter> appliedFilters = await showModalBottomSheet(
-                        useRootNavigator: true,
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (context) => FiltersBottomSheetView(
-                          fields: fields,
-                          filters: model.filters,
-                        ),
-                      );
-
-                      model.applyFilters(appliedFilters);
-                    },
-                  ),
-                  appBar: buildAppBar(
-                    title: model.meta.docs[0].name,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ShowSiblingDoctypes(
-                            model: model,
-                            title: model.meta.docs[0].name,
+                        List<Filter> appliedFilters =
+                            await showModalBottomSheet(
+                          useRootNavigator: true,
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (context) => FiltersBottomSheetView(
+                            fields: fields,
+                            filters: model.filters,
                           ),
-                        ),
-                      );
-                    },
-                    actions: <Widget>[
-                      _newDoc(context),
-                    ],
-                  ),
-                  body: RefreshIndicator(
-                    onRefresh: () {
-                      return Future.value(model.refresh());
-                    },
-                    child: Container(
+                        );
+
+                        model.applyFilters(appliedFilters);
+                      },
+                    ),
+                    appBar: buildAppBar(
+                      title: model.meta.docs[0].name,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ShowSiblingDoctypes(
+                              model: model,
+                              title: model.meta.docs[0].name,
+                            ),
+                          ),
+                        );
+                      },
+                      actions: <Widget>[
+                        _newDoc(context),
+                      ],
+                    ),
+                    body: Container(
                       color: Palette.bgColor,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,9 +162,7 @@ class CustomListView extends StatelessWidget {
                       ),
                     ),
                   ),
-                );
-              },
-            ),
+                ),
     );
   }
 
@@ -195,13 +194,14 @@ class CustomListView extends StatelessWidget {
   }
 
   Widget _generateList({
-    @required List<Filter> filters,
-    @required DoctypeResponse meta,
-    @required ListViewViewModel model,
+    required List<Filter> filters,
+    required DoctypeResponse meta,
+    required ListViewViewModel model,
   }) {
     return PagewiseListView(
       pageLoadController: model.pagewiseLoadController,
       padding: EdgeInsets.zero,
+      showRetry: false,
       noItemsFoundBuilder: (context) {
         return _noItemsFoundBuilder(
           filters: filters,
@@ -209,15 +209,28 @@ class CustomListView extends StatelessWidget {
           model: model,
         );
       },
+      errorBuilder: (context, e) {
+        return Container(
+          height: MediaQuery.of(context).size.height - 200,
+          child: handleError(
+            error: e as ErrorResponse,
+            context: context,
+            onRetry: () {
+              model.refresh();
+            },
+          ),
+        );
+      },
       itemBuilder: ((buildContext, entry, _) {
+        late var e = entry as Map;
         return _generateItem(
           model: model,
-          data: entry,
+          data: e,
           onListTap: () {
             model.onListTap(
               context: buildContext,
               meta: meta,
-              name: entry["name"],
+              name: e["name"],
             );
           },
           onButtonTap: (k, v) {
@@ -229,10 +242,10 @@ class CustomListView extends StatelessWidget {
   }
 
   Widget _generateItem({
-    @required Map data,
-    @required Function onListTap,
-    @required Function onButtonTap,
-    @required ListViewViewModel model,
+    required Map data,
+    required Function onListTap,
+    required Function onButtonTap,
+    required ListViewViewModel model,
   }) {
     var assignee =
         data["_assign"] != null ? json.decode(data["_assign"]) : null;
@@ -265,9 +278,9 @@ class CustomListView extends StatelessWidget {
   }
 
   Widget _noItemsFoundBuilder({
-    @required List<Filter> filters,
-    @required BuildContext context,
-    @required ListViewViewModel model,
+    required List<Filter> filters,
+    required BuildContext context,
+    required ListViewViewModel model,
   }) {
     return Container(
       color: Colors.white,
@@ -306,13 +319,12 @@ class CustomListView extends StatelessWidget {
 
 class AddFilterButton extends StatelessWidget {
   final int appliedFilters;
-  final Function onPressed;
+  final void Function()? onPressed;
 
   const AddFilterButton({
-    Key key,
-    @required this.appliedFilters,
-    @required this.onPressed,
-  }) : super(key: key);
+    required this.appliedFilters,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -379,10 +391,9 @@ class ShowSiblingDoctypes extends StatelessWidget {
   final String title;
 
   const ShowSiblingDoctypes({
-    Key key,
-    this.model,
-    this.title,
-  }) : super(key: key);
+    required this.model,
+    required this.title,
+  });
   @override
   Widget build(BuildContext context) {
     return Scaffold(

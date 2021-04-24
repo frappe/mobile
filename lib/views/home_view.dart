@@ -75,7 +75,7 @@ class _HomeViewState extends State<HomeView> {
       PersistentBottomNavBarItem(
         title: 'Profile',
         icon: UserAvatar(
-          uid: Config().userId,
+          uid: Config().userId!,
           size: 12,
         ),
         activeColorPrimary: FrappePalette.grey[800]!,

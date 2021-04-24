@@ -1,163 +1,160 @@
-// @dart=2.9
-
 class GetDocResponse {
-  List docs;
-  Docinfo docinfo;
+  late List docs;
+  Docinfo? docinfo;
 
-  GetDocResponse({this.docs, this.docinfo});
+  GetDocResponse({
+    required this.docs,
+    this.docinfo,
+  });
 
   GetDocResponse.fromJson(Map<String, dynamic> json) {
     if (json['docs'] != null) {
-      docs = new List();
+      docs = [];
       json['docs'].forEach((v) {
         docs.add(v);
       });
     }
-    docinfo =
-        json['docinfo'] != null ? new Docinfo.fromJson(json['docinfo']) : null;
+    docinfo = Docinfo.fromJson(json['docinfo']);
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.docs != null) {
-      data['docs'] = this.docs.map((v) => v.toJson()).toList();
-    }
-    if (this.docinfo != null) {
-      data['docinfo'] = this.docinfo.toJson();
-    }
+    data['docs'] = this.docs.map((v) => v.toJson()).toList();
+    data['docinfo'] = this.docinfo?.toJson();
     return data;
   }
 }
 
 class Docinfo {
-  List<Attachments> attachments;
-  List<AttachmentLogs> attachmentLogs;
-  List<Communication> communications;
-  List<Comment> comments;
-  int totalComments;
-  List<Version> versions;
-  List<Assignments> assignments;
-  List assignmentLogs;
-  Permissions permissions;
-  List<Shared> shared;
-  List shareLogs;
-  List likeLogs;
-  List<View> views;
-  List<EnergyPointLogs> energyPointLogs;
-  List additionalTimelineContent;
-  List milestones;
-  Null isDocumentFollowed;
-  String tags;
-  String documentEmail;
+  late List<Attachments> attachments;
+  late List<AttachmentLogs>? attachmentLogs;
+  late List<Communication> communications;
+  late List<Comment> comments;
+  int? totalComments;
+  late List<Version> versions;
+  late List<Assignments> assignments;
+  List? assignmentLogs;
+  Permissions? permissions;
+  late List<Shared> shared;
+  late List shareLogs;
+  List? likeLogs;
+  late List<View> views;
+  late List<EnergyPointLogs> energyPointLogs;
+  List? additionalTimelineContent;
+  List? milestones;
+  dynamic isDocumentFollowed;
+  late String tags;
+  String? documentEmail;
 
-  Docinfo(
-      {this.attachments,
-      this.attachmentLogs,
-      this.communications,
-      this.comments,
-      this.totalComments,
-      this.versions,
-      this.assignments,
-      this.assignmentLogs,
-      this.permissions,
-      this.shared,
-      this.shareLogs,
-      this.likeLogs,
-      this.views,
-      this.energyPointLogs,
-      this.additionalTimelineContent,
-      this.milestones,
-      this.isDocumentFollowed,
-      this.tags,
-      this.documentEmail});
+  Docinfo({
+    required this.attachments,
+    this.attachmentLogs,
+    required this.communications,
+    required this.comments,
+    this.totalComments,
+    required this.versions,
+    required this.assignments,
+    this.assignmentLogs,
+    this.permissions,
+    required this.shared,
+    required this.shareLogs,
+    this.likeLogs,
+    required this.views,
+    required this.energyPointLogs,
+    this.additionalTimelineContent,
+    this.milestones,
+    this.isDocumentFollowed,
+    required this.tags,
+    this.documentEmail,
+  });
 
   Docinfo.fromJson(Map<String, dynamic> json) {
     if (json['attachments'] != null) {
-      attachments = new List<Attachments>();
+      attachments = [];
       json['attachments'].forEach((v) {
         attachments.add(new Attachments.fromJson(v));
       });
     }
     if (json['attachment_logs'] != null) {
-      attachmentLogs = new List<AttachmentLogs>();
+      attachmentLogs = [];
       json['attachment_logs'].forEach((v) {
-        attachmentLogs.add(new AttachmentLogs.fromJson(v));
+        attachmentLogs?.add(new AttachmentLogs.fromJson(v));
       });
     }
     if (json['communications'] != null) {
-      communications = new List<Communication>();
+      communications = [];
       json['communications'].forEach((v) {
         communications.add(Communication.fromJson(v));
       });
     }
     if (json['comments'] != null) {
-      comments = new List<Comment>();
+      comments = [];
       json['comments'].forEach((v) {
         comments.add(Comment.fromJson(v));
       });
     }
     totalComments = json['total_comments'];
     if (json['versions'] != null) {
-      versions = new List<Version>();
+      versions = [];
       json['versions'].forEach((v) {
         versions.add(new Version.fromJson(v));
       });
     }
     if (json['assignments'] != null) {
-      assignments = new List<Assignments>();
+      assignments = [];
       json['assignments'].forEach((v) {
         assignments.add(new Assignments.fromJson(v));
       });
     }
     if (json['assignment_logs'] != null) {
-      assignmentLogs = new List();
+      assignmentLogs = [];
       json['assignment_logs'].forEach((v) {
-        assignmentLogs.add(v);
+        assignmentLogs?.add(v);
       });
     }
     permissions = json['permissions'] != null
         ? new Permissions.fromJson(json['permissions'])
         : null;
     if (json['shared'] != null) {
-      shared = new List<Shared>();
+      shared = [];
       json['shared'].forEach((v) {
         shared.add(new Shared.fromJson(v));
       });
     }
     if (json['share_logs'] != null) {
-      shareLogs = new List();
+      shareLogs = [];
       json['share_logs'].forEach((v) {
         shareLogs.add(v);
       });
     }
     if (json['like_logs'] != null) {
-      likeLogs = new List();
+      likeLogs = [];
       json['like_logs'].forEach((v) {
-        likeLogs.add(v);
+        likeLogs?.add(v);
       });
     }
     if (json['views'] != null) {
-      views = new List();
+      views = [];
       json['views'].forEach((v) {
         views.add(View.fromJson(v));
       });
     }
     if (json['energy_point_logs'] != null) {
-      energyPointLogs = new List<EnergyPointLogs>();
+      energyPointLogs = [];
       json['energy_point_logs'].forEach((v) {
         energyPointLogs.add(new EnergyPointLogs.fromJson(v));
       });
     }
     if (json['additional_timeline_content'] != null) {
-      additionalTimelineContent = new List();
+      additionalTimelineContent = [];
       json['additional_timeline_content'].forEach((v) {
-        additionalTimelineContent.add(v);
+        additionalTimelineContent?.add(v);
       });
     }
     if (json['milestones'] != null) {
-      milestones = new List();
+      milestones = [];
       json['milestones'].forEach((v) {
-        milestones.add(v);
+        milestones?.add(v);
       });
     }
     isDocumentFollowed = json['is_document_followed'];
@@ -167,56 +164,38 @@ class Docinfo {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.attachments != null) {
-      data['attachments'] = this.attachments.map((v) => v.toJson()).toList();
-    }
+    data['attachments'] = this.attachments.map((v) => v.toJson()).toList();
     if (this.attachmentLogs != null) {
       data['attachment_logs'] =
-          this.attachmentLogs.map((v) => v.toJson()).toList();
+          this.attachmentLogs?.map((v) => v.toJson()).toList();
     }
-    if (this.communications != null) {
-      data['communications'] =
-          this.communications.map((v) => v.toJson()).toList();
-    }
-    if (this.comments != null) {
-      data['comments'] = this.comments.map((v) => v.toJson()).toList();
-    }
+    data['communications'] =
+        this.communications.map((v) => v.toJson()).toList();
+    data['comments'] = this.comments.map((v) => v.toJson()).toList();
     data['total_comments'] = this.totalComments;
-    if (this.versions != null) {
-      data['versions'] = this.versions.map((v) => v.toJson()).toList();
-    }
-    if (this.assignments != null) {
-      data['assignments'] = this.assignments.map((v) => v.toJson()).toList();
-    }
+    data['versions'] = this.versions.map((v) => v.toJson()).toList();
+    data['assignments'] = this.assignments.map((v) => v.toJson()).toList();
     if (this.assignmentLogs != null) {
       data['assignment_logs'] =
-          this.assignmentLogs.map((v) => v.toJson()).toList();
+          this.assignmentLogs?.map((v) => v.toJson()).toList();
     }
     if (this.permissions != null) {
-      data['permissions'] = this.permissions.toJson();
+      data['permissions'] = this.permissions?.toJson();
     }
-    if (this.shared != null) {
-      data['shared'] = this.shared.map((v) => v.toJson()).toList();
-    }
-    if (this.shareLogs != null) {
-      data['share_logs'] = this.shareLogs.map((v) => v.toJson()).toList();
-    }
+    data['shared'] = this.shared.map((v) => v.toJson()).toList();
+    data['share_logs'] = this.shareLogs.map((v) => v.toJson()).toList();
     if (this.likeLogs != null) {
-      data['like_logs'] = this.likeLogs.map((v) => v).toList();
+      data['like_logs'] = this.likeLogs?.map((v) => v).toList();
     }
-    if (this.views != null) {
-      data['views'] = this.views.map((v) => v.toJson()).toList();
-    }
-    if (this.energyPointLogs != null) {
-      data['energy_point_logs'] =
-          this.energyPointLogs.map((v) => v.toJson()).toList();
-    }
+    data['views'] = this.views.map((v) => v.toJson()).toList();
+    data['energy_point_logs'] =
+        this.energyPointLogs.map((v) => v.toJson()).toList();
     if (this.additionalTimelineContent != null) {
       data['additional_timeline_content'] =
-          this.additionalTimelineContent.map((v) => v).toList();
+          this.additionalTimelineContent?.map((v) => v).toList();
     }
     if (this.milestones != null) {
-      data['milestones'] = this.milestones.map((v) => v).toList();
+      data['milestones'] = this.milestones?.map((v) => v).toList();
     }
     data['is_document_followed'] = this.isDocumentFollowed;
     data['tags'] = this.tags;
@@ -226,12 +205,17 @@ class Docinfo {
 }
 
 class Attachments {
-  String name;
-  String fileName;
-  String fileUrl;
-  int isPrivate;
+  late String name;
+  late String fileName;
+  late String fileUrl;
+  late int isPrivate;
 
-  Attachments({this.name, this.fileName, this.fileUrl, this.isPrivate});
+  Attachments({
+    required this.name,
+    required this.fileName,
+    required this.fileUrl,
+    required this.isPrivate,
+  });
 
   Attachments.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -251,14 +235,19 @@ class Attachments {
 }
 
 class AttachmentLogs {
-  String name;
-  String creation;
-  String content;
-  String owner;
-  String commentType;
+  late String name;
+  late String creation;
+  late String content;
+  late String owner;
+  late String commentType;
 
-  AttachmentLogs(
-      {this.name, this.creation, this.content, this.owner, this.commentType});
+  AttachmentLogs({
+    required this.name,
+    required this.creation,
+    required this.content,
+    required this.owner,
+    required this.commentType,
+  });
 
   AttachmentLogs.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -280,46 +269,47 @@ class AttachmentLogs {
 }
 
 class Communication {
-  String name;
-  String communicationType;
-  String communicationMedium;
-  String commentType;
-  String communicationDate;
-  String content;
-  String sender;
-  String senderFullName;
-  dynamic cc;
-  dynamic bcc;
-  String creation;
-  String subject;
-  String deliveryStatus;
-  String sLikedBy;
-  String referenceDoctype;
-  String referenceName;
-  int readByRecipient;
-  int rating;
-  String attachments;
+  late String name;
+  late String communicationType;
+  late String communicationMedium;
+  late String commentType;
+  late String communicationDate;
+  late String content;
+  late String sender;
+  late String senderFullName;
+  late dynamic cc;
+  late dynamic bcc;
+  late String creation;
+  late String subject;
+  late String deliveryStatus;
+  late String sLikedBy;
+  late String referenceDoctype;
+  late String referenceName;
+  late int readByRecipient;
+  late int rating;
+  late String attachments;
 
-  Communication(
-      {this.name,
-      this.communicationType,
-      this.communicationMedium,
-      this.commentType,
-      this.communicationDate,
-      this.content,
-      this.sender,
-      this.senderFullName,
-      this.cc,
-      this.bcc,
-      this.creation,
-      this.subject,
-      this.deliveryStatus,
-      this.sLikedBy,
-      this.referenceDoctype,
-      this.referenceName,
-      this.readByRecipient,
-      this.rating,
-      this.attachments});
+  Communication({
+    required this.name,
+    required this.communicationType,
+    required this.communicationMedium,
+    required this.commentType,
+    required this.communicationDate,
+    required this.content,
+    required this.sender,
+    required this.senderFullName,
+    required this.cc,
+    required this.bcc,
+    required this.creation,
+    required this.subject,
+    required this.deliveryStatus,
+    required this.sLikedBy,
+    required this.referenceDoctype,
+    required this.referenceName,
+    required this.readByRecipient,
+    required this.rating,
+    required this.attachments,
+  });
 
   Communication.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -369,14 +359,19 @@ class Communication {
 }
 
 class Comment {
-  String name;
-  String creation;
-  String content;
-  String owner;
-  String commentType;
+  late String name;
+  late String creation;
+  late String content;
+  late String owner;
+  late String commentType;
 
-  Comment(
-      {this.name, this.creation, this.content, this.owner, this.commentType});
+  Comment({
+    required this.name,
+    required this.creation,
+    required this.content,
+    required this.owner,
+    required this.commentType,
+  });
 
   Comment.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -398,12 +393,17 @@ class Comment {
 }
 
 class Version {
-  String name;
-  String owner;
-  String creation;
-  String data;
+  late String name;
+  late String owner;
+  late String creation;
+  late String data;
 
-  Version({this.name, this.owner, this.creation, this.data});
+  Version({
+    required this.name,
+    required this.owner,
+    required this.creation,
+    required this.data,
+  });
 
   Version.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -423,11 +423,15 @@ class Version {
 }
 
 class View {
-  String name;
-  String creation;
-  String owner;
+  late String name;
+  late String creation;
+  late String owner;
 
-  View({this.name, this.creation, this.owner});
+  View({
+    required this.name,
+    required this.creation,
+    required this.owner,
+  });
 
   View.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -445,12 +449,17 @@ class View {
 }
 
 class Assignments {
-  String name;
-  String owner;
-  String description;
-  String status;
+  late String name;
+  late String owner;
+  late String description;
+  late String status;
 
-  Assignments({this.name, this.owner, this.description, this.status});
+  Assignments({
+    required this.name,
+    required this.owner,
+    required this.description,
+    required this.status,
+  });
 
   Assignments.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -470,21 +479,21 @@ class Assignments {
 }
 
 class Permissions {
-  int select;
-  int read;
-  int write;
-  int create;
-  int delete;
-  int submit;
-  int cancel;
-  int amend;
-  int print;
-  int email;
-  int report;
-  int import;
-  int export;
-  int setUserPermissions;
-  int share;
+  int? select;
+  int? read;
+  int? write;
+  int? create;
+  int? delete;
+  int? submit;
+  int? cancel;
+  int? amend;
+  int? print;
+  int? email;
+  int? report;
+  int? import;
+  int? export;
+  int? setUserPermissions;
+  int? share;
 
   Permissions(
       {this.select,
@@ -544,14 +553,14 @@ class Permissions {
 }
 
 class Shared {
-  String name;
-  String user;
-  int read;
-  int write;
-  int share;
-  int everyone;
-  String owner;
-  String creation;
+  String? name;
+  String? user;
+  int? read;
+  int? write;
+  int? share;
+  int? everyone;
+  String? owner;
+  String? creation;
 
   Shared(
       {this.name,
@@ -589,56 +598,57 @@ class Shared {
 }
 
 class EnergyPointLogs {
-  String name;
-  String creation;
-  String modified;
-  String modifiedBy;
-  String owner;
-  int docstatus;
-  dynamic parent;
-  dynamic parentfield;
-  dynamic parenttype;
-  int idx;
-  String user;
-  String type;
-  int points;
-  String rule;
-  String referenceDoctype;
-  String referenceName;
-  int reverted;
-  dynamic revertOf;
-  String reason;
-  int seen;
-  dynamic nUserTags;
-  dynamic nComments;
-  dynamic nAssign;
-  dynamic nLikedBy;
+  late String name;
+  late String creation;
+  late String modified;
+  late String modifiedBy;
+  late String owner;
+  late int docstatus;
+  late dynamic parent;
+  late dynamic parentfield;
+  late dynamic parenttype;
+  late int idx;
+  late String user;
+  late String type;
+  late int points;
+  late String rule;
+  late String referenceDoctype;
+  late String referenceName;
+  late int reverted;
+  late dynamic revertOf;
+  late String reason;
+  late int seen;
+  late dynamic nUserTags;
+  late dynamic nComments;
+  late dynamic nAssign;
+  late dynamic nLikedBy;
 
-  EnergyPointLogs(
-      {this.name,
-      this.creation,
-      this.modified,
-      this.modifiedBy,
-      this.owner,
-      this.docstatus,
-      this.parent,
-      this.parentfield,
-      this.parenttype,
-      this.idx,
-      this.user,
-      this.type,
-      this.points,
-      this.rule,
-      this.referenceDoctype,
-      this.referenceName,
-      this.reverted,
-      this.revertOf,
-      this.reason,
-      this.seen,
-      this.nUserTags,
-      this.nComments,
-      this.nAssign,
-      this.nLikedBy});
+  EnergyPointLogs({
+    required this.name,
+    required this.creation,
+    required this.modified,
+    required this.modifiedBy,
+    required this.owner,
+    required this.docstatus,
+    required this.parent,
+    required this.parentfield,
+    required this.parenttype,
+    required this.idx,
+    required this.user,
+    required this.type,
+    required this.points,
+    required this.rule,
+    required this.referenceDoctype,
+    required this.referenceName,
+    required this.reverted,
+    required this.revertOf,
+    required this.reason,
+    required this.seen,
+    required this.nUserTags,
+    required this.nComments,
+    required this.nAssign,
+    required this.nLikedBy,
+  });
 
   EnergyPointLogs.fromJson(Map<String, dynamic> json) {
     name = json['name'];

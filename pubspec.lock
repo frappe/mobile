@@ -1177,12 +1177,10 @@ packages:
   workmanager:
     dependency: "direct main"
     description:
-      path: "."
-      ref: "1c4e162ea4e71855856fb9e55a1545b3dae9a25d"
-      resolved-ref: "1c4e162ea4e71855856fb9e55a1545b3dae9a25d"
-      url: "https://github.com/ened/flutter_workmanager.git"
-    source: git
-    version: "0.2.4"
+      name: workmanager
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.0"
   xdg_directories:
     dependency: transitive
     description:
