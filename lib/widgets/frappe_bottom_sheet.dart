@@ -1,29 +1,27 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 
 class FrappeBottomSheet extends StatelessWidget {
-  final Widget body;
+  final Widget? body;
 
   final String title;
-  final Widget trailing;
-  final String leadingText;
-  final Function leadingOnPressed;
-  final Function onActionButtonPress;
-  final Widget bottomBar;
+  final Widget? trailing;
+  final String? leadingText;
+  final void Function()? leadingOnPressed;
+  final void Function()? onActionButtonPress;
+  final Widget? bottomBar;
   final bool showLeading;
 
   const FrappeBottomSheet({
-    Key key,
     this.body,
-    @required this.title,
+    required this.title,
     this.trailing,
     this.leadingOnPressed,
     this.leadingText,
     this.bottomBar,
     this.onActionButtonPress,
     this.showLeading = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -75,12 +73,15 @@ class FrappeBottomSheet extends StatelessWidget {
                 ),
               ),
             ),
-            FlatButton(
-              padding: EdgeInsets.zero,
-              minWidth: 65,
-              child: trailing,
-              onPressed: onActionButtonPress,
-            )
+            if (trailing != null)
+              TextButton(
+                style: TextButton.styleFrom(
+                  minimumSize: Size(65, 30),
+                  padding: EdgeInsets.zero,
+                ),
+                child: trailing!,
+                onPressed: onActionButtonPress,
+              )
           ],
         ),
       ),

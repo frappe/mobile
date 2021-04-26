@@ -450,25 +450,6 @@ Future<int> getActiveNotifications() async {
   return activeNotifications.length;
 }
 
-showErrorDialog(e, BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text(e.statusMessage),
-        actions: <Widget>[
-          FlatButton(
-            child: Text('Ok'),
-            onPressed: () async {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-
 Map extractChangedValues(Map original, Map updated) {
   var changedValues = {};
   for (var key in updated.keys) {
@@ -477,27 +458,6 @@ Map extractChangedValues(Map original, Map updated) {
     }
   }
   return changedValues;
-}
-
-requestIOSLocationAuthorization(connectivity) async {
-  try {
-    if (Platform.isIOS) {
-      LocationAuthorizationStatus status =
-          await connectivity.getLocationServiceAuthorization();
-      if (status == LocationAuthorizationStatus.notDetermined) {
-        status = await connectivity.requestLocationServiceAuthorization();
-      } else {
-        return {
-          "access": true,
-        };
-      }
-    }
-  } on PlatformException catch (e) {
-    print(e.toString());
-    return {
-      "access": false,
-    };
-  }
 }
 
 Future<bool> verifyOnline() async {

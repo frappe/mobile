@@ -1,6 +1,3 @@
-// @dart=2.9
-
-import 'package:flutter/foundation.dart';
 import 'package:frappe_app/app/locator.dart';
 import 'package:frappe_app/services/api/api.dart';
 import 'package:frappe_app/views/base_viewmodel.dart';
@@ -17,8 +14,8 @@ class AssigneesBottomSheetViewModel extends BaseViewModel {
   }
 
   addAssignees({
-    @required String doctype,
-    @required String name,
+    required String doctype,
+    required String name,
   }) async {
     await locator<Api>().addAssignees(
       doctype,
@@ -33,9 +30,9 @@ class AssigneesBottomSheetViewModel extends BaseViewModel {
   }
 
   removeAssignedUser({
-    @required String doctype,
-    @required String name,
-    @required String user,
+    required String doctype,
+    required String name,
+    required String user,
   }) async {
     try {
       await locator<Api>().removeAssignee(doctype, name, user);

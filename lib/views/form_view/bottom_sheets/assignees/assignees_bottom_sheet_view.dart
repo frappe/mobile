@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
@@ -22,11 +20,10 @@ class AssigneesBottomSheetView extends StatelessWidget {
   final List<Assignments> assignees;
 
   const AssigneesBottomSheetView({
-    Key key,
-    @required this.doctype,
-    @required this.name,
-    @required this.assignees,
-  }) : super(key: key);
+    required this.doctype,
+    required this.name,
+    required this.assignees,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +86,7 @@ class AssigneesBottomSheetView extends StatelessWidget {
                         )
                       ],
                     ),
-                    fillColor: FrappePalette.grey[100],
+                    fillColor: FrappePalette.grey[100]!,
                     doctypeField: DoctypeField(
                       options: 'User',
                       label: 'Search',
@@ -118,8 +115,8 @@ class AssigneesBottomSheetView extends StatelessWidget {
   }
 
   List<Widget> _generateChildren({
-    @required AssigneesBottomSheetViewModel model,
-    BuildContext context,
+    required AssigneesBottomSheetViewModel model,
+    required BuildContext context,
   }) {
     var users = <Widget>[];
 
@@ -165,13 +162,12 @@ class AssigneesBottomSheetView extends StatelessWidget {
 
 class UserTile extends StatelessWidget {
   final String userId;
-  final Function onRemove;
+  final void Function()? onRemove;
 
   const UserTile({
-    Key key,
-    @required this.userId,
-    @required this.onRemove,
-  }) : super(key: key);
+    required this.userId,
+    required this.onRemove,
+  });
 
   @override
   Widget build(BuildContext context) {

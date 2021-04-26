@@ -93,7 +93,6 @@ class ListViewViewModel extends BaseViewModel {
   }
 
   onListTap({
-    required DoctypeResponse meta,
     required String name,
     required BuildContext context,
   }) {

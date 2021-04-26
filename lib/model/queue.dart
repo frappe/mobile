@@ -1,5 +1,4 @@
-// @dart=2.9
-
+import 'package:frappe_app/model/common.dart';
 import 'package:hive/hive.dart';
 
 import '../services/storage_service.dart';
@@ -90,7 +89,7 @@ class Queue {
         index,
         {
           ...q,
-          "error": e.statusMessage,
+          "error": (e as ErrorResponse).statusMessage,
         },
       );
     }

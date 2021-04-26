@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
@@ -25,14 +24,14 @@ class Timeline extends StatelessWidget {
   final Function refreshCallback;
 
   Timeline({
-    @required this.docinfo,
-    @required this.doctype,
-    @required this.name,
-    @required this.emailSenderField,
-    @required this.emailSubjectField,
-    @required this.communicationOnly,
-    @required this.switchCallback,
-    @required this.refreshCallback,
+    required this.docinfo,
+    required this.doctype,
+    required this.name,
+    required this.emailSenderField,
+    required this.emailSubjectField,
+    required this.communicationOnly,
+    required this.switchCallback,
+    required this.refreshCallback,
   });
 
   @override

@@ -162,7 +162,10 @@ class AwesomeSearch extends SearchDelegate {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) {
-                    return CustomListView(meta: meta);
+                    return CustomListView(
+                      meta: meta,
+                      module: meta.docs[0].module,
+                    );
                   },
                 ),
               );

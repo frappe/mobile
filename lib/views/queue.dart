@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:frappe_app/model/offline_storage.dart';
 import 'package:frappe_app/views/form_view/form_view.dart';
@@ -67,8 +66,7 @@ class _QueueListState extends State<QueueList> {
                     icon: Icon(Icons.sync),
                     onPressed: () async {
                       var isOnline = await verifyOnline();
-                      if ((connectionStatus == null ||
-                              connectionStatus == ConnectivityStatus.offline) &&
+                      if (connectionStatus == ConnectivityStatus.offline &&
                           !isOnline) {
                         FrappeAlert.errorAlert(
                           title: 'Cant Sync, App is offline',

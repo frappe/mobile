@@ -1,9 +1,9 @@
-// @dart=2.9
 import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/utils/navigation_helper.dart';
 import 'package:frappe_app/views/form_view/form_view.dart';
 import 'package:injectable/injectable.dart';
@@ -22,8 +22,8 @@ class NewDocViewModel extends BaseViewModel {
   saveDoc({
     @required var formKey,
     @required var connectionStatus,
-    @required DoctypeResponse meta,
-    @required BuildContext context,
+    required DoctypeResponse meta,
+    required BuildContext context,
   }) async {
     if (formKey.currentState.saveAndValidate()) {
       var formValue = formKey.currentState.value;
@@ -71,7 +71,10 @@ class NewDocViewModel extends BaseViewModel {
             ),
           );
         } catch (e) {
-          showErrorDialog(e, context);
+          FrappeAlert.errorAlert(
+            title: (e as ErrorResponse).statusMessage,
+            context: context,
+          );
         }
       }
     }

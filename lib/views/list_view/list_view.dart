@@ -28,9 +28,11 @@ import '../../widgets/list_item.dart';
 
 class CustomListView extends StatelessWidget {
   final DoctypeResponse meta;
+  final String module;
 
   CustomListView({
     required this.meta,
+    required this.module,
   });
 
   @override
@@ -39,7 +41,7 @@ class CustomListView extends StatelessWidget {
       onModelReady: (model) {
         model.meta = meta;
         model.getData(meta.docs[0]);
-        model.getDesktopPage(meta.docs[0].module);
+        model.getDesktopPage(module);
       },
       onModelClose: (model) {
         model.error = null;
@@ -229,7 +231,6 @@ class CustomListView extends StatelessWidget {
           onListTap: () {
             model.onListTap(
               context: buildContext,
-              meta: meta,
               name: e["name"],
             );
           },

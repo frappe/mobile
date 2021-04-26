@@ -95,7 +95,7 @@ class DioApi implements Api {
         );
         // response;
       } else {
-        throw ErrorResponse(statusMessage: 'Something went wrong');
+        throw ErrorResponse();
       }
     } catch (e) {
       if (e is DioError) {
@@ -141,7 +141,7 @@ class DioApi implements Api {
           statusMessage: response.statusMessage,
         );
       } else {
-        throw ErrorResponse(statusMessage: 'Something went wrong');
+        throw ErrorResponse();
       }
     } catch (e) {
       if (e is DioError) {
@@ -212,7 +212,7 @@ class DioApi implements Api {
           throw ErrorResponse(statusMessage: error.message);
         }
       } else {
-        throw ErrorResponse(statusMessage: 'Something went wrong');
+        throw ErrorResponse();
       }
     }
   }
@@ -293,7 +293,7 @@ class DioApi implements Api {
           statusMessage: response.statusMessage,
         );
       } else {
-        throw ErrorResponse(statusMessage: 'Something went wrong');
+        throw ErrorResponse();
       }
     } catch (e) {
       if (e is DioError) {
@@ -341,7 +341,7 @@ class DioApi implements Api {
           statusMessage: response.statusMessage,
         );
       } else {
-        throw ErrorResponse(statusMessage: 'Something went wrong');
+        throw ErrorResponse();
       }
     } catch (e) {
       if (e is DioError) {
@@ -597,7 +597,7 @@ class DioApi implements Api {
       if (response.statusCode == 200) {
         return response;
       } else {
-        throw ErrorResponse(statusMessage: 'Something went wrong');
+        throw ErrorResponse();
       }
     } catch (e) {
       if (e is DioError) {
@@ -620,7 +620,7 @@ class DioApi implements Api {
           );
         }
       } else {
-        throw e;
+        throw ErrorResponse();
       }
     }
   }
@@ -669,7 +669,7 @@ class DioApi implements Api {
           statusMessage: response.statusMessage,
         );
       } else {
-        throw ErrorResponse(statusMessage: 'Something went wrong');
+        throw ErrorResponse();
       }
     } catch (e) {
       if (e is DioError) {

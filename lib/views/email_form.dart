@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/widgets/custom_form.dart';
@@ -9,22 +7,21 @@ import '../model/doctype_response.dart';
 
 import '../services/api/api.dart';
 
-import '../utils/enums.dart';
 import '../utils/helpers.dart';
 
 class EmailForm extends StatelessWidget {
   final String doctype;
   final String doc;
-  final String subjectField;
-  final String senderField;
+  final String? subjectField;
+  final String? senderField;
   final Function callback;
 
   EmailForm({
-    @required this.doctype,
-    @required this.doc,
+    required this.doctype,
+    required this.doc,
     this.subjectField,
     this.senderField,
-    @required this.callback,
+    required this.callback,
   });
 
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
@@ -111,18 +108,20 @@ class EmailForm extends StatelessWidget {
         actions: <Widget>[
           TextButton(
             onPressed: () async {
-              if (_fbKey.currentState.saveAndValidate()) {
-                var formValue = _fbKey.currentState.value;
+              if (_fbKey.currentState != null) {
+                if (_fbKey.currentState!.saveAndValidate()) {
+                  var formValue = _fbKey.currentState!.value;
 
-                await locator<Api>().sendEmail(
-                  recipients: formValue["recipients"],
-                  subject: formValue["subject"],
-                  content: formValue["content"],
-                  doctype: doctype,
-                  doctypeName: doc,
-                );
-                callback();
-                Navigator.of(context).pop();
+                  await locator<Api>().sendEmail(
+                    recipients: formValue["recipients"],
+                    subject: formValue["subject"],
+                    content: formValue["content"],
+                    doctype: doctype,
+                    doctypeName: doc,
+                  );
+                  callback();
+                  Navigator.of(context).pop();
+                }
               }
             },
             child: Text(

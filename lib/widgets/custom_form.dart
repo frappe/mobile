@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/model/doctype_response.dart';
@@ -8,24 +7,23 @@ import 'package:frappe_app/utils/helpers.dart';
 class CustomForm extends StatelessWidget {
   final GlobalKey<FormBuilderState> formKey;
   final List<DoctypeField> fields;
-  final Map doc;
-  final ViewType viewType;
+  final Map? doc;
+  final ViewType? viewType;
   final bool editMode;
   final bool withLabel;
 
   const CustomForm({
-    Key key,
-    @required this.formKey,
-    @required this.fields,
+    required this.formKey,
+    required this.fields,
     this.viewType,
     this.doc,
     this.editMode = true,
     this.withLabel = true,
-  }) : super(key: key);
+  });
 
   List<Widget> _generateChildren(
     List<DoctypeField> fields,
-    Map doc,
+    Map? doc,
     bool editMode,
   ) {
     List<DoctypeField> filteredFields;

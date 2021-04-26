@@ -96,7 +96,7 @@ class DeskViewModel extends BaseViewModel {
     try {
       await getDeskSidebarItems();
 
-      currentModule = modules[0].label;
+      currentModule = modules[0].name;
 
       await getDesktopPage(
         currentModule,
@@ -129,6 +129,7 @@ class DeskViewModel extends BaseViewModel {
           context,
           screen: CustomListView(
             meta: meta,
+            module: currentModule,
           ),
           withNavBar: true,
         );

@@ -23,14 +23,14 @@ class DeskMessage {
   late String name;
   late String? category;
   late String? icon;
-  late String? module;
+  late String module;
   late String label;
 
   DeskMessage({
     required this.name,
     this.category,
     this.icon,
-    this.module,
+    required this.module,
     required this.label,
   });
 

@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -19,25 +17,25 @@ import 'base_input.dart';
 
 class LinkField extends StatefulWidget {
   final DoctypeField doctypeField;
-  final Map doc;
+  final Map? doc;
 
   final key;
   final bool withLabel;
   final bool showInputBorder;
   final bool allowClear;
-  final Function onSuggestionSelected;
-  final Function noItemsFoundBuilder;
-  final Widget prefixIcon;
+  final Function? onSuggestionSelected;
+  final Function? noItemsFoundBuilder;
+  final Widget? prefixIcon;
   final Color fillColor;
-  final ItemBuilder itemBuilder;
-  final SuggestionsCallback suggestionsCallback;
+  final ItemBuilder? itemBuilder;
+  final SuggestionsCallback? suggestionsCallback;
   final AxisDirection direction;
   final bool clearTextOnSelection;
 
   LinkField({
     this.key,
-    @required this.doctypeField,
-    @required this.fillColor,
+    required this.doctypeField,
+    required this.fillColor,
     this.withLabel = true,
     this.doc,
     this.prefixIcon,
@@ -63,7 +61,7 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
     super.initState();
 
     _textEditingController.text =
-        widget.doc != null ? widget.doc[widget.doctypeField.fieldname] : null;
+        widget.doc != null ? widget.doc![widget.doctypeField.fieldname] : null;
   }
 
   @override
@@ -71,11 +69,9 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
     List<String Function(dynamic)> validators = [];
     var f = setMandatory(widget.doctypeField);
 
-    if (f != null) {
-      validators.add(
-        f(context),
-      );
-    }
+    validators.add(
+      f(context),
+    );
 
     var connectionStatus = Provider.of<ConnectivityStatus>(
       context,
@@ -87,8 +83,9 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
         child: FormBuilderTypeAhead(
           controller: _textEditingController,
           key: widget.key,
-          noItemsFoundBuilder: (context) =>
-              widget.noItemsFoundBuilder(_textEditingController.text),
+          noItemsFoundBuilder: (context) => widget.noItemsFoundBuilder != null
+              ? widget.noItemsFoundBuilder!(_textEditingController.text)
+              : null,
           direction: AxisDirection.up,
           onSuggestionSelected: (item) {
             if (widget.clearTextOnSelection) {
@@ -98,9 +95,9 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
             }
             if (widget.onSuggestionSelected != null) {
               if (item is String) {
-                widget.onSuggestionSelected(item);
-              } else {
-                widget.onSuggestionSelected(item["value"]);
+                widget.onSuggestionSelected!(item);
+              } else if (item is Map) {
+                widget.onSuggestionSelected!(item["value"]);
               }
             }
           },
@@ -126,11 +123,11 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
                 return item["value"];
               }
             }
-            return item;
+            return item.toString();
           },
           name: widget.doctypeField.fieldname,
           itemBuilder: widget.itemBuilder ??
-              (context, item) {
+              (context, Map item) {
                 return ListTile(
                   title: Text(
                     item["value"],
@@ -141,8 +138,7 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
               (query) async {
                 var lowercaseQuery = query.toLowerCase();
                 var isOnline = await verifyOnline();
-                if ((connectionStatus == null ||
-                        connectionStatus == ConnectivityStatus.offline) &&
+                if (connectionStatus == ConnectivityStatus.offline &&
                     !isOnline) {
                   var linkFull = await OfflineStorage.getItem(
                       '${widget.doctypeField.options}LinkFull');

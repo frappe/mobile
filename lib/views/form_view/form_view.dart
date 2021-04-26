@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:provider/provider.dart';
+
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/model/common.dart';
@@ -11,7 +13,6 @@ import 'package:frappe_app/views/form_view/form_view_viewmodel.dart';
 import 'package:frappe_app/widgets/collapsed_avatars.dart';
 import 'package:frappe_app/widgets/custom_expansion_tile.dart';
 import 'package:frappe_app/widgets/timeline.dart';
-import 'package:provider/provider.dart';
 
 import 'package:frappe_app/views/form_view/bottom_sheets/assignees/assignees_bottom_sheet_view.dart';
 import 'package:frappe_app/views/form_view/bottom_sheets/attachments/view_attachments_bottom_sheet_view.dart';
@@ -217,9 +218,9 @@ class FormView extends StatelessWidget {
                               ),
                             if (!queued)
                               Timeline(
-                                docinfo: model.docinfo,
+                                docinfo: model.docinfo!,
                                 doctype: meta.docs[0].name,
-                                name: name,
+                                name: name!,
                                 communicationOnly: model.communicationOnly,
                                 switchCallback: (val) {
                                   model.toggleSwitch(val);
