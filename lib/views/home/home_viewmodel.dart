@@ -90,7 +90,7 @@ class HomeViewModel extends BaseViewModel {
     try {
       await getDeskSidebarItems();
 
-      currentModule = modules[0].label;
+      currentModule = modules[0].name;
 
       await getDesktopPage(
         currentModule,
