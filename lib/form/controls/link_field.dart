@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/widgets/form_builder_typeahead.dart';
 import 'package:provider/provider.dart';
 
@@ -20,13 +21,10 @@ class LinkField extends StatefulWidget {
   final Map? doc;
 
   final key;
-  final bool withLabel;
   final bool showInputBorder;
-  final bool allowClear;
   final Function? onSuggestionSelected;
   final Function? noItemsFoundBuilder;
   final Widget? prefixIcon;
-  final Color fillColor;
   final ItemBuilder? itemBuilder;
   final SuggestionsCallback? suggestionsCallback;
   final AxisDirection direction;
@@ -35,11 +33,8 @@ class LinkField extends StatefulWidget {
   LinkField({
     this.key,
     required this.doctypeField,
-    required this.fillColor,
-    this.withLabel = true,
     this.doc,
     this.prefixIcon,
-    this.allowClear = true,
     this.onSuggestionSelected,
     this.noItemsFoundBuilder,
     this.showInputBorder = false,
@@ -66,12 +61,14 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
 
   @override
   Widget build(BuildContext context) {
-    List<String Function(dynamic)> validators = [];
+    List<String? Function(dynamic?)> validators = [];
     var f = setMandatory(widget.doctypeField);
 
-    validators.add(
-      f(context),
-    );
+    if (f != null) {
+      validators.add(
+        f(context),
+      );
+    }
 
     var connectionStatus = Provider.of<ConnectivityStatus>(
       context,
@@ -102,20 +99,8 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
             }
           },
           validator: FormBuilderValidators.compose(validators),
-          decoration: InputDecoration(
-            filled: true,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 10,
-            ),
-            border: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: const BorderRadius.all(
-                const Radius.circular(6),
-              ),
-            ),
-            prefixIcon: widget.prefixIcon,
-            fillColor: widget.fillColor,
-            hintText: widget.withLabel ? null : widget.doctypeField.label,
+          decoration: Palette.formFieldDecoration(
+            label: widget.doctypeField.label,
           ),
           selectionToTextTransformer: (item) {
             if (item != null) {
@@ -127,12 +112,18 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
           },
           name: widget.doctypeField.fieldname,
           itemBuilder: widget.itemBuilder ??
-              (context, Map item) {
-                return ListTile(
-                  title: Text(
-                    item["value"],
-                  ),
-                );
+              (context, item) {
+                if (item is Map) {
+                  return ListTile(
+                    title: Text(
+                      item["value"],
+                    ),
+                  );
+                } else {
+                  return ListTile(
+                    title: Text(item.toString()),
+                  );
+                }
               },
           suggestionsCallback: widget.suggestionsCallback ??
               (query) async {

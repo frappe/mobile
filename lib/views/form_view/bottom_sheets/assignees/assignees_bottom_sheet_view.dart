@@ -71,9 +71,7 @@ class AssigneesBottomSheetView extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: LinkField(
-                    withLabel: false,
                     clearTextOnSelection: true,
-                    direction: AxisDirection.up,
                     prefixIcon: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -86,7 +84,6 @@ class AssigneesBottomSheetView extends StatelessWidget {
                         )
                       ],
                     ),
-                    fillColor: FrappePalette.grey[100]!,
                     doctypeField: DoctypeField(
                       options: 'User',
                       label: 'Search',

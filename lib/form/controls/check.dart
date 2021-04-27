@@ -15,15 +15,12 @@ class Check extends StatelessWidget with Control, ControlInput {
   final DoctypeField doctypeField;
   final Map doc;
 
-  final bool withLabel;
-
   final Function onChanged;
 
   const Check({
     this.key,
     @required this.doctypeField,
     this.doc,
-    this.withLabel,
     this.onChanged,
   });
 
@@ -56,7 +53,6 @@ class Check extends StatelessWidget with Control, ControlInput {
       attribute: doctypeField.fieldname,
       label: Text(doctypeField.label),
       decoration: Palette.formFieldDecoration(
-        withLabel: withLabel,
         label: doctypeField.label,
         filled: false,
         field: "check",

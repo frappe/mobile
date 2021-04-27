@@ -1,9 +1,8 @@
-// @dart=2.9
-
 import 'package:flutter/material.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/widgets/form_builder_typeahead.dart';
 
 import '../../model/doctype_response.dart';
@@ -15,27 +14,25 @@ typedef String SelectionToTextTransformer<T>(T selection);
 
 class AutoComplete extends StatefulWidget {
   final DoctypeField doctypeField;
-  final Map doc;
 
-  final bool showInputBorder;
-  final bool allowClear;
-  final Function onSuggestionSelected;
-  final Icon prefixIcon;
-  final Color fillColor;
-  final key;
-  final ItemBuilder itemBuilder;
-  final SuggestionsCallback suggestionsCallback;
-  final SelectionToTextTransformer selectionToTextTransformer;
+  final Map? doc;
+  final void Function(dynamic)? onSuggestionSelected;
+  final Widget? prefixIcon;
+  final Key? key;
+  final ItemBuilder? itemBuilder;
+  final SuggestionsCallback? suggestionsCallback;
+  final SelectionToTextTransformer? selectionToTextTransformer;
+  final InputDecoration? inputDecoration;
+  final TextEditingController? controller;
 
   AutoComplete({
-    @required this.doctypeField,
-    @required this.fillColor,
+    required this.doctypeField,
     this.doc,
+    this.controller,
+    this.inputDecoration,
     this.prefixIcon,
     this.key,
-    this.allowClear = true,
     this.onSuggestionSelected,
-    this.showInputBorder = false,
     this.itemBuilder,
     this.suggestionsCallback,
     this.selectionToTextTransformer,
@@ -47,11 +44,17 @@ class AutoComplete extends StatefulWidget {
 
 class _AutoCompleteState extends State<AutoComplete>
     with Control, ControlInput {
-  final TextEditingController _typeAheadController = TextEditingController();
+  TextEditingController? _typeAheadController;
+
+  @override
+  void initState() {
+    _typeAheadController = widget.controller ?? TextEditingController();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<String Function(dynamic)> validators = [];
+    List<String? Function(dynamic?)> validators = [];
 
     var f = setMandatory(widget.doctypeField);
 
@@ -68,32 +71,15 @@ class _AutoCompleteState extends State<AutoComplete>
         child: FormBuilderTypeAhead(
           key: widget.key,
           controller: _typeAheadController,
-          onSuggestionSelected: (item) {
-            if (widget.onSuggestionSelected != null) {
-              widget.onSuggestionSelected(item);
-            }
-          },
+          onSuggestionSelected: widget.onSuggestionSelected,
           onChanged: (_) {
             setState(() {});
           },
           validator: FormBuilderValidators.compose(validators),
-          decoration: InputDecoration(
-            filled: true,
-            prefixIcon: widget.prefixIcon,
-            suffixIcon: widget.allowClear
-                ? _typeAheadController.text != ''
-                    ? IconButton(
-                        icon: Icon(Icons.close, color: Colors.black),
-                        onPressed: () {
-                          _typeAheadController.clear();
-                        },
-                      )
-                    : null
-                : null,
-            fillColor: widget.fillColor,
-            enabledBorder: !widget.showInputBorder ? InputBorder.none : null,
-            hintText: widget.doctypeField.label,
-          ),
+          decoration: widget.inputDecoration ??
+              Palette.formFieldDecoration(
+                prefixIcon: widget.prefixIcon,
+              ),
           selectionToTextTransformer: widget.selectionToTextTransformer ??
               (item) {
                 return item.toString();
@@ -103,15 +89,15 @@ class _AutoCompleteState extends State<AutoComplete>
               (context, item) {
                 return ListTile(
                   title: Text(
-                    item,
+                    item.toString(),
                   ),
                 );
               },
           initialValue: widget.doc != null
-              ? widget.doc[widget.doctypeField.fieldname]
+              ? widget.doc![widget.doctypeField.fieldname]
               : null,
           suggestionsCallback: widget.suggestionsCallback ??
-              (query) async {
+              (query) {
                 var lowercaseQuery = query.toLowerCase();
                 List opts;
                 if (widget.doctypeField.options is String) {
@@ -121,7 +107,9 @@ class _AutoCompleteState extends State<AutoComplete>
                 }
                 return opts
                     .where(
-                      (option) => option.toLowerCase().contains(lowercaseQuery),
+                      (option) => option.toLowerCase().contains(
+                            lowercaseQuery,
+                          ),
                     )
                     .toList();
               },

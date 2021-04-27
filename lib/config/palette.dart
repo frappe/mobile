@@ -43,8 +43,7 @@ class Palette {
 
   // TODO
   static InputDecoration formFieldDecoration({
-    required bool withLabel,
-    required String label,
+    String? label,
     Widget? suffixIcon,
     Widget? prefixIcon,
     bool filled = true,
@@ -64,7 +63,7 @@ class Palette {
           const Radius.circular(6.0),
         ),
       ),
-      hintText: !withLabel ? label : null,
+      // hintText: label,
       filled: filled,
       fillColor: Palette.fieldBgColor,
     );

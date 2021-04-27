@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -14,24 +13,19 @@ import 'base_control.dart';
 import 'base_input.dart';
 
 class TextEditor extends StatelessWidget with Control, ControlInput {
-  final Key key;
   final DoctypeField doctypeField;
-  final Map doc;
-  final bool readOnly;
-
-  final bool withLabel;
+  final Key? key;
+  final Map? doc;
 
   const TextEditor({
+    required this.doctypeField,
     this.key,
-    @required this.doctypeField,
-    this.readOnly = false,
     this.doc,
-    this.withLabel,
   });
 
   @override
   Widget build(BuildContext context) {
-    List<String Function(dynamic)> validators = [];
+    List<String? Function(dynamic?)> validators = [];
 
     var f = setMandatory(doctypeField);
 
@@ -40,22 +34,22 @@ class TextEditor extends StatelessWidget with Control, ControlInput {
         f(context),
       );
     }
+
     return FormBuilderTextEditor(
       onTap: (field) async {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) {
               return EditText(
-                data: doc != null ? doc[doctypeField.fieldname] : null,
+                data: doc != null ? doc![doctypeField.fieldname] : null,
               );
             },
           ),
         );
       },
       key: key,
-      initialValue: doc != null ? doc[doctypeField.fieldname] : null,
+      initialValue: doc != null ? doc![doctypeField.fieldname] : null,
       name: doctypeField.fieldname,
-      enabled: !readOnly,
       // validator: FormBuilderValidators.compose(validators),
     );
   }
@@ -63,10 +57,10 @@ class TextEditor extends StatelessWidget with Control, ControlInput {
 
 class EditText extends StatelessWidget {
   final String data;
+
   const EditText({
-    Key key,
-    this.data,
-  }) : super(key: key);
+    required this.data,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +74,7 @@ class EditText extends StatelessWidget {
         data: data,
         customImageRenders: {
           (attr, _) => attr["src"] != null: networkImageRender(mapUrl: (url) {
-            return Config().baseUrl + url;
+            return Config().baseUrl! + url!;
           }),
         },
       ),
@@ -90,22 +84,19 @@ class EditText extends StatelessWidget {
 
 // TODO: temp fix
 class TextEditor2 extends StatelessWidget with Control, ControlInput {
-  final Key key;
   final DoctypeField doctypeField;
-  final Map doc;
-
-  final bool withLabel;
+  final Key? key;
+  final Map? doc;
 
   const TextEditor2({
+    required this.doctypeField,
     this.key,
-    @required this.doctypeField,
     this.doc,
-    this.withLabel,
   });
 
   @override
   Widget build(BuildContext context) {
-    List<String Function(dynamic)> validators = [];
+    List<String? Function(dynamic?)> validators = [];
 
     var f = setMandatory(doctypeField);
 
@@ -117,10 +108,9 @@ class TextEditor2 extends StatelessWidget with Control, ControlInput {
     return FormBuilderTextField(
       key: key,
       maxLines: 10,
-      initialValue: doc != null ? doc[doctypeField.fieldname] : null,
+      initialValue: doc != null ? doc![doctypeField.fieldname] : null,
       name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(
-        withLabel: withLabel,
         label: doctypeField.label,
       ),
       validator: FormBuilderValidators.compose(validators),

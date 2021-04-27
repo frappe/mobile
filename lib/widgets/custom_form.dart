@@ -10,7 +10,6 @@ class CustomForm extends StatelessWidget {
   final Map? doc;
   final ViewType? viewType;
   final bool editMode;
-  final bool withLabel;
 
   const CustomForm({
     required this.formKey,
@@ -18,7 +17,6 @@ class CustomForm extends StatelessWidget {
     this.viewType,
     this.doc,
     this.editMode = true,
-    this.withLabel = true,
   });
 
   List<Widget> _generateChildren(
@@ -49,7 +47,6 @@ class CustomForm extends StatelessWidget {
       doc: doc,
       viewType: viewType,
       editMode: editMode,
-      withLabel: withLabel,
     );
   }
 

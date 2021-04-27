@@ -252,8 +252,8 @@ class DoctypeField {
   late String? parenttype;
   late int? idx;
   late int? docstatus;
-  late String? fieldname;
-  late String? label;
+  late String fieldname;
+  late String label;
   late String? fieldtype;
   late String? oldfieldtype;
   late dynamic? options;
@@ -304,8 +304,8 @@ class DoctypeField {
       this.parenttype,
       this.idx,
       this.docstatus,
-      this.fieldname,
-      this.label,
+      required this.fieldname,
+      required this.label,
       this.fieldtype,
       this.oldfieldtype,
       this.options,

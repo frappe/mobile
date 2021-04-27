@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:frappe_app/utils/helpers.dart';
+import 'package:frappe_app/widgets/padded_card_list_tile.dart';
 
 import 'package:provider/provider.dart';
 
@@ -115,21 +116,14 @@ class DeskView extends StatelessWidget {
     required DeskViewModel model,
     required BuildContext context,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: 10.0,
-        right: 10.0,
-        top: 8.0,
-      ),
-      child: CardListTile(
-        title: Text(item.label),
-        onTap: () async {
-          model.navigateToView(
-            doctype: item.linkTo,
-            context: context,
-          );
-        },
-      ),
+    return PaddedCardListTile(
+      title: item.label,
+      onTap: () async {
+        model.navigateToView(
+          doctype: item.linkTo,
+          context: context,
+        );
+      },
     );
   }
 

@@ -44,7 +44,6 @@ class TagsBottomSheetView extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: LinkField(
-                    withLabel: false,
                     clearTextOnSelection: true,
                     direction: AxisDirection.up,
                     noItemsFoundBuilder: (query) {
@@ -97,10 +96,8 @@ class TagsBottomSheetView extends StatelessWidget {
                         )
                       ],
                     ),
-                    fillColor: FrappePalette.grey[100],
                     doctypeField: DoctypeField(
-                      label: 'Search or create tags here',
-                    ),
+                        label: 'Search or create tags here', fieldname: "tags"),
                     onSuggestionSelected: (selectedTag) async {
                       await model.addTag(
                         doctype: doctype,

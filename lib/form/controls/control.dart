@@ -23,8 +23,6 @@ import './multi_select.dart';
 Widget makeControl({
   required DoctypeField field,
   Map? doc,
-  bool withLabel = true,
-  bool editMode = true,
   bool decorateControl = true,
 }) {
   Widget control;
@@ -35,9 +33,6 @@ Widget makeControl({
         control = LinkField(
           doctypeField: field,
           doc: doc,
-          fillColor: Palette.fieldBgColor,
-          allowClear: editMode,
-          withLabel: withLabel,
         );
       }
       break;
@@ -45,8 +40,6 @@ Widget makeControl({
     case "Autocomplete":
       {
         control = AutoComplete(
-          fillColor: Palette.fieldBgColor,
-          allowClear: editMode,
           doctypeField: field,
           doc: doc,
         );
@@ -65,10 +58,8 @@ Widget makeControl({
     case "Select":
       {
         control = Select(
-          allowClear: editMode,
           doc: doc,
           doctypeField: field,
-          withLabel: withLabel,
         );
       }
       break;
@@ -87,7 +78,6 @@ Widget makeControl({
         control = SmallText(
           doctypeField: field,
           doc: doc,
-          withLabel: withLabel,
         );
       }
       break;
@@ -97,7 +87,6 @@ Widget makeControl({
         control = Data(
           doc: doc,
           doctypeField: field,
-          withLabel: withLabel,
         );
       }
       break;
@@ -107,7 +96,6 @@ Widget makeControl({
         control = Check(
           doctypeField: field,
           doc: doc,
-          withLabel: withLabel,
         );
       }
       break;
@@ -117,7 +105,6 @@ Widget makeControl({
         control = TextEditor(
           doctypeField: field,
           doc: doc,
-          withLabel: withLabel,
         );
       }
       break;
@@ -128,7 +115,6 @@ Widget makeControl({
         control = TextEditor2(
           doctypeField: field,
           doc: doc,
-          withLabel: withLabel,
         );
       }
       break;
@@ -138,8 +124,6 @@ Widget makeControl({
         control = DatetimeField(
           doctypeField: field,
           doc: doc,
-          withLabel: withLabel,
-          editMode: editMode,
         );
       }
       break;
@@ -149,7 +133,6 @@ Widget makeControl({
         control = Float(
           doctypeField: field,
           doc: doc,
-          withLabel: withLabel,
         );
       }
       break;
@@ -159,7 +142,6 @@ Widget makeControl({
         control = Int(
           doctypeField: field,
           doc: doc,
-          withLabel: withLabel,
         );
       }
       break;
@@ -169,7 +151,6 @@ Widget makeControl({
         control = Time(
           doctypeField: field,
           doc: doc,
-          withLabel: withLabel,
         );
       }
       break;
@@ -179,7 +160,6 @@ Widget makeControl({
         control = Date(
           doctypeField: field,
           doc: doc,
-          withLabel: withLabel,
         );
       }
       break;
@@ -189,7 +169,6 @@ Widget makeControl({
     //     control = customSignature.Signature(
     //       doc: doc,
     //       doctypeField: field,
-    //       withLabel: withLabel,
     //     );
     //   }
     //   break;
@@ -210,7 +189,6 @@ Widget makeControl({
   if (decorateControl) {
     return buildDecoratedControl(
       control: control,
-      withLabel: withLabel,
       label: field.label,
     );
   } else {
@@ -220,30 +198,22 @@ Widget makeControl({
 
 Widget buildDecoratedControl({
   required Widget control,
-  required bool withLabel,
   String? label = "",
 }) {
-  if (withLabel) {
-    return Padding(
-      padding: Palette.fieldPadding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: Palette.labelPadding,
-            child: Text(
-              label ?? "",
-              style: Palette.secondaryTxtStyle,
-            ),
+  return Padding(
+    padding: Palette.fieldPadding,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: Palette.labelPadding,
+          child: Text(
+            label ?? "",
+            style: Palette.secondaryTxtStyle,
           ),
-          control
-        ],
-      ),
-    );
-  } else {
-    return Padding(
-      padding: Palette.fieldPadding,
-      child: control,
-    );
-  }
+        ),
+        control
+      ],
+    ),
+  );
 }

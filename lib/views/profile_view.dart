@@ -3,6 +3,7 @@ import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/utils/navigation_helper.dart';
 import 'package:frappe_app/views/login/login_view.dart';
 import 'package:frappe_app/views/queue.dart';
+import 'package:frappe_app/widgets/card_list_tile.dart';
 
 class ProfileView extends StatelessWidget {
   @override
@@ -18,39 +19,25 @@ class ProfileView extends StatelessWidget {
         padding: const EdgeInsets.only(top: 4.0),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: ListTile(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => QueueList(),
-                    ),
-                  );
-                },
-                tileColor: Colors.white,
-                visualDensity: VisualDensity(
-                  vertical: -4,
-                ),
-                title: Text('Queue'),
-              ),
+            CardListTile(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => QueueList(),
+                  ),
+                );
+              },
+              title: Text("Queue"),
             ),
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: ListTile(
-                onTap: () async {
-                  await clearLoginInfo();
-                  NavigationHelper.clearAllAndNavigateTo(
-                    context: context,
-                    page: Login(),
-                  );
-                },
-                tileColor: Colors.white,
-                visualDensity: VisualDensity(
-                  vertical: -4,
-                ),
-                title: Text('Logout'),
-              ),
+            CardListTile(
+              onTap: () async {
+                await clearLoginInfo();
+                NavigationHelper.clearAllAndNavigateTo(
+                  context: context,
+                  page: Login(),
+                );
+              },
+              title: Text("Logout"),
             ),
           ],
         ),

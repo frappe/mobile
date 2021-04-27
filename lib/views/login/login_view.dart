@@ -60,11 +60,9 @@ class Login extends StatelessWidget {
                                 FormBuilderValidators.url(context),
                               ]),
                               decoration: Palette.formFieldDecoration(
-                                withLabel: true,
                                 label: "Server URL",
                               ),
                             ),
-                            withLabel: true,
                             label: "Server URL",
                           ),
                           buildDecoratedControl(
@@ -75,11 +73,9 @@ class Login extends StatelessWidget {
                                 FormBuilderValidators.required(context),
                               ]),
                               decoration: Palette.formFieldDecoration(
-                                withLabel: true,
                                 label: "Email Address",
                               ),
                             ),
-                            withLabel: true,
                             label: "Email Address",
                           ),
                           PasswordField(),
@@ -189,7 +185,6 @@ class _PasswordFieldState extends State<PasswordField> {
             ]),
             obscureText: _hidePassword,
             decoration: Palette.formFieldDecoration(
-              withLabel: true,
               label: "Password",
             ),
           ),
@@ -215,7 +210,6 @@ class _PasswordFieldState extends State<PasswordField> {
           )
         ],
       ),
-      withLabel: true,
       label: "Password",
     );
   }

@@ -55,27 +55,31 @@ class FormViewViewModel extends BaseViewModel {
         docs: queuedData["data"],
       );
     } else {
-      var isOnline = await verifyOnline();
+      try {
+        var isOnline = await verifyOnline();
 
-      if (!isOnline) {
-        var response = await OfflineStorage.getItem(
-          '$doctype$name',
-        );
-        response = response["data"];
-        if (response != null) {
-          formData = GetDocResponse.fromJson(response);
-          docinfo = formData.docinfo;
-        } else {
-          error = ErrorResponse(
-            statusCode: HttpStatus.serviceUnavailable,
+        if (!isOnline) {
+          var response = OfflineStorage.getItem(
+            '$doctype$name',
           );
+          response = response["data"];
+          if (response != null) {
+            formData = GetDocResponse.fromJson(response);
+            docinfo = formData.docinfo;
+          } else {
+            error = ErrorResponse(
+              statusCode: HttpStatus.serviceUnavailable,
+            );
+          }
+        } else {
+          formData = await locator<Api>().getdoc(
+            doctype,
+            name!,
+          );
+          docinfo = formData.docinfo;
         }
-      } else {
-        formData = await locator<Api>().getdoc(
-          doctype,
-          name!,
-        );
-        docinfo = formData.docinfo;
+      } catch (e) {
+        error = e as ErrorResponse;
       }
     }
     setState(ViewState.idle);

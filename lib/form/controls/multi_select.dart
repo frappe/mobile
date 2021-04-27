@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -16,14 +14,15 @@ import 'base_control.dart';
 
 class MultiSelect extends StatefulWidget {
   final DoctypeField doctypeField;
-  final Map doc;
-  final FutureOr<List<dynamic>> Function(String) findSuggestions;
-  final dynamic Function(List<dynamic>) valueTransformer;
-  final Function(List<dynamic>) onChanged;
-  final Key key;
+
+  final Map? doc;
+  final FutureOr<List<dynamic>> Function(String)? findSuggestions;
+  final dynamic Function(List<dynamic>)? valueTransformer;
+  final Function(List<dynamic>)? onChanged;
+  final Key? key;
 
   MultiSelect({
-    @required this.doctypeField,
+    required this.doctypeField,
     this.doc,
     this.key,
     this.findSuggestions,
@@ -41,21 +40,24 @@ class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
       key: widget.key,
       onChanged: widget.onChanged,
       valueTransformer: widget.valueTransformer ??
-          (l) {
-            return l
-                .map((a) {
-                  return a["value"];
+          (value) {
+            return value
+                .map((v) {
+                  if (v is Map) {
+                    return v["value"];
+                  } else {
+                    return v;
+                  }
                 })
                 .toList()
                 .join(',');
           },
       decoration: Palette.formFieldDecoration(
         label: widget.doctypeField.label,
-        withLabel: false,
       ),
       name: widget.doctypeField.fieldname,
       initialValue:
-          widget.doc != null ? widget.doc[widget.doctypeField.fieldname] : [],
+          widget.doc != null ? widget.doc![widget.doctypeField.fieldname] : [],
       findSuggestions: widget.findSuggestions ??
           (String query) async {
             if (query.length != 0) {
@@ -79,7 +81,7 @@ class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
       chipBuilder: (context, state, profile) {
         return InputChip(
           label: Text(
-            profile["value"],
+            (profile as Map)["value"],
             style: TextStyle(fontSize: 12),
           ),
           deleteIconColor: Palette.iconColor,
@@ -95,7 +97,9 @@ class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
       },
       suggestionBuilder: (context, state, profile) {
         return ListTile(
-          title: Text(profile["value"]),
+          title: Text(
+            (profile as Map)["value"],
+          ),
           onTap: () => state.selectSuggestion(profile),
         );
       },

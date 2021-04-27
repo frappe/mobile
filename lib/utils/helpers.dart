@@ -89,15 +89,16 @@ List<Widget> generateLayout({
   @required ViewType viewType,
   Map doc,
   bool editMode = true,
-  bool withLabel = true,
 }) {
   if (viewType == ViewType.form) {
     fields.insert(
-        0,
-        DoctypeField(
-          fieldtype: "Section Break",
-          label: "Form",
-        ));
+      0,
+      DoctypeField(
+        fieldtype: "Section Break",
+        label: "Form",
+        fieldname: "section",
+      ),
+    );
   }
   List<Widget> collapsibles = [];
   List<Widget> sections = [];
@@ -213,8 +214,6 @@ List<Widget> generateLayout({
             child: makeControl(
               field: field,
               doc: doc,
-              withLabel: withLabel,
-              editMode: editMode,
             ),
           ),
         );
@@ -223,8 +222,6 @@ List<Widget> generateLayout({
           makeControl(
             doc: doc,
             field: field,
-            withLabel: withLabel,
-            editMode: editMode,
           ),
         );
       }
@@ -236,8 +233,6 @@ List<Widget> generateLayout({
             child: makeControl(
               doc: doc,
               field: field,
-              withLabel: withLabel,
-              editMode: editMode,
             ),
           ),
         );
@@ -246,8 +241,6 @@ List<Widget> generateLayout({
           makeControl(
             field: field,
             doc: doc,
-            withLabel: withLabel,
-            editMode: editMode,
           ),
         );
       }
@@ -259,8 +252,6 @@ List<Widget> generateLayout({
             child: makeControl(
               doc: doc,
               field: field,
-              withLabel: withLabel,
-              editMode: editMode,
             ),
           ),
         );
@@ -269,8 +260,6 @@ List<Widget> generateLayout({
           makeControl(
             field: field,
             doc: doc,
-            withLabel: withLabel,
-            editMode: editMode,
           ),
         );
       }

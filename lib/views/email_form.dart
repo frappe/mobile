@@ -138,7 +138,6 @@ class EmailForm extends StatelessWidget {
         child: CustomForm(
           fields: meta.fields,
           formKey: _fbKey,
-          withLabel: false,
         ),
       ),
     );

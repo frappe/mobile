@@ -34,8 +34,7 @@ class CommentInput extends StatelessWidget {
             TextField(
               controller: _input,
               maxLines: null,
-              decoration:
-                  Palette.formFieldDecoration(label: "", withLabel: true),
+              decoration: Palette.formFieldDecoration(),
             ),
             SizedBox(
               height: 10,

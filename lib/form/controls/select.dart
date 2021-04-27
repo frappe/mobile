@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
@@ -12,25 +10,20 @@ import 'base_control.dart';
 import 'base_input.dart';
 
 class Select extends StatelessWidget with Control, ControlInput {
-  final Key key;
   final DoctypeField doctypeField;
-  final Map doc;
 
-  final bool allowClear;
-
-  final bool withLabel;
+  final Key? key;
+  final Map? doc;
 
   const Select({
     this.key,
-    this.doctypeField,
+    required this.doctypeField,
     this.doc,
-    this.allowClear,
-    this.withLabel,
   });
 
   @override
   Widget build(BuildContext context) {
-    List<String Function(dynamic)> validators = [];
+    List<String? Function(dynamic?)> validators = [];
 
     var f = setMandatory(doctypeField);
 
@@ -52,13 +45,12 @@ class Select extends StatelessWidget with Control, ControlInput {
       icon: FrappeIcon(
         FrappeIcons.select,
       ),
-      initialValue:
-          doc != null ? doc[doctypeField.fieldname] : doctypeField.defaultValue,
-      allowClear: allowClear,
+      initialValue: doc != null
+          ? doc![doctypeField.fieldname]
+          : doctypeField.defaultValue,
       name: doctypeField.fieldname,
-      hint: !withLabel ? Text(doctypeField.label) : null,
+      hint: Text(doctypeField.label),
       decoration: Palette.formFieldDecoration(
-        withLabel: withLabel,
         label: doctypeField.label,
       ),
       validator: FormBuilderValidators.compose(validators),
