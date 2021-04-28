@@ -49,16 +49,6 @@ class LinkField extends StatefulWidget {
 }
 
 class _LinkFieldState extends State<LinkField> with Control, ControlInput {
-  final TextEditingController _textEditingController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-
-    _textEditingController.text =
-        widget.doc != null ? widget.doc![widget.doctypeField.fieldname] : null;
-  }
-
   @override
   Widget build(BuildContext context) {
     List<String? Function(dynamic?)> validators = [];
@@ -78,18 +68,12 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
       child: Theme(
         data: Theme.of(context).copyWith(primaryColor: Colors.black),
         child: FormBuilderTypeAhead(
-          controller: _textEditingController,
           key: widget.key,
-          noItemsFoundBuilder: (context) => widget.noItemsFoundBuilder != null
-              ? widget.noItemsFoundBuilder!(_textEditingController.text)
+          initialValue: widget.doc != null
+              ? widget.doc![widget.doctypeField.fieldname]
               : null,
           direction: AxisDirection.up,
           onSuggestionSelected: (item) {
-            if (widget.clearTextOnSelection) {
-              setState(() {
-                _textEditingController.text = '';
-              });
-            }
             if (widget.onSuggestionSelected != null) {
               if (item is String) {
                 widget.onSuggestionSelected!(item);
