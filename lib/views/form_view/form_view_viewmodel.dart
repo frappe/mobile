@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
+import 'package:frappe_app/views/form_view/form_view.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../app/locator.dart';
@@ -47,7 +48,6 @@ class FormViewViewModel extends BaseViewModel {
     required String doctype,
     required String? name,
     required Map? queuedData,
-    required ConnectivityStatus connectivityStatus,
   }) async {
     setState(ViewState.busy);
     if (queued && queuedData != null) {
@@ -95,19 +95,11 @@ class FormViewViewModel extends BaseViewModel {
     required String doctype,
     required DoctypeResponse meta,
     required Map formValue,
-    required ConnectivityStatus connectivityStatus,
     required Map doc,
     required Map? queuedData,
   }) async {
-    formValue.forEach((key, value) {
-      if (value is Uint8List) {
-        var str = base64.encode(value);
-
-        formValue[key] = "data:image/png;base64,$str";
-      }
-    });
     var isOnline = await verifyOnline();
-    if (connectivityStatus == ConnectivityStatus.offline && !isOnline) {
+    if (!isOnline) {
       if (queuedData != null) {
         queuedData["data"] = [
           {
@@ -159,6 +151,13 @@ class FormViewViewModel extends BaseViewModel {
         );
 
         if (response.statusCode == HttpStatus.ok) {
+          formData = GetDocResponse(
+            docs: response.data["docs"],
+            docinfo: Docinfo.fromJson(
+              response.data["docinfo"],
+            ),
+          );
+
           refresh();
         }
       } catch (e) {

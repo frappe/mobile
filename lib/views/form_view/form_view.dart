@@ -56,7 +56,6 @@ class FormView extends StatelessWidget {
         model.communicationOnly = true;
         model.editMode = false;
         model.getData(
-          connectivityStatus: connectionStatus,
           queued: queued,
           queuedData: queuedData,
           doctype: meta.docs[0].name,
@@ -81,7 +80,6 @@ class FormView extends StatelessWidget {
                         model.communicationOnly = true;
                         model.editMode = false;
                         model.getData(
-                          connectivityStatus: connectionStatus,
                           queued: queued,
                           queuedData: queuedData,
                           doctype: meta.docs[0].name,
@@ -174,7 +172,6 @@ class FormView extends StatelessWidget {
                                 docInfo: model.docinfo!,
                                 refreshCallback: () {
                                   model.getData(
-                                    connectivityStatus: connectionStatus,
                                     queued: queued,
                                     queuedData: queuedData,
                                     doctype: meta.docs[0].name,
@@ -264,7 +261,6 @@ class FormView extends StatelessWidget {
 
         try {
           await model.handleUpdate(
-            connectivityStatus: connectionStatus,
             name: name!,
             doctype: meta.docs[0].name,
             meta: meta,
