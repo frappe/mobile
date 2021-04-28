@@ -260,13 +260,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
-  datetime_picker_formfield:
-    dependency: "direct main"
-    description:
-      name: datetime_picker_formfield
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.0"
   device_info:
     dependency: "direct main"
     description:
@@ -356,13 +349,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.9.5"
-  flutter_datetime_picker:
-    dependency: "direct main"
-    description:
-      name: flutter_datetime_picker
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.5.0"
   flutter_downloader:
     dependency: "direct main"
     description:
@@ -373,10 +359,12 @@ packages:
   flutter_form_builder:
     dependency: "direct main"
     description:
-      name: flutter_form_builder
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "6.0.0-nullsafety.1"
+      path: "."
+      ref: e80fdaa31c6150bdb503f1437b9fa9cf127d0380
+      resolved-ref: e80fdaa31c6150bdb503f1437b9fa9cf127d0380
+      url: "https://github.com/sumitbhanushali/flutter_form_builder"
+    source: git
+    version: "6.0.0"
   flutter_html:
     dependency: "direct main"
     description:
@@ -1204,4 +1192,4 @@ packages:
     version: "3.1.0"
 sdks:
   dart: ">=2.12.0 <3.0.0"
-  flutter: ">=2.0.0"
+  flutter: ">=1.25.0"
