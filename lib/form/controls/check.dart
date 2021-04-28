@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:flutter/material.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 
@@ -11,22 +9,22 @@ import 'base_control.dart';
 import 'base_input.dart';
 
 class Check extends StatelessWidget with Control, ControlInput {
-  final Key key;
   final DoctypeField doctypeField;
-  final Map doc;
+  final Key? key;
+  final Map? doc;
 
-  final Function onChanged;
+  final Function? onChanged;
 
   const Check({
+    required this.doctypeField,
     this.key,
-    @required this.doctypeField,
     this.doc,
     this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    List<String Function(dynamic)> validators = [];
+    List<String? Function(dynamic?)> validators = [];
 
     var f = setMandatory(doctypeField);
 
@@ -43,11 +41,11 @@ class Check extends StatelessWidget with Control, ControlInput {
       },
       activeColor: FrappePalette.blue,
       leadingInput: true,
-      initialValue: doc != null ? doc[doctypeField.fieldname] == 1 : null,
+      initialValue: doc != null ? doc![doctypeField.fieldname] == 1 : null,
       onChanged: onChanged != null
           ? (val) {
               val = val == true ? 1 : 0;
-              onChanged(val);
+              onChanged!(val);
             }
           : null,
       attribute: doctypeField.fieldname,

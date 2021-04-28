@@ -55,12 +55,11 @@ class FormView extends StatelessWidget {
       onModelReady: (model) {
         model.communicationOnly = true;
         model.editMode = false;
-        model.getData(
-          queued: queued,
-          queuedData: queuedData,
-          doctype: meta.docs[0].name,
-          name: name,
-        );
+        model.meta = meta;
+        model.queued = queued;
+        model.queuedData = queuedData;
+        model.name = name;
+        model.getData();
       },
       onModelClose: (model) {
         model.error = null;
@@ -79,12 +78,7 @@ class FormView extends StatelessWidget {
                       onRetry: () {
                         model.communicationOnly = true;
                         model.editMode = false;
-                        model.getData(
-                          queued: queued,
-                          queuedData: queuedData,
-                          doctype: meta.docs[0].name,
-                          name: name,
-                        );
+                        model.getData();
                       });
                 }
                 var docs = model.formData.docs;
@@ -129,8 +123,6 @@ class FormView extends StatelessWidget {
                           onPressed: model.editMode
                               ? () => _handleUpdate(
                                     doc: docs[0],
-                                    connectionStatus: connectionStatus,
-                                    meta: meta,
                                     model: model,
                                     context: context,
                                   )
@@ -171,12 +163,7 @@ class FormView extends StatelessWidget {
                                 doctype: meta.docs[0].name,
                                 docInfo: model.docinfo!,
                                 refreshCallback: () {
-                                  model.getData(
-                                    queued: queued,
-                                    queuedData: queuedData,
-                                    doctype: meta.docs[0].name,
-                                    name: name,
-                                  );
+                                  model.getData();
                                 },
                               ),
                             CustomForm(
@@ -204,10 +191,7 @@ class FormView extends StatelessWidget {
                                       name: name!,
                                       doctype: meta.docs[0].name,
                                       callback: () {
-                                        model.updateDocinfo(
-                                          doctype: meta.docs[0].name,
-                                          name: name!,
-                                        );
+                                        model.getDocinfo();
                                       },
                                     )
                                   ],
@@ -223,10 +207,7 @@ class FormView extends StatelessWidget {
                                   model.toggleSwitch(val);
                                 },
                                 refreshCallback: () {
-                                  model.updateDocinfo(
-                                    doctype: meta.docs[0].name,
-                                    name: name!,
-                                  );
+                                  model.getDocinfo();
                                 },
                                 emailSubjectField:
                                     docs[0][meta.docs[0].subjectField] ??
@@ -250,8 +231,6 @@ class FormView extends StatelessWidget {
 
   _handleUpdate({
     required Map doc,
-    required ConnectivityStatus connectionStatus,
-    required DoctypeResponse meta,
     required FormViewViewModel model,
     required BuildContext context,
   }) async {
@@ -261,9 +240,6 @@ class FormView extends StatelessWidget {
 
         try {
           await model.handleUpdate(
-            name: name!,
-            doctype: meta.docs[0].name,
-            meta: meta,
             formValue: formValue,
             doc: doc,
             queuedData: queuedData,

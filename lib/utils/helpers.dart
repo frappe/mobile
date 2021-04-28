@@ -1,11 +1,8 @@
 // @dart=2.9
 import 'dart:io';
 
-import 'package:connectivity/connectivity.dart';
 import 'package:device_info/device_info.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frappe_app/model/common.dart';
@@ -25,14 +22,10 @@ import '../views/no_internet.dart';
 
 import 'http.dart';
 import '../main.dart';
-import '../form/controls/control.dart';
 import '../app/locator.dart';
 
 import '../utils/dio_helper.dart';
 import '../utils/enums.dart';
-
-import '../widgets/section.dart';
-import '../widgets/custom_expansion_tile.dart';
 
 getDownloadPath() async {
   // TODO
@@ -82,191 +75,6 @@ String toTitleCase(String str) {
           (Match m) =>
               "${m[0][0].toUpperCase()}${m[0].substring(1).toLowerCase()}")
       .replaceAll(RegExp(r'(_|-)+'), ' ');
-}
-
-List<Widget> generateLayout({
-  @required List<DoctypeField> fields,
-  @required ViewType viewType,
-  Map doc,
-  bool editMode = true,
-}) {
-  if (viewType == ViewType.form) {
-    fields.insert(
-      0,
-      DoctypeField(
-        fieldtype: "Section Break",
-        label: "Form",
-        fieldname: "section",
-      ),
-    );
-  }
-  List<Widget> collapsibles = [];
-  List<Widget> sections = [];
-  List<Widget> widgets = [];
-
-  List<String> collapsibleLabels = [];
-  List<String> sectionLabels = [];
-
-  var isCollapsible = false;
-  var isSection = false;
-
-  int cIdx = 0;
-  int sIdx = 0;
-
-  fields.forEach((field) {
-    var val = doc != null
-        ? doc[field.fieldname] ?? field.defaultValue
-        : field.defaultValue;
-
-    if (val == '__user') {
-      val = Config().userId;
-    }
-
-    if (val is List) {
-      if (val.isEmpty) {
-        val = null;
-      }
-    }
-
-    if (field.fieldtype == "Section Break") {
-      if (sections.length > 0) {
-        var sectionVisibility = sections.any((element) {
-          if (element is Visibility) {
-            return element.visible == true;
-          } else {
-            return true;
-          }
-        });
-
-        widgets.add(
-          Visibility(
-            visible: sectionVisibility,
-            child: sectionLabels[sIdx] != ''
-                ? ListTileTheme(
-                    contentPadding: EdgeInsets.all(0),
-                    child: CustomExpansionTile(
-                      maintainState: true,
-                      initiallyExpanded: true,
-                      title: Text(
-                        sectionLabels[sIdx],
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
-                      ),
-                      children: [...sections],
-                    ),
-                  )
-                : Section(
-                    title: sectionLabels[sIdx],
-                    children: [...sections],
-                  ),
-          ),
-        );
-
-        sIdx += 1;
-        sections.clear();
-      } else if (collapsibles.length > 0) {
-        var sectionVisibility = collapsibles.any((element) {
-          if (element is Visibility) {
-            return element.visible == true;
-          } else {
-            return true;
-          }
-        });
-        widgets.add(
-          Visibility(
-            visible: sectionVisibility,
-            child: ListTileTheme(
-              contentPadding: EdgeInsets.all(0),
-              child: CustomExpansionTile(
-                maintainState: true,
-                title: Text(
-                  collapsibleLabels[cIdx],
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                  ),
-                ),
-                children: [...collapsibles],
-              ),
-            ),
-          ),
-        );
-        cIdx += 1;
-        collapsibles.clear();
-      }
-
-      if (field.collapsible == 1) {
-        isSection = false;
-        isCollapsible = true;
-        collapsibleLabels.add(field.label);
-      } else {
-        isCollapsible = false;
-        isSection = true;
-        sectionLabels.add(field.label != null ? field.label : '');
-      }
-    } else if (isCollapsible) {
-      if (viewType == ViewType.form) {
-        collapsibles.add(
-          Visibility(
-            visible: editMode ? true : val != null && val != '',
-            child: makeControl(
-              field: field,
-              doc: doc,
-            ),
-          ),
-        );
-      } else {
-        collapsibles.add(
-          makeControl(
-            doc: doc,
-            field: field,
-          ),
-        );
-      }
-    } else if (isSection) {
-      if (viewType == ViewType.form) {
-        sections.add(
-          Visibility(
-            visible: editMode ? true : val != null && val != '',
-            child: makeControl(
-              doc: doc,
-              field: field,
-            ),
-          ),
-        );
-      } else {
-        sections.add(
-          makeControl(
-            field: field,
-            doc: doc,
-          ),
-        );
-      }
-    } else {
-      if (viewType == ViewType.form) {
-        widgets.add(
-          Visibility(
-            visible: editMode ? true : val != null && val != '',
-            child: makeControl(
-              doc: doc,
-              field: field,
-            ),
-          ),
-        );
-      } else {
-        widgets.add(
-          makeControl(
-            field: field,
-            doc: doc,
-          ),
-        );
-      }
-    }
-  });
-
-  return widgets;
 }
 
 DateTime parseDate(val) {

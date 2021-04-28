@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/palette.dart';
 
@@ -7,8 +6,8 @@ class Section extends StatelessWidget {
   final List<Widget> children;
 
   Section({
-    this.title,
-    this.children,
+    required this.title,
+    required this.children,
   });
 
   @override
