@@ -75,6 +75,7 @@ class _AutoCompleteState extends State<AutoComplete>
           onChanged: (_) {
             setState(() {});
           },
+          direction: AxisDirection.up,
           validator: FormBuilderValidators.compose(validators),
           decoration: widget.inputDecoration ??
               Palette.formFieldDecoration(

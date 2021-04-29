@@ -253,7 +253,7 @@ class DoctypeField {
   late int? idx;
   late int? docstatus;
   late String fieldname;
-  late String label;
+  late String? label;
   late String? fieldtype;
   late String? oldfieldtype;
   late dynamic? options;
