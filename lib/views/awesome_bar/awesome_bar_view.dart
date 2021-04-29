@@ -1,305 +1,264 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
-import 'package:frappe_app/form/controls/autocomplete.dart';
-import 'package:frappe_app/model/doctype_response.dart';
+import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/views/awesome_bar/awesome_bar_viewmodel.dart';
-import 'package:frappe_app/views/new_doc/new_doc_view.dart';
+import 'package:frappe_app/widgets/card_list_tile.dart';
 
-import '../../model/offline_storage.dart';
 import '../../utils/frappe_icon.dart';
 
 import '../../config/frappe_icons.dart';
 
-import '../../app/locator.dart';
 import '../base_view.dart';
-import '../list_view/list_view.dart';
 
 class Awesombar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textEditingController = TextEditingController();
-    var awesomeBarItems = [];
-    var awesomeItems = OfflineStorage.getItem('awesomeItems');
-    awesomeItems = awesomeItems["data"];
-
-    // activeModules.keys.forEach((module) {
-    //   awesomeBarItems.add(
-    //     {
-    //       "type": "Module",
-    //       "value": module,
-    //       "label": "Open $module",
-    //     },
-    //   );
-    // });
-
-    if (awesomeItems != null) {
-      awesomeItems.values.forEach(
-        (value) {
-          (value as List).forEach(
-            (v) {
-              awesomeBarItems.add(
-                {
-                  "type": "Doctype",
-                  "value": v,
-                  "label": "$v List",
-                },
-              );
-              awesomeBarItems.add(
-                {
-                  "type": "New Doc",
-                  "value": v,
-                  "label": "New $v",
-                },
-              );
-            },
-          );
-        },
-      );
-    }
 
     return BaseView<AwesomBarViewModel>(
-      builder: (context, model, child) => Scaffold(
-        appBar: AppBar(
-          elevation: 0.8,
-          toolbarHeight: 90,
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 16,
+      onModelReady: (model) {
+        model.init();
+      },
+      builder: (context, model, child) {
+        if (model.error != null) {
+          return handleError(
+            error: model.error,
+            context: context,
+            onRetry: () {
+              model.refresh();
+            },
+          );
+        } else {
+          return Scaffold(
+            appBar: searchBar(
+              model: model,
+              controller: textEditingController,
+              context: context,
+            ),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 14,
+                horizontal: 16,
               ),
-              Text('Search'),
-              SizedBox(
-                height: 8,
+              child:
+                  // model.recentSearchesMode
+                  //     ? RecentSearches(
+                  //         awesomeBarItems: model.recentSearches,
+                  //         onItemTap: (awesomeBarItem) => model.onItemTap(
+                  //           awesomeBarItem: awesomeBarItem,
+                  //           context: context,
+                  //         ),
+                  //       )
+                  //     :
+                  SearchResults(
+                awesomeBarItems: model.filteredAwesomeBarItems,
+                onItemTap: (awesomeBarItem) => model.onItemTap(
+                  awesomeBarItem: awesomeBarItem,
+                  context: context,
+                ),
               ),
-              Row(
-                children: [
-                  Flexible(
-                    flex: 5,
-                    child: Focus(
-                      onFocusChange: (hasFocus) {
-                        model.toggleFocus(hasFocus);
-                      },
-                      child: AutoComplete(
-                        controller: textEditingController,
-                        inputDecoration: InputDecoration(
-                          filled: true,
-                          isDense: true,
-                          contentPadding: EdgeInsets.zero,
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                            borderRadius: BorderRadius.circular(
-                              6,
-                            ),
-                          ),
-                          fillColor: FrappePalette.grey[100],
-                          hintStyle: TextStyle(
-                            fontSize: 18,
-                            color: FrappePalette.grey[600],
-                            fontWeight: FontWeight.normal,
-                          ),
-                          hintText: "Search",
-                          suffixIcon: model.hasFocus
-                              ? InkWell(
-                                  onTap: () {
-                                    textEditingController.clear();
-                                  },
-                                  child: CircleAvatar(
-                                    backgroundColor: FrappePalette.grey,
-                                    child: FrappeIcon(
-                                      FrappeIcons.close_alt,
-                                      size: 14,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                )
-                              : null,
-                          prefixIcon: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: FrappeIcon(
-                              FrappeIcons.search,
-                              color: FrappePalette.grey[700],
-                            ),
-                          ),
-                          prefixIconConstraints: BoxConstraints(
-                            minHeight: 42,
-                            maxHeight: 42,
-                          ),
-                          suffixIconConstraints: BoxConstraints(
-                            minHeight: 22,
-                            maxHeight: 22,
-                          ),
-                        ),
-                        itemBuilder: (context, item) {
-                          return ListTile(
-                            title: Text(
-                              item["label"],
-                            ),
-                            onTap: () async {
-                              var meta =
-                                  await OfflineStorage.getMeta(item["value"]);
-                              if (item["type"] == "Doctype") {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return CustomListView(
-                                        meta: meta,
-                                        module: meta.docs[0].module,
-                                      );
-                                    },
-                                  ),
-                                );
-                              } else if (item["type"] == "New Doc") {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return NewDoc(meta: meta);
-                                    },
-                                  ),
-                                );
-                              } else if (item["type"] == "Module") {
-                                // locator<NavigationService>().navigateTo(
-                                //   Routes.home,
-                                //   arguments: DoctypeViewArguments(
-                                //     module: item["value"],
-                                //   ),
-                                // );
-                                // TODO
-                              }
-                            },
-                          );
-                        },
-                        suggestionsCallback: (query) {
-                          var lowercaseQuery = query.toLowerCase();
+            ),
+          );
+        }
+      },
+    );
+  }
 
-                          return awesomeBarItems.where((option) {
-                            return option["label"].toLowerCase().contains(
-                                  lowercaseQuery,
-                                );
-                          }).toList();
-                        },
-                        doctypeField: DoctypeField(
-                          label: "Search",
-                          fieldname: "search",
-                          options: awesomeBarItems,
+  AppBar searchBar({
+    required AwesomBarViewModel model,
+    required TextEditingController controller,
+    required BuildContext context,
+  }) {
+    return AppBar(
+      elevation: 0.8,
+      toolbarHeight: 90,
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Search'),
+          SizedBox(
+            height: 8,
+          ),
+          Row(
+            children: [
+              Flexible(
+                flex: 5,
+                child: Focus(
+                  onFocusChange: (hasFocus) {
+                    model.toggleFocus(hasFocus);
+                  },
+                  child: TextField(
+                    onChanged: (searchText) {
+                      model.filterSearchItems(searchText);
+                    },
+                    controller: controller,
+                    decoration: InputDecoration(
+                      filled: true,
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(
+                          6,
                         ),
+                      ),
+                      fillColor: FrappePalette.grey[100],
+                      hintStyle: TextStyle(
+                        fontSize: 18,
+                        color: FrappePalette.grey[600],
+                        fontWeight: FontWeight.normal,
+                      ),
+                      hintText: "Search",
+                      suffixIcon: model.hasFocus
+                          ? InkWell(
+                              onTap: () {
+                                controller.clear();
+                                model.filterSearchItems("");
+                              },
+                              child: CircleAvatar(
+                                backgroundColor: FrappePalette.grey,
+                                child: FrappeIcon(
+                                  FrappeIcons.close_alt,
+                                  size: 14,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            )
+                          : null,
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: FrappeIcon(
+                          FrappeIcons.search,
+                          color: FrappePalette.grey[700],
+                        ),
+                      ),
+                      prefixIconConstraints: BoxConstraints(
+                        minHeight: 42,
+                        maxHeight: 42,
+                      ),
+                      suffixIconConstraints: BoxConstraints(
+                        minHeight: 22,
+                        maxHeight: 22,
                       ),
                     ),
                   ),
-                  if (model.hasFocus)
-                    Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8.0, bottom: 8),
-                        child: FlatButton(
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(
-                              color: FrappePalette.blue[500],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          padding: EdgeInsets.zero,
-                          minWidth: 70,
-                          onPressed: () {
-                            FocusScope.of(context).requestFocus(FocusNode());
-                          },
+                ),
+              ),
+              if (model.hasFocus)
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, bottom: 8),
+                    child: FlatButton(
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: FrappePalette.blue[500],
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                    )
-                ],
-              )
+                      padding: EdgeInsets.zero,
+                      minWidth: 70,
+                      onPressed: () {
+                        FocusScope.of(context).requestFocus(FocusNode());
+                      },
+                    ),
+                  ),
+                )
             ],
-          ),
-        ),
+          )
+        ],
       ),
     );
   }
 }
 
-class AwesomeSearch extends SearchDelegate {
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
-        icon: Icon(Icons.clear),
-        onPressed: () {
-          query = '';
-        },
-      )
-    ];
-  }
+class SearchResults extends StatelessWidget {
+  final List<AwesomeBarItem> awesomeBarItems;
+  final Function onItemTap;
+
+  const SearchResults({
+    required this.awesomeBarItems,
+    required this.onItemTap,
+  });
 
   @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-      icon: Icon(Icons.arrow_back),
-      onPressed: () {
-        close(context, null);
-      },
-    );
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    return Container();
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    var awesomeBarItems = [];
-    var awesomeItems = OfflineStorage.getItem('awesomeItems');
-    awesomeItems = awesomeItems["data"];
-
-    // activeModules.keys.forEach((module) {
-    //   awesomeBarItems.add(
-    //     {
-    //       "type": "Module",
-    //       "value": module,
-    //       "label": "Open $module",
-    //     },
-    //   );
-    // });
-
-    if (awesomeItems != null) {
-      awesomeItems.values.forEach(
-        (value) {
-          (value as List).forEach(
-            (v) {
-              awesomeBarItems.add(
-                {
-                  "type": "Doctype",
-                  "value": v,
-                  "label": "$v List",
-                },
-              );
-              awesomeBarItems.add(
-                {
-                  "type": "New Doc",
-                  "value": v,
-                  "label": "New $v",
-                },
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: awesomeBarItems.length > 5 ? 5 : awesomeBarItems.length,
+      itemBuilder: (context, index) {
+        var awesomeBarItem = awesomeBarItems[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 4,
+          ),
+          child: CardListTile(
+            title: Text(
+              awesomeBarItem.label,
+              style: TextStyle(
+                color: FrappePalette.grey[900],
+              ),
+            ),
+            onTap: () async {
+              onItemTap(
+                awesomeBarItem,
               );
             },
-          );
-        },
-      );
-    }
-
-    awesomeBarItems = awesomeBarItems.where((element) {
-      var lowercaseQuery = query.toLowerCase();
-      return (element["value"] as String)
-          .toLowerCase()
-          .contains(lowercaseQuery);
-    }).toList();
-
-    return ListView.builder(
-      itemCount: awesomeBarItems.length,
-      itemBuilder: (_, index) {
-        var item = awesomeBarItems[index];
-        return ListTile(
-          title: Text(item["label"]),
+          ),
         );
       },
     );
   }
 }
+
+// class RecentSearches extends StatelessWidget {
+//   final List<AwesomeBarItem> awesomeBarItems;
+//   final Function onItemTap;
+
+//   const RecentSearches({
+//     required this.awesomeBarItems,
+//     required this.onItemTap,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return SingleChildScrollView(
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Text(
+//             "Recent",
+//             style: TextStyle(
+//               color: FrappePalette.grey[700],
+//             ),
+//           ),
+//           ListView.builder(
+//             shrinkWrap: true,
+//             physics: NeverScrollableScrollPhysics(),
+//             itemCount: awesomeBarItems.length > 5 ? 5 : awesomeBarItems.length,
+//             itemBuilder: (context, index) {
+//               var awesomeBarItem = awesomeBarItems[index];
+//               return Padding(
+//                 padding: const EdgeInsets.symmetric(
+//                   vertical: 4,
+//                 ),
+//                 child: CardListTile(
+//                   title: Text(
+//                     awesomeBarItem.label,
+//                     style: TextStyle(
+//                       color: FrappePalette.grey[900],
+//                     ),
+//                   ),
+//                   onTap: () async {
+//                     onItemTap(
+//                       awesomeBarItem,
+//                     );
+//                   },
+//                 ),
+//               );
+//             },
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

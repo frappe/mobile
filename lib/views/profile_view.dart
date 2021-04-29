@@ -3,7 +3,7 @@ import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/utils/navigation_helper.dart';
 import 'package:frappe_app/views/login/login_view.dart';
 import 'package:frappe_app/views/queue.dart';
-import 'package:frappe_app/widgets/card_list_tile.dart';
+import 'package:frappe_app/widgets/padded_card_list_tile.dart';
 
 class ProfileView extends StatelessWidget {
   @override
@@ -19,7 +19,7 @@ class ProfileView extends StatelessWidget {
         padding: const EdgeInsets.only(top: 4.0),
         child: Column(
           children: [
-            CardListTile(
+            PaddedCardListTile(
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -27,9 +27,9 @@ class ProfileView extends StatelessWidget {
                   ),
                 );
               },
-              title: Text("Queue"),
+              title: "Queue",
             ),
-            CardListTile(
+            PaddedCardListTile(
               onTap: () async {
                 await clearLoginInfo();
                 NavigationHelper.clearAllAndNavigateTo(
@@ -37,7 +37,7 @@ class ProfileView extends StatelessWidget {
                   page: Login(),
                 );
               },
-              title: Text("Logout"),
+              title: "Logout",
             ),
           ],
         ),

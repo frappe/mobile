@@ -190,13 +190,16 @@ Widget makeControl({
       control = Container();
       break;
   }
-  if (decorateControl) {
+  if (decorateControl && field.fieldtype != "Check") {
     return buildDecoratedControl(
       control: control,
       label: field.label,
     );
   } else {
-    return control;
+    return Padding(
+      padding: Palette.fieldPadding,
+      child: control,
+    );
   }
 }
 
@@ -228,16 +231,15 @@ List<Widget> generateLayout({
   Map? doc,
   bool editMode = true,
 }) {
-  if (viewType == ViewType.form) {
-    fields.insert(
-      0,
-      DoctypeField(
-        fieldtype: "Section Break",
-        label: "Form",
-        fieldname: "section",
-      ),
-    );
-  }
+  fields.insert(
+    0,
+    DoctypeField(
+      fieldtype: "Section Break",
+      label: "Form",
+      fieldname: "section",
+    ),
+  );
+
   List<Widget> collapsibles = [];
   List<Widget> sections = [];
   List<Widget> widgets = [];
@@ -286,7 +288,7 @@ List<Widget> generateLayout({
                       maintainState: true,
                       initiallyExpanded: true,
                       title: Text(
-                        sectionLabels[sIdx],
+                        sectionLabels[sIdx] ?? "",
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 16,

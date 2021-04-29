@@ -34,6 +34,7 @@ class Check extends StatelessWidget with Control, ControlInput {
       );
     }
 
+    // TODO fix overflow
     return CustomFormBuilderCheckbox(
       key: key,
       valueTransformer: (val) {
@@ -49,7 +50,9 @@ class Check extends StatelessWidget with Control, ControlInput {
             }
           : null,
       attribute: doctypeField.fieldname,
-      label: Text(doctypeField.label),
+      label: Text(
+        doctypeField.label,
+      ),
       decoration: Palette.formFieldDecoration(
         label: doctypeField.label,
         filled: false,

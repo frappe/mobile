@@ -181,7 +181,7 @@ handle403(BuildContext context) async {
 handleError({
   @required ErrorResponse error,
   @required BuildContext context,
-  @required Function onRetry,
+  Function onRetry,
   bool hideAppBar = false,
 }) {
   if (error.statusCode == HttpStatus.forbidden) {
@@ -195,11 +195,12 @@ handleError({
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text("${error.statusMessage}"),
-            FrappeFlatButton(
-              onPressed: () => onRetry(),
-              buttonType: ButtonType.primary,
-              title: "Retry",
-            ),
+            if (onRetry != null)
+              FrappeFlatButton(
+                onPressed: () => onRetry(),
+                buttonType: ButtonType.primary,
+                title: "Retry",
+              ),
           ],
         ),
       ),
