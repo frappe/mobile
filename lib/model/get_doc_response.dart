@@ -275,7 +275,7 @@ class Communication {
   late String commentType;
   late String communicationDate;
   late String content;
-  late String sender;
+  late String? sender;
   late String senderFullName;
   late dynamic cc;
   late dynamic bcc;

@@ -27,12 +27,16 @@ AppBar buildAppBar({
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: FrappePalette.grey[900],
-              fontSize: 18,
+          Flexible(
+            child: Text(
+              title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: FrappePalette.grey[900],
+                fontSize: 18,
+              ),
             ),
           ),
           expanded

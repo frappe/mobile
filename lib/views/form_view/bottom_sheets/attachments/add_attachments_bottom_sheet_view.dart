@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
@@ -12,10 +10,6 @@ import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
 import 'add_attachments_bottom_sheet_viewmodel.dart';
 
 class AddAttachmentsBottomSheetView extends StatelessWidget {
-  const AddAttachmentsBottomSheetView({
-    Key key,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return BaseView<AddAttachmentsBottomSheetViewModel>(
@@ -74,11 +68,10 @@ class UploadType extends StatelessWidget {
   final Color iconBackground;
 
   const UploadType({
-    Key key,
-    @required this.iconPath,
-    @required this.subtitle,
-    @required this.iconBackground,
-  }) : super(key: key);
+    required this.iconPath,
+    required this.subtitle,
+    required this.iconBackground,
+  });
 
   @override
   Widget build(BuildContext context) {

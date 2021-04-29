@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:frappe_app/app/locator.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/services/api/api.dart';
@@ -10,10 +8,10 @@ import 'package:injectable/injectable.dart';
 @lazySingleton
 class ViewAttachmenetsBottomSheetViewModel extends BaseViewModel {
   AttachmentsFilter selectedFilter = AttachmentsFilter.all;
-  bool allFilesPrivate;
-  List<FrappeFile> filesToUpload;
-  String doctype;
-  String name;
+  late bool allFilesPrivate;
+  late List<FrappeFile> filesToUpload;
+  late String doctype;
+  late String name;
 
   changeTab(AttachmentsFilter tab) {
     selectedFilter = tab;

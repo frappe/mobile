@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'dart:io' as io;
 
 import 'package:file_picker/file_picker.dart';
@@ -29,14 +27,13 @@ class ViewAttachmentsBottomSheetView extends StatelessWidget {
   final String name;
 
   const ViewAttachmentsBottomSheetView({
-    Key key,
-    @required this.attachments,
-    @required this.doctype,
-    @required this.name,
-  }) : super(key: key);
+    required this.attachments,
+    required this.doctype,
+    required this.name,
+  });
 
   _triggerFilePicker(Function addFiles) async {
-    FilePickerResult _files = await FilePicker.platform.pickFiles(
+    FilePickerResult? _files = await FilePicker.platform.pickFiles(
       type: FileType.any,
       allowMultiple: true,
     );
@@ -158,11 +155,10 @@ class ViewFilesToAttach extends StatelessWidget {
   final Function togglePrivate;
 
   const ViewFilesToAttach({
-    Key key,
-    @required this.filesToUpload,
-    @required this.removeFileToUpload,
-    @required this.togglePrivate,
-  }) : super(key: key);
+    required this.filesToUpload,
+    required this.removeFileToUpload,
+    required this.togglePrivate,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -181,7 +177,7 @@ class ViewFilesToAttach extends StatelessWidget {
                 width: 12,
               ),
               Text(
-                filesToUpload[idx].file.name,
+                filesToUpload[idx].file.name!,
               )
             ],
           ),
@@ -222,13 +218,12 @@ class ViewFilesToAttach extends StatelessWidget {
 
 class ViewAttachedFiles extends StatelessWidget {
   const ViewAttachedFiles({
-    Key key,
-    @required this.itemWidth,
-    @required this.itemHeight,
-    @required this.attachments,
-    @required this.changeTab,
-    @required this.selectedFilter,
-  }) : super(key: key);
+    required this.itemWidth,
+    required this.itemHeight,
+    required this.attachments,
+    required this.changeTab,
+    required this.selectedFilter,
+  });
 
   final double itemWidth;
   final double itemHeight;
@@ -300,10 +295,9 @@ class AttachmentsList extends StatelessWidget {
   final List<Attachments> attachments;
 
   const AttachmentsList({
-    Key key,
-    @required this.attachmentsFilter,
-    @required this.attachments,
-  }) : super(key: key);
+    required this.attachmentsFilter,
+    required this.attachments,
+  });
 
   bool isFile(Attachments attachment) {
     var ext = attachment.fileName.split('.').last;
@@ -370,11 +364,10 @@ class AttachmentsList extends StatelessWidget {
 
 class AttachmentsGrid extends StatelessWidget {
   const AttachmentsGrid({
-    Key key,
-    @required this.itemWidth,
-    @required this.itemHeight,
-    @required this.attachments,
-  }) : super(key: key);
+    required this.itemWidth,
+    required this.itemHeight,
+    required this.attachments,
+  });
 
   final double itemWidth;
   final double itemHeight;
@@ -465,10 +458,9 @@ class Tab extends StatelessWidget {
   final bool selected;
 
   const Tab({
-    Key key,
-    @required this.title,
-    @required this.selected,
-  }) : super(key: key);
+    required this.title,
+    required this.selected,
+  });
 
   @override
   Widget build(BuildContext context) {

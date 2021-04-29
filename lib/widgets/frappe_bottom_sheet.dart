@@ -73,15 +73,19 @@ class FrappeBottomSheet extends StatelessWidget {
                 ),
               ),
             ),
-            if (trailing != null)
-              TextButton(
-                style: TextButton.styleFrom(
-                  minimumSize: Size(65, 30),
-                  padding: EdgeInsets.zero,
-                ),
-                child: trailing!,
-                onPressed: onActionButtonPress,
-              )
+            trailing != null
+                ? TextButton(
+                    style: TextButton.styleFrom(
+                      minimumSize: Size(65, 30),
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: trailing!,
+                    onPressed: onActionButtonPress,
+                  )
+                : TextButton(
+                    onPressed: () {},
+                    child: Container(),
+                  ),
           ],
         ),
       ),
