@@ -1,0 +1,147 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/model/doctype_response.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
+import 'package:frappe_app/utils/enums.dart';
+import 'package:frappe_app/utils/frappe_alert.dart';
+
+import 'package:frappe_app/utils/frappe_icon.dart';
+import 'package:frappe_app/views/base_view.dart';
+import 'package:frappe_app/widgets/custom_form.dart';
+
+import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
+
+import 'add_review_bottom_sheet_viewmodel.dart';
+
+class AddReviewBottomSheetView extends StatelessWidget {
+  final String name;
+  final DoctypeDoc meta;
+  final Map doc;
+  final Docinfo docinfo;
+
+  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+
+  AddReviewBottomSheetView({
+    required this.name,
+    required this.meta,
+    required this.doc,
+    required this.docinfo,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BaseView<AddReviewBottomSheetViewModel>(
+      onModelClose: (model) {},
+      onModelReady: (model) {
+        model.getReviewFormFields(
+          doc: doc,
+          docInfo: docinfo,
+          meta: meta,
+        );
+      },
+      builder: (context, model, child) => FractionallySizedBox(
+        heightFactor: 0.6,
+        child: FrappeBottomSheet(
+          title: 'Add Review',
+          onActionButtonPress: () async {
+            if (_fbKey.currentState != null &&
+                _fbKey.currentState!.saveAndValidate()) {
+              var formValue = _fbKey.currentState!.value;
+              try {
+                await model.addReview(
+                  doctype: meta.name,
+                  name: name,
+                  formValue: formValue,
+                );
+              } catch (e) {
+                FrappeAlert.errorAlert(
+                  title: (e as ErrorResponse).statusMessage,
+                  context: context,
+                );
+              }
+
+              Navigator.of(context).pop(true);
+            }
+          },
+          trailing: Row(
+            children: [
+              FrappeIcon(
+                FrappeIcons.small_add,
+                color: FrappePalette.blue[500],
+                size: 16,
+              ),
+              Text(
+                'Add',
+                style: TextStyle(
+                  color: FrappePalette.blue[500],
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          body: Container(
+            color: Colors.white,
+            height: double.infinity,
+            child: CustomForm(
+              fields: model.fields,
+              formKey: _fbKey,
+              viewType: ViewType.newForm,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class UploadType extends StatelessWidget {
+  final String iconPath;
+  final String subtitle;
+  final Color iconBackground;
+
+  const UploadType({
+    required this.iconPath,
+    required this.subtitle,
+    required this.iconBackground,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: FrappePalette.grey[100],
+        borderRadius: BorderRadius.circular(
+          8,
+        ),
+      ),
+      height: 100,
+      width: 120,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            backgroundColor: iconBackground,
+            child: FrappeIcon(
+              iconPath,
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            subtitle,
+            style: TextStyle(
+              color: FrappePalette.grey[800],
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

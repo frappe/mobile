@@ -158,13 +158,25 @@ class FormView extends StatelessWidget {
                               ),
                             ),
                             if (!queued)
-                              DocInfo(
-                                name: name!,
-                                doctype: meta.docs[0].name,
-                                docInfo: model.docinfo!,
-                                refreshCallback: () {
-                                  model.getData();
-                                },
+                              ListTileTheme(
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                ),
+                                child: CustomExpansionTile(
+                                  title: Text('Docinfo'),
+                                  children: [
+                                    DocInfo(
+                                      name: name!,
+                                      meta: meta.docs[0],
+                                      doc: docs[0],
+                                      doctype: meta.docs[0].name,
+                                      docInfo: model.docinfo!,
+                                      refreshCallback: () {
+                                        model.getData();
+                                      },
+                                    )
+                                  ],
+                                ),
                               ),
                             CustomForm(
                               fields: meta.docs[0].fields,
@@ -264,12 +276,16 @@ class DocInfo extends StatelessWidget {
   final String doctype;
   final String name;
   final Function refreshCallback;
+  final Map doc;
+  final DoctypeDoc meta;
 
   const DocInfo({
     required this.docInfo,
     required this.refreshCallback,
     required this.doctype,
     required this.name,
+    required this.doc,
+    required this.meta,
   });
 
   @override
@@ -369,6 +385,10 @@ class DocInfo extends StatelessWidget {
                           isScrollControlled: true,
                           builder: (context) => ViewReviewsBottomSheetView(
                             reviews: reviews,
+                            doc: doc,
+                            docinfo: docInfo,
+                            name: name,
+                            meta: meta,
                           ),
                         ) ??
                         false;

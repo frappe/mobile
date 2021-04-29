@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/model/doctype_response.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
 
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/views/base_view.dart';
+import 'package:frappe_app/views/form_view/bottom_sheets/reviews/add_review_bottom_sheet_view.dart';
 import 'package:frappe_app/views/form_view/bottom_sheets/reviews/view_reviews_bottom_sheet_viewmodel.dart';
 
 import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
@@ -15,10 +18,18 @@ import 'package:frappe_app/widgets/review_pill.dart';
 class ViewReviewsBottomSheetView extends StatelessWidget {
   final List reviews;
 
+  final String name;
+  final DoctypeDoc meta;
+  final Map doc;
+  final Docinfo docinfo;
+
   const ViewReviewsBottomSheetView({
-    Key key,
     @required this.reviews,
-  }) : super(key: key);
+    @required this.name,
+    @required this.meta,
+    @required this.doc,
+    @required this.docinfo,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +45,19 @@ class ViewReviewsBottomSheetView extends StatelessWidget {
         heightFactor: 0.3,
         child: FrappeBottomSheet(
           title: 'Reviews',
-          onActionButtonPress: () {},
+          onActionButtonPress: () {
+            Navigator.of(context).pop();
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (context) => AddReviewBottomSheetView(
+                name: name,
+                meta: meta,
+                doc: doc,
+                docinfo: docinfo,
+              ),
+            );
+          },
           trailing: Row(
             children: [
               FrappeIcon(
