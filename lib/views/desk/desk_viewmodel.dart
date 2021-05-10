@@ -30,9 +30,10 @@ class DeskViewModel extends BaseViewModel {
   switchModule(
     String newModule,
   ) async {
+    setState(ViewState.busy);
     currentModule = newModule;
     await getDesktopPage();
-    notifyListeners();
+    setState(ViewState.idle);
   }
 
   bool get hasError => error != null;
