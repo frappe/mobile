@@ -9,11 +9,13 @@ import 'base_input.dart';
 
 class Int extends StatelessWidget with Control, ControlInput {
   final DoctypeField doctypeField;
+  final void Function(String)? onChanged;
   final Key? key;
   final Map? doc;
 
   const Int({
     required this.doctypeField,
+    this.onChanged,
     this.key,
     this.doc,
   });
@@ -32,6 +34,7 @@ class Int extends StatelessWidget with Control, ControlInput {
 
     return FormBuilderTextField(
       key: key,
+      onChanged: onChanged,
       initialValue: doc != null
           ? doc![doctypeField.fieldname] != null
               ? doc![doctypeField.fieldname].toString()

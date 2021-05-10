@@ -8,12 +8,14 @@ import 'base_input.dart';
 
 class SmallText extends StatelessWidget with Control, ControlInput {
   final DoctypeField doctypeField;
+  final void Function(String)? onChanged;
 
   final Key? key;
   final Map? doc;
 
   const SmallText({
     required this.doctypeField,
+    this.onChanged,
     this.key,
     this.doc,
   });
@@ -32,6 +34,7 @@ class SmallText extends StatelessWidget with Control, ControlInput {
 
     return FormBuilderTextField(
       key: key,
+      onChanged: onChanged,
       initialValue: doc != null ? doc![doctypeField.fieldname] : null,
       name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(

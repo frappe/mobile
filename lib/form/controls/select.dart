@@ -11,6 +11,7 @@ import 'base_input.dart';
 
 class Select extends StatelessWidget with Control, ControlInput {
   final DoctypeField doctypeField;
+  final void Function(dynamic)? onChanged;
 
   final Key? key;
   final Map? doc;
@@ -19,6 +20,7 @@ class Select extends StatelessWidget with Control, ControlInput {
     this.key,
     required this.doctypeField,
     this.doc,
+    this.onChanged,
   });
 
   @override
@@ -42,6 +44,7 @@ class Select extends StatelessWidget with Control, ControlInput {
 
     return FormBuilderDropdown(
       key: key,
+      onChanged: onChanged,
       icon: FrappeIcon(
         FrappeIcons.select,
       ),

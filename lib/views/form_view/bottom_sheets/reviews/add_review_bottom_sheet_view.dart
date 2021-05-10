@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/form/controls/autocomplete.dart';
+import 'package:frappe_app/form/controls/control.dart';
+import 'package:frappe_app/form/controls/int.dart';
+import 'package:frappe_app/form/controls/select.dart';
+import 'package:frappe_app/form/controls/small_text.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
-import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/frappe_alert.dart';
 
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/views/base_view.dart';
-import 'package:frappe_app/widgets/custom_form.dart';
 
 import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
 
@@ -22,8 +24,6 @@ class AddReviewBottomSheetView extends StatelessWidget {
   final Map doc;
   final Docinfo docinfo;
 
-  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-
   AddReviewBottomSheetView({
     required this.name,
     required this.meta,
@@ -34,36 +34,35 @@ class AddReviewBottomSheetView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseView<AddReviewBottomSheetViewModel>(
-      onModelClose: (model) {},
       onModelReady: (model) {
         model.getReviewFormFields(
           doc: doc,
           docInfo: docinfo,
           meta: meta,
         );
+        model.formObj = {
+          "to_user": null,
+          "action": model.fields[1].defaultValue,
+          "points": null,
+          "reason": null,
+        };
       },
       builder: (context, model, child) => FractionallySizedBox(
         heightFactor: 0.6,
         child: FrappeBottomSheet(
           title: 'Add Review',
           onActionButtonPress: () async {
-            if (_fbKey.currentState != null &&
-                _fbKey.currentState!.saveAndValidate()) {
-              var formValue = _fbKey.currentState!.value;
-              try {
-                await model.addReview(
-                  doctype: meta.name,
-                  name: name,
-                  formValue: formValue,
-                );
-              } catch (e) {
-                FrappeAlert.errorAlert(
-                  title: (e as ErrorResponse).statusMessage,
-                  context: context,
-                );
-              }
-
+            try {
+              await model.addReview(
+                doctype: meta.name,
+                name: name,
+              );
               Navigator.of(context).pop(true);
+            } catch (e) {
+              FrappeAlert.errorAlert(
+                title: (e as ErrorResponse).statusMessage,
+                context: context,
+              );
             }
           },
           trailing: Row(
@@ -86,10 +85,47 @@ class AddReviewBottomSheetView extends StatelessWidget {
           body: Container(
             color: Colors.white,
             height: double.infinity,
-            child: CustomForm(
-              fields: model.fields,
-              formKey: _fbKey,
-              viewType: ViewType.newForm,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  buildDecoratedControl(
+                    label: model.fields[0].label,
+                    control: AutoComplete(
+                      doctypeField: model.fields[0],
+                      onSuggestionSelected: (v) {
+                        model.formObj["to_user"] = v;
+                      },
+                    ),
+                  ),
+                  buildDecoratedControl(
+                    label: model.fields[1].label,
+                    control: Select(
+                      doctypeField: model.fields[1],
+                      onChanged: (v) {
+                        model.formObj["action"] = v;
+                      },
+                    ),
+                  ),
+                  buildDecoratedControl(
+                    label: model.fields[2].label,
+                    control: Int(
+                      doctypeField: model.fields[2],
+                      onChanged: (v) {
+                        model.formObj["points"] = v;
+                      },
+                    ),
+                  ),
+                  buildDecoratedControl(
+                    label: model.fields[3].label,
+                    control: SmallText(
+                      doctypeField: model.fields[3],
+                      onChanged: (v) {
+                        model.formObj["reason"] = v;
+                      },
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),

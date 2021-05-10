@@ -789,18 +789,48 @@ class DioApi implements Api {
         .replaceAll(new RegExp(r"\s+"), "");
     // trim all whitespace
 
-    final response = await DioHelper.dio.post(
-      '/method/frappe.social.doctype.energy_point_log.energy_point_log.review',
-      data: data,
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
-    );
+    try {
+      final response = await DioHelper.dio.post(
+        '/method/frappe.social.doctype.energy_point_log.energy_point_log.review',
+        data: data,
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+        ),
+      );
 
-    if (response.statusCode == 200) {
-      return response.data;
-    } else {
-      throw Exception('Something went wrong');
+      if (response.statusCode == 200) {
+        if (response.data["_server_messages"] != null) {
+          var errorMsgs = json.decode(response.data["_server_messages"]);
+          var errorMsg = json.decode(errorMsgs[0])["message"];
+
+          throw ErrorResponse(
+            statusMessage: errorMsg,
+          );
+        }
+        return response.data;
+      } else if (response.statusCode == HttpStatus.forbidden) {
+        throw ErrorResponse(
+          stackTrace: response.data,
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
+        );
+      } else {
+        throw ErrorResponse();
+      }
+    } catch (e) {
+      if (e is DioError) {
+        var error = e.error;
+        if (error is SocketException) {
+          throw ErrorResponse(
+            statusCode: HttpStatus.serviceUnavailable,
+            statusMessage: error.message,
+          );
+        } else {
+          throw ErrorResponse(statusMessage: error.message);
+        }
+      } else {
+        throw e;
+      }
     }
   }
 

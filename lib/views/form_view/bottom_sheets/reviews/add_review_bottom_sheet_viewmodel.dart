@@ -1,4 +1,5 @@
 import 'package:frappe_app/app/locator.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/config.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
@@ -10,16 +11,30 @@ import 'package:injectable/injectable.dart';
 class AddReviewBottomSheetViewModel extends BaseViewModel {
   late List<DoctypeField> fields;
 
+  Map<String, dynamic> formObj = {};
+
+  validate() {
+    if (formObj["to_user"] == null) {
+      throw ErrorResponse(statusMessage: "To User is Required");
+    } else if (formObj["action"] == null) {
+      throw ErrorResponse(statusMessage: "Action is Required");
+    } else if (formObj["points"] == null) {
+      throw ErrorResponse(statusMessage: "Points are Required");
+    } else if (formObj["reason"] == null) {
+      throw ErrorResponse(statusMessage: "Reason is Required");
+    }
+  }
+
   addReview({
     required String doctype,
     required String name,
-    required Map formValue,
   }) async {
     try {
+      validate();
       await locator<Api>().addReview(
         doctype,
         name,
-        formValue,
+        formObj,
       );
     } catch (e) {
       throw e;
@@ -37,14 +52,19 @@ class AddReviewBottomSheetViewModel extends BaseViewModel {
         fieldtype: 'Autocomplete',
         label: 'To User',
         reqd: 1,
-        options: "User",
+        options: getInvolvedUsers(
+          meta: meta,
+          docInfo: docInfo,
+          doc: doc,
+        ),
       ),
       DoctypeField(
-          fieldname: 'review_type',
-          fieldtype: 'Select',
-          label: 'Action',
-          options: ['Appreciation', 'Criticism'],
-          defaultValue: 'Appreciation'),
+        fieldname: 'review_type',
+        fieldtype: 'Select',
+        label: 'Action',
+        options: ['Appreciation', 'Criticism'],
+        defaultValue: 'Appreciation',
+      ),
       DoctypeField(
         fieldname: 'points',
         fieldtype: 'Int',
