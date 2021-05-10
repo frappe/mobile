@@ -22,6 +22,7 @@ import '../../utils/helpers.dart';
 @lazySingleton
 class DeskViewModel extends BaseViewModel {
   late String currentModule;
+  String? passedModule;
   List<DeskMessage> modules = [];
   late DesktopPageResponse desktopPage;
   ErrorResponse? error;
@@ -30,9 +31,7 @@ class DeskViewModel extends BaseViewModel {
     String newModule,
   ) async {
     currentModule = newModule;
-    await getDesktopPage(
-      currentModule,
-    );
+    await getDesktopPage();
     notifyListeners();
   }
 
@@ -64,9 +63,7 @@ class DeskViewModel extends BaseViewModel {
     modules = deskSidebarItems.message;
   }
 
-  getDesktopPage(
-    String currentModule,
-  ) async {
+  getDesktopPage() async {
     DesktopPageResponse _desktopPage;
 
     var isOnline = await verifyOnline();
@@ -96,11 +93,9 @@ class DeskViewModel extends BaseViewModel {
     try {
       await getDeskSidebarItems();
 
-      currentModule = modules[0].name;
+      currentModule = passedModule ?? modules[0].name;
 
-      await getDesktopPage(
-        currentModule,
-      );
+      await getDesktopPage();
       error = null;
     } catch (e) {
       error = e as ErrorResponse;

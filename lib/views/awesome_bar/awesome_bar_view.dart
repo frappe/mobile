@@ -11,6 +11,12 @@ import '../../config/frappe_icons.dart';
 import '../base_view.dart';
 
 class Awesombar extends StatelessWidget {
+  final Function bottomNavCallback;
+
+  const Awesombar(
+    this.bottomNavCallback,
+  );
+
   @override
   Widget build(BuildContext context) {
     final textEditingController = TextEditingController();
@@ -55,6 +61,7 @@ class Awesombar extends StatelessWidget {
                 onItemTap: (awesomeBarItem) => model.onItemTap(
                   awesomeBarItem: awesomeBarItem,
                   context: context,
+                  bottomNavCallback: bottomNavCallback,
                 ),
               ),
             ),

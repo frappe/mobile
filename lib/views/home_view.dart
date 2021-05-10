@@ -15,8 +15,9 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  // final PersistentTabController _controller =
-  //     PersistentTabController(initialIndex: 0);
+  final PersistentTabController _controller =
+      PersistentTabController(initialIndex: 0);
+  String? module;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +39,8 @@ class _HomeViewState extends State<HomeView> {
     // );
     return PersistentTabView(
       context,
+      controller: _controller,
+      decoration: NavBarDecoration(boxShadow: [BoxShadow()]),
       screens: _buildScreens(),
       items: _navBarsItems(),
       navBarStyle: NavBarStyle.style5,
@@ -46,8 +49,17 @@ class _HomeViewState extends State<HomeView> {
 
   List<Widget> _buildScreens() {
     return [
-      DeskView(),
-      Awesombar(),
+      DeskView(module),
+      Awesombar(
+        (String selectedModule) {
+          setState(
+            () {
+              module = selectedModule;
+              _controller.index = 0;
+            },
+          );
+        },
+      ),
       ProfileView(),
     ];
   }

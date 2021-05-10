@@ -39,20 +39,35 @@ class AwesomBarViewModel extends BaseViewModel {
     var awesomeItems = OfflineStorage.getItem('awesomeItems')["data"];
 
     if (awesomeItems != null) {
+      awesomeItems.keys.forEach(
+        (module) {
+          awesomeBarItems.add(
+            AwesomeBarItem(
+              type: "Module",
+              value: module,
+              label: "Open $module",
+            ),
+          );
+        },
+      );
       awesomeItems.values.forEach(
         (value) {
           (value as List).forEach(
             (v) {
-              awesomeBarItems.add(AwesomeBarItem(
-                type: "Doctype",
-                value: v,
-                label: "$v List",
-              ));
-              awesomeBarItems.add(AwesomeBarItem(
-                type: "NewDoc",
-                value: v,
-                label: "New $v",
-              ));
+              awesomeBarItems.add(
+                AwesomeBarItem(
+                  type: "Doctype",
+                  value: v,
+                  label: "$v List",
+                ),
+              );
+              awesomeBarItems.add(
+                AwesomeBarItem(
+                  type: "NewDoc",
+                  value: v,
+                  label: "New $v",
+                ),
+              );
             },
           );
         },
@@ -90,14 +105,15 @@ class AwesomBarViewModel extends BaseViewModel {
   onItemTap({
     required AwesomeBarItem awesomeBarItem,
     required BuildContext context,
+    required Function bottomNavCallback,
   }) async {
     // addToRecent(awesomeBarItem);
     try {
-      var meta = await OfflineStorage.getMeta(
-        awesomeBarItem.value,
-      );
-      error = null;
       if (awesomeBarItem.type == "Doctype") {
+        var meta = await OfflineStorage.getMeta(
+          awesomeBarItem.value,
+        );
+        error = null;
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) {
@@ -109,6 +125,10 @@ class AwesomBarViewModel extends BaseViewModel {
           ),
         );
       } else if (awesomeBarItem.type == "NewDoc") {
+        var meta = await OfflineStorage.getMeta(
+          awesomeBarItem.value,
+        );
+        error = null;
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) {
@@ -116,15 +136,17 @@ class AwesomBarViewModel extends BaseViewModel {
             },
           ),
         );
+      } else if (awesomeBarItem.type == "Module") {
+        bottomNavCallback(
+          awesomeBarItem.value,
+        );
+        // locator<NavigationService>().navigateTo(
+        //   Routes.home,
+        //   arguments: DoctypeViewArguments(
+        //     module: item["value"],
+        //   ),
+        // );
       }
-      // } else if (item["type"] == "Module") {
-      // locator<NavigationService>().navigateTo(
-      //   Routes.home,
-      //   arguments: DoctypeViewArguments(
-      //     module: item["value"],
-      //   ),
-      // );
-      // TODO
     } catch (e) {
       error = e as ErrorResponse;
     }

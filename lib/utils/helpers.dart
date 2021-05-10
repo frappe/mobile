@@ -323,18 +323,17 @@ initAwesomeItems() async {
   for (var item in deskSidebarItems.message) {
     var desktopPage = await locator<Api>().getDesktopPage(item.label);
 
+    var doctypes = [];
     desktopPage.message.cards.items.forEach(
       (item) {
-        var doctypes = [];
         item.links.forEach(
           (link) {
             doctypes.add(link.label);
           },
         );
-
-        moduleDoctypesMapping[item.label] = doctypes;
       },
     );
+    moduleDoctypesMapping[item.label] = doctypes;
   }
 
   OfflineStorage.putItem('awesomeItems', moduleDoctypesMapping);

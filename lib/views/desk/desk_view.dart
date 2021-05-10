@@ -13,11 +13,17 @@ import '../../config/palette.dart';
 import '../../utils/enums.dart';
 
 import '../../widgets/header_app_bar.dart';
-import '../../widgets/card_list_tile.dart';
 import '../base_view.dart';
 import 'desk_viewmodel.dart';
 
+// ignore: must_be_immutable
 class DeskView extends StatelessWidget {
+  String? module;
+
+  DeskView([
+    this.module,
+  ]);
+
   @override
   Widget build(BuildContext context) {
     Provider.of<ConnectivityStatus>(
@@ -31,55 +37,68 @@ class DeskView extends StatelessWidget {
       onModelClose: (model) {
         model.error = null;
       },
-      builder: (context, model, child) => model.state == ViewState.busy
-          ? Center(
+      builder: (context, model, child) {
+        if (model.state == ViewState.busy) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (model.hasError) {
+          return handleError(
+            onRetry: () {
+              model.getData();
+            },
+            error: model.error,
+            context: context,
+          );
+        } else {
+          if (module != null) {
+            model.passedModule = module;
+            module = null;
+            model.getData();
+            return Center(
               child: CircularProgressIndicator(),
-            )
-          : model.hasError
-              ? handleError(
-                  onRetry: () {
-                    model.getData();
-                  },
-                  error: model.error,
-                  context: context,
-                )
-              : Scaffold(
-                  backgroundColor: Palette.bgColor,
-                  appBar: buildAppBar(
-                    isRoot: true,
-                    title: model.currentModule,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ShowModules(
-                            model: model,
-                            title: model.currentModule,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  body: RefreshIndicator(
-                    onRefresh: () async {
-                      model.getData();
-                    },
-                    child: Builder(
-                      builder: (
-                        context,
-                      ) {
-                        return ListView(
-                          padding: EdgeInsets.zero,
-                          children: _generateChildren(
-                            desktopPage: model.desktopPage,
-                            model: model,
-                            context: context,
-                          ),
-                        );
-                      },
+            );
+          } else {
+            return Scaffold(
+              backgroundColor: Palette.bgColor,
+              appBar: buildAppBar(
+                isRoot: true,
+                title: model.currentModule,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ShowModules(
+                        model: model,
+                        title: model.currentModule,
+                      ),
                     ),
-                  ),
+                  );
+                },
+              ),
+              body: RefreshIndicator(
+                onRefresh: () async {
+                  model.getData();
+                },
+                child: Builder(
+                  builder: (
+                    context,
+                  ) {
+                    return ListView(
+                      padding: EdgeInsets.zero,
+                      children: _generateChildren(
+                        desktopPage: model.desktopPage,
+                        model: model,
+                        context: context,
+                      ),
+                    );
+                  },
                 ),
+              ),
+            );
+          }
+        }
+      },
     );
   }
 
