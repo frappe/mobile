@@ -158,25 +158,15 @@ class FormView extends StatelessWidget {
                               ),
                             ),
                             if (!queued)
-                              ListTileTheme(
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                ),
-                                child: CustomExpansionTile(
-                                  title: Text('Docinfo'),
-                                  children: [
-                                    DocInfo(
-                                      name: name!,
-                                      meta: meta.docs[0],
-                                      doc: docs[0],
-                                      doctype: meta.docs[0].name,
-                                      docInfo: model.docinfo!,
-                                      refreshCallback: () {
-                                        model.getData();
-                                      },
-                                    )
-                                  ],
-                                ),
+                              DocInfo(
+                                name: name!,
+                                meta: meta.docs[0],
+                                doc: docs[0],
+                                doctype: meta.docs[0].name,
+                                docInfo: model.docinfo!,
+                                refreshCallback: () {
+                                  model.getData();
+                                },
                               ),
                             CustomForm(
                               fields: meta.docs[0].fields,
