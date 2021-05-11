@@ -33,6 +33,7 @@ Future<void> cacheAllUsers() async {
       var res = await locator<Api>().fetchList(
         fieldnames: fieldNames,
         doctype: 'User',
+        orderBy: '`tabUser`.`modified` desc',
         filters: filters,
         meta: meta.docs[0],
       );

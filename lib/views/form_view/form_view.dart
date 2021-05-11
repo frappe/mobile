@@ -30,6 +30,7 @@ import '../../utils/enums.dart';
 
 import '../../widgets/custom_form.dart';
 import '../../widgets/frappe_button.dart';
+import 'bottom_sheets/reviews/add_review_bottom_sheet_view.dart';
 
 class FormView extends StatelessWidget {
   final String? name;
@@ -282,10 +283,18 @@ class DocInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Builder(
       builder: (context) {
-        var reviews = docInfo.energyPointLogs.where((item) {
-          return ["Appreciation", "Criticism"].contains(item.type);
-        }).toList();
+        List<EnergyPointLogs> reviews = docInfo.energyPointLogs != null
+            ? docInfo.energyPointLogs!.where(
+                (item) {
+                  return ["Appreciation", "Criticism"].contains(
+                    item.type,
+                  );
+                },
+              ).toList()
+            : [];
+
         List tags = docInfo.tags.isNotEmpty ? docInfo.tags.split(',') : [];
+
         return Container(
           color: FrappePalette.grey[50],
           width: double.infinity,
@@ -369,22 +378,41 @@ class DocInfo extends StatelessWidget {
                       : null,
                   actionIcon: FrappeIcons.review,
                   onTap: () async {
-                    bool refresh = await showModalBottomSheet(
-                          context: context,
-                          useRootNavigator: true,
-                          isScrollControlled: true,
-                          builder: (context) => ViewReviewsBottomSheetView(
-                            reviews: reviews,
-                            doc: doc,
-                            docinfo: docInfo,
-                            name: name,
-                            meta: meta,
-                          ),
-                        ) ??
-                        false;
+                    if (reviews.isEmpty) {
+                      bool refresh = await showModalBottomSheet(
+                            context: context,
+                            useRootNavigator: true,
+                            isScrollControlled: true,
+                            builder: (context) => AddReviewBottomSheetView(
+                              doc: doc,
+                              docinfo: docInfo,
+                              name: name,
+                              meta: meta,
+                            ),
+                          ) ??
+                          false;
 
-                    if (refresh) {
-                      refreshCallback();
+                      if (refresh) {
+                        refreshCallback();
+                      }
+                    } else {
+                      bool refresh = await showModalBottomSheet(
+                            context: context,
+                            useRootNavigator: true,
+                            isScrollControlled: true,
+                            builder: (context) => ViewReviewsBottomSheetView(
+                              reviews: reviews,
+                              doc: doc,
+                              docinfo: docInfo,
+                              name: name,
+                              meta: meta,
+                            ),
+                          ) ??
+                          false;
+
+                      if (refresh) {
+                        refreshCallback();
+                      }
                     }
                   },
                 ),

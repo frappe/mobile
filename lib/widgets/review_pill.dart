@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
@@ -7,7 +6,7 @@ import 'package:frappe_app/widgets/user_avatar.dart';
 class ReviewPill extends StatelessWidget {
   final EnergyPointLogs review;
 
-  const ReviewPill({Key key, this.review}) : super(key: key);
+  const ReviewPill(this.review);
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +33,7 @@ class ReviewPill extends StatelessWidget {
         ),
         shape: RoundedRectangleBorder(
           side: BorderSide(
-            color: FrappePalette.grey[300],
+            color: FrappePalette.grey[300]!,
           ),
           borderRadius: BorderRadius.all(
             Radius.circular(15),

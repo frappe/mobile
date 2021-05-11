@@ -53,7 +53,10 @@ class DioApi implements Api {
             statusMessage: error.message,
           );
         } else {
-          throw ErrorResponse(statusMessage: error.message, statusCode: error);
+          throw ErrorResponse(
+            statusMessage: error.message,
+            statusCode: error,
+          );
         }
       } else {
         throw e;
@@ -221,15 +224,17 @@ class DioApi implements Api {
     @required List fieldnames,
     @required String doctype,
     @required DoctypeDoc meta,
+    @required String orderBy,
     List filters,
-    pageLength,
-    offset,
+    int pageLength,
+    int offset,
   }) async {
     var queryParams = {
       'doctype': doctype,
       'fields': jsonEncode(fieldnames),
-      'page_length': pageLength,
-      'with_comment_count': true
+      'page_length': pageLength.toString(),
+      'with_comment_count': true,
+      'order_by': orderBy
     };
 
     queryParams['limit_start'] = offset.toString();
@@ -829,7 +834,7 @@ class DioApi implements Api {
           throw ErrorResponse(statusMessage: error.message);
         }
       } else {
-        throw e;
+        throw ErrorResponse();
       }
     }
   }

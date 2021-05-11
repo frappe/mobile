@@ -39,7 +39,7 @@ class Docinfo {
   late List shareLogs;
   List? likeLogs;
   late List<View> views;
-  late List<EnergyPointLogs> energyPointLogs;
+  List<EnergyPointLogs>? energyPointLogs;
   List? additionalTimelineContent;
   List? milestones;
   dynamic isDocumentFollowed;
@@ -142,7 +142,7 @@ class Docinfo {
     if (json['energy_point_logs'] != null) {
       energyPointLogs = [];
       json['energy_point_logs'].forEach((v) {
-        energyPointLogs.add(new EnergyPointLogs.fromJson(v));
+        energyPointLogs?.add(new EnergyPointLogs.fromJson(v));
       });
     }
     if (json['additional_timeline_content'] != null) {
@@ -189,7 +189,7 @@ class Docinfo {
     }
     data['views'] = this.views.map((v) => v.toJson()).toList();
     data['energy_point_logs'] =
-        this.energyPointLogs.map((v) => v.toJson()).toList();
+        this.energyPointLogs?.map((v) => v.toJson()).toList();
     if (this.additionalTimelineContent != null) {
       data['additional_timeline_content'] =
           this.additionalTimelineContent?.map((v) => v).toList();

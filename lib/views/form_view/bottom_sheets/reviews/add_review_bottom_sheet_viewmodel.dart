@@ -16,7 +16,7 @@ class AddReviewBottomSheetViewModel extends BaseViewModel {
   validate() {
     if (formObj["to_user"] == null) {
       throw ErrorResponse(statusMessage: "To User is Required");
-    } else if (formObj["action"] == null) {
+    } else if (formObj["review_type"] == null) {
       throw ErrorResponse(statusMessage: "Action is Required");
     } else if (formObj["points"] == null) {
       throw ErrorResponse(statusMessage: "Points are Required");
@@ -111,6 +111,7 @@ class AddReviewBottomSheetViewModel extends BaseViewModel {
         .toSet()
         .toList()
         .where((user) => !['Administrator', Config().userId].contains(user))
+        .where((user) => user != null)
         .toList();
   }
 }

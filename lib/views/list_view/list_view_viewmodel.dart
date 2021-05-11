@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:frappe_app/model/common.dart';
@@ -59,6 +60,7 @@ class ListViewViewModel extends BaseViewModel {
               filters: transformedFilters,
               meta: meta,
               doctype: meta.name,
+              orderBy: '`tab${meta.name}`.`modified` desc',
               fieldnames: generateFieldnames(
                 meta.name,
                 meta,
@@ -73,7 +75,7 @@ class ListViewViewModel extends BaseViewModel {
           pageSize: Constants.offlinePageSize,
           pageFuture: (pageIndex) {
             return Future.delayed(
-              Duration(seconds: 1),
+              Duration(seconds: 0),
               () {
                 var response = OfflineStorage.getItem(
                   '${meta.name}List',
@@ -120,7 +122,23 @@ class ListViewViewModel extends BaseViewModel {
   getDesktopPage(String module) async {
     setState(ViewState.busy);
     try {
-      desktopPageResponse = await locator<Api>().getDesktopPage(module);
+      var isOnline = await verifyOnline();
+
+      if (isOnline) {
+        desktopPageResponse = await locator<Api>().getDesktopPage(module);
+      } else {
+        var offlinedesktopPageResponse =
+            OfflineStorage.getItem('${module}Doctypes')["data"];
+
+        if (offlinedesktopPageResponse != null) {
+          desktopPageResponse =
+              DesktopPageResponse.fromJson(offlinedesktopPageResponse);
+        } else {
+          throw ErrorResponse(
+            statusCode: HttpStatus.serviceUnavailable,
+          );
+        }
+      }
     } catch (e) {
       error = e as ErrorResponse;
     }

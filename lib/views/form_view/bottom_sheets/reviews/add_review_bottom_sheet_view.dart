@@ -42,7 +42,7 @@ class AddReviewBottomSheetView extends StatelessWidget {
         );
         model.formObj = {
           "to_user": null,
-          "action": model.fields[1].defaultValue,
+          "review_type": model.fields[1].defaultValue,
           "points": null,
           "reason": null,
         };

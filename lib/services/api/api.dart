@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
@@ -30,9 +27,10 @@ abstract class Api {
     @required List fieldnames,
     @required String doctype,
     @required DoctypeDoc meta,
+    @required String orderBy,
     List filters,
-    pageLength,
-    offset,
+    int pageLength,
+    int offset,
   });
 
   Future<GetDocResponse> getdoc(String doctype, String name);

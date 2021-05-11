@@ -347,7 +347,9 @@ class ShowModules extends StatelessWidget {
                           tileColor: model.currentModule == element.name
                               ? Palette.bgColor
                               : Colors.white,
-                          title: Text(element.label),
+                          title: Text(
+                            element.label,
+                          ),
                           onTap: () {
                             model.switchModule(
                               element.name,

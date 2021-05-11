@@ -192,6 +192,7 @@ class OfflineStorage {
 
       var docList = await locator<Api>().fetchList(
         doctype: doctype,
+        orderBy: '`tab$doctype`.`modified` desc',
         fieldnames: generateFieldnames(doctype, docMeta.docs[0]),
         pageLength: Constants.offlinePageSize,
         offset: 0,
@@ -262,7 +263,11 @@ class OfflineStorage {
             ),
           );
         } else {
-          throw ErrorResponse(statusCode: HttpStatus.serviceUnavailable);
+          throw ErrorResponse(
+            statusCode: HttpStatus.serviceUnavailable,
+            statusMessage:
+                "$doctype is currently not available for offline use",
+          );
         }
       }
       return metaResponse;

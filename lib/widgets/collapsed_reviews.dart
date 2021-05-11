@@ -24,7 +24,7 @@ class CollapsedReviews extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2.0),
           child: ReviewPill(
-            review: item,
+            item,
           ),
         );
       },
@@ -58,6 +58,7 @@ class CollapsedReviews extends StatelessWidget {
     return Container(
       width: 194,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: _genearateChildren(),
       ),
     );

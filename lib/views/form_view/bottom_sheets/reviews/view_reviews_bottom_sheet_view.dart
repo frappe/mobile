@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:flutter/material.dart';
 
 import 'package:frappe_app/config/frappe_icons.dart';
@@ -24,11 +22,11 @@ class ViewReviewsBottomSheetView extends StatelessWidget {
   final Docinfo docinfo;
 
   const ViewReviewsBottomSheetView({
-    @required this.reviews,
-    @required this.name,
-    @required this.meta,
-    @required this.doc,
-    @required this.docinfo,
+    required this.reviews,
+    required this.name,
+    required this.meta,
+    required this.doc,
+    required this.docinfo,
   });
 
   @override
@@ -83,7 +81,7 @@ class ViewReviewsBottomSheetView extends StatelessWidget {
             ),
             itemBuilder: (context, index) {
               return ReviewPill(
-                review: reviews[index],
+                reviews[index],
               );
             },
           ),

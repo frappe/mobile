@@ -105,7 +105,7 @@ Widget makeControl({
 
     case "Text Editor":
       {
-        control = TextEditor(
+        control = TextEditor2(
           doctypeField: field,
           doc: doc,
         );
