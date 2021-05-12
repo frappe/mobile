@@ -235,7 +235,7 @@ List<Widget> generateLayout({
       0,
       DoctypeField(
         fieldtype: "Section Break",
-        label: "Form",
+        label: null,
         fieldname: "section",
       ),
     );
@@ -250,7 +250,10 @@ List<Widget> generateLayout({
 
   int cIdx = 0;
 
-  fields.forEach((field) {
+  fields.asMap().entries.forEach((entry) {
+    var field = entry.value;
+    var fIdx = entry.key;
+
     var val = doc != null
         ? doc[field.fieldname] ?? field.defaultValue
         : field.defaultValue;
@@ -281,7 +284,7 @@ List<Widget> generateLayout({
               contentPadding: EdgeInsets.all(0),
               child: CustomExpansionTile(
                 maintainState: true,
-                initiallyExpanded: collapsibleLabels[cIdx] == "Form",
+                initiallyExpanded: cIdx == 0,
                 title: Text(
                   collapsibleLabels[cIdx],
                   style: TextStyle(
@@ -300,9 +303,7 @@ List<Widget> generateLayout({
 
       isCollapsible = true;
       collapsibleLabels.add(
-        field.fieldtype == "Section Break" && cIdx == 0 && field.label == null
-            ? "Section"
-            : field.label ?? "Form",
+        field.label == null ? fields[fIdx + 1].label ?? "Form" : field.label!,
       );
     } else if (isCollapsible) {
       if (viewType == ViewType.form) {
