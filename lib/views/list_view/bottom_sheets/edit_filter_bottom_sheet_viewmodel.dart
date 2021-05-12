@@ -16,6 +16,7 @@ class EditFilterBottomSheetViewModel extends BaseViewModel {
 
   updateFieldName(DoctypeField field) {
     filter.field = field;
+    filter.value = null;
     notifyListeners();
   }
 
