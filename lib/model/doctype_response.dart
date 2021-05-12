@@ -280,7 +280,7 @@ class DoctypeField {
   late int? inPreview;
   late int? readOnly;
   late int? length;
-  late int? translatable;
+  late dynamic? translatable;
   late int? rememberLastSelectedValue;
   late int? allowBulkEdit;
   late int? printHideIfNoValue;

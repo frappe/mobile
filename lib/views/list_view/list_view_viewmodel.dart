@@ -52,7 +52,11 @@ class ListViewViewModel extends BaseViewModel {
                 meta.name,
                 filter.field.fieldname,
                 filter.filterOperator.value,
-                filter.value
+                filter.field.fieldtype == "Check"
+                    ? filter.value == "Yes"
+                        ? "1"
+                        : "0"
+                    : filter.value
               ];
             }).toList();
 

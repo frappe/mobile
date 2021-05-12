@@ -55,6 +55,7 @@ class Filter {
       json['field'],
     );
     value = json['value'];
+    isInit = json['isInit'];
   }
 
   Map<String, dynamic> toJson() {
@@ -62,6 +63,7 @@ class Filter {
     data['filterOperator'] = this.filterOperator.toJson();
     data['field'] = this.field.toJson();
     data['value'] = this.value;
+    data['isInit'] = this.isInit;
     return data;
   }
 }
