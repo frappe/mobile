@@ -69,7 +69,13 @@ class FiltersBottomSheetView extends StatelessWidget {
                   child: FrappeFlatButton(
                     buttonType: ButtonType.primary,
                     onPressed: () {
-                      Navigator.of(context).pop(model.filtersToApply);
+                      Navigator.of(context).pop(
+                        model.filtersToApply
+                            .where(
+                              (filterToApply) => filterToApply.value != null,
+                            )
+                            .toList(),
+                      );
                     },
                     title: 'Apply',
                   ),
