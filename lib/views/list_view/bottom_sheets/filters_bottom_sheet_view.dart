@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
@@ -19,10 +18,9 @@ class FiltersBottomSheetView extends StatelessWidget {
   final List<Filter> filters;
 
   const FiltersBottomSheetView({
-    Key key,
-    @required this.fields,
-    this.filters,
-  }) : super(key: key);
+    required this.fields,
+    required this.filters,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -124,17 +122,16 @@ class FiltersBottomSheetView extends StatelessWidget {
 
 class AddFilter extends StatelessWidget {
   final List<DoctypeField> fields;
-  final Function onDelete;
+  final void Function() onDelete;
   final Function onUpdate;
   final Filter filter;
 
   const AddFilter({
-    Key key,
-    @required this.fields,
-    @required this.onDelete,
-    @required this.onUpdate,
-    @required this.filter,
-  }) : super(key: key);
+    required this.fields,
+    required this.onDelete,
+    required this.onUpdate,
+    required this.filter,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +175,7 @@ class AddFilter extends StatelessWidget {
                             maxWidth: MediaQuery.of(context).size.width - 110,
                           ),
                           child: Text(
-                            filter.field.label,
+                            filter.field.label!,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: FrappePalette.grey[600],

@@ -38,11 +38,13 @@ class Filter {
   late DoctypeField field;
   late FilterOperator filterOperator;
   late String? value;
+  late bool isInit;
 
   Filter({
     required this.filterOperator,
     required this.field,
     this.value,
+    this.isInit = false,
   });
 
   Filter.fromJson(Map<String, dynamic> json) {

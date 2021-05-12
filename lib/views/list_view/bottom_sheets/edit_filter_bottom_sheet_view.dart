@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
-import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/form/controls/control.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/doctype_response.dart';
@@ -73,55 +72,6 @@ class EditFilterBottomSheetView extends StatelessWidget {
   }
 }
 
-class EditValue extends StatefulWidget {
-  final Function onActionButtonPress;
-  final Function leadingOnPressed;
-  final EditFilterBottomSheetViewModel model;
-
-  EditValue({
-    this.onActionButtonPress,
-    this.leadingOnPressed,
-    this.model,
-  });
-
-  @override
-  _EditValueState createState() => _EditValueState();
-}
-
-class _EditValueState extends State<EditValue> {
-  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-  @override
-  Widget build(BuildContext context) {
-    return FrappeBottomSheet(
-      title: 'Edit Value',
-      leadingText: 'Back',
-      leadingOnPressed: widget.leadingOnPressed,
-      trailing: Text(
-        'Done',
-        style: TextStyle(
-          color: FrappePalette.blue[500],
-        ),
-      ),
-      onActionButtonPress: () {
-        _fbKey.currentState.save();
-        var v = _fbKey.currentState.value[widget.model.filter.field.fieldname];
-        widget.model.updateValue(v);
-        widget.onActionButtonPress(widget.model.filter);
-      },
-      body: Column(
-        children: [
-          FormBuilder(
-            key: _fbKey,
-            child: makeControl(
-              field: widget.model.filter.field,
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
-
 class SelectFilterField extends StatelessWidget {
   final Function onActionButtonPress;
   final Function leadingOnPressed;
@@ -139,20 +89,26 @@ class SelectFilterField extends StatelessWidget {
   Widget build(BuildContext context) {
     return FrappeBottomSheet(
       title: 'Choose filter field',
-      showLeading: false,
       trailing: Text(
-        'Done',
+        model.filter.isInit ? 'Next' : 'Done',
         style: TextStyle(
           color: FrappePalette.blue[500],
         ),
       ),
-      onActionButtonPress: onActionButtonPress,
+      onActionButtonPress: () {
+        if (model.filter.isInit) {
+          model.moveToPage(2);
+        } else {
+          Navigator.of(context).pop(model.filter);
+        }
+      },
       body: ListView(
           children: fields.map((field) {
         return ListTile(
+          selectedTileColor: FrappePalette.grey[100],
+          selected: field.fieldname == model.filter.field.fieldname,
           onTap: () {
             model.updateFieldName(field);
-            model.moveToPage(2);
           },
           visualDensity: VisualDensity(vertical: -4),
           title: Text(
@@ -186,22 +142,29 @@ class SelectFilterOperator extends StatelessWidget {
   Widget build(BuildContext context) {
     return FrappeBottomSheet(
       trailing: Text(
-        'Done',
+        model.filter.isInit ? 'Next' : 'Done',
         style: TextStyle(
           color: FrappePalette.blue[500],
         ),
       ),
-      leadingOnPressed: leadingOnPressed,
-      leadingText: "Back",
-      onActionButtonPress: onActionButtonPress,
+      leadingOnPressed: model.filter.isInit ? leadingOnPressed : null,
+      leadingText: model.filter.isInit ? "Back" : null,
+      onActionButtonPress: () {
+        if (model.filter.isInit) {
+          model.moveToPage(3);
+        } else {
+          Navigator.of(context).pop(model.filter);
+        }
+      },
       title: 'Choose filter operator',
       body: ListView(
           children: Constants.filterOperators.map(
         (opt) {
           return ListTile(
+            selectedTileColor: FrappePalette.grey[100],
+            selected: opt == model.filter.filterOperator,
             onTap: () {
               model.updateFilterOperator(opt);
-              model.moveToPage(3);
             },
             visualDensity: VisualDensity(vertical: -4),
             title: Text(
@@ -217,6 +180,56 @@ class SelectFilterOperator extends StatelessWidget {
           );
         },
       ).toList()),
+    );
+  }
+}
+
+class EditValue extends StatefulWidget {
+  final Function onActionButtonPress;
+  final Function leadingOnPressed;
+  final EditFilterBottomSheetViewModel model;
+
+  EditValue({
+    this.onActionButtonPress,
+    this.leadingOnPressed,
+    this.model,
+  });
+
+  @override
+  _EditValueState createState() => _EditValueState();
+}
+
+class _EditValueState extends State<EditValue> {
+  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+  @override
+  Widget build(BuildContext context) {
+    return FrappeBottomSheet(
+      title: 'Edit Value',
+      leadingText: widget.model.filter.isInit ? 'Back' : null,
+      leadingOnPressed:
+          widget.model.filter.isInit ? widget.leadingOnPressed : null,
+      trailing: Text(
+        'Done',
+        style: TextStyle(
+          color: FrappePalette.blue[500],
+        ),
+      ),
+      onActionButtonPress: () {
+        _fbKey.currentState.save();
+        var v = _fbKey.currentState.value[widget.model.filter.field.fieldname];
+        widget.model.updateValue(v);
+        widget.onActionButtonPress(widget.model.filter);
+      },
+      body: Column(
+        children: [
+          FormBuilder(
+            key: _fbKey,
+            child: makeControl(
+              field: widget.model.filter.field,
+            ),
+          )
+        ],
+      ),
     );
   }
 }

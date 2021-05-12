@@ -16,13 +16,16 @@ class EditFilterBottomSheetViewModel extends BaseViewModel {
 
   updateFieldName(DoctypeField field) {
     filter.field = field;
+    notifyListeners();
   }
 
   updateFilterOperator(FilterOperator filterOperator) {
     filter.filterOperator = filterOperator;
+    notifyListeners();
   }
 
   updateValue(String value) {
     filter.value = value;
+    filter.isInit = false;
   }
 }

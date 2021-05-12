@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/doctype_response.dart';
@@ -9,7 +8,7 @@ import 'package:injectable/injectable.dart';
 @lazySingleton
 class FiltersBottomSheetViewModel extends BaseViewModel {
   List<Filter> filtersToApply = [];
-  List<DoctypeField> fields;
+  late List<DoctypeField> fields;
 
   removeFilter(int index) {
     filtersToApply.removeAt(index);
@@ -17,8 +16,8 @@ class FiltersBottomSheetViewModel extends BaseViewModel {
   }
 
   updateFilter({
-    @required Filter filter,
-    @required int index,
+    required Filter filter,
+    required int index,
   }) {
     filtersToApply[index] = filter;
     notifyListeners();
@@ -34,6 +33,7 @@ class FiltersBottomSheetViewModel extends BaseViewModel {
       Filter(
         filterOperator: Constants.filterOperators[0],
         field: fields[0],
+        isInit: true,
       ),
     );
     notifyListeners();
