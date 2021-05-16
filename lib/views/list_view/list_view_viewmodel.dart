@@ -48,15 +48,20 @@ class ListViewViewModel extends BaseViewModel {
           pageSize: Constants.pageSize,
           pageFuture: (pageIndex) {
             var transformedFilters = filters.map((filter) {
+              String value;
+              if (filter.field.fieldtype == "Check") {
+                value = filter.value == "Yes" ? "1" : "0";
+              } else if (filter.filterOperator.value == "like") {
+                value = "%${filter.value}%";
+              } else {
+                value = filter.value!;
+              }
+
               return [
                 meta.name,
                 filter.field.fieldname,
                 filter.filterOperator.value,
-                filter.field.fieldtype == "Check"
-                    ? filter.value == "Yes"
-                        ? "1"
-                        : "0"
-                    : filter.value
+                value,
               ];
             }).toList();
 

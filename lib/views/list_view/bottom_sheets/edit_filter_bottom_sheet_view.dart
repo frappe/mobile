@@ -166,6 +166,13 @@ class SelectFilterOperator extends StatelessWidget {
           } else {
             return false;
           }
+        } else if (model.filter.field.fieldname == "_assign" ||
+            model.filter.field.fieldname == "owner") {
+          if (opt.label == "Like") {
+            return true;
+          } else {
+            return false;
+          }
         } else {
           return true;
         }

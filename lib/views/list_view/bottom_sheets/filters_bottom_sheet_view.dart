@@ -26,7 +26,24 @@ class FiltersBottomSheetView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BaseView<FiltersBottomSheetViewModel>(
       onModelReady: (model) {
-        model.fields = fields;
+        List<DoctypeField> prioritizedFilterFields = [
+          DoctypeField(
+            fieldname: '_assign',
+            label: "Assigned To",
+            options: 'User',
+            fieldtype: "Link",
+          ),
+          DoctypeField(
+            fieldname: 'owner',
+            label: "Created By",
+            options: 'User',
+            fieldtype: "Link",
+          ),
+          ...fields.where((field) => field.inStandardFilter == 1).toList(),
+          ...fields.where((field) => field.inStandardFilter == 0).toList(),
+        ];
+
+        model.fields = prioritizedFilterFields;
         if (filters.isEmpty) {
           model.addFilter();
         } else {
@@ -99,26 +116,28 @@ class FiltersBottomSheetView extends StatelessWidget {
             ],
           ),
           body: ListView(
-            children: model.filtersToApply.asMap().entries.map(
-              (entry) {
-                var filter = entry.value;
-                var idx = entry.key;
+            children: [
+              ...model.filtersToApply.asMap().entries.map(
+                (entry) {
+                  var filter = entry.value;
+                  var idx = entry.key;
 
-                return AddFilter(
-                  fields: fields,
-                  filter: filter,
-                  onDelete: () {
-                    model.removeFilter(idx);
-                  },
-                  onUpdate: (Filter filter) {
-                    model.updateFilter(
-                      filter: filter,
-                      index: idx,
-                    );
-                  },
-                );
-              },
-            ).toList(),
+                  return AddFilter(
+                    fields: model.fields,
+                    filter: filter,
+                    onDelete: () {
+                      model.removeFilter(idx);
+                    },
+                    onUpdate: (Filter filter) {
+                      model.updateFilter(
+                        filter: filter,
+                        index: idx,
+                      );
+                    },
+                  );
+                },
+              ).toList()
+            ],
           ),
         ),
       ),
