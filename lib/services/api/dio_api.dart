@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
+import 'package:frappe_app/model/group_by_count_response.dart';
 
 import '../../model/doctype_response.dart';
 import '../../model/desktop_page_response.dart';
@@ -94,7 +95,6 @@ class DioApi implements Api {
         throw ErrorResponse(
           statusCode: response.statusCode,
           statusMessage: response.statusMessage,
-          stackTrace: response.data,
         );
         // response;
       } else {
@@ -139,7 +139,6 @@ class DioApi implements Api {
         return DesktopPageResponse.fromJson(response.data);
       } else if (response.statusCode == 403) {
         throw ErrorResponse(
-          stackTrace: response.data,
           statusCode: response.statusCode,
           statusMessage: response.statusMessage,
         );
@@ -192,7 +191,6 @@ class DioApi implements Api {
         return DoctypeResponse.fromJson(response.data);
       } else if (response.statusCode == HttpStatus.forbidden) {
         throw ErrorResponse(
-          stackTrace: response.data,
           statusCode: response.statusCode,
           statusMessage: response.statusMessage,
         );
@@ -200,7 +198,6 @@ class DioApi implements Api {
         throw ErrorResponse(
           statusMessage: response.statusMessage,
           statusCode: response.statusCode,
-          stackTrace: response.data,
         );
       }
     } catch (e) {
@@ -293,7 +290,6 @@ class DioApi implements Api {
         return newL;
       } else if (response.statusCode == HttpStatus.forbidden) {
         throw ErrorResponse(
-          stackTrace: response.data,
           statusCode: response.statusCode,
           statusMessage: response.statusMessage,
         );
@@ -341,7 +337,6 @@ class DioApi implements Api {
         return GetDocResponse.fromJson(response.data);
       } else if (response.statusCode == 403) {
         throw ErrorResponse(
-          stackTrace: response.data,
           statusCode: response.statusCode,
           statusMessage: response.statusMessage,
         );
@@ -669,7 +664,6 @@ class DioApi implements Api {
         return response.data;
       } else if (response.statusCode == HttpStatus.forbidden) {
         throw ErrorResponse(
-          stackTrace: response.data,
           statusCode: response.statusCode,
           statusMessage: response.statusMessage,
         );
@@ -815,7 +809,6 @@ class DioApi implements Api {
         return response.data;
       } else if (response.statusCode == HttpStatus.forbidden) {
         throw ErrorResponse(
-          stackTrace: response.data,
           statusCode: response.statusCode,
           statusMessage: response.statusMessage,
         );
@@ -925,6 +918,53 @@ class DioApi implements Api {
       return response.data;
     } else {
       throw Exception('Something went wrong');
+    }
+  }
+
+  Future<GroupByCountResponse> getGroupByCount({
+    @required String doctype,
+    @required List currentFilters,
+    @required String field,
+  }) async {
+    var reqData = {
+      "doctype": doctype,
+      "current_filters": currentFilters,
+      "field": field
+    };
+
+    try {
+      final response = await DioHelper.dio.post(
+        '/method/frappe.desk.listview.get_group_by_count',
+        data: reqData,
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return GroupByCountResponse.fromJson(response.data);
+      } else if (response.statusCode == HttpStatus.forbidden) {
+        throw ErrorResponse(
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
+        );
+      } else {
+        throw ErrorResponse();
+      }
+    } catch (e) {
+      if (e is DioError) {
+        var error = e.error;
+        if (error is SocketException) {
+          throw ErrorResponse(
+            statusCode: HttpStatus.serviceUnavailable,
+            statusMessage: error.message,
+          );
+        } else {
+          throw ErrorResponse(statusMessage: error.message);
+        }
+      } else {
+        throw ErrorResponse();
+      }
     }
   }
 }
