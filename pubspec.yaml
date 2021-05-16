@@ -18,6 +18,7 @@ environment:
 
 
 dependencies:
+  flutter_easyloading: ^3.0.0
   html_editor_enhanced: ^1.8.0
   flutter_typeahead: ^3.1.1
   flutter_chips_input: ^1.9.5

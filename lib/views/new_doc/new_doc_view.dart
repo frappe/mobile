@@ -45,15 +45,18 @@ class _NewDocState extends State<NewDoc> {
                     horizontal: 4,
                   ),
                   child: FrappeFlatButton(
-                    buttonType: ButtonType.primary,
-                    title: 'Save',
-                    onPressed: () => model.saveDoc(
-                      connectionStatus: connectionStatus,
-                      formKey: _fbKey,
-                      meta: widget.meta,
-                      context: context,
-                    ),
-                  ),
+                      buttonType: ButtonType.primary,
+                      title: 'Save',
+                      onPressed: () async {
+                        if (_fbKey.currentState.saveAndValidate()) {
+                          var formValue = _fbKey.currentState.value;
+                          await model.saveDoc(
+                            formValue: formValue,
+                            meta: widget.meta,
+                            context: context,
+                          );
+                        }
+                      }),
                 ),
               ],
             ),

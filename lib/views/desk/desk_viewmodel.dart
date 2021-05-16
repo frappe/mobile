@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:frappe_app/model/common.dart';
 
 import 'package:frappe_app/utils/frappe_alert.dart';
+import 'package:frappe_app/utils/loading_indicator.dart';
 import 'package:frappe_app/views/form_view/form_view.dart';
 import 'package:frappe_app/views/list_view/list_view.dart';
 import 'package:injectable/injectable.dart';
@@ -108,8 +109,12 @@ class DeskViewModel extends BaseViewModel {
     required String doctype,
     required BuildContext context,
   }) async {
+    LoadingIndicator.loadingWithBackgroundDisabled();
+
     try {
       var meta = await OfflineStorage.getMeta(doctype);
+
+      LoadingIndicator.stopLoading();
 
       if (meta.docs[0].issingle == 1) {
         pushNewScreen(
@@ -131,6 +136,7 @@ class DeskViewModel extends BaseViewModel {
         );
       }
     } catch (e) {
+      LoadingIndicator.stopLoading();
       FrappeAlert.errorAlert(
         context: context,
         title: e is ErrorResponse ? e.statusMessage : "Something went wrong",

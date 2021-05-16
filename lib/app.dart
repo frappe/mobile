@@ -1,5 +1,6 @@
 // @dart=2.9
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:frappe_app/views/home_view.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -44,6 +45,7 @@ class _FrappeAppState extends State<FrappeApp> {
         create: (context) =>
             ConnectivityService().connectionStatusController.stream,
         child: MaterialApp(
+          builder: EasyLoading.init(),
           debugShowCheckedModeBanner: false,
           title: 'Frappe',
           theme: new ThemeData(

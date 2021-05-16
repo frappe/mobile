@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
+import 'package:frappe_app/utils/loading_indicator.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../app/locator.dart';
@@ -93,6 +94,7 @@ class FormViewViewModel extends BaseViewModel {
     required Map doc,
     required Map? queuedData,
   }) async {
+    LoadingIndicator.loadingWithBackgroundDisabled("Saving");
     var isOnline = await verifyOnline();
     if (!isOnline) {
       if (queuedData != null) {
@@ -119,20 +121,23 @@ class FormViewViewModel extends BaseViewModel {
           queuedData,
         );
       } else {
-        Queue.add({
-          "type": "Update",
-          "name": name,
-          "doctype": meta.docs[0].name,
-          "title": getTitle(meta.docs[0], formValue),
-          "updated_keys": extractChangedValues(doc, formValue),
-          "data": [
-            {
-              ...doc,
-              ...formValue,
-            }
-          ],
-        });
+        Queue.add(
+          {
+            "type": "Update",
+            "name": name,
+            "doctype": meta.docs[0].name,
+            "title": getTitle(meta.docs[0], formValue),
+            "updated_keys": extractChangedValues(doc, formValue),
+            "data": [
+              {
+                ...doc,
+                ...formValue,
+              }
+            ],
+          },
+        );
       }
+      LoadingIndicator.stopLoading();
     } else {
       formValue = {
         ...doc,
@@ -154,9 +159,12 @@ class FormViewViewModel extends BaseViewModel {
             docinfo: docinfo,
           );
 
+          LoadingIndicator.stopLoading();
+
           refresh();
         }
       } catch (e) {
+        LoadingIndicator.stopLoading();
         throw e;
       }
     }
