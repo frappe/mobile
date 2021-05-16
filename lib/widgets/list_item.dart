@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
@@ -9,7 +8,7 @@ import 'package:frappe_app/widgets/collapsed_avatars.dart';
 import 'package:frappe_app/widgets/like_doc.dart';
 
 class ListItem extends StatelessWidget {
-  final String title;
+  final String? title;
   final String modifiedOn;
   final String name;
   final String doctype;
@@ -24,21 +23,23 @@ class ListItem extends StatelessWidget {
   final List assignee;
 
   final Function onButtonTap;
-  final Function onListTap;
+  final void Function() onListTap;
+  final Function toggleLikeCallback;
 
   ListItem({
-    @required this.doctype,
-    @required this.isFav,
-    @required this.seen,
-    @required this.commentCount,
-    @required this.likeCount,
-    @required this.status,
-    @required this.onButtonTap,
-    @required this.title,
-    @required this.assignee,
-    @required this.modifiedOn,
-    @required this.name,
-    @required this.onListTap,
+    required this.doctype,
+    required this.isFav,
+    required this.seen,
+    required this.commentCount,
+    required this.likeCount,
+    required this.status,
+    required this.onButtonTap,
+    required this.title,
+    required this.assignee,
+    required this.modifiedOn,
+    required this.name,
+    required this.onListTap,
+    required this.toggleLikeCallback,
   });
 
   @override
@@ -154,6 +155,7 @@ class ListItem extends StatelessWidget {
                   LikeDoc(
                     doctype: doctype,
                     name: name,
+                    successCallback: toggleLikeCallback,
                     isFav: isFav,
                     iconColor: FrappePalette.grey[500],
                   ),

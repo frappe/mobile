@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -6,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 
 import '../model/offline_storage.dart';
-import '../utils/dio_helper.dart';
 import '../utils/helpers.dart';
 import '../utils/http.dart';
 

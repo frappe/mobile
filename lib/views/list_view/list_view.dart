@@ -244,7 +244,7 @@ class CustomListView extends StatelessWidget {
 
   Widget _generateItem({
     required Map data,
-    required Function onListTap,
+    required void Function() onListTap,
     required Function onButtonTap,
     required ListViewViewModel model,
   }) {
@@ -264,6 +264,9 @@ class CustomListView extends StatelessWidget {
       onListTap: onListTap,
       isFav: isLikedByUser,
       seen: isSeenByUser,
+      toggleLikeCallback: () {
+        model.refresh();
+      },
       assignee: assignee != null && assignee.length > 0 ? assignee : null,
       onButtonTap: onButtonTap,
       title: getTitle(model.meta.docs[0], data),

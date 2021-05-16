@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 
 import '../app/locator.dart';
@@ -7,16 +6,19 @@ import '../config/palette.dart';
 import '../services/api/api.dart';
 import '../utils/frappe_icon.dart';
 
+// ignore: must_be_immutable
 class LikeDoc extends StatefulWidget {
   bool isFav;
   final String doctype;
   final String name;
-  final Color iconColor;
+  final Color? iconColor;
+  final Function? successCallback;
 
   LikeDoc({
-    @required this.isFav,
-    @required this.doctype,
-    @required this.name,
+    required this.isFav,
+    required this.doctype,
+    required this.name,
+    this.successCallback,
     this.iconColor,
   });
 
@@ -37,6 +39,9 @@ class _LikeDocState extends State<LikeDoc> {
     );
 
     if (response.statusCode == 200) {
+      if (widget.successCallback != null) {
+        widget.successCallback!();
+      }
       return;
     } else {
       setState(() {
