@@ -12,13 +12,18 @@ import '../../utils/enums.dart';
 import '../../widgets/custom_form.dart';
 import '../../widgets/frappe_button.dart';
 
-class NewDoc extends StatelessWidget {
+class NewDoc extends StatefulWidget {
   final DoctypeResponse meta;
 
   const NewDoc({
     @required this.meta,
   });
 
+  @override
+  _NewDocState createState() => _NewDocState();
+}
+
+class _NewDocState extends State<NewDoc> {
   @override
   Widget build(BuildContext context) {
     final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
@@ -32,7 +37,7 @@ class NewDoc extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               elevation: 0,
-              title: Text("New ${meta.docs[0].name}"),
+              title: Text("New ${widget.meta.docs[0].name}"),
               actions: <Widget>[
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -45,7 +50,7 @@ class NewDoc extends StatelessWidget {
                     onPressed: () => model.saveDoc(
                       connectionStatus: connectionStatus,
                       formKey: _fbKey,
-                      meta: meta,
+                      meta: widget.meta,
                       context: context,
                     ),
                   ),
@@ -54,7 +59,7 @@ class NewDoc extends StatelessWidget {
             ),
             body: CustomForm(
               formKey: _fbKey,
-              fields: meta.docs[0].fields,
+              fields: widget.meta.docs[0].fields,
               viewType: ViewType.newForm,
             ),
           );
