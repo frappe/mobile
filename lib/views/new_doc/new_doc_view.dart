@@ -23,10 +23,11 @@ class NewDoc extends StatefulWidget {
   _NewDocState createState() => _NewDocState();
 }
 
+final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+
 class _NewDocState extends State<NewDoc> {
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
     var connectionStatus = Provider.of<ConnectivityStatus>(
       context,
     );
