@@ -89,7 +89,7 @@ class AddReviewBottomSheetView extends StatelessWidget {
               child: Column(
                 children: [
                   buildDecoratedControl(
-                    label: model.fields[0].label,
+                    field: model.fields[0],
                     control: AutoComplete(
                       doctypeField: model.fields[0],
                       onSuggestionSelected: (v) {
@@ -98,7 +98,7 @@ class AddReviewBottomSheetView extends StatelessWidget {
                     ),
                   ),
                   buildDecoratedControl(
-                    label: model.fields[1].label,
+                    field: model.fields[1],
                     control: Select(
                       doctypeField: model.fields[1],
                       onChanged: (v) {
@@ -107,7 +107,7 @@ class AddReviewBottomSheetView extends StatelessWidget {
                     ),
                   ),
                   buildDecoratedControl(
-                    label: model.fields[2].label,
+                    field: model.fields[2],
                     control: Int(
                       doctypeField: model.fields[2],
                       onChanged: (v) {
@@ -116,7 +116,7 @@ class AddReviewBottomSheetView extends StatelessWidget {
                     ),
                   ),
                   buildDecoratedControl(
-                    label: model.fields[3].label,
+                    field: model.fields[3],
                     control: SmallText(
                       doctypeField: model.fields[3],
                       onChanged: (v) {

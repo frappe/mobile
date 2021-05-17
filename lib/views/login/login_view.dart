@@ -5,6 +5,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/form/controls/control.dart';
 import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/utils/navigation_helper.dart';
 import 'package:frappe_app/views/home_view.dart';
 
@@ -63,7 +64,10 @@ class Login extends StatelessWidget {
                                 label: "Server URL",
                               ),
                             ),
-                            label: "Server URL",
+                            field: DoctypeField(
+                              fieldname: 'serverUrl',
+                              label: "Server URL",
+                            ),
                           ),
                           buildDecoratedControl(
                             control: FormBuilderTextField(
@@ -76,7 +80,8 @@ class Login extends StatelessWidget {
                                 label: "Email Address",
                               ),
                             ),
-                            label: "Email Address",
+                            field: DoctypeField(
+                                fieldname: "email", label: "Email Address"),
                           ),
                           PasswordField(),
                           FrappeFlatButton(
@@ -210,7 +215,7 @@ class _PasswordFieldState extends State<PasswordField> {
           )
         ],
       ),
-      label: "Password",
+      field: DoctypeField(fieldname: "password", label: "Password"),
     );
   }
 }

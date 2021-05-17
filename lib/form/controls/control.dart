@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
 
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/model/config.dart';
@@ -192,7 +193,7 @@ Widget makeControl({
   if (decorateControl && field.fieldtype != "Check") {
     return buildDecoratedControl(
       control: control,
-      label: field.label,
+      field: field,
     );
   } else {
     return Padding(
@@ -204,19 +205,34 @@ Widget makeControl({
 
 Widget buildDecoratedControl({
   required Widget control,
-  String? label = "",
+  required DoctypeField field,
 }) {
   return Padding(
     padding: Palette.fieldPadding,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Padding(
-          padding: Palette.labelPadding,
-          child: Text(
-            label ?? "",
-            style: Palette.secondaryTxtStyle,
-          ),
+        Row(
+          children: [
+            Padding(
+              padding: Palette.labelPadding,
+              child: Text(
+                field.label ?? "",
+                style: Palette.secondaryTxtStyle,
+              ),
+            ),
+            SizedBox(width: 4),
+            if (field.reqd == 1)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4.0),
+                child: Text(
+                  '*',
+                  style: TextStyle(
+                    color: FrappePalette.red,
+                  ),
+                ),
+              ),
+          ],
         ),
         control
       ],

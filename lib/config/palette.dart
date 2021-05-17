@@ -63,6 +63,12 @@ class Palette {
           const Radius.circular(6.0),
         ),
       ),
+      errorBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.red),
+        borderRadius: const BorderRadius.all(
+          const Radius.circular(6.0),
+        ),
+      ),
       // hintText: label,
       filled: filled,
       fillColor: Palette.fieldBgColor,

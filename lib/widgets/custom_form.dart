@@ -54,6 +54,7 @@ class CustomForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return FormBuilder(
       enabled: editMode,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       key: formKey,
       child: Container(
         color: Colors.white,
