@@ -35,9 +35,12 @@ class CustomForm extends StatelessWidget {
         },
       ).toList();
     } else if (viewType == ViewType.newForm) {
-      filteredFields = fields.where((field) {
-        return field.fieldtype == "Section Break" || field.hidden != 1;
-      }).toList();
+      filteredFields = fields.where(
+        (field) {
+          return (field.readOnly != 1 || field.fieldtype == "Section Break") &&
+              field.hidden != 1;
+        },
+      ).toList();
     } else {
       filteredFields = fields;
     }
