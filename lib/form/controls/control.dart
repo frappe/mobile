@@ -106,17 +106,7 @@ Widget makeControl({
 
     case "Text Editor":
       {
-        control = TextEditor2(
-          doctypeField: field,
-          doc: doc,
-        );
-      }
-      break;
-
-    // TODO: temp fix
-    case "Text Editor2":
-      {
-        control = TextEditor2(
+        control = TextEditor(
           doctypeField: field,
           doc: doc,
         );
