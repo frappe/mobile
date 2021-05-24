@@ -36,7 +36,7 @@ class Config {
 
   Uri? get uri {
     if (baseUrl != null) {
-      Uri.parse(baseUrl!);
+      return Uri.parse(baseUrl!);
     } else {
       return null;
     }
