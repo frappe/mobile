@@ -14,16 +14,24 @@ import 'package:frappe_app/views/form_view/bottom_sheets/assignees/assignees_bot
 import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
 import 'package:frappe_app/widgets/user_avatar.dart';
 
-class AssigneesBottomSheetView extends StatelessWidget {
+class AssigneesBottomSheetView extends StatefulWidget {
   final String doctype;
   final String name;
   final List<Assignments> assignees;
 
-  const AssigneesBottomSheetView({
+  AssigneesBottomSheetView({
     required this.doctype,
     required this.name,
     required this.assignees,
   });
+
+  @override
+  _AssigneesBottomSheetViewState createState() =>
+      _AssigneesBottomSheetViewState();
+}
+
+class _AssigneesBottomSheetViewState extends State<AssigneesBottomSheetView> {
+  final _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +40,7 @@ class AssigneesBottomSheetView extends StatelessWidget {
         model.selectedUsers = [];
       },
       onModelReady: (model) {
-        model.assignedUsers = assignees.map<String>((assignee) {
+        model.assignedUsers = widget.assignees.map<String>((assignee) {
           return assignee.owner;
         }).toList();
       },
@@ -42,8 +50,8 @@ class AssigneesBottomSheetView extends StatelessWidget {
           title: 'Assignees',
           onActionButtonPress: () async {
             await model.addAssignees(
-              doctype: doctype,
-              name: name,
+              doctype: widget.doctype,
+              name: widget.name,
             );
 
             Navigator.of(context).pop(true);
@@ -71,7 +79,7 @@ class AssigneesBottomSheetView extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: LinkField(
-                    clearTextOnSelection: true,
+                    controller: _controller,
                     prefixIcon: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -91,6 +99,7 @@ class AssigneesBottomSheetView extends StatelessWidget {
                     ),
                     onSuggestionSelected: (item) {
                       model.onUserSelected(item);
+                      _controller.clear();
                     },
                   ),
                 ),
@@ -137,8 +146,8 @@ class AssigneesBottomSheetView extends StatelessWidget {
         onRemove: () async {
           try {
             await model.removeAssignedUser(
-              doctype: doctype,
-              name: name,
+              doctype: widget.doctype,
+              name: widget.name,
               user: user,
             );
 

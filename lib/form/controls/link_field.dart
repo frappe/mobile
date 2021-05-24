@@ -28,7 +28,7 @@ class LinkField extends StatefulWidget {
   final ItemBuilder? itemBuilder;
   final SuggestionsCallback? suggestionsCallback;
   final AxisDirection direction;
-  final bool clearTextOnSelection;
+  final TextEditingController? controller;
 
   LinkField({
     this.key,
@@ -40,7 +40,7 @@ class LinkField extends StatefulWidget {
     this.showInputBorder = false,
     this.itemBuilder,
     this.suggestionsCallback,
-    this.clearTextOnSelection = false,
+    this.controller,
     this.direction = AxisDirection.down,
   });
 
@@ -69,6 +69,7 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
         data: Theme.of(context).copyWith(primaryColor: Colors.black),
         child: FormBuilderTypeAhead(
           key: widget.key,
+          controller: widget.controller,
           initialValue: widget.doc != null
               ? widget.doc![widget.doctypeField.fieldname]
               : null,

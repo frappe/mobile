@@ -13,7 +13,7 @@ import 'package:frappe_app/views/base_view.dart';
 import 'package:frappe_app/views/form_view/bottom_sheets/tags/tags_bottom_sheet_viewmodel.dart';
 import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
 
-class TagsBottomSheetView extends StatelessWidget {
+class TagsBottomSheetView extends StatefulWidget {
   final String doctype;
   final String name;
   final List tags;
@@ -28,11 +28,18 @@ class TagsBottomSheetView extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _TagsBottomSheetViewState createState() => _TagsBottomSheetViewState();
+}
+
+class _TagsBottomSheetViewState extends State<TagsBottomSheetView> {
+  final _controller = TextEditingController();
+
+  @override
   Widget build(BuildContext context) {
     return BaseView<TagsBottomSheetViewModel>(
       onModelClose: (model) {},
       onModelReady: (model) {
-        model.currentTags = tags;
+        model.currentTags = widget.tags;
       },
       builder: (context, model, child) => FractionallySizedBox(
         heightFactor: 0.5,
@@ -44,18 +51,18 @@ class TagsBottomSheetView extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: LinkField(
-                    clearTextOnSelection: true,
+                    controller: _controller,
                     direction: AxisDirection.up,
                     noItemsFoundBuilder: (query) {
                       return ListTile(
                         onTap: () async {
                           await model.addTag(
-                            doctype: doctype,
-                            name: name,
+                            doctype: widget.doctype,
+                            name: widget.name,
                             tag: query,
                           );
 
-                          refreshCallback();
+                          widget.refreshCallback();
 
                           FocusScope.of(context).unfocus();
                         },
@@ -97,15 +104,19 @@ class TagsBottomSheetView extends StatelessWidget {
                       ],
                     ),
                     doctypeField: DoctypeField(
-                        label: 'Search or create tags here', fieldname: "tags"),
+                      label: 'Search or create tags here',
+                      fieldname: "tags",
+                    ),
                     onSuggestionSelected: (selectedTag) async {
                       await model.addTag(
-                        doctype: doctype,
-                        name: name,
+                        doctype: widget.doctype,
+                        name: widget.name,
                         tag: selectedTag,
                       );
 
-                      refreshCallback();
+                      _controller.clear();
+
+                      widget.refreshCallback();
                     },
                     itemBuilder: (context, item) {
                       return ListTile(
@@ -114,7 +125,7 @@ class TagsBottomSheetView extends StatelessWidget {
                     },
                     suggestionsCallback: (query) async {
                       return await model.getTags(
-                        doctype: doctype,
+                        doctype: widget.doctype,
                         query: query,
                       );
                     },
@@ -174,8 +185,8 @@ class TagsBottomSheetView extends StatelessWidget {
               onPressed: () async {
                 try {
                   await model.removeTag(
-                    doctype: doctype,
-                    name: name,
+                    doctype: widget.doctype,
+                    name: widget.name,
                     tag: tag,
                     index: index,
                   );
@@ -185,7 +196,7 @@ class TagsBottomSheetView extends StatelessWidget {
                     title: "$tag has been removed",
                   );
 
-                  refreshCallback();
+                  widget.refreshCallback();
                 } catch (e) {
                   print(e);
                 }
