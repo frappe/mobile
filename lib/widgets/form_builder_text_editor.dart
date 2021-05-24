@@ -51,48 +51,51 @@ class FormBuilderTextEditor<T> extends FormBuilderField<T> {
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                   maxHeight: 200,
+                  minHeight: 100,
                   minWidth: double.infinity,
                 ),
                 child: Container(
                   color: Palette.fieldBgColor,
                   child: SingleChildScrollView(
-                    child: Html(
-                      data: field.value as String,
-                      customImageRenders: {
-                        networkSourceMatcher(domains: [
-                          Config().baseUrl!,
-                        ]): networkImageRender(
-                          headers: {
-                            HttpHeaders.cookieHeader: DioHelper.cookies!,
-                          },
-                          altWidget: (alt) => Text(alt ?? ""),
-                          loadingWidget: () => Text("Loading..."),
-                        ),
-                        // for relative paths, prefix with a base url
-                        (attr, _) =>
-                                attr["src"] != null &&
-                                !(attr["src"]!.startsWith("http") ||
-                                    attr["src"]!.startsWith("https")):
-                            networkImageRender(
-                          headers: {
-                            HttpHeaders.cookieHeader: DioHelper.cookies!,
-                          },
-                          mapUrl: (url) => Config().baseUrl! + url!,
-                        ),
-                        // Custom placeholder image for broken links
-                        networkSourceMatcher():
-                            networkImageRender(altWidget: (_) => FrappeLogo()),
-                      },
-                      onLinkTap: (url, _, __, ___) {
-                        print("Opening $url...");
-                      },
-                      onImageTap: (src, _, __, ___) {
-                        print(src);
-                      },
-                      onImageError: (exception, stackTrace) {
-                        print(exception);
-                      },
-                    ),
+                    child: field.value != null
+                        ? Html(
+                            data: field.value as String,
+                            customImageRenders: {
+                              networkSourceMatcher(domains: [
+                                Config().baseUrl!,
+                              ]): networkImageRender(
+                                headers: {
+                                  HttpHeaders.cookieHeader: DioHelper.cookies!,
+                                },
+                                altWidget: (alt) => Text(alt ?? ""),
+                                loadingWidget: () => Text("Loading..."),
+                              ),
+                              // for relative paths, prefix with a base url
+                              (attr, _) =>
+                                      attr["src"] != null &&
+                                      !(attr["src"]!.startsWith("http") ||
+                                          attr["src"]!.startsWith("https")):
+                                  networkImageRender(
+                                headers: {
+                                  HttpHeaders.cookieHeader: DioHelper.cookies!,
+                                },
+                                mapUrl: (url) => Config().baseUrl! + url!,
+                              ),
+                              // Custom placeholder image for broken links
+                              networkSourceMatcher(): networkImageRender(
+                                  altWidget: (_) => FrappeLogo()),
+                            },
+                            onLinkTap: (url, _, __, ___) {
+                              print("Opening $url...");
+                            },
+                            onImageTap: (src, _, __, ___) {
+                              print(src);
+                            },
+                            onImageError: (exception, stackTrace) {
+                              print(exception);
+                            },
+                          )
+                        : Container(),
                   ),
                 ),
               ),
@@ -109,7 +112,7 @@ class _FormBuilderTextEditorState<T>
     extends FormBuilderFieldState<FormBuilderTextEditor<T>, T> {}
 
 class EditText extends StatefulWidget {
-  final String data;
+  final String? data;
 
   EditText({
     required this.data,
@@ -124,14 +127,18 @@ class _EditTextState extends State<EditText> {
 
   @override
   Widget build(BuildContext context) {
-    final doc = parse(widget.data);
-    doc.getElementsByTagName("img").forEach((element) {
-      if (!element.attributes['src']!.startsWith("http")) {
-        element.attributes['src'] =
-            Config().baseUrl! + element.attributes['src']!;
-      }
-    });
-    var html = doc.outerHtml;
+    String? html;
+    if (widget.data != null) {
+      final doc = parse(widget.data);
+      doc.getElementsByTagName("img").forEach((element) {
+        if (!element.attributes['src']!.startsWith("http")) {
+          element.attributes['src'] =
+              Config().baseUrl! + element.attributes['src']!;
+        }
+      });
+      html = doc.outerHtml;
+    }
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0.8,

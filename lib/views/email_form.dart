@@ -71,7 +71,7 @@ class EmailForm extends StatelessWidget {
           defaultValue: '$doctype}: $subjectField} ($doc})',
         ),
         DoctypeField(
-          fieldtype: "Text Editor2",
+          fieldtype: "Text Editor",
           fieldname: "content",
           label: "Message",
         ),
