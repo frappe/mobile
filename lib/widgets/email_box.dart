@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
@@ -22,7 +21,7 @@ class EmailBox extends StatelessWidget {
     var time = timeago.format(DateTime.parse(data.creation));
 
     var document = parse(data.content);
-    String parsedContent = parse(document.body.text).documentElement.text;
+    String parsedContent = parse(document.body!.text).documentElement!.text;
 
     return Container(
       color: Colors.white,
@@ -87,11 +86,11 @@ class ViewEmail extends StatelessWidget {
   final String content;
 
   ViewEmail({
-    @required this.title,
-    @required this.time,
-    @required this.senderFullName,
-    @required this.sender,
-    @required this.content,
+    required this.title,
+    required this.time,
+    required this.senderFullName,
+    required this.sender,
+    required this.content,
   });
 
   @override
@@ -100,7 +99,7 @@ class ViewEmail extends StatelessWidget {
     var imgs = document.getElementsByTagName('img');
 
     imgs.forEach((img) {
-      if (Uri.parse(img.attributes["src"]).hasAbsolutePath) {
+      if (!img.attributes["src"]!.startsWith("http")) {
         img.attributes["src"] = "${Config().baseUrl}${img.attributes["src"]}";
       }
     });
