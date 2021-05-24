@@ -7,6 +7,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/style.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
+import 'package:html/parser.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 
@@ -29,23 +30,38 @@ class DocVersion extends StatelessWidget {
       var changed = decoded["changed"];
       var author = version.owner;
       var createdBy = decoded["created_by"];
+      var stringMaxSize = 50;
 
       if (changed != null) {
         txt = "<div><b>$author</b> changed value of ";
 
         changed.forEach((c) {
-          var fromVal;
-          var toVal;
+          String fromVal;
+          String toVal;
           if (c[1] == null || c[1] == "") {
             fromVal = '""';
           } else {
-            fromVal = c[1];
+            fromVal = parse(c[1].toString()).documentElement.text;
+            if (fromVal.length > stringMaxSize) {
+              fromVal = fromVal.substring(0, stringMaxSize) + "...";
+            }
           }
 
           if (c[2] == null || c[2] == "") {
             toVal = '""';
           } else {
-            toVal = c[2];
+            toVal = parse(c[2].toString()).documentElement.text;
+            if (toVal.length > stringMaxSize) {
+              toVal = toVal.substring(0, stringMaxSize) + "...";
+            }
+          }
+
+          if (fromVal == "") {
+            fromVal = '""';
+          }
+
+          if (toVal == "") {
+            toVal = '""';
           }
 
           txt += "${toTitleCase(c[0])} from <b>$fromVal</b> to <b>$toVal</b> ";
