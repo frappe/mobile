@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
@@ -252,10 +254,15 @@ class FormView extends StatelessWidget {
             context: context,
           );
         } catch (e) {
-          FrappeAlert.errorAlert(
-            title: (e as ErrorResponse).statusMessage,
-            context: context,
-          );
+          var _e = e as ErrorResponse;
+          if (_e.statusCode == HttpStatus.serviceUnavailable) {
+            noInternetAlert(context);
+          } else {
+            FrappeAlert.errorAlert(
+              title: _e.statusMessage,
+              context: context,
+            );
+          }
         }
       }
     }

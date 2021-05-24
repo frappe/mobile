@@ -137,10 +137,16 @@ class DeskViewModel extends BaseViewModel {
       }
     } catch (e) {
       LoadingIndicator.stopLoading();
-      FrappeAlert.errorAlert(
-        context: context,
-        title: e is ErrorResponse ? e.statusMessage : "Something went wrong",
-      );
+      var _e = e as ErrorResponse;
+
+      if (_e.statusCode == HttpStatus.serviceUnavailable) {
+        noInternetAlert(context);
+      } else {
+        FrappeAlert.errorAlert(
+          context: context,
+          title: _e.statusMessage,
+        );
+      }
     }
   }
 }

@@ -1,4 +1,9 @@
 // @dart=2.9
+import 'dart:io';
+
+import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/utils/frappe_alert.dart';
+import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/views/base_view.dart';
 import 'package:frappe_app/views/new_doc/new_doc_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +33,7 @@ final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
 class _NewDocState extends State<NewDoc> {
   @override
   Widget build(BuildContext context) {
-    var connectionStatus = Provider.of<ConnectivityStatus>(
+    Provider.of<ConnectivityStatus>(
       context,
     );
 
@@ -51,11 +56,28 @@ class _NewDocState extends State<NewDoc> {
                       onPressed: () async {
                         if (_fbKey.currentState.saveAndValidate()) {
                           var formValue = _fbKey.currentState.value;
-                          await model.saveDoc(
-                            formValue: formValue,
-                            meta: widget.meta,
-                            context: context,
-                          );
+
+                          try {
+                            await model.saveDoc(
+                              formValue: formValue,
+                              meta: widget.meta,
+                              context: context,
+                            );
+                          } catch (e) {
+                            var _e = e as ErrorResponse;
+
+                            if (_e.statusCode ==
+                                HttpStatus.serviceUnavailable) {
+                              noInternetAlert(
+                                context,
+                              );
+                            } else {
+                              FrappeAlert.errorAlert(
+                                title: _e.statusMessage,
+                                context: context,
+                              );
+                            }
+                          }
                         }
                       }),
                 ),

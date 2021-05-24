@@ -8,6 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/offline_storage.dart';
 import 'package:frappe_app/services/storage_service.dart';
+import 'package:frappe_app/utils/frappe_alert.dart';
 import 'package:frappe_app/utils/navigation_helper.dart';
 import 'package:frappe_app/views/session_expired.dart';
 import 'package:frappe_app/widgets/frappe_button.dart';
@@ -45,7 +46,7 @@ downloadFile(String fileUrl, String downloadPath) async {
 
   await FlutterDownloader.enqueue(
     headers: {
-      HttpHeaders.cookieHeader: await DioHelper.getCookies(),
+      HttpHeaders.cookieHeader: DioHelper.cookies,
     },
     url: absoluteUrl,
     savedDir: downloadPath,
@@ -337,4 +338,14 @@ initAwesomeItems() async {
   }
 
   OfflineStorage.putItem('awesomeItems', moduleDoctypesMapping);
+}
+
+noInternetAlert(
+  BuildContext context,
+) {
+  FrappeAlert.warnAlert(
+    title: "Connection Lost",
+    subtitle: "You are not connected to Internet. Retry after sometime.",
+    context: context,
+  );
 }
