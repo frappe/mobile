@@ -117,9 +117,7 @@ class Timeline extends StatelessWidget {
         );
 
         for (var event in _processData()) {
-          if (event["_category"] == "versions") {
-            event = Version.fromJson(event);
-          } else if (event["_category"] == "communications") {
+          if (event["_category"] == "communications") {
             event = Communication.fromJson(event);
           } else if (event["_category"] == "comments") {
             event = Comment.fromJson(event);
@@ -136,10 +134,11 @@ class Timeline extends StatelessWidget {
                 },
               ),
             );
-          } else if (event is Version) {
+          } else {
             if (communicationOnly) {
               continue;
             }
+
             children.add(DocVersion(event));
           }
         }

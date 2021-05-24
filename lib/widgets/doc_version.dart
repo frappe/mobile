@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'dart:convert';
 import 'dart:io';
 
@@ -6,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/style.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
-import 'package:frappe_app/model/get_doc_response.dart';
+import 'package:frappe_app/model/offline_storage.dart';
 import 'package:html/parser.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
@@ -16,19 +15,31 @@ import '../utils/helpers.dart';
 import '../utils/http.dart';
 
 class DocVersion extends StatelessWidget {
-  final Version version;
+  final Map version;
 
   DocVersion(this.version);
 
   @override
   Widget build(BuildContext context) {
-    String txt;
+    var txt = "";
 
-    var time = timeago.format(DateTime.parse(version.creation));
-    if (version.data != null) {
-      final decoded = json.decode(version.data);
+    var time = timeago.format(DateTime.parse(version["creation"]));
+    var author = version["owner"];
+
+    var allUsers = OfflineStorage.getItem('allUsers');
+    allUsers = allUsers["data"];
+    if (allUsers != null) {
+      var user = allUsers[author];
+
+      if (user != null) {
+        author = user["full_name"];
+      } else {
+        author = "Support Bot";
+      }
+    }
+    if (version["data"] != null) {
+      final decoded = json.decode(version["data"]);
       var changed = decoded["changed"];
-      var author = version.owner;
       var createdBy = decoded["created_by"];
       var stringMaxSize = 50;
 
@@ -41,7 +52,7 @@ class DocVersion extends StatelessWidget {
           if (c[1] == null || c[1] == "") {
             fromVal = '""';
           } else {
-            fromVal = parse(c[1].toString()).documentElement.text;
+            fromVal = parse(c[1].toString()).documentElement?.text ?? "";
             if (fromVal.length > stringMaxSize) {
               fromVal = fromVal.substring(0, stringMaxSize) + "...";
             }
@@ -50,7 +61,7 @@ class DocVersion extends StatelessWidget {
           if (c[2] == null || c[2] == "") {
             toVal = '""';
           } else {
-            toVal = parse(c[2].toString()).documentElement.text;
+            toVal = parse(c[2].toString()).documentElement?.text ?? "";
             if (toVal.length > stringMaxSize) {
               toVal = toVal.substring(0, stringMaxSize) + "...";
             }
@@ -69,9 +80,11 @@ class DocVersion extends StatelessWidget {
       } else if (createdBy != null) {
         txt = "<div><b>$createdBy</b> created";
       }
+    } else if (version["_category"] == "views") {
+      txt = "<div><b>$author</b> viewed";
     }
 
-    txt += "</br><span>$time</span></div>";
+    txt += "<p><span>$time</span></p></div>";
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 4.0, top: 4.0),
