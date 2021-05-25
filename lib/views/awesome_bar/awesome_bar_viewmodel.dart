@@ -74,8 +74,11 @@ class AwesomBarViewModel extends BaseViewModel {
         },
       );
 
-      filteredAwesomeBarItems =
-          awesomeBarItems.where((element) => true).toList();
+      filteredAwesomeBarItems = awesomeBarItems
+          .where(
+            (element) => true,
+          )
+          .toList();
     }
   }
 
@@ -109,9 +112,9 @@ class AwesomBarViewModel extends BaseViewModel {
     required Function bottomNavCallback,
   }) async {
     // addToRecent(awesomeBarItem);
-    LoadingIndicator.loadingWithBackgroundDisabled();
     try {
       if (awesomeBarItem.type == "Doctype") {
+        LoadingIndicator.loadingWithBackgroundDisabled();
         var meta = await OfflineStorage.getMeta(
           awesomeBarItem.value,
         );
@@ -128,6 +131,7 @@ class AwesomBarViewModel extends BaseViewModel {
           ),
         );
       } else if (awesomeBarItem.type == "NewDoc") {
+        LoadingIndicator.loadingWithBackgroundDisabled();
         var meta = await OfflineStorage.getMeta(
           awesomeBarItem.value,
         );
@@ -144,12 +148,6 @@ class AwesomBarViewModel extends BaseViewModel {
         bottomNavCallback(
           awesomeBarItem.value,
         );
-        // locator<NavigationService>().navigateTo(
-        //   Routes.home,
-        //   arguments: DoctypeViewArguments(
-        //     module: item["value"],
-        //   ),
-        // );
       }
     } catch (e) {
       error = e as ErrorResponse;
@@ -173,8 +171,11 @@ class AwesomeBarItem {
   late String value;
   late String label;
 
-  AwesomeBarItem(
-      {required this.type, required this.value, required this.label});
+  AwesomeBarItem({
+    required this.type,
+    required this.value,
+    required this.label,
+  });
 
   AwesomeBarItem.fromJson(Map<String, dynamic> json) {
     type = json['type'];
