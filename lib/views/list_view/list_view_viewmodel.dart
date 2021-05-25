@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/model/desk_sidebar_items_response.dart';
 import 'package:frappe_app/model/desktop_page_response.dart';
 import 'package:frappe_app/views/form_view/form_view.dart';
 import 'package:injectable/injectable.dart';
@@ -134,10 +135,45 @@ class ListViewViewModel extends BaseViewModel {
       var isOnline = await verifyOnline();
 
       if (isOnline) {
-        desktopPageResponse = await locator<Api>().getDesktopPage(module);
+        var deskItems = await locator<Api>().getDeskSideBarItems();
+
+        var desktopPage = module;
+        for (final element in deskItems.message) {
+          if (element.module == module) {
+            desktopPage = element.name;
+            break;
+          }
+        }
+
+        desktopPageResponse = await locator<Api>().getDesktopPage(desktopPage);
       } else {
+        var deskSidebarItemsCache = OfflineStorage.getItem(
+          'deskSidebarItems',
+        )["data"];
+
+        late DeskSidebarItemsResponse deskItems;
+
+        if (deskSidebarItemsCache != null) {
+          deskItems = DeskSidebarItemsResponse.fromJson(
+            deskSidebarItemsCache,
+          );
+        } else {
+          throw ErrorResponse(
+            statusCode: HttpStatus.serviceUnavailable,
+          );
+        }
+
+        var desktopPage = module;
+
+        for (final element in deskItems.message) {
+          if (element.module == module) {
+            desktopPage = element.name;
+            break;
+          }
+        }
+
         var offlinedesktopPageResponse =
-            OfflineStorage.getItem('${module}Doctypes')["data"];
+            OfflineStorage.getItem('${desktopPage}Doctypes')["data"];
 
         if (offlinedesktopPageResponse != null) {
           desktopPageResponse =
