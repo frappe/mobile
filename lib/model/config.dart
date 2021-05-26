@@ -10,9 +10,11 @@ class Config {
         defaultValue: false,
       );
 
-  String? get userId => Uri.decodeFull(configContainer.get(
-        'userId',
-      ));
+  String? get userId => Uri.decodeFull(
+        configContainer.get(
+          'userId',
+        ),
+      );
 
   String get user => configContainer.get(
         'user',

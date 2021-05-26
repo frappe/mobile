@@ -6,8 +6,11 @@ import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/form/controls/control.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/doctype_response.dart';
+import 'package:frappe_app/model/login_request.dart';
+import 'package:frappe_app/utils/http.dart';
 import 'package:frappe_app/utils/navigation_helper.dart';
 import 'package:frappe_app/views/home_view.dart';
+import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
 
 import 'login_viewmodel.dart';
 
@@ -99,14 +102,37 @@ class Login extends StatelessWidget {
                                   var formValue = _fbKey.currentState?.value;
 
                                   try {
-                                    await model.login(
-                                      formValue,
+                                    await setBaseUrl(formValue!["serverURL"]);
+
+                                    var loginRequest = LoginRequest(
+                                      usr: formValue["usr"].trimRight(),
+                                      pwd: formValue["pwd"],
                                     );
 
-                                    NavigationHelper.pushReplacement(
-                                      context: context,
-                                      page: HomeView(),
+                                    var loginResponse = await model.login(
+                                      loginRequest,
                                     );
+
+                                    if (loginResponse.verification != null &&
+                                        loginResponse.tmpId != null) {
+                                      showModalBottomSheet(
+                                        context: context,
+                                        useRootNavigator: true,
+                                        isScrollControlled: true,
+                                        builder: (context) =>
+                                            VerificationBottomSheetView(
+                                          loginRequest: loginRequest,
+                                          tmpId: loginResponse.tmpId!,
+                                          message: loginResponse
+                                              .verification!.prompt,
+                                        ),
+                                      );
+                                    } else {
+                                      NavigationHelper.pushReplacement(
+                                        context: context,
+                                        page: HomeView(),
+                                      );
+                                    }
                                   } catch (e) {
                                     var _e = e as ErrorResponse;
 
@@ -114,8 +140,7 @@ class Login extends StatelessWidget {
                                         HttpStatus.unauthorized) {
                                       FrappeAlert.errorAlert(
                                         title: "Not Authorized",
-                                        subtitle:
-                                            'Invalid Username or Password',
+                                        subtitle: _e.statusMessage,
                                         context: context,
                                       );
                                     } else {
@@ -137,6 +162,119 @@ class Login extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class VerificationBottomSheetView extends StatefulWidget {
+  final String message;
+  final String tmpId;
+  final LoginRequest loginRequest;
+
+  VerificationBottomSheetView({
+    required this.message,
+    required this.tmpId,
+    required this.loginRequest,
+  });
+
+  @override
+  _VerificationBottomSheetViewState createState() =>
+      _VerificationBottomSheetViewState();
+}
+
+class _VerificationBottomSheetViewState
+    extends State<VerificationBottomSheetView> {
+  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return BaseView<LoginViewModel>(
+      builder: (context, model, child) => AnimatedPadding(
+        padding: MediaQuery.of(context).viewInsets,
+        duration: const Duration(milliseconds: 100),
+        child: FractionallySizedBox(
+          heightFactor: 0.4,
+          child: FrappeBottomSheet(
+            title: 'Verification',
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Text(widget.message),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  FormBuilder(
+                    key: _fbKey,
+                    child: buildDecoratedControl(
+                      control: FormBuilderTextField(
+                        name: 'otp',
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(context),
+                        ]),
+                        decoration: Palette.formFieldDecoration(
+                          label: "Verification",
+                        ),
+                      ),
+                      field: DoctypeField(
+                        fieldname: 'otp',
+                        label: "Verification",
+                      ),
+                    ),
+                  ),
+                  FrappeFlatButton(
+                    title: model.loginButtonLabel,
+                    fullWidth: true,
+                    height: 46,
+                    buttonType: ButtonType.primary,
+                    onPressed: () async {
+                      FocusScope.of(context).requestFocus(
+                        FocusNode(),
+                      );
+
+                      if (_fbKey.currentState != null) {
+                        if (_fbKey.currentState!.saveAndValidate()) {
+                          var formValue = _fbKey.currentState?.value;
+                          widget.loginRequest.tmpId = widget.tmpId;
+                          widget.loginRequest.otp = formValue!["otp"];
+                          widget.loginRequest.cmd = "login";
+
+                          try {
+                            await model.login(widget.loginRequest);
+
+                            NavigationHelper.pushReplacement(
+                              context: context,
+                              page: HomeView(),
+                            );
+                          } catch (e) {
+                            var _e = e as ErrorResponse;
+
+                            if (_e.statusCode == HttpStatus.unauthorized) {
+                              FrappeAlert.errorAlert(
+                                title: "Not Authorized",
+                                subtitle: _e.statusMessage,
+                                context: context,
+                              );
+                            } else {
+                              FrappeAlert.errorAlert(
+                                title: "Error",
+                                subtitle: _e.statusMessage,
+                                context: context,
+                              );
+                            }
+                          }
+                        }
+                      }
+                    },
+                  ),
+                  Container(
+                    height: 100,
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

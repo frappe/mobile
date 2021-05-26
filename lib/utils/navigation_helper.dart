@@ -14,6 +14,18 @@ class NavigationHelper {
     );
   }
 
+  static push({
+    required BuildContext context,
+    required Widget page,
+    bool withNavBar = false,
+  }) {
+    Navigator.of(context, rootNavigator: !withNavBar).push(
+      MaterialPageRoute(builder: (context) {
+        return page;
+      }),
+    );
+  }
+
   static pushReplacement({
     required BuildContext context,
     required Widget page,

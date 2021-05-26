@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/model/group_by_count_response.dart';
+import 'package:frappe_app/model/login_request.dart';
 
 import '../../model/doctype_response.dart';
 import '../../model/desktop_page_response.dart';
@@ -10,8 +11,7 @@ import '../../model/login_response.dart';
 
 abstract class Api {
   Future<LoginResponse> login(
-    String usr,
-    String pwd,
+    LoginRequest loginRequest,
   );
 
   Future<DeskSidebarItemsResponse> getDeskSideBarItems();

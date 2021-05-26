@@ -1,3 +1,4 @@
+import 'package:frappe_app/model/login_request.dart';
 import 'package:frappe_app/model/login_response.dart';
 import 'package:injectable/injectable.dart';
 
@@ -50,28 +51,34 @@ class LoginViewModel extends BaseViewModel {
     );
   }
 
-  Future<LoginResponse> login(data) async {
+  Future<LoginResponse> login(LoginRequest loginRequest) async {
     loginButtonLabel = "Verifying...";
     notifyListeners();
-    await setBaseUrl(data["serverURL"]);
 
     try {
       var response = await locator<Api>().login(
-        data["usr"].trimRight(),
-        data["pwd"],
+        loginRequest,
       );
-      updateUserDetails(response);
-      OfflineStorage.putItem(
-        'usr',
-        data["usr"].trimRight(),
-      );
-      await cacheAllUsers();
-      await initAwesomeItems();
 
-      loginButtonLabel = "Success";
-      notifyListeners();
+      if (response.verification != null) {
+        loginButtonLabel = "Verify";
+        return response;
+      } else {
+        updateUserDetails(response);
 
-      return response;
+        OfflineStorage.putItem(
+          'usr',
+          loginRequest.usr,
+        );
+
+        await cacheAllUsers();
+        await initAwesomeItems();
+
+        loginButtonLabel = "Success";
+        notifyListeners();
+
+        return response;
+      }
     } catch (e) {
       Config.set('isLoggedIn', false);
       loginButtonLabel = "Login";

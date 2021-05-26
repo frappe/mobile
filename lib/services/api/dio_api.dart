@@ -8,6 +8,7 @@ import 'package:dio/dio.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/model/group_by_count_response.dart';
+import 'package:frappe_app/model/login_request.dart';
 
 import '../../model/doctype_response.dart';
 import '../../model/desktop_page_response.dart';
@@ -21,14 +22,11 @@ import '../../utils/dio_helper.dart';
 import '../../model/offline_storage.dart';
 
 class DioApi implements Api {
-  Future<LoginResponse> login(String usr, String pwd) async {
+  Future<LoginResponse> login(LoginRequest loginRequest) async {
     try {
       final response = await DioHelper.dio.post(
         '/method/login',
-        data: {
-          'usr': usr,
-          'pwd': pwd,
-        },
+        data: loginRequest.toJson(),
         options: Options(
           validateStatus: (status) {
             return status < 500;
@@ -36,13 +34,17 @@ class DioApi implements Api {
         ),
       );
       if (response.statusCode == 200) {
-        response.data["user_id"] =
-            response.headers.map["set-cookie"][3].split(';')[0].split('=')[1];
+        if (response.headers.map["set-cookie"] != null &&
+            response.headers.map["set-cookie"][3] != null) {
+          response.data["user_id"] =
+              response.headers.map["set-cookie"][3].split(';')[0].split('=')[1];
+        }
+
         return LoginResponse.fromJson(response.data);
       } else {
         throw ErrorResponse(
           statusCode: response.statusCode,
-          statusMessage: response.statusMessage,
+          statusMessage: response.data["message"],
         );
       }
     } catch (e) {
