@@ -60,6 +60,23 @@ class FormBuilderTextEditor<T> extends FormBuilderField<T> {
                     child: field.value != null
                         ? Html(
                             data: field.value as String,
+                            customRender: {
+                              "img": (renderContext, child) {
+                                var src = renderContext.tree.attributes['src'];
+                                if (src != null) {
+                                  if (!src.startsWith("http")) {
+                                    src = Config().baseUrl! + src;
+                                  }
+                                  return Image.network(
+                                    src,
+                                    headers: {
+                                      HttpHeaders.cookieHeader:
+                                          DioHelper.cookies!,
+                                    },
+                                  );
+                                }
+                              },
+                            },
                             customImageRenders: {
                               networkSourceMatcher(domains: [
                                 Config().baseUrl!,

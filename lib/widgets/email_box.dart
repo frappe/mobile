@@ -165,6 +165,9 @@ class ViewEmail extends StatelessWidget {
                         ),
                         child: Image.network(
                           src,
+                          headers: {
+                            HttpHeaders.cookieHeader: DioHelper.cookies!,
+                          },
                         ),
                       );
                     }
