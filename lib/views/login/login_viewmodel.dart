@@ -1,5 +1,6 @@
 import 'package:frappe_app/model/login_request.dart';
 import 'package:frappe_app/model/login_response.dart';
+import 'package:frappe_app/utils/dio_helper.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../app/locator.dart';
@@ -73,6 +74,7 @@ class LoginViewModel extends BaseViewModel {
 
         await cacheAllUsers();
         await initAwesomeItems();
+        await DioHelper.initCookies();
 
         loginButtonLabel = "Success";
         notifyListeners();

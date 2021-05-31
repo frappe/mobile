@@ -22,6 +22,9 @@ class DioHelper {
       );
     dio?.options.connectTimeout = 60 * 1000;
     dio?.options.receiveTimeout = 60 * 1000;
+  }
+
+  static Future initCookies() async {
     cookies = await getCookies();
   }
 
