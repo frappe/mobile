@@ -105,22 +105,25 @@ class SelectFilterField extends StatelessWidget {
       },
       body: ListView(
           children: fields.map((field) {
-        return ListTile(
-          selectedTileColor: FrappePalette.grey[100],
-          selected: field.fieldname == model.filter.field.fieldname,
-          onTap: () {
-            model.updateFieldName(field);
-          },
-          visualDensity: VisualDensity(vertical: -4),
-          title: Text(
-            field.label,
-            style: TextStyle(
-              color: FrappePalette.grey[700],
+        return Container(
+          color: field.fieldname == model.filter.field.fieldname
+              ? FrappePalette.grey[100]
+              : null,
+          child: ListTile(
+            onTap: () {
+              model.updateFieldName(field);
+            },
+            visualDensity: VisualDensity(vertical: -4),
+            title: Text(
+              field.label,
+              style: TextStyle(
+                color: FrappePalette.grey[700],
+              ),
             ),
-          ),
-          trailing: FrappeIcon(
-            FrappeIcons.arrow_right,
-            size: 18,
+            trailing: FrappeIcon(
+              FrappeIcons.arrow_right,
+              size: 18,
+            ),
           ),
         );
       }).toList()),
@@ -178,22 +181,25 @@ class SelectFilterOperator extends StatelessWidget {
         }
       }).map(
         (opt) {
-          return ListTile(
-            selectedTileColor: FrappePalette.grey[100],
-            selected: opt == model.filter.filterOperator,
-            onTap: () {
-              model.updateFilterOperator(opt);
-            },
-            visualDensity: VisualDensity(vertical: -4),
-            title: Text(
-              opt.label,
-              style: TextStyle(
-                color: FrappePalette.grey[700],
+          return Container(
+            color: opt == model.filter.filterOperator
+                ? FrappePalette.grey[100]
+                : null,
+            child: ListTile(
+              onTap: () {
+                model.updateFilterOperator(opt);
+              },
+              visualDensity: VisualDensity(vertical: -4),
+              title: Text(
+                opt.label,
+                style: TextStyle(
+                  color: FrappePalette.grey[700],
+                ),
               ),
-            ),
-            trailing: FrappeIcon(
-              FrappeIcons.arrow_right,
-              size: 18,
+              trailing: FrappeIcon(
+                FrappeIcons.arrow_right,
+                size: 18,
+              ),
             ),
           );
         },
