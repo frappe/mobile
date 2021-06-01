@@ -3,19 +3,18 @@
 
 **Please Note, this Project is still in beta stage and requires latest version(develop) of Frappe Framework v13**
 
-<kbd><img width="216" height="432" src="screenshots/login.png" alt="Frappe Books Preview" /></kbd>
-<kbd><img width="216" height="432" src="screenshots/home.png" alt="Frappe Books Preview" /></kbd>
-<kbd><img width="216" height="432" src="screenshots/list_view.png" alt="Frappe Books Preview" /></kbd>
+<kbd><img width="216" height="432" src="screenshots/desk.jpeg" alt="Desk" /></kbd>
+<kbd><img width="216" height="432" src="screenshots/awesomebar.jpeg" alt="Awesome Bar" /></kbd>
+<kbd><img width="216" height="432" src="screenshots/form_view.jpeg" alt="Form View" /></kbd>
 
 ## Features:
-1) Offline First (Data is automatically fetched in background every 30 mins)
-3) Create/Update Docs (queued when offline and processed automatically when reconnected to internet)
-4) Add/Remove Assignees, Tags
-5) Add/Remove/Download Attachments 
-6) Add Comments, Send Email
-7) Appreciate/Criticize Users involved in specified Doc.
-8) Timeline
-9) Awesombar
+1) Create/Update Docs
+2) Add/Remove Assignees, Tags
+3) Add/Remove/Download Attachments 
+4) Add Comments, Send Email
+5) Appreciate/Criticize Users involved in specified Doc.
+6) Timeline
+7) Awesombar
 
 
 ## Development
