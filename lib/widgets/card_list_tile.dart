@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class CardListTile extends StatelessWidget {
-  final Widget leading;
-  final Widget title;
-  final Widget subtitle;
-  final Widget trailing;
+  final Widget? leading;
+  final Widget? title;
+  final Widget? subtitle;
+  final Widget? trailing;
   final double elevation;
   final EdgeInsetsGeometry margin;
-  final Color color;
-  final Function onTap;
+  final Color? color;
+  final void Function()? onTap;
 
   const CardListTile({
     this.leading,

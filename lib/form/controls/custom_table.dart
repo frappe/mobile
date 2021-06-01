@@ -8,17 +8,16 @@ import '../../services/api/api.dart';
 
 class CustomTable extends StatelessWidget {
   final DoctypeField doctypeField;
-  final Map doc;
+  final Map? doc;
 
   const CustomTable({
-    Key key,
-    @required this.doctypeField,
+    required this.doctypeField,
     this.doc,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    if (doc == null || doc[doctypeField.fieldname] == null) {
+    if (doc == null || doc?[doctypeField.fieldname] == null) {
       return Container();
     }
     return FutureBuilder(
@@ -52,7 +51,7 @@ class CustomTable extends StatelessWidget {
           colCount = columns.length < colCount ? columns.length : colCount;
 
           return JsonTable(
-            doc[doctypeField.fieldname],
+            doc?[doctypeField.fieldname],
             tableCellBuilder: (value) {
               var isNum = double.tryParse(value) != null;
               return Container(
@@ -93,7 +92,7 @@ class CustomTable extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      header,
+                      header!,
                       textAlign: numFields.contains(header)
                           ? TextAlign.end
                           : TextAlign.start,
@@ -109,7 +108,7 @@ class CustomTable extends StatelessWidget {
             columns: columns,
           );
         } else if (snapshot.hasError) {
-          return Text(snapshot.error);
+          return Text(snapshot.error.toString());
         } else {
           return Center(
             child: CircularProgressIndicator(),

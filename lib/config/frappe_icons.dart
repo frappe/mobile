@@ -22,4 +22,16 @@ class FrappeIcons {
   static const question = '$_basePath/question.svg';
   static const error = '$_basePath/error.svg';
   static const frappe = '$_basePath/frappe_ico.svg';
+  static const add_user = '$_basePath/add_user.svg';
+  static const down_arrow = '$_basePath/down_arrow.svg';
+  static const close_alt = '$_basePath/close_alt.svg';
+  static const image_add = '$_basePath/image_add.svg';
+  static const small_file = '$_basePath/small_file.svg';
+  static const lock = '$_basePath/lock.svg';
+  static const home_filled = '$_basePath/home_filled.svg';
+  static const home_outlined = '$_basePath/home_outlined.svg';
+  static const select = '$_basePath/select.svg';
+  static const arrow_right = '$_basePath/arrow_right.svg';
+  static const email = '$_basePath/email.svg';
+  static const unlock = '$_basePath/unlock.svg';
 }

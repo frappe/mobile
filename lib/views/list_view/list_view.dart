@@ -2,18 +2,18 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/views/base_view.dart';
+import 'package:frappe_app/views/list_view/bottom_sheets/filters_bottom_sheet_view.dart';
+import 'package:frappe_app/views/new_doc/new_doc_view.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../model/doctype_response.dart';
 
 import '../../app/locator.dart';
-import '../../app/router.gr.dart';
 
 import '../../views/list_view/list_view_viewmodel.dart';
-import '../../views/filter_list/filter_list_view.dart';
-
-import '../../services/navigation_service.dart';
 
 import '../../config/palette.dart';
 import '../../config/frappe_icons.dart';
@@ -28,22 +28,24 @@ import '../../widgets/list_item.dart';
 
 class CustomListView extends StatelessWidget {
   final DoctypeResponse meta;
+  final String module;
 
   CustomListView({
-    @required this.meta,
+    required this.meta,
+    required this.module,
   });
 
   @override
   Widget build(BuildContext context) {
     return BaseView<ListViewViewModel>(
       onModelReady: (model) {
+        model.meta = meta;
         model.getData(meta.docs[0]);
+        model.getDesktopPage(module);
       },
       onModelClose: (model) {
-        model.filters = {};
-
-        model.showLiked = false;
         model.error = null;
+        model.filters.clear();
       },
       builder: (context, model, child) => model.state == ViewState.busy
           ? Scaffold(
@@ -51,46 +53,122 @@ class CustomListView extends StatelessWidget {
                 child: CircularProgressIndicator(),
               ),
             )
-          : Builder(
-              builder: (context) {
-                if (model.error != null) {
-                  return handleError(model.error);
-                }
+          : model.hasError
+              ? handleError(
+                  error: model.error,
+                  context: context,
+                  onRetry: () {
+                    model.meta = meta;
+                    model.getData(meta.docs[0]);
+                    model.getDesktopPage(meta.docs[0].module);
+                  },
+                )
+              : RefreshIndicator(
+                  onRefresh: () {
+                    return Future.value(model.refresh());
+                  },
+                  child: Scaffold(
+                    floatingActionButtonLocation:
+                        FloatingActionButtonLocation.centerFloat,
+                    floatingActionButton: AddFilterButton(
+                      appliedFilters: model.filters.length,
+                      onPressed: () async {
+                        var fields = model.getFilterableFields(
+                          meta.docs[0].fields,
+                        );
 
-                var filters = model.filters;
+                        List<Filter> appliedFilters =
+                            await showModalBottomSheet(
+                          useRootNavigator: true,
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (context) => FiltersBottomSheetView(
+                            fields: fields,
+                            filters: model.filters,
+                          ),
+                        );
 
-                return Scaffold(
-                  bottomNavigationBar: _bottomBar(
-                    model: model,
-                    filters: filters,
-                    context: context,
-                  ),
-                  body: HeaderAppBar(
-                    subtitle: meta.docs[0].name,
-                    subActions: <Widget>[
-                      _newDoc(),
-                    ],
-                    body: RefreshIndicator(
-                      onRefresh: () {
-                        return Future.value(model.refresh());
+                        model.applyFilters(appliedFilters);
                       },
-                      child: Container(
-                        color: Palette.bgColor,
-                        child: _generateList(
-                          model: model,
-                          filters: filters,
-                          meta: meta,
-                        ),
+                    ),
+                    appBar: buildAppBar(
+                      title: model.meta.docs[0].name,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ShowSiblingDoctypes(
+                              model: model,
+                              title: model.meta.docs[0].name,
+                            ),
+                          ),
+                        );
+                      },
+                      actions: <Widget>[
+                        _newDoc(context),
+                      ],
+                    ),
+                    body: Container(
+                      color: Palette.bgColor,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (model.filters.isNotEmpty)
+                            Container(
+                              height: 50,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: model.filters.length,
+                                itemBuilder: (context, index) {
+                                  var filter = model.filters[index];
+                                  var txt =
+                                      "${filter.field.label} ${filter.filterOperator.label} ${filter.value}";
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0,
+                                      vertical: 10,
+                                    ),
+                                    child: InputChip(
+                                      label: Text(
+                                        txt,
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                      deleteIcon: FrappeIcon(
+                                        FrappeIcons.close_alt,
+                                        size: 14,
+                                      ),
+                                      backgroundColor: FrappePalette.grey[200],
+                                      shape: BeveledRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(6),
+                                        ),
+                                      ),
+                                      onDeleted: () {
+                                        model.removeFilter(index);
+                                      },
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          Expanded(
+                            child: _generateList(
+                              model: model,
+                              filters: model.filters,
+                              meta: meta,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                );
-              },
-            ),
+                ),
     );
   }
 
-  Widget _newDoc() {
+  Widget _newDoc(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Container(
@@ -104,9 +182,12 @@ class CustomListView extends StatelessWidget {
             color: Colors.white,
           ),
           onPressed: () {
-            locator<NavigationService>().navigateTo(
-              Routes.newDoc,
-              arguments: NewDocArguments(meta: meta),
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) {
+                  return NewDoc(meta: meta);
+                },
+              ),
             );
           },
         ),
@@ -115,13 +196,14 @@ class CustomListView extends StatelessWidget {
   }
 
   Widget _generateList({
-    @required Map filters,
-    @required DoctypeResponse meta,
-    @required ListViewViewModel model,
+    required List<Filter> filters,
+    required DoctypeResponse meta,
+    required ListViewViewModel model,
   }) {
     return PagewiseListView(
       pageLoadController: model.pagewiseLoadController,
       padding: EdgeInsets.zero,
+      showRetry: false,
       noItemsFoundBuilder: (context) {
         return _noItemsFoundBuilder(
           filters: filters,
@@ -129,19 +211,31 @@ class CustomListView extends StatelessWidget {
           model: model,
         );
       },
+      errorBuilder: (context, e) {
+        return Container(
+          height: MediaQuery.of(context).size.height - 200,
+          child: handleError(
+            error: e as ErrorResponse,
+            context: context,
+            onRetry: () {
+              model.refresh();
+            },
+          ),
+        );
+      },
       itemBuilder: ((buildContext, entry, _) {
+        late var e = entry as Map;
         return _generateItem(
           model: model,
-          data: entry,
-          meta: meta.docs[0],
+          data: e,
           onListTap: () {
             model.onListTap(
-              meta: meta,
-              name: entry["name"],
+              context: buildContext,
+              name: e["name"],
             );
           },
           onButtonTap: (k, v) {
-            model.onButtonTap(key: k, value: v);
+            // model.onButtonTap(key: k, value: v);
           },
         );
       }),
@@ -149,11 +243,10 @@ class CustomListView extends StatelessWidget {
   }
 
   Widget _generateItem({
-    @required Map data,
-    @required Function onListTap,
-    @required Function onButtonTap,
-    @required DoctypeDoc meta,
-    @required ListViewViewModel model,
+    required Map data,
+    required void Function() onListTap,
+    required Function onButtonTap,
+    required ListViewViewModel model,
   }) {
     var assignee =
         data["_assign"] != null ? json.decode(data["_assign"]) : null;
@@ -166,15 +259,17 @@ class CustomListView extends StatelessWidget {
     var isSeenByUser = seenBy.contains(model.userId);
 
     return ListItem(
-      doctype: meta.name,
+      doctype: model.meta.docs[0].name,
+      likeCount: likedBy.length,
       onListTap: onListTap,
       isFav: isLikedByUser,
       seen: isSeenByUser,
-      assignee: assignee != null && assignee.length > 0
-          ? ['_assign', assignee[0]]
-          : null,
+      toggleLikeCallback: () {
+        model.refresh();
+      },
+      assignee: assignee != null && assignee.length > 0 ? assignee : null,
       onButtonTap: onButtonTap,
-      title: getTitle(meta, data),
+      title: getTitle(model.meta.docs[0], data),
       modifiedOn: "${timeago.format(
         DateTime.parse(
           data['modified'],
@@ -187,9 +282,9 @@ class CustomListView extends StatelessWidget {
   }
 
   Widget _noItemsFoundBuilder({
-    @required Map filters,
-    @required BuildContext context,
-    @required ListViewViewModel model,
+    required List<Filter> filters,
+    required BuildContext context,
+    required ListViewViewModel model,
   }) {
     return Container(
       color: Colors.white,
@@ -211,10 +306,11 @@ class CustomListView extends StatelessWidget {
             buttonType: ButtonType.primary,
             title: 'Create New',
             onPressed: () {
-              locator<NavigationService>().navigateTo(
-                Routes.newDoc,
-                arguments: NewDocArguments(
-                  meta: meta,
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return NewDoc(meta: meta);
+                  },
                 ),
               );
             },
@@ -223,74 +319,160 @@ class CustomListView extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _bottomBar({
-    @required Map filters,
-    @required BuildContext context,
-    @required ListViewViewModel model,
-  }) {
-    return Container(
-      height: 60,
-      child: BottomAppBar(
-        color: Colors.white,
-        child: Row(
-          children: <Widget>[
-            Spacer(),
-            FrappeRaisedButton(
-              minWidth: 120,
-              onPressed: () async {
-                Map newFilters = await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return FilterList(
-                        filters: filters,
-                        doctype: meta.docs[0].name,
-                        meta: meta,
-                      );
-                    },
-                  ),
-                );
+class AddFilterButton extends StatelessWidget {
+  final int appliedFilters;
+  final void Function()? onPressed;
 
-                // Map newFilters = await showModalBottomSheet(
-                //   context: context,
-                //   isScrollControlled: true,
-                //   builder: (BuildContext context) {
-                //     return FractionallySizedBox(
-                //       heightFactor: 0.96,
-                //       child: FilterList(
-                //         filters: filters,
-                //         doctype: doctype,
-                //         meta: model.meta,
-                //       ),
-                //     );
-                //   },
-                // );
+  const AddFilterButton({
+    required this.appliedFilters,
+    required this.onPressed,
+  });
 
-                model.applyFilters(newFilters);
-              },
-              title: 'Filters (${model.filters.length})',
-              icon: FrappeIcons.filter,
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            FrappeRaisedButton(
-              minWidth: 120,
-              onPressed: () {
-                model.toggleLiked(
-                  meta.docs[0].name,
-                );
-              },
-              title: 'Liked',
-              icon: model.showLiked
-                  ? FrappeIcons.favourite_active
-                  : FrappeIcons.favourite_resting,
-              iconSize: 16.0,
-            ),
-            Spacer()
-          ],
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      style: TextButton.styleFrom(
+        backgroundColor: FrappePalette.grey[700],
+        padding: EdgeInsets.all(8),
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            color: Colors.transparent,
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(5),
+          ),
         ),
       ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          FrappeIcon(
+            FrappeIcons.filter,
+            color: Colors.white,
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Text(
+            'Add filter',
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(
+                4,
+              ),
+            ),
+            child: Center(
+              child: Text(
+                appliedFilters.toString(),
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      onPressed: onPressed,
+    );
+  }
+}
+
+class ShowSiblingDoctypes extends StatelessWidget {
+  final ListViewViewModel model;
+  final String title;
+
+  const ShowSiblingDoctypes({
+    required this.model,
+    required this.title,
+  });
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: buildAppBar(
+        title: title,
+        expanded: true,
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      ),
+      body: model.state == ViewState.busy
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Builder(
+              builder: (context) {
+                List<Widget> listItems = [];
+
+                model.desktopPageResponse.message.cards.items.forEach(
+                  (item) {
+                    listItems.add(Column(
+                      children: [
+                        ListTile(
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                          ),
+                          title: Text(
+                            item.label,
+                            style: TextStyle(
+                              color: FrappePalette.grey[600],
+                              fontWeight: FontWeight.w600,
+                              fontSize: 11,
+                            ),
+                          ),
+                          visualDensity: VisualDensity(
+                            vertical: -4,
+                          ),
+                        ),
+                        ...item.links.where((link) {
+                          return link.type != "DocType";
+                        }).map(
+                          (link) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0,
+                              ),
+                              child: ListTile(
+                                visualDensity: VisualDensity(
+                                  vertical: -4,
+                                ),
+                                tileColor: title == link.label
+                                    ? Palette.bgColor
+                                    : Colors.white,
+                                title: Text(link.label),
+                                onTap: () {
+                                  model.switchDoctype(
+                                    doctype: link.label,
+                                    context: context,
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ).toList()
+                      ],
+                    ));
+                  },
+                );
+
+                return ListView(
+                  children: listItems,
+                );
+              },
+            ),
     );
   }
 }

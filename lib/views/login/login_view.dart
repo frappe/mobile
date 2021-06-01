@@ -2,21 +2,25 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/form/controls/control.dart';
+import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/model/doctype_response.dart';
+import 'package:frappe_app/model/login_request.dart';
+import 'package:frappe_app/utils/http.dart';
+import 'package:frappe_app/utils/navigation_helper.dart';
+import 'package:frappe_app/views/home_view.dart';
+import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
 
 import 'login_viewmodel.dart';
 
 import '../../config/palette.dart';
 import '../../widgets/frappe_button.dart';
 
-import '../../app/router.gr.dart';
-import '../../app/locator.dart';
-
 import '../../views/base_view.dart';
-import '../../services/navigation_service.dart';
 
 import '../../utils/frappe_alert.dart';
 import '../../utils/enums.dart';
-import '../../utils/helpers.dart';
 
 class Login extends StatelessWidget {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
@@ -51,8 +55,8 @@ class Login extends StatelessWidget {
                       key: _fbKey,
                       child: Column(
                         children: <Widget>[
-                          buildDecoratedWidget(
-                            FormBuilderTextField(
+                          buildDecoratedControl(
+                            control: FormBuilderTextField(
                               name: 'serverURL',
                               initialValue: model.savedCreds.serverURL,
                               validator: FormBuilderValidators.compose([
@@ -60,30 +64,29 @@ class Login extends StatelessWidget {
                                 FormBuilderValidators.url(context),
                               ]),
                               decoration: Palette.formFieldDecoration(
-                                withLabel: true,
                                 label: "Server URL",
                               ),
                             ),
-                            true,
-                            "Server URL",
+                            field: DoctypeField(
+                              fieldname: 'serverUrl',
+                              label: "Server URL",
+                            ),
                           ),
-                          buildDecoratedWidget(
-                              FormBuilderTextField(
-                                name: 'usr',
-                                initialValue: model.savedCreds.usr,
-                                validator: FormBuilderValidators.compose([
-                                  FormBuilderValidators.required(context),
-                                ]),
-                                decoration: Palette.formFieldDecoration(
-                                  withLabel: true,
-                                  label: "Email Address",
-                                ),
+                          buildDecoratedControl(
+                            control: FormBuilderTextField(
+                              name: 'usr',
+                              initialValue: model.savedCreds.usr,
+                              validator: FormBuilderValidators.compose([
+                                FormBuilderValidators.required(context),
+                              ]),
+                              decoration: Palette.formFieldDecoration(
+                                label: "Email Address",
                               ),
-                              true,
-                              "Email Address"),
-                          PasswordField(
-                            savedPassword: model.savedCreds.pwd,
+                            ),
+                            field: DoctypeField(
+                                fieldname: "email", label: "Email Address"),
                           ),
+                          PasswordField(),
                           FrappeFlatButton(
                             title: model.loginButtonLabel,
                             fullWidth: true,
@@ -94,31 +97,59 @@ class Login extends StatelessWidget {
                                 FocusNode(),
                               );
 
-                              if (_fbKey.currentState.saveAndValidate()) {
-                                var formValue = _fbKey.currentState.value;
+                              if (_fbKey.currentState != null) {
+                                if (_fbKey.currentState!.saveAndValidate()) {
+                                  var formValue = _fbKey.currentState?.value;
 
-                                var response = await model.login(
-                                  formValue,
-                                );
+                                  try {
+                                    await setBaseUrl(formValue!["serverURL"]);
 
-                                if (response["success"] == true) {
-                                  locator<NavigationService>().pushReplacement(
-                                    Routes.home,
-                                  );
-                                } else {
-                                  if (response["statusCode"] ==
-                                      HttpStatus.unauthorized) {
-                                    FrappeAlert.errorAlert(
-                                      title: "Not Authorized",
-                                      subtitle: 'Invalid Username or Password',
-                                      context: context,
+                                    var loginRequest = LoginRequest(
+                                      usr: formValue["usr"].trimRight(),
+                                      pwd: formValue["pwd"],
                                     );
-                                  } else {
-                                    FrappeAlert.errorAlert(
-                                      title: "Error",
-                                      subtitle: response["message"],
-                                      context: context,
+
+                                    var loginResponse = await model.login(
+                                      loginRequest,
                                     );
+
+                                    if (loginResponse.verification != null &&
+                                        loginResponse.tmpId != null) {
+                                      showModalBottomSheet(
+                                        context: context,
+                                        useRootNavigator: true,
+                                        isScrollControlled: true,
+                                        builder: (context) =>
+                                            VerificationBottomSheetView(
+                                          loginRequest: loginRequest,
+                                          tmpId: loginResponse.tmpId!,
+                                          message: loginResponse
+                                              .verification!.prompt,
+                                        ),
+                                      );
+                                    } else {
+                                      NavigationHelper.pushReplacement(
+                                        context: context,
+                                        page: HomeView(),
+                                      );
+                                    }
+                                  } catch (e) {
+                                    var _e = e as ErrorResponse;
+
+                                    if (_e.statusCode ==
+                                        HttpStatus.unauthorized) {
+                                      FrappeAlert.errorAlert(
+                                        title: "Not Authorized",
+                                        subtitle: _e.statusMessage,
+                                        context: context,
+                                      );
+                                    } else {
+                                      FrappeAlert.errorAlert(
+                                        title: "Error",
+                                        subtitle: _e.statusMessage,
+                                        context: context,
+                                      );
+                                    }
                                   }
                                 }
                               }
@@ -138,11 +169,120 @@ class Login extends StatelessWidget {
   }
 }
 
-class Title extends StatelessWidget {
-  const Title({
-    Key key,
-  }) : super(key: key);
+class VerificationBottomSheetView extends StatefulWidget {
+  final String message;
+  final String tmpId;
+  final LoginRequest loginRequest;
 
+  VerificationBottomSheetView({
+    required this.message,
+    required this.tmpId,
+    required this.loginRequest,
+  });
+
+  @override
+  _VerificationBottomSheetViewState createState() =>
+      _VerificationBottomSheetViewState();
+}
+
+class _VerificationBottomSheetViewState
+    extends State<VerificationBottomSheetView> {
+  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return BaseView<LoginViewModel>(
+      builder: (context, model, child) => AnimatedPadding(
+        padding: MediaQuery.of(context).viewInsets,
+        duration: const Duration(milliseconds: 100),
+        child: FractionallySizedBox(
+          heightFactor: 0.4,
+          child: FrappeBottomSheet(
+            title: 'Verification',
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Text(widget.message),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  FormBuilder(
+                    key: _fbKey,
+                    child: buildDecoratedControl(
+                      control: FormBuilderTextField(
+                        name: 'otp',
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(context),
+                        ]),
+                        decoration: Palette.formFieldDecoration(
+                          label: "Verification",
+                        ),
+                      ),
+                      field: DoctypeField(
+                        fieldname: 'otp',
+                        label: "Verification",
+                      ),
+                    ),
+                  ),
+                  FrappeFlatButton(
+                    title: model.loginButtonLabel,
+                    fullWidth: true,
+                    height: 46,
+                    buttonType: ButtonType.primary,
+                    onPressed: () async {
+                      FocusScope.of(context).requestFocus(
+                        FocusNode(),
+                      );
+
+                      if (_fbKey.currentState != null) {
+                        if (_fbKey.currentState!.saveAndValidate()) {
+                          var formValue = _fbKey.currentState?.value;
+                          widget.loginRequest.tmpId = widget.tmpId;
+                          widget.loginRequest.otp = formValue!["otp"];
+                          widget.loginRequest.cmd = "login";
+
+                          try {
+                            await model.login(widget.loginRequest);
+
+                            NavigationHelper.pushReplacement(
+                              context: context,
+                              page: HomeView(),
+                            );
+                          } catch (e) {
+                            var _e = e as ErrorResponse;
+
+                            if (_e.statusCode == HttpStatus.unauthorized) {
+                              FrappeAlert.errorAlert(
+                                title: "Not Authorized",
+                                subtitle: _e.statusMessage,
+                                context: context,
+                              );
+                            } else {
+                              FrappeAlert.errorAlert(
+                                title: "Error",
+                                subtitle: _e.statusMessage,
+                                context: context,
+                              );
+                            }
+                          }
+                        }
+                      }
+                    },
+                  ),
+                  Container(
+                    height: 100,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Title extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
@@ -156,10 +296,6 @@ class Title extends StatelessWidget {
 }
 
 class FrappeLogo extends StatelessWidget {
-  const FrappeLogo({
-    Key key,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Image(
@@ -171,49 +307,53 @@ class FrappeLogo extends StatelessWidget {
 }
 
 class PasswordField extends StatefulWidget {
-  final String savedPassword;
-
-  const PasswordField({
-    Key key,
-    this.savedPassword,
-  }) : super(key: key);
-
   @override
   _PasswordFieldState createState() => _PasswordFieldState();
 }
 
 class _PasswordFieldState extends State<PasswordField> {
   bool _hidePassword = true;
+
   @override
   Widget build(BuildContext context) {
-    return buildDecoratedWidget(
-        FormBuilderTextField(
-          maxLines: 1,
-          name: 'pwd',
-          initialValue: widget.savedPassword,
-          validator: FormBuilderValidators.compose([
-            FormBuilderValidators.required(context),
-          ]),
-          obscureText: _hidePassword,
-          decoration: Palette.formFieldDecoration(
-            withLabel: true,
-            label: "Password",
-            suffixIcon: FlatButton(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              child: Text(_hidePassword ? "Show" : "Hide"),
-              onPressed: () {
-                setState(
-                  () {
-                    // TODO
-                    _hidePassword = !_hidePassword;
-                  },
-                );
-              },
+    return buildDecoratedControl(
+      control: Stack(
+        alignment: Alignment.centerRight,
+        children: [
+          FormBuilderTextField(
+            maxLines: 1,
+            name: 'pwd',
+            validator: FormBuilderValidators.compose([
+              FormBuilderValidators.required(context),
+            ]),
+            obscureText: _hidePassword,
+            decoration: Palette.formFieldDecoration(
+              label: "Password",
             ),
           ),
-        ),
-        true,
-        "Password");
+          TextButton(
+            style: ButtonStyle(
+              overlayColor: MaterialStateProperty.all(
+                Colors.transparent,
+              ),
+            ),
+            child: Text(
+              _hidePassword ? "Show" : "Hide",
+              style: TextStyle(
+                color: FrappePalette.grey[600],
+              ),
+            ),
+            onPressed: () {
+              setState(
+                () {
+                  _hidePassword = !_hidePassword;
+                },
+              );
+            },
+          )
+        ],
+      ),
+      field: DoctypeField(fieldname: "password", label: "Password"),
+    );
   }
 }

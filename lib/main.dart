@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -21,7 +23,7 @@ void main() async {
   await FlutterDownloader.initialize();
   await initApiConfig();
   await initLocalNotifications();
-  await initAutoSync();
+  // await initAutoSync();
 
   runApp(FrappeApp());
 }

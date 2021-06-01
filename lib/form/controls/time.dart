@@ -9,23 +9,19 @@ import 'base_control.dart';
 import 'base_input.dart';
 
 class Time extends StatelessWidget with Control, ControlInput {
-  final Key key;
   final DoctypeField doctypeField;
-  final Map doc;
-  final bool withLabel;
-  final bool editMode;
+  final Key? key;
+  final Map? doc;
 
   const Time({
+    required this.doctypeField,
     this.key,
-    @required this.doctypeField,
     this.doc,
-    this.withLabel,
-    this.editMode,
   });
 
   @override
   Widget build(BuildContext context) {
-    List<String Function(dynamic)> validators = [];
+    List<String? Function(dynamic?)> validators = [];
 
     var f = setMandatory(doctypeField);
 
@@ -39,17 +35,16 @@ class Time extends StatelessWidget with Control, ControlInput {
       key: key,
       initialValue: doc != null
           ? DateFormat.Hms().parse(
-              doc[doctypeField.fieldname],
+              doc![doctypeField.fieldname],
             )
           : null,
       inputType: InputType.time,
       valueTransformer: (val) {
-        return val != null ? val.toIso8601String() : null;
+        return val.toIso8601String();
       },
       keyboardType: TextInputType.number,
       name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(
-        withLabel: withLabel,
         label: doctypeField.label,
       ),
       validator: FormBuilderValidators.compose(validators),

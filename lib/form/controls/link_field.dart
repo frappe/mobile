@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/widgets/form_builder_typeahead.dart';
 import 'package:provider/provider.dart';
 
 import '../../model/doctype_response.dart';
@@ -15,33 +18,30 @@ import 'base_input.dart';
 
 class LinkField extends StatefulWidget {
   final DoctypeField doctypeField;
-  final Map doc;
+  final Map? doc;
 
   final key;
-  final bool withLabel;
   final bool showInputBorder;
-  final bool allowClear;
-  final Function onSuggestionSelected;
-  final Icon prefixIcon;
-  final Color fillColor;
-  final ItemBuilder itemBuilder;
-  final SuggestionsCallback suggestionsCallback;
-
-  final List<String Function(dynamic)> validators;
+  final Function? onSuggestionSelected;
+  final Function? noItemsFoundBuilder;
+  final Widget? prefixIcon;
+  final ItemBuilder? itemBuilder;
+  final SuggestionsCallback? suggestionsCallback;
+  final AxisDirection direction;
+  final TextEditingController? controller;
 
   LinkField({
     this.key,
-    @required this.doctypeField,
-    @required this.fillColor,
-    this.withLabel = true,
+    required this.doctypeField,
     this.doc,
     this.prefixIcon,
-    this.allowClear = true,
     this.onSuggestionSelected,
-    this.validators,
+    this.noItemsFoundBuilder,
     this.showInputBorder = false,
     this.itemBuilder,
     this.suggestionsCallback,
+    this.controller,
+    this.direction = AxisDirection.down,
   });
 
   @override
@@ -51,8 +51,7 @@ class LinkField extends StatefulWidget {
 class _LinkFieldState extends State<LinkField> with Control, ControlInput {
   @override
   Widget build(BuildContext context) {
-    List<String Function(dynamic)> validators = [];
-
+    List<String? Function(dynamic?)> validators = [];
     var f = setMandatory(widget.doctypeField);
 
     if (f != null) {
@@ -70,29 +69,23 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
         data: Theme.of(context).copyWith(primaryColor: Colors.black),
         child: FormBuilderTypeAhead(
           key: widget.key,
+          controller: widget.controller,
+          initialValue: widget.doc != null
+              ? widget.doc![widget.doctypeField.fieldname]
+              : null,
+          direction: AxisDirection.up,
           onSuggestionSelected: (item) {
             if (widget.onSuggestionSelected != null) {
-              widget.onSuggestionSelected(item);
+              if (item is String) {
+                widget.onSuggestionSelected!(item);
+              } else if (item is Map) {
+                widget.onSuggestionSelected!(item["value"]);
+              }
             }
           },
-          onChanged: (_) {
-            setState(() {});
-          },
           validator: FormBuilderValidators.compose(validators),
-          decoration: InputDecoration(
-            filled: true,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 10,
-            ),
-            border: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: const BorderRadius.all(
-                const Radius.circular(6),
-              ),
-            ),
-            prefixIcon: widget.prefixIcon,
-            fillColor: widget.fillColor,
-            hintText: widget.withLabel ? null : widget.doctypeField.label,
+          decoration: Palette.formFieldDecoration(
+            label: widget.doctypeField.label,
           ),
           selectionToTextTransformer: (item) {
             if (item != null) {
@@ -100,26 +93,28 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
                 return item["value"];
               }
             }
-            return item;
+            return item.toString();
           },
           name: widget.doctypeField.fieldname,
           itemBuilder: widget.itemBuilder ??
               (context, item) {
-                return ListTile(
-                  title: Text(
-                    item["value"],
-                  ),
-                );
+                if (item is Map) {
+                  return ListTile(
+                    title: Text(
+                      item["value"],
+                    ),
+                  );
+                } else {
+                  return ListTile(
+                    title: Text(item.toString()),
+                  );
+                }
               },
-          initialValue: widget.doc != null
-              ? widget.doc[widget.doctypeField.fieldname]
-              : null,
           suggestionsCallback: widget.suggestionsCallback ??
               (query) async {
                 var lowercaseQuery = query.toLowerCase();
                 var isOnline = await verifyOnline();
-                if ((connectionStatus == null ||
-                        connectionStatus == ConnectivityStatus.offline) &&
+                if (connectionStatus == ConnectivityStatus.offline &&
                     !isOnline) {
                   var linkFull = await OfflineStorage.getItem(
                       '${widget.doctypeField.options}LinkFull');

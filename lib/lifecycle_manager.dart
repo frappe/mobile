@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/services/storage_service.dart';
 import 'package:frappe_app/utils/helpers.dart';
+
+import 'app/locator.dart';
 
 class LifeCycleManager extends StatefulWidget {
   final Widget child;
-  LifeCycleManager({Key key, this.child}) : super(key: key);
+  LifeCycleManager({required this.child});
 
   _LifeCycleManagerState createState() => _LifeCycleManagerState();
 }
@@ -12,13 +15,13 @@ class _LifeCycleManagerState extends State<LifeCycleManager>
     with WidgetsBindingObserver {
   @override
   void initState() {
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
     super.initState();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
 
@@ -29,11 +32,16 @@ class _LifeCycleManagerState extends State<LifeCycleManager>
       case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
         print('detached');
-        await putSharedPrefValue("backgroundTask", true);
-        print(await getSharedPrefValue("backgroundTask"));
+        await locator<StorageService>().putSharedPrefBoolValue(
+          "backgroundTask",
+          true,
+        );
         break;
       case AppLifecycleState.resumed:
-        await putSharedPrefValue("backgroundTask", false);
+        await locator<StorageService>().putSharedPrefBoolValue(
+          "backgroundTask",
+          false,
+        );
         print('resume...');
         break;
 

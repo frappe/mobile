@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
 
 import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/model/config.dart';
 import 'package:frappe_app/model/doctype_response.dart';
-import 'package:frappe_app/form/controls/barcode.dart';
+import 'package:frappe_app/utils/enums.dart';
+import 'package:frappe_app/widgets/custom_expansion_tile.dart';
 
 import '../../config/palette.dart';
-import '../../utils/helpers.dart';
 
 import './custom_table.dart';
 import './check.dart';
@@ -21,266 +23,365 @@ import './time.dart';
 import './autocomplete.dart';
 import './link_field.dart';
 import './multi_select.dart';
-import './signature.dart' as customSignature;
 
 Widget makeControl({
-  @required DoctypeField field,
-  dynamic value,
-  Map doc,
-  bool withLabel = true,
-  bool editMode = true,
-  Function onChanged,
+  required DoctypeField field,
+  Map? doc,
+  bool decorateControl = true,
 }) {
-  Widget fieldWidget;
+  Widget control;
 
   switch (field.fieldtype) {
     case "Link":
       {
-        fieldWidget = buildDecoratedWidget(
-            LinkField(
-              key: Key(value),
-              doctypeField: field,
-              doc: doc,
-              fillColor: Palette.fieldBgColor,
-              allowClear: editMode,
-              withLabel: withLabel,
-            ),
-            withLabel,
-            field.label);
+        control = LinkField(
+          doctypeField: field,
+          doc: doc,
+        );
       }
       break;
 
     case "Autocomplete":
       {
-        fieldWidget = buildDecoratedWidget(
-          AutoComplete(
-            key: Key(value),
-            fillColor: Palette.fieldBgColor,
-            allowClear: editMode,
-            doctypeField: field,
-            doc: doc,
-          ),
-          withLabel,
-          field.label,
+        control = AutoComplete(
+          doctypeField: field,
+          doc: doc,
         );
       }
       break;
 
     case "Table":
       {
-        fieldWidget = buildDecoratedWidget(
-          CustomTable(
-            doctypeField: field,
-            doc: doc,
-          ),
-          withLabel,
-          field.label,
+        control = CustomTable(
+          doctypeField: field,
+          doc: doc,
         );
       }
       break;
 
     case "Select":
       {
-        fieldWidget = buildDecoratedWidget(
-            Select(
-              key: Key(value),
-              allowClear: editMode,
-              doc: doc,
-              doctypeField: field,
-              withLabel: withLabel,
-            ),
-            withLabel,
-            field.label);
+        control = Select(
+          doc: doc,
+          doctypeField: field,
+        );
       }
       break;
 
     case "MultiSelect":
       {
-        if (value != null) {
-          value = [
-            {
-              "value": value,
-              "description": value,
-            }
-          ];
-        }
-
-        fieldWidget = buildDecoratedWidget(
-          MultiSelect(
-            doctypeField: field,
-            doc: doc,
-          ),
-          withLabel,
-          field.label,
+        control = MultiSelect(
+          doctypeField: field,
+          doc: doc,
         );
       }
       break;
 
     case "Small Text":
       {
-        fieldWidget = buildDecoratedWidget(
-          SmallText(
-            key: Key(value),
-            doctypeField: field,
-            doc: doc,
-            withLabel: withLabel,
-          ),
-          withLabel,
-          field.label,
+        control = SmallText(
+          doctypeField: field,
+          doc: doc,
         );
       }
       break;
 
     case "Data":
       {
-        fieldWidget = buildDecoratedWidget(
-            Data(
-              key: Key(value),
-              doc: doc,
-              doctypeField: field,
-              withLabel: withLabel,
-            ),
-            withLabel,
-            field.label);
+        control = Data(
+          doc: doc,
+          doctypeField: field,
+        );
       }
       break;
 
     case "Check":
       {
-        fieldWidget = buildDecoratedWidget(
-            Check(
-              key: UniqueKey(),
-              doctypeField: field,
-              doc: doc,
-              onChanged: onChanged,
-              withLabel: withLabel,
-            ),
-            false);
+        control = Check(
+          doctypeField: field,
+          doc: doc,
+        );
       }
       break;
 
     case "Text Editor":
       {
-        fieldWidget = buildDecoratedWidget(
-          TextEditor(
-            doctypeField: field,
-            doc: doc,
-            withLabel: withLabel,
-          ),
-          withLabel,
-          field.label,
+        control = TextEditor(
+          doctypeField: field,
+          doc: doc,
         );
       }
       break;
 
     case "Datetime":
       {
-        fieldWidget = buildDecoratedWidget(
-          DatetimeField(
-            key: Key(value),
-            doctypeField: field,
-            doc: doc,
-            withLabel: withLabel,
-            editMode: editMode,
-          ),
-          withLabel,
-          field.label,
+        control = DatetimeField(
+          doctypeField: field,
+          doc: doc,
         );
       }
       break;
 
     case "Float":
       {
-        fieldWidget = buildDecoratedWidget(
-          Float(
-            key: Key(value.toString()),
-            doctypeField: field,
-            doc: doc,
-            withLabel: withLabel,
-          ),
-          withLabel,
-          field.label,
+        control = Float(
+          doctypeField: field,
+          doc: doc,
         );
       }
       break;
 
     case "Int":
       {
-        fieldWidget = buildDecoratedWidget(
-          Int(
-            key: Key(value.toString()),
-            doctypeField: field,
-            doc: doc,
-            withLabel: withLabel,
-          ),
-          withLabel,
-          field.label,
+        control = Int(
+          doctypeField: field,
+          doc: doc,
         );
       }
       break;
 
     case "Time":
       {
-        fieldWidget = buildDecoratedWidget(
-          Time(
-            key: Key(value),
-            doctypeField: field,
-            doc: doc,
-            withLabel: withLabel,
-          ),
-          withLabel,
-          field.label,
+        control = Time(
+          doctypeField: field,
+          doc: doc,
         );
       }
       break;
 
     case "Date":
       {
-        fieldWidget = buildDecoratedWidget(
-          Date(
-            key: Key(value),
-            doctypeField: field,
-            doc: doc,
-            withLabel: withLabel,
-          ),
-          withLabel,
-          field.label,
+        control = Date(
+          doctypeField: field,
+          doc: doc,
         );
       }
       break;
 
     // case "Signature":
     //   {
-    //     fieldWidget = buildDecoratedWidget(
-    //       customSignature.Signature(
-    //         key: Key(value),
-    //         doc: doc,
-    //         doctypeField: field,
-    //         withLabel: withLabel,
-    //       ),
-    //       withLabel,
-    //       field.label,
+    //     control = customSignature.Signature(
+    //       doc: doc,
+    //       doctypeField: field,
     //     );
     //   }
     //   break;
 
     // case "Barcode":
     //   {
-    //     fieldWidget = buildDecoratedWidget(
-    //       FormBuilderBarcode(
-    //         key: Key(value),
-    //         doctypeField: field,
-    //         doc: doc,
-    //       ),
-    //       withLabel,
-    //       field.label,
+    //     control = FormBuilderBarcode(
+    //       doctypeField: field,
+    //       doc: doc,
     //     );
     //   }
     //   break;
 
     default:
-      fieldWidget = Container();
+      control = Container();
       break;
   }
-  return fieldWidget;
+  if (decorateControl && field.fieldtype != "Check") {
+    return buildDecoratedControl(
+      control: control,
+      field: field,
+    );
+  } else {
+    return Padding(
+      padding: Palette.fieldPadding,
+      child: control,
+    );
+  }
+}
+
+Widget buildDecoratedControl({
+  required Widget control,
+  required DoctypeField field,
+}) {
+  return Padding(
+    padding: Palette.fieldPadding,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Row(
+          children: [
+            Padding(
+              padding: Palette.labelPadding,
+              child: Text(
+                field.label ?? "",
+                style: Palette.secondaryTxtStyle,
+              ),
+            ),
+            SizedBox(width: 4),
+            if (field.reqd == 1)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4.0),
+                child: Text(
+                  '*',
+                  style: TextStyle(
+                    color: FrappePalette.red,
+                  ),
+                ),
+              ),
+          ],
+        ),
+        control
+      ],
+    ),
+  );
+}
+
+List<Widget> generateLayout({
+  required List<DoctypeField> fields,
+  ViewType? viewType,
+  Map? doc,
+  bool editMode = true,
+}) {
+  if (fields.first.fieldtype != "Section Break" && viewType == ViewType.form) {
+    fields.insert(
+      0,
+      DoctypeField(
+        fieldtype: "Section Break",
+        label: null,
+        fieldname: "section",
+      ),
+    );
+  }
+
+  List<Widget> collapsibles = [];
+  List<Widget> widgets = [];
+
+  List<String> collapsibleLabels = [];
+
+  var isCollapsible = false;
+
+  int cIdx = 0;
+
+  fields.asMap().entries.forEach((entry) {
+    var field = entry.value;
+    var fIdx = entry.key;
+
+    var val = doc != null
+        ? doc[field.fieldname] ?? field.defaultValue
+        : field.defaultValue;
+
+    if (val == '__user') {
+      val = Config().userId;
+    }
+
+    if (val is List) {
+      if (val.isEmpty) {
+        val = null;
+      }
+    }
+
+    if (field.fieldtype == "Section Break") {
+      if (collapsibles.length > 0) {
+        var sectionVisibility = collapsibles.any((element) {
+          if (element is Visibility) {
+            return element.visible == true;
+          } else {
+            return true;
+          }
+        });
+        widgets.add(
+          Visibility(
+            visible: sectionVisibility,
+            child: ListTileTheme(
+              contentPadding: EdgeInsets.all(0),
+              child: CustomExpansionTile(
+                maintainState: true,
+                initiallyExpanded: cIdx == 0,
+                title: Text(
+                  collapsibleLabels[cIdx],
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
+                ),
+                children: [...collapsibles],
+              ),
+            ),
+          ),
+        );
+        cIdx += 1;
+        collapsibles.clear();
+      }
+
+      isCollapsible = true;
+      collapsibleLabels.add(
+        field.label == null ? fields[fIdx + 1].label ?? "Form" : field.label!,
+      );
+    } else if (isCollapsible) {
+      if (viewType == ViewType.form) {
+        collapsibles.add(
+          Visibility(
+            visible: editMode ? true : val != null && val != '',
+            child: makeControl(
+              field: field,
+              doc: doc,
+            ),
+          ),
+        );
+      } else {
+        collapsibles.add(
+          makeControl(
+            doc: doc,
+            field: field,
+          ),
+        );
+      }
+    } else {
+      if (viewType == ViewType.form) {
+        widgets.add(
+          Visibility(
+            visible: editMode ? true : val != null && val != '',
+            child: makeControl(
+              doc: doc,
+              field: field,
+            ),
+          ),
+        );
+      } else {
+        widgets.add(
+          makeControl(
+            field: field,
+            doc: doc,
+          ),
+        );
+      }
+    }
+  });
+
+  if (collapsibles.length > 0) {
+    var sectionVisibility = collapsibles.any((element) {
+      if (element is Visibility) {
+        return element.visible == true;
+      } else {
+        return true;
+      }
+    });
+    widgets.add(
+      Visibility(
+        visible: sectionVisibility,
+        child: ListTileTheme(
+          contentPadding: EdgeInsets.all(0),
+          child: CustomExpansionTile(
+            maintainState: true,
+            title: Text(
+              collapsibleLabels[cIdx],
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+              ),
+            ),
+            children: [...collapsibles],
+          ),
+        ),
+      ),
+    );
+    cIdx += 1;
+    collapsibles.clear();
+  }
+
+  return widgets;
 }

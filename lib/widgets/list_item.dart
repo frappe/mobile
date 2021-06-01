@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/utils/indicator.dart';
-import 'package:frappe_app/widgets/user_avatar.dart';
+import 'package:frappe_app/widgets/collapsed_avatars.dart';
+import 'package:frappe_app/widgets/like_doc.dart';
 
 class ListItem extends StatelessWidget {
-  final String title;
+  final String? title;
   final String modifiedOn;
   final String name;
   final String doctype;
@@ -15,25 +17,29 @@ class ListItem extends StatelessWidget {
   final bool seen;
 
   final int commentCount;
+  final int likeCount;
 
   final List status;
   final List assignee;
 
   final Function onButtonTap;
-  final Function onListTap;
+  final void Function() onListTap;
+  final Function toggleLikeCallback;
 
   ListItem({
-    @required this.doctype,
-    @required this.isFav,
-    @required this.seen,
-    @required this.commentCount,
-    @required this.status,
-    @required this.onButtonTap,
-    @required this.title,
-    @required this.assignee,
-    @required this.modifiedOn,
-    @required this.name,
-    @required this.onListTap,
+    required this.doctype,
+    required this.isFav,
+    required this.seen,
+    required this.commentCount,
+    required this.likeCount,
+    required this.status,
+    required this.onButtonTap,
+    required this.title,
+    required this.assignee,
+    required this.modifiedOn,
+    required this.name,
+    required this.onListTap,
+    required this.toggleLikeCallback,
   });
 
   @override
@@ -51,6 +57,7 @@ class ListItem extends StatelessWidget {
         ),
         elevation: 0,
         child: Container(
+          height: 112,
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
@@ -63,11 +70,34 @@ class ListItem extends StatelessWidget {
             children: <Widget>[
               Row(
                 children: <Widget>[
+                  Container(
+                    width: colWidth,
+                    child: Text(
+                      title ?? "",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: FrappePalette.grey[900],
+                        fontWeight: !seen ? FontWeight.w600 : null,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: <Widget>[
                   Flexible(
                     child: Text(
                       name,
                       maxLines: 1,
-                      style: Palette.secondaryTxtStyle,
+                      style: TextStyle(
+                        color: FrappePalette.grey[600],
+                        fontWeight: FontWeight.w400,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -82,34 +112,16 @@ class ListItem extends StatelessWidget {
                   Flexible(
                     child: Text(
                       modifiedOn,
-                      style: Palette.secondaryTxtStyle,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                children: <Widget>[
-                  Container(
-                    width: colWidth,
-                    child: Text(
-                      title ?? "",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
-                        // fontWeight: FontWeight.bold
-                        fontWeight: !seen ? FontWeight.bold : null,
+                        color: FrappePalette.grey[600],
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
                   ),
                 ],
               ),
               SizedBox(
-                height: 10,
+                height: 5,
               ),
               Row(
                 children: <Widget>[
@@ -124,32 +136,45 @@ class ListItem extends StatelessWidget {
                     ),
                   ),
                   VerticalDivider(),
-                  Padding(
-                      padding: const EdgeInsets.only(right: 6.0),
-                      child: FrappeIcon(
-                        FrappeIcons.message_1,
-                        size: 16,
-                        color: Palette.secondaryTxtColor,
-                      )),
+                  FrappeIcon(
+                    FrappeIcons.message_1,
+                    size: 16,
+                    color: FrappePalette.grey[500],
+                  ),
+                  SizedBox(
+                    width: 6.0,
+                  ),
                   Text(
                     '$commentCount',
-                    style: Palette.secondaryTxtStyle,
-                  ),
-                  Spacer(),
-                  GestureDetector(
-                    onTap: assignee != null
-                        ? () {
-                            onButtonTap(
-                              assignee[0],
-                              assignee[1],
-                            );
-                          }
-                        : null,
-                    child: UserAvatar(
-                      size: 16,
-                      uid: assignee != null ? assignee[1] : null,
+                    style: TextStyle(
+                      color: FrappePalette.grey[700],
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
+                  VerticalDivider(),
+                  LikeDoc(
+                    doctype: doctype,
+                    name: name,
+                    successCallback: toggleLikeCallback,
+                    isFav: isFav,
+                    iconColor: FrappePalette.grey[500],
+                  ),
+                  SizedBox(
+                    width: 6.0,
+                  ),
+                  Text(
+                    '$likeCount',
+                    style: TextStyle(
+                      color: FrappePalette.grey[700],
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  Spacer(),
+                  assignee != null
+                      ? CollapsedAvatars(assignee)
+                      : Container(
+                          height: 38,
+                        ),
                 ],
               ),
             ],

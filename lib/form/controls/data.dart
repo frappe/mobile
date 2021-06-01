@@ -7,37 +7,32 @@ import 'base_input.dart';
 import 'base_control.dart';
 
 class Data extends StatelessWidget with Control, ControlInput {
-  final Key key;
-
-  final bool withLabel;
   final DoctypeField doctypeField;
-  final Map doc;
+
+  final Key? key;
+  final Map? doc;
 
   const Data({
-    @required this.doctypeField,
+    required this.doctypeField,
     this.key,
-    this.withLabel,
     this.doc,
   });
 
   @override
   Widget build(BuildContext context) {
-    List<String Function(dynamic)> validators = [];
+    List<String? Function(dynamic?)> validators = [];
 
     var f = setMandatory(doctypeField);
 
     if (f != null) {
-      validators.add(
-        f(context),
-      );
+      validators.add(f(context));
     }
 
     return FormBuilderTextField(
       key: key,
-      initialValue: doc != null ? doc[doctypeField.fieldname] : null,
+      initialValue: doc != null ? doc![doctypeField.fieldname] : null,
       name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(
-        withLabel: withLabel,
         label: doctypeField.label,
       ),
       validator: FormBuilderValidators.compose(validators),

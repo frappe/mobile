@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 
 class FrappePalette {
+  static List<MaterialColor> colors = [
+    grey,
+    blue,
+    yellow,
+    darkGreen,
+    red,
+    orange,
+  ];
+
   static const MaterialColor grey = MaterialColor(
     _greyPrimaryValue,
     <int, Color>{

@@ -1,3 +1,4 @@
+import 'package:frappe_app/model/common.dart';
 import 'package:hive/hive.dart';
 
 import '../services/storage_service.dart';
@@ -8,7 +9,7 @@ import 'config.dart';
 
 class Queue {
   static Box getQueueContainer() {
-    return locator<StorageService>().getBox('queue');
+    return locator<StorageService>().getHiveBox('queue');
   }
 
   static putAt(int index, dynamic value) {
@@ -88,7 +89,7 @@ class Queue {
         index,
         {
           ...q,
-          "error": e.statusMessage,
+          "error": (e as ErrorResponse).statusMessage,
         },
       );
     }

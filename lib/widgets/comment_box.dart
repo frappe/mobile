@@ -1,75 +1,75 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_html/flutter_html.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../app/locator.dart';
 import '../model/config.dart';
 
 import '../services/api/api.dart';
-import '../services/navigation_service.dart';
 
 class CommentBox extends StatelessWidget {
-  final Map data;
+  final Comment data;
   final Function callback;
 
   CommentBox(this.data, this.callback);
 
-  void _choiceAction(
-    BuildContext context,
-    String choice,
-  ) {
-    if (choice == 'Delete') {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Are you sure'),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('Yes'),
-                onPressed: () async {
-                  locator<NavigationService>().pop();
-                  locator<Api>().deleteComment(data["name"]);
-                  callback();
-                },
-              ),
-              FlatButton(
-                child: Text('No'),
-                onPressed: () {
-                  locator<NavigationService>().pop();
-                },
-              )
-            ],
-          );
-        },
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    var time = timeago.format(DateTime.parse(data["creation"]));
+    var time = timeago.format(DateTime.parse(data.creation));
 
-    return Card(
-      elevation: 0,
+    return Container(
+      color: Colors.white,
       child: Column(
         children: [
           ListTile(
-            title: Text('${data["owner"]}'),
-            subtitle: Text(time),
-            trailing: Config().user == data["owner"]
-                ? PopupMenuButton(
-                    onSelected: (choice) {
-                      _choiceAction(context, choice);
-                    },
-                    itemBuilder: (context) {
-                      return [
-                        PopupMenuItem(
-                          child: Text('Delete'),
-                          value: "Delete",
-                        )
-                      ];
+            title: Text('${data.owner}'),
+            subtitle: Row(
+              children: [
+                Text("commented"),
+                SizedBox(
+                  width: 8,
+                ),
+                Text(
+                  time,
+                ),
+              ],
+            ),
+            trailing: Config().userId == data.owner
+                ? IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: FrappeIcon(
+                      FrappeIcons.close_alt,
+                      size: 16,
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text('Are you sure'),
+                            actions: <Widget>[
+                              FlatButton(
+                                child: Text('Yes'),
+                                onPressed: () async {
+                                  Navigator.of(context).pop();
+                                  await locator<Api>().deleteComment(data.name);
+                                  callback();
+                                },
+                              ),
+                              FlatButton(
+                                child: Text('No'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              )
+                            ],
+                          );
+                        },
+                      );
                     },
                   )
                 : null,
@@ -77,7 +77,7 @@ class CommentBox extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: Html(
-              data: data["content"],
+              data: data.content,
             ),
           ),
         ],

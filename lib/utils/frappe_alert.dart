@@ -7,11 +7,11 @@ import '../utils/frappe_icon.dart';
 
 class FrappeAlert {
   static showAlert({
-    @required String icon,
-    @required String title,
-    String subtitle,
-    @required BuildContext context,
-    @required MaterialColor color,
+    required String icon,
+    required String title,
+    required BuildContext context,
+    required MaterialColor color,
+    String? subtitle,
     Duration aleartDuration = const Duration(seconds: 5),
   }) {
     FToast fToast = FToast();
@@ -72,9 +72,9 @@ class FrappeAlert {
   }
 
   static infoAlert({
-    @required String title,
-    String subtitle,
-    @required BuildContext context,
+    required String title,
+    required BuildContext context,
+    String? subtitle,
   }) {
     FrappeAlert.showAlert(
       icon: FrappeIcons.info,
@@ -86,9 +86,9 @@ class FrappeAlert {
   }
 
   static warnAlert({
-    @required String title,
-    String subtitle,
-    @required BuildContext context,
+    required String title,
+    required BuildContext context,
+    String? subtitle,
   }) {
     FrappeAlert.showAlert(
       icon: FrappeIcons.warning,
@@ -100,9 +100,9 @@ class FrappeAlert {
   }
 
   static errorAlert({
-    @required String title,
-    String subtitle,
-    @required BuildContext context,
+    required String title,
+    required BuildContext context,
+    String? subtitle,
   }) {
     FrappeAlert.showAlert(
       icon: FrappeIcons.error,
@@ -114,9 +114,9 @@ class FrappeAlert {
   }
 
   static successAlert({
-    @required String title,
-    String subtitle,
-    @required BuildContext context,
+    required String title,
+    required BuildContext context,
+    String? subtitle,
   }) {
     FrappeAlert.showAlert(
       icon: FrappeIcons.success,

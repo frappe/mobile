@@ -1,19 +1,18 @@
+// @dart=2.9
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
+import 'package:frappe_app/views/home_view.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import 'app/router.gr.dart';
-
 import 'lifecycle_manager.dart';
-import 'app/locator.dart';
 
 import 'model/config.dart';
 import 'utils/enums.dart';
 
 import 'services/connectivity_service.dart';
-import 'services/navigation_service.dart';
 
-import 'views/home/home_view.dart';
 import 'views/login/login_view.dart';
 
 class FrappeApp extends StatefulWidget {
@@ -41,38 +40,39 @@ class _FrappeAppState extends State<FrappeApp> {
 
   @override
   Widget build(BuildContext context) {
-    return LifeCycleManager(
-      child: StreamProvider<ConnectivityStatus>(
-        create: (context) =>
-            ConnectivityService().connectionStatusController.stream,
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Frappe',
-          navigatorKey: locator<NavigationService>().navigatorKey,
-          onGenerateRoute: MyRouter().onGenerateRoute,
-          initialRoute: Routes.frappeApp,
-          theme: new ThemeData(
-            textTheme: GoogleFonts.interTextTheme(
-              Theme.of(context).textTheme.apply(
-                  // fontSizeFactor: 0.7,
-                  ),
-            ),
-            disabledColor: Colors.black,
-            primaryColor: Colors.white,
-            accentColor: Colors.black54,
-          ),
-          home: GestureDetector(
-            onTap: () {
-              FocusScope.of(context).requestFocus(new FocusNode());
-            },
-            child: Scaffold(
-              body: _isLoaded
-                  ? _isLoggedIn
-                      ? Home()
-                      : Login()
-                  : Center(
-                      child: CircularProgressIndicator(),
+    return Portal(
+      child: LifeCycleManager(
+        child: StreamProvider<ConnectivityStatus>(
+          initialData: ConnectivityStatus.offline,
+          create: (context) =>
+              ConnectivityService().connectionStatusController.stream,
+          child: MaterialApp(
+            builder: EasyLoading.init(),
+            debugShowCheckedModeBanner: false,
+            title: 'Frappe',
+            theme: new ThemeData(
+              textTheme: GoogleFonts.interTextTheme(
+                Theme.of(context).textTheme.apply(
+                    // fontSizeFactor: 0.7,
                     ),
+              ),
+              disabledColor: Colors.black,
+              primaryColor: Colors.white,
+              accentColor: Colors.black54,
+            ),
+            home: GestureDetector(
+              onTap: () {
+                FocusScope.of(context).requestFocus(new FocusNode());
+              },
+              child: Scaffold(
+                body: _isLoaded
+                    ? _isLoggedIn
+                        ? HomeView()
+                        : Login()
+                    : Center(
+                        child: CircularProgressIndicator(),
+                      ),
+              ),
             ),
           ),
         ),

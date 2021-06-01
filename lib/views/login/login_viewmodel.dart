@@ -1,3 +1,6 @@
+import 'package:frappe_app/model/login_request.dart';
+import 'package:frappe_app/model/login_response.dart';
+import 'package:frappe_app/utils/dio_helper.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../app/locator.dart';
@@ -12,14 +15,12 @@ import '../../model/config.dart';
 import '../../views/base_viewmodel.dart';
 
 class SavedCredentials {
-  String serverURL;
-  String usr;
-  String pwd;
+  String? serverURL;
+  String? usr;
 
   SavedCredentials({
-    this.serverURL = "",
-    this.usr = "",
-    this.pwd = "",
+    this.serverURL,
+    this.usr,
   });
 }
 
@@ -27,24 +28,18 @@ class SavedCredentials {
 class LoginViewModel extends BaseViewModel {
   var savedCreds = SavedCredentials();
 
-  String loginButtonLabel;
+  late String loginButtonLabel;
 
   init() {
     loginButtonLabel = "Login";
-    var savedUsr = OfflineStorage.getItem('usr');
-    var savedPwd = OfflineStorage.getItem('pwd');
-    var serverURL = Config().baseUrl;
-    savedUsr = savedUsr["data"];
-    savedPwd = savedPwd["data"];
 
     savedCreds = SavedCredentials(
-      serverURL: serverURL,
-      usr: savedUsr,
-      pwd: savedPwd,
+      serverURL: Config().baseUrl,
+      usr: OfflineStorage.getItem('usr')["data"],
     );
   }
 
-  updateConfig(response) {
+  updateUserDetails(LoginResponse response) {
     Config.set('isLoggedIn', true);
 
     Config.set(
@@ -57,48 +52,40 @@ class LoginViewModel extends BaseViewModel {
     );
   }
 
-  cacheCreds(data) {
-    OfflineStorage.putItem(
-      'usr',
-      data["usr"].trimRight(),
-    );
-    OfflineStorage.putItem(
-      'pwd',
-      data["pwd"],
-    );
-  }
-
-  login(data) async {
+  Future<LoginResponse> login(LoginRequest loginRequest) async {
     loginButtonLabel = "Verifying...";
     notifyListeners();
-    await setBaseUrl(data["serverURL"]);
 
     try {
       var response = await locator<Api>().login(
-        data["usr"].trimRight(),
-        data["pwd"],
+        loginRequest,
       );
-      updateConfig(response);
-      cacheCreds(data);
-      await cacheAllUsers();
-      await initAwesomeItems();
 
-      loginButtonLabel = "Success";
-      notifyListeners();
+      if (response.verification != null) {
+        loginButtonLabel = "Verify";
+        return response;
+      } else {
+        updateUserDetails(response);
 
-      return {
-        "success": true,
-        "message": "Success",
-      };
+        OfflineStorage.putItem(
+          'usr',
+          loginRequest.usr,
+        );
+
+        await cacheAllUsers();
+        await initAwesomeItems();
+        await DioHelper.initCookies();
+
+        loginButtonLabel = "Success";
+        notifyListeners();
+
+        return response;
+      }
     } catch (e) {
       Config.set('isLoggedIn', false);
       loginButtonLabel = "Login";
       notifyListeners();
-      return {
-        "success": false,
-        "message": e.statusMessage,
-        "statusCode": e.statusCode,
-      };
+      throw e;
     }
   }
 }

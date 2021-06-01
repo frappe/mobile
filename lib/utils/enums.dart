@@ -1,8 +1,4 @@
-enum EventType {
-  comment,
-  email,
-  docVersion,
-}
+enum AttachmentsFilter { all, files, links }
 
 enum Order {
   asc,

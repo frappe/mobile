@@ -1,40 +1,47 @@
-import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:frappe_app/views/base_view.dart';
-import 'package:frappe_app/views/form_view/form_view_viewmodel.dart';
 import 'package:provider/provider.dart';
+
+import 'package:frappe_app/config/frappe_icons.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
+import 'package:frappe_app/views/base_view.dart';
+import 'package:frappe_app/views/comment_input.dart';
+import 'package:frappe_app/views/form_view/form_view_viewmodel.dart';
+import 'package:frappe_app/widgets/collapsed_avatars.dart';
+import 'package:frappe_app/widgets/custom_expansion_tile.dart';
+import 'package:frappe_app/widgets/timeline.dart';
+
+import 'package:frappe_app/views/form_view/bottom_sheets/assignees/assignees_bottom_sheet_view.dart';
+import 'package:frappe_app/views/form_view/bottom_sheets/attachments/view_attachments_bottom_sheet_view.dart';
+import 'package:frappe_app/views/form_view/bottom_sheets/reviews/view_reviews_bottom_sheet_view.dart';
+import 'package:frappe_app/views/form_view/bottom_sheets/share/share_bottom_sheet_view.dart';
+import 'package:frappe_app/views/form_view/bottom_sheets/tags/tags_bottom_sheet_view.dart';
+import 'package:frappe_app/widgets/collapsed_reviews.dart';
 
 import '../../model/doctype_response.dart';
 import '../../config/palette.dart';
 
-import '../../app/locator.dart';
-import '../../app/router.gr.dart';
-
-import '../../services/navigation_service.dart';
-
 import '../../utils/helpers.dart';
 import '../../utils/frappe_alert.dart';
-import '../../utils/indicator.dart';
 import '../../utils/enums.dart';
-
-import '../../model/config.dart';
 
 import '../../widgets/custom_form.dart';
 import '../../widgets/frappe_button.dart';
-import '../../widgets/timeline.dart';
-import '../../widgets/user_avatar.dart';
-import '../../widgets/like_doc.dart';
+import 'bottom_sheets/reviews/add_review_bottom_sheet_view.dart';
 
 class FormView extends StatelessWidget {
-  final String name;
+  final String? name;
   final bool queued;
-  final Map queuedData;
+  final Map? queuedData;
   final DoctypeResponse meta;
 
   FormView({
-    @required this.meta,
+    required this.meta,
     this.name,
     this.queued = false,
     this.queuedData,
@@ -49,16 +56,15 @@ class FormView extends StatelessWidget {
     );
     return BaseView<FormViewViewModel>(
       onModelReady: (model) {
-        model.getData(
-          connectivityStatus: connectionStatus,
-          queued: queued,
-          queuedData: queuedData,
-          doctype: meta.docs[0].name,
-          name: name,
-        );
+        model.communicationOnly = true;
+        model.editMode = false;
+        model.meta = meta;
+        model.queued = queued;
+        model.queuedData = queuedData;
+        model.name = name;
+        model.getData();
       },
       onModelClose: (model) {
-        model.editMode = false;
         model.error = null;
       },
       builder: (context, model, child) => model.state == ViewState.busy
@@ -69,80 +75,155 @@ class FormView extends StatelessWidget {
           : Builder(
               builder: (context) {
                 if (model.error != null) {
-                  return handleError(model.error);
+                  return handleError(
+                      error: model.error,
+                      context: context,
+                      onRetry: () {
+                        model.communicationOnly = true;
+                        model.editMode = false;
+                        model.getData();
+                      });
                 }
-                var docs = model.formData["docs"];
-                var docInfo = model.formData["docinfo"];
+                var docs = model.formData.docs;
 
                 var builderContext;
-                var likedBy = docs[0]['_liked_by'] != null
-                    ? json.decode(docs[0]['_liked_by'])
-                    : [];
-                var isLikedByUser = likedBy.contains(model.user);
+
+                // var likedBy = docs[0]['_liked_by'] != null
+                //     ? json.decode(docs[0]['_liked_by'])
+                //     : [];
+                // var isLikedByUser = likedBy.contains(model.user);
 
                 return Scaffold(
                   backgroundColor: Palette.bgColor,
-                  bottomNavigationBar: _bottomBar(
-                    doc: docs[0],
-                    meta: meta,
-                    model: model,
+                  appBar: AppBar(
+                    elevation: 0.8,
+                    backgroundColor: Colors.white,
+                    title: Text('${meta.docs[0].name} Details'),
+                    actions: [
+                      if (model.editMode)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12.0,
+                            horizontal: 4,
+                          ),
+                          child: FrappeFlatButton(
+                            buttonType: ButtonType.secondary,
+                            title: 'Cancel',
+                            onPressed: () {
+                              _fbKey.currentState?.reset();
+                              model.toggleEdit();
+                            },
+                          ),
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12.0,
+                          horizontal: 8,
+                        ),
+                        child: FrappeFlatButton(
+                          buttonType: ButtonType.primary,
+                          title: model.editMode ? 'Save' : 'Edit',
+                          onPressed: model.editMode
+                              ? () => _handleUpdate(
+                                    doc: docs[0],
+                                    model: model,
+                                    context: context,
+                                  )
+                              : () {
+                                  model.toggleEdit();
+                                },
+                        ),
+                      )
+                    ],
                   ),
                   body: Builder(
                     builder: (context) {
                       builderContext = context;
-                      return DefaultTabController(
-                        length: 2,
-                        child: NestedScrollView(
-                          headerSliverBuilder:
-                              (BuildContext context, bool innerBoxIsScrolled) {
-                            return <Widget>[
-                              _appBar(
-                                context: builderContext,
-                                connectionStatus: connectionStatus,
-                                doc: docs[0],
-                                docInfo: docInfo,
-                                meta: meta,
-                                model: model,
+                      return SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              color: FrappePalette.grey[50],
+                              width: double.infinity,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
                               ),
-                              _tabHeader(),
-                            ];
-                          },
-                          body: TabBarView(
-                            children: [
-                              SingleChildScrollView(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    Container(
-                                      color: Palette.bgColor,
-                                      height: 10,
+                              child: Text(
+                                getTitle(meta.docs[0], docs[0]) ?? "",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: FrappePalette.grey[900],
+                                ),
+                              ),
+                            ),
+                            if (!queued)
+                              DocInfo(
+                                name: name!,
+                                meta: meta.docs[0],
+                                doc: docs[0],
+                                doctype: meta.docs[0].name,
+                                docInfo: model.docinfo!,
+                                refreshCallback: () {
+                                  model.getData();
+                                },
+                              ),
+                            CustomForm(
+                              fields: meta.docs[0].fields,
+                              formKey: _fbKey,
+                              doc: docs[0],
+                              viewType: ViewType.form,
+                              editMode: model.editMode,
+                            ),
+                            if (!queued)
+                              ListTileTheme(
+                                tileColor: Colors.white,
+                                child: CustomExpansionTile(
+                                  maintainState: true,
+                                  initiallyExpanded: false,
+                                  title: Text(
+                                    "Add a comment",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
                                     ),
-                                    CustomForm(
-                                      fields: meta.docs[0].fields,
-                                      formKey: _fbKey,
-                                      doc: docs[0],
-                                      viewType: ViewType.form,
-                                      editMode: model.editMode,
-                                    ),
+                                  ),
+                                  children: [
+                                    CommentInput(
+                                      name: name!,
+                                      doctype: meta.docs[0].name,
+                                      callback: () {
+                                        model.getDocinfo();
+                                      },
+                                    )
                                   ],
                                 ),
                               ),
-                              !queued
-                                  ? Timeline([
-                                      ...docInfo['comments'],
-                                      ...docInfo["communications"],
-                                      ...docInfo["versions"],
-                                      // ...docInfo["views"],TODO
-                                    ], () {
-                                      model.refresh();
-                                    })
-                                  : Center(
-                                      child: Text(
-                                        'Activity not available in offline mode',
-                                      ),
-                                    ),
-                            ],
-                          ),
+                            if (!queued)
+                              Timeline(
+                                docinfo: model.docinfo!,
+                                doctype: meta.docs[0].name,
+                                name: name!,
+                                communicationOnly: model.communicationOnly,
+                                switchCallback: (val) {
+                                  model.toggleSwitch(val);
+                                },
+                                refreshCallback: () {
+                                  model.getDocinfo();
+                                },
+                                emailSubjectField:
+                                    docs[0][meta.docs[0].subjectField] ??
+                                        getTitle(
+                                          meta.docs[0],
+                                          docs[0],
+                                        ),
+                                emailSenderField: docs[0]
+                                    [meta.docs[0].senderField],
+                              ),
+                          ],
                         ),
                       );
                     },
@@ -154,318 +235,329 @@ class FormView extends StatelessWidget {
   }
 
   _handleUpdate({
-    @required Map doc,
-    @required ConnectivityStatus connectionStatus,
-    @required DoctypeResponse meta,
-    @required FormViewViewModel model,
-    @required BuildContext context,
+    required Map doc,
+    required FormViewViewModel model,
+    required BuildContext context,
   }) async {
-    if (_fbKey.currentState.saveAndValidate()) {
-      var formValue = _fbKey.currentState.value;
+    if (_fbKey.currentState != null) {
+      if (_fbKey.currentState!.saveAndValidate()) {
+        var formValue = _fbKey.currentState!.value;
 
-      try {
-        await model.handleUpdate(
-          connectivityStatus: connectionStatus,
-          name: name,
-          doctype: meta.docs[0].name,
-          meta: meta,
-          formValue: formValue,
-          doc: doc,
-          queuedData: queuedData,
-        );
-        FrappeAlert.infoAlert(
-          title: 'Changes Saved',
-          context: context,
-        );
-      } catch (e) {
-        showErrorDialog(e, context);
+        try {
+          await model.handleUpdate(
+            formValue: formValue,
+            doc: doc,
+            queuedData: queuedData,
+          );
+          FrappeAlert.infoAlert(
+            title: 'Changes Saved',
+            context: context,
+          );
+        } catch (e) {
+          var _e = e as ErrorResponse;
+          if (_e.statusCode == HttpStatus.serviceUnavailable) {
+            noInternetAlert(context);
+          } else {
+            FrappeAlert.errorAlert(
+              title: _e.statusMessage,
+              context: context,
+            );
+          }
+        }
       }
     }
   }
+}
 
-  Widget _tabHeader() {
-    return SliverPersistentHeader(
-      delegate: _SliverAppBarDelegate(
-        TabBar(
-          labelColor: Colors.black87,
-          unselectedLabelColor: Colors.grey,
-          tabs: [
-            Tab(
-              child: Text('Detail'),
-            ),
-            Tab(
-              child: Text('Activity'),
-            ),
-          ],
-        ),
-      ),
-      pinned: true,
-    );
-  }
+class DocInfo extends StatelessWidget {
+  final Docinfo docInfo;
+  final String doctype;
+  final String name;
+  final Function refreshCallback;
+  final Map doc;
+  final DoctypeDoc meta;
 
-  Widget _appBar(
-      {Map doc,
-      Map docInfo,
-      BuildContext context,
-      ConnectivityStatus connectionStatus,
-      @required FormViewViewModel model,
-      @required DoctypeResponse meta}) {
-    String title;
-    if (queuedData != null) {
-      title = queuedData["title"];
-    } else {
-      title = getTitle(meta.docs[0], doc) ?? "";
-    }
+  const DocInfo({
+    required this.docInfo,
+    required this.refreshCallback,
+    required this.doctype,
+    required this.name,
+    required this.doc,
+    required this.meta,
+  });
 
-    return SliverAppBar(
-      elevation: 0,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          padding: EdgeInsets.only(
-            top: 90,
-            right: 20,
-            left: 20,
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      builder: (context) {
+        List<EnergyPointLogs> reviews = docInfo.energyPointLogs != null
+            ? docInfo.energyPointLogs!.where(
+                (item) {
+                  return ["Appreciation", "Criticism"].contains(
+                    item.type,
+                  );
+                },
+              ).toList()
+            : [];
+
+        List tags = docInfo.tags.isNotEmpty ? docInfo.tags.split(',') : [];
+
+        return Container(
+          color: FrappePalette.grey[50],
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: 20,
           ),
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: !queued
-                ? () {
-                    locator<NavigationService>().navigateTo(
-                      Routes.viewDocInfo,
-                      arguments: ViewDocInfoArguments(
-                        meta: meta.docs[0],
-                        doc: doc,
-                        docInfo: docInfo,
-                        doctype: meta.docs[0].name,
-                        name: name,
-                        callback: model.refresh,
-                      ),
-                    );
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DocInfoItem(
+                title: 'Assignees',
+                actionTitle: 'Add assignee',
+                actionIcon: FrappeIcons.add_user,
+                filledWidget: docInfo.assignments.isNotEmpty
+                    ? CollapsedAvatars(
+                        docInfo.assignments.map(
+                          (assignment) {
+                            return assignment.owner;
+                          },
+                        ).toList(),
+                      )
+                    : null,
+                onTap: () async {
+                  bool refresh = await showModalBottomSheet(
+                        context: context,
+                        useRootNavigator: true,
+                        isScrollControlled: true,
+                        builder: (context) => AssigneesBottomSheetView(
+                          assignees: docInfo.assignments,
+                          doctype: doctype,
+                          name: name,
+                        ),
+                      ) ??
+                      false;
+
+                  if (refresh) {
+                    refreshCallback();
                   }
-                : null,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Flexible(
-                  child: Text(
-                    title,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  children: <Widget>[
-                    Indicator.buildStatusButton(
-                        meta.docs[0].name, doc['status']),
-                    VerticalDivider(),
-                    if (queued && queuedData["error"] != null)
-                      FrappeFlatButton.small(
-                        height: 24,
-                        title: "Show Error",
-                        onPressed: () {
-                          locator<NavigationService>().navigateTo(
-                            Routes.queueError,
-                            arguments: QueueErrorArguments(
-                              error: queuedData["error"],
-                              dataToUpdate: queuedData["updated_keys"],
-                            ),
-                          );
-                        },
-                        buttonType: ButtonType.secondary,
-                      ),
-                    Spacer(),
-                    if (!queued)
-                      InkWell(
-                        onTap: () {
-                          locator<NavigationService>().navigateTo(
-                            Routes.viewDocInfo,
-                            arguments: ViewDocInfoArguments(
-                              doc: doc,
-                              meta: meta.docs[0],
-                              docInfo: docInfo,
-                              doctype: meta.docs[0].name,
-                              name: name,
-                              callback: model.refresh,
-                            ),
-                          );
-                        },
-                        child: Row(
-                          children: _generateAssignees(docInfo["assignments"]),
+                },
+              ),
+              DocInfoItem(
+                title: 'Attachments',
+                actionTitle: 'Attach file',
+                filledWidget: docInfo.attachments.isNotEmpty
+                    ? Text(
+                        '${docInfo.attachments.length} Attachments',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: FrappePalette.grey[600],
+                          fontWeight: FontWeight.w400,
                         ),
                       )
-                  ],
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
-      actions: <Widget>[
-        // if (!editMode)
-        //   LikeDoc(
-        //     doctype: doctype,
-        //     name: name,
-        //     isFav: isLikedByUser,
-        //   ),
-        if (model.editMode)
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 12.0,
-              horizontal: 4,
-            ),
-            child: FrappeFlatButton(
-              buttonType: ButtonType.secondary,
-              title: 'Cancel',
-              onPressed: () {
-                _fbKey.currentState.reset();
-                model.refresh();
-              },
-            ),
-          ),
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 12.0,
-            horizontal: 8,
-          ),
-          child: FrappeFlatButton(
-            buttonType: ButtonType.primary,
-            title: model.editMode ? 'Save' : 'Edit',
-            onPressed: model.editMode
-                ? () => _handleUpdate(
-                      doc: doc,
-                      connectionStatus: connectionStatus,
-                      meta: meta,
-                      model: model,
-                      context: context,
-                    )
-                : () {
-                    model.toggleEdit();
+                    : null,
+                actionIcon: FrappeIcons.attachment,
+                onTap: () async {
+                  bool refresh = await showModalBottomSheet(
+                        context: context,
+                        useRootNavigator: true,
+                        isScrollControlled: true,
+                        builder: (context) => ViewAttachmentsBottomSheetView(
+                          attachments: docInfo.attachments,
+                          name: name,
+                          doctype: doctype,
+                        ),
+                      ) ??
+                      false;
+
+                  if (refresh) {
+                    refreshCallback();
+                  }
+                },
+              ),
+              if (docInfo.energyPointLogs != null)
+                DocInfoItem(
+                  title: 'Reviews',
+                  actionTitle: 'Add review',
+                  filledWidget: reviews.isNotEmpty
+                      ? CollapsedReviews(
+                          reviews,
+                        )
+                      : null,
+                  actionIcon: FrappeIcons.review,
+                  onTap: () async {
+                    if (reviews.isEmpty) {
+                      bool refresh = await showModalBottomSheet(
+                            context: context,
+                            useRootNavigator: true,
+                            isScrollControlled: true,
+                            builder: (context) => AddReviewBottomSheetView(
+                              doc: doc,
+                              docinfo: docInfo,
+                              name: name,
+                              meta: meta,
+                            ),
+                          ) ??
+                          false;
+
+                      if (refresh) {
+                        refreshCallback();
+                      }
+                    } else {
+                      bool refresh = await showModalBottomSheet(
+                            context: context,
+                            useRootNavigator: true,
+                            isScrollControlled: true,
+                            builder: (context) => ViewReviewsBottomSheetView(
+                              reviews: reviews,
+                              doc: doc,
+                              docinfo: docInfo,
+                              name: name,
+                              meta: meta,
+                            ),
+                          ) ??
+                          false;
+
+                      if (refresh) {
+                        refreshCallback();
+                      }
+                    }
                   },
+                ),
+              DocInfoItem(
+                title: 'Tags',
+                actionTitle: 'Add tags',
+                actionIcon: FrappeIcons.tag,
+                filledWidget: tags.isNotEmpty
+                    ? Text(
+                        '${tags.length} Tags',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: FrappePalette.grey[600],
+                          fontWeight: FontWeight.w400,
+                        ),
+                      )
+                    : null,
+                onTap: () async {
+                  showModalBottomSheet(
+                    context: context,
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    builder: (context) => TagsBottomSheetView(
+                      tags: tags,
+                      doctype: doctype,
+                      name: name,
+                      refreshCallback: refreshCallback,
+                    ),
+                  );
+                },
+              ),
+              DocInfoItem(
+                title: 'Shared',
+                actionTitle: 'Shared with',
+                filledWidget: docInfo.shared.isNotEmpty
+                    ? CollapsedAvatars(
+                        docInfo.shared.map(
+                          (share) {
+                            return share.owner;
+                          },
+                        ).toList(),
+                      )
+                    : null,
+                showBorder: false,
+                actionIcon: FrappeIcons.share,
+                onTap: () async {
+                  bool refresh = await showModalBottomSheet(
+                        context: context,
+                        useRootNavigator: true,
+                        isScrollControlled: true,
+                        builder: (context) => ShareBottomSheetView(
+                          shares: docInfo.shared,
+                          doctype: doctype,
+                          name: name,
+                        ),
+                      ) ??
+                      false;
+
+                  if (refresh) {
+                    refreshCallback();
+                  }
+                },
+              ),
+            ],
           ),
-        )
-      ],
-      expandedHeight: model.editMode ? 0.0 : 180.0,
-      floating: true,
-      pinned: true,
-    );
-  }
-
-  List<Widget> _generateAssignees(List l) {
-    const int size = 2;
-    List<Widget> w = [];
-
-    if (l.length == 0) {
-      return [
-        CircleAvatar(
-          backgroundColor: Palette.bgColor,
-          child: Icon(
-            Icons.add,
-            color: Colors.black,
-          ),
-        ),
-      ];
-    }
-
-    for (int i = 0; i < l.length; i++) {
-      if (i < size) {
-        w.add(
-          UserAvatar(uid: l[i]["owner"]),
         );
-      } else {
-        w.add(UserAvatar.renderShape(txt: "+ ${l.length - size}"));
-        break;
-      }
-    }
-    return w;
-  }
-
-  Widget _bottomBar({
-    @required Map doc,
-    @required DoctypeResponse meta,
-    @required FormViewViewModel model,
-  }) {
-    return Container(
-      height: model.editMode ? 0 : 60,
-      child: BottomAppBar(
-        color: Colors.white,
-        child: Row(
-          children: <Widget>[
-            Spacer(),
-            FrappeRaisedButton(
-              minWidth: 120,
-              title: 'Comment',
-              onPressed: () {
-                locator<NavigationService>().navigateTo(
-                  Routes.commentInput,
-                  arguments: CommentInputArguments(
-                    doctype: meta.docs[0].name,
-                    name: name,
-                    authorEmail: Config().user,
-                    callback: model.refresh,
-                  ),
-                );
-              },
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            FrappeRaisedButton(
-              minWidth: 120,
-              title: 'New Email',
-              onPressed: () {
-                locator<NavigationService>().navigateTo(
-                  Routes.emailForm,
-                  arguments: EmailFormArguments(
-                    callback: model.refresh,
-                    subjectField: doc[meta.docs[0].subjectField] ??
-                        getTitle(meta.docs[0], doc),
-                    senderField: doc[meta.docs[0].senderField],
-                    doctype: meta.docs[0].name,
-                    doc: name,
-                  ),
-                );
-              },
-            ),
-            Spacer()
-          ],
-        ),
-      ),
+      },
     );
   }
 }
 
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  _SliverAppBarDelegate(this._tabBar);
+class DocInfoItem extends StatelessWidget {
+  final String title;
+  final String actionTitle;
+  final String actionIcon;
+  final void Function()? onTap;
+  final bool showBorder;
+  final Widget? filledWidget;
 
-  final TabBar _tabBar;
+  const DocInfoItem({
+    required this.title,
+    required this.actionTitle,
+    required this.actionIcon,
+    required this.onTap,
+    this.filledWidget,
+    this.showBorder = true,
+  });
 
   @override
-  double get minExtent => _tabBar.preferredSize.height;
-  @override
-  double get maxExtent => _tabBar.preferredSize.height;
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
-    return new Container(
-      color: Colors.white,
-      child: _tabBar,
+  Widget build(BuildContext context) {
+    return Container(
+      height: 60,
+      child: FlatButton(
+        onPressed: onTap,
+        shape: showBorder
+            ? Border(
+                bottom: BorderSide(
+                  color: FrappePalette.grey[200]!,
+                  width: 2,
+                ),
+              )
+            : null,
+        padding: EdgeInsets.symmetric(vertical: 14),
+        child: Row(
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 13,
+                color: FrappePalette.grey[900],
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+            Spacer(),
+            filledWidget ??
+                Row(
+                  children: [
+                    FrappeIcon(
+                      actionIcon,
+                      color: FrappePalette.grey[600],
+                      size: 13,
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      actionTitle,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: FrappePalette.grey[600],
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+          ],
+        ),
+      ),
     );
-  }
-
-  @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return false;
   }
 }

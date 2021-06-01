@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
-import 'package:dio/dio.dart';
 
 import '../app/locator.dart';
 
@@ -14,10 +13,11 @@ import '../services/api/api.dart';
 
 import '../utils/constants.dart';
 import '../utils/helpers.dart';
+import 'common.dart';
 import 'config.dart';
 
 class OfflineStorage {
-  static var storage = locator<StorageService>().getBox('offline');
+  static var storage = locator<StorageService>().getHiveBox('offline');
 
   static String generateKeyHash(String key) {
     return sha1.convert(utf8.encode(key)).toString();
@@ -28,7 +28,7 @@ class OfflineStorage {
       return;
     }
 
-    var k = Config().primaryCacheKey + "#@#" + secondaryKey;
+    var k = Config().primaryCacheKey! + "#@#" + secondaryKey;
     var kHash = generateKeyHash(k);
 
     var v = {
@@ -48,7 +48,7 @@ class OfflineStorage {
 
     data.forEach(
       (key, value) {
-        v[generateKeyHash(Config().primaryCacheKey + "#@#" + key)] = {
+        v[generateKeyHash(Config().primaryCacheKey! + "#@#" + key)] = {
           'timestamp': DateTime.now(),
           "data": value,
         };
@@ -56,8 +56,9 @@ class OfflineStorage {
     );
 
     if (isIsolate) {
-      var runBackgroundTask = await getSharedPrefValue("backgroundTask");
-      if (runBackgroundTask) {
+      var runBackgroundTask = await locator<StorageService>()
+          .getSharedPrefBoolValue("backgroundTask");
+      if (runBackgroundTask ?? false) {
         await storage.putAll(v);
       }
     } else {
@@ -69,7 +70,7 @@ class OfflineStorage {
     if (Config().primaryCacheKey == null) {
       return {"data": null};
     }
-    var k = Config().primaryCacheKey + "#@#" + secondaryKey;
+    var k = Config().primaryCacheKey! + "#@#" + secondaryKey;
     var keyHash = generateKeyHash(k);
 
     if (storage.get(keyHash) == null) {
@@ -80,7 +81,7 @@ class OfflineStorage {
   }
 
   static Future remove(String secondaryKey) async {
-    var k = Config().primaryCacheKey + "#@#" + secondaryKey;
+    var k = Config().primaryCacheKey! + "#@#" + secondaryKey;
     var keyHash = generateKeyHash(k);
     storage.delete(keyHash);
   }
@@ -191,6 +192,7 @@ class OfflineStorage {
 
       var docList = await locator<Api>().fetchList(
         doctype: doctype,
+        orderBy: '`tab$doctype`.`modified` desc',
         fieldnames: generateFieldnames(doctype, docMeta.docs[0]),
         pageLength: Constants.offlinePageSize,
         offset: 0,
@@ -237,7 +239,8 @@ class OfflineStorage {
   }
 
   static Future<bool> storeApiResponse() async {
-    var storeApiResponse = await getSharedPrefValue(
+    var storeApiResponse =
+        await locator<StorageService>().getSharedPrefBoolValue(
       "storeApiResponse",
     );
     return storeApiResponse ?? true;
@@ -255,9 +258,16 @@ class OfflineStorage {
         var cachedMeta = getItem('${doctype}Meta');
         if (cachedMeta["data"] != null) {
           metaResponse = DoctypeResponse.fromJson(
-              Map<String, dynamic>.from(cachedMeta["data"]));
+            Map<String, dynamic>.from(
+              cachedMeta["data"],
+            ),
+          );
         } else {
-          throw Response(statusCode: HttpStatus.serviceUnavailable);
+          throw ErrorResponse(
+            statusCode: HttpStatus.serviceUnavailable,
+            statusMessage:
+                "$doctype is currently not available for offline use",
+          );
         }
       }
       return metaResponse;

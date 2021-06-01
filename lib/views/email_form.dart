@@ -1,34 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/widgets/custom_form.dart';
 
 import '../app/locator.dart';
 import '../model/doctype_response.dart';
 
 import '../services/api/api.dart';
-import '../services/navigation_service.dart';
-
-import '../utils/enums.dart';
-import '../utils/helpers.dart';
 
 class EmailForm extends StatelessWidget {
   final String doctype;
   final String doc;
-  final String subjectField;
-  final String senderField;
+  final String? subjectField;
+  final String? senderField;
   final Function callback;
 
-  EmailForm(
-      {@required this.doctype,
-      @required this.doc,
-      this.subjectField,
-      this.senderField,
-      @required this.callback});
+  EmailForm({
+    required this.doctype,
+    required this.doc,
+    this.subjectField,
+    this.senderField,
+    required this.callback,
+  });
 
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
 
   @override
   Widget build(BuildContext context) {
     final meta = DoctypeDoc(
+      issingle: 1,
+      module: "",
+      name: "",
       doctype: "communication",
       fields: [
         DoctypeField(
@@ -100,38 +101,41 @@ class EmailForm extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        elevation: 0.8,
         title: Text('Send Email'),
         actions: <Widget>[
-          FlatButton(
+          TextButton(
             onPressed: () async {
-              if (_fbKey.currentState.saveAndValidate()) {
-                var formValue = _fbKey.currentState.value;
+              if (_fbKey.currentState != null) {
+                if (_fbKey.currentState!.saveAndValidate()) {
+                  var formValue = _fbKey.currentState!.value;
 
-                await locator<Api>().sendEmail(
-                  recipients: formValue["recipients"],
-                  subject: formValue["subject"],
-                  content: formValue["content"],
-                  doctype: doctype,
-                  doctypeName: doc,
-                );
-                callback();
-                locator<NavigationService>().pop();
+                  await locator<Api>().sendEmail(
+                    recipients: formValue["recipients"],
+                    subject: formValue["subject"],
+                    content: formValue["content"],
+                    doctype: doctype,
+                    doctypeName: doc,
+                  );
+                  callback();
+                  Navigator.of(context).pop();
+                }
               }
             },
-            child: Text('Send'),
+            child: Text(
+              'Send',
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            ),
           )
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: FormBuilder(
-          key: _fbKey,
-          child: ListView(
-            children: generateLayout(
-                fields: meta.fields,
-                viewType: ViewType.newForm,
-                withLabel: false),
-          ),
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        child: CustomForm(
+          fields: meta.fields,
+          formKey: _fbKey,
         ),
       ),
     );

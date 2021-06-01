@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frappe_app/model/offline_storage.dart';
+import 'package:frappe_app/views/form_view/form_view.dart';
 import 'package:provider/provider.dart';
 
 import '../config/frappe_icons.dart';
 import '../config/palette.dart';
 
-import '../services/navigation_service.dart';
 import '../widgets/card_list_tile.dart';
-
-import '../app/locator.dart';
-import '../app/router.gr.dart';
 
 import '../utils/frappe_alert.dart';
 import '../utils/frappe_icon.dart';
@@ -69,8 +66,7 @@ class _QueueListState extends State<QueueList> {
                     icon: Icon(Icons.sync),
                     onPressed: () async {
                       var isOnline = await verifyOnline();
-                      if ((connectionStatus == null ||
-                              connectionStatus == ConnectivityStatus.offline) &&
+                      if (connectionStatus == ConnectivityStatus.offline &&
                           !isOnline) {
                         FrappeAlert.errorAlert(
                           title: 'Cant Sync, App is offline',
@@ -117,14 +113,17 @@ class _QueueListState extends State<QueueList> {
                   ),
                   onTap: () async {
                     q["qIdx"] = index;
-                    locator<NavigationService>().navigateTo(
-                      Routes.formView,
-                      arguments: FormViewArguments(
-                        queued: true,
-                        meta: await OfflineStorage.getMeta(q['doctype']),
-                        queuedData: q,
-                      ),
-                    );
+                    var meta = await OfflineStorage.getMeta(q['doctype']);
+
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) {
+                        return FormView(
+                          queued: true,
+                          queuedData: q,
+                          meta: meta,
+                        );
+                      },
+                    ));
                   },
                 );
               },

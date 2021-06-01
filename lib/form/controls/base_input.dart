@@ -4,7 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import '../../model/doctype_response.dart';
 
 class ControlInput {
-  String Function(dynamic) Function(BuildContext, {String errorText})
+  String? Function(dynamic) Function(BuildContext, {String errorText})?
       setMandatory(
     DoctypeField doctypeField,
   ) {

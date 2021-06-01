@@ -1,75 +1,220 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/model/get_doc_response.dart';
+import 'package:frappe_app/utils/enums.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/utils/helpers.dart';
+import 'package:frappe_app/views/email_form.dart';
+import 'package:frappe_app/widgets/doc_version.dart';
+import 'package:frappe_app/widgets/email_box.dart';
 
-import '../config/palette.dart';
-import '../utils/enums.dart';
-import '../widgets/event.dart';
+import 'package:timelines/timelines.dart' as timeline;
 
-class Timeline extends StatefulWidget {
-  final List data;
-  final Function callback;
+import 'comment_box.dart';
 
-  Timeline(this.data, this.callback);
+class Timeline extends StatelessWidget {
+  final Docinfo docinfo;
+  final String doctype;
+  final String name;
+  final String emailSubjectField;
+  final String emailSenderField;
+  final bool communicationOnly;
+  final Function switchCallback;
+  final Function refreshCallback;
 
-  @override
-  _TimelineState createState() => _TimelineState();
-}
-
-class _TimelineState extends State<Timeline> {
-  var showAll = false;
+  Timeline({
+    required this.docinfo,
+    required this.doctype,
+    required this.name,
+    required this.emailSenderField,
+    required this.emailSubjectField,
+    required this.communicationOnly,
+    required this.switchCallback,
+    required this.refreshCallback,
+  });
 
   @override
   Widget build(BuildContext context) {
-    var sortedEvents = sortBy(widget.data, "creation", Order.desc);
-    List<Widget> children = [
-      SwitchListTile.adaptive(
-        title: Text('Show All'),
-        contentPadding: EdgeInsets.symmetric(horizontal: 8),
-        value: showAll,
-        activeColor: Colors.blue,
-        onChanged: (val) {
-          showAll = val;
-          setState(() {});
-        },
-      )
-    ];
+    return Builder(
+      builder: (context) {
+        List<Widget> children = [
+          Row(
+            children: [
+              Text(
+                'Activity',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 18,
+                  color: FrappePalette.grey[900],
+                ),
+              ),
+              Spacer(),
+              Switch.adaptive(
+                value: communicationOnly,
+                activeColor: Colors.blue,
+                onChanged: (val) {
+                  switchCallback(val);
+                },
+              ),
+              Text(
+                "Communication Only",
+                style: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 13,
+                  color: FrappePalette.grey[700],
+                ),
+              ),
+            ],
+          ),
+        ];
 
-    for (var event in sortedEvents) {
-      EventType eventType;
+        children.add(
+          Row(
+            children: [
+              FlatButton.icon(
+                color: FrappePalette.grey[600],
+                shape: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.transparent,
+                  ),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(6),
+                  ),
+                ),
+                label: Text(
+                  'New Email',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                icon: FrappeIcon(
+                  FrappeIcons.email,
+                ),
+                onPressed: () {
+                  Navigator.of(
+                    context,
+                    rootNavigator: true,
+                  ).push(
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return EmailForm(
+                          callback: () {
+                            refreshCallback();
+                          },
+                          subjectField: emailSubjectField,
+                          senderField: emailSenderField,
+                          doctype: doctype,
+                          doc: name,
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
 
-      if (event["communication_medium"] == "Email") {
-        eventType = EventType.email;
-      } else if (event["comment_type"] == "Comment") {
-        eventType = EventType.comment;
-      } else {
-        if (!showAll) {
-          continue;
+        for (var event in _processData()) {
+          if (event["_category"] == "communications") {
+            event = Communication.fromJson(event);
+          } else if (event["_category"] == "comments") {
+            event = Comment.fromJson(event);
+          }
+
+          if (event is Communication) {
+            children.add(EmailBox(event));
+          } else if (event is Comment) {
+            children.add(
+              CommentBox(
+                event,
+                () {
+                  refreshCallback();
+                },
+              ),
+            );
+          } else {
+            if (communicationOnly) {
+              continue;
+            }
+
+            children.add(DocVersion(event));
+          }
         }
-        eventType = EventType.docVersion;
-      }
-      children.add(
-        Event(
-          eventType,
-          event,
-          widget.callback,
-        ),
-      );
-    }
 
-    return Container(
-      color: Palette.bgColor,
-      child: ListView.separated(
-        padding: EdgeInsets.all(8),
-        itemCount: children.length,
-        itemBuilder: (BuildContext context, int index) {
-          return children[index];
-        },
-        separatorBuilder: (BuildContext context, int index) {
-          return Padding(
-            padding: EdgeInsets.all(4),
-          );
-        },
-      ),
+        return Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: timeline.Timeline.tileBuilder(
+            theme: timeline.TimelineThemeData(
+              connectorTheme: timeline.ConnectorThemeData(
+                space: 51,
+                thickness: 2,
+                color: FrappePalette.grey[200],
+              ),
+              nodePosition: 0,
+            ),
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            builder: timeline.TimelineTileBuilder.connected(
+              indicatorBuilder: (context, idx) {
+                return CircleAvatar(
+                  radius: 10,
+                  backgroundColor: FrappePalette.grey[300],
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    radius: 8,
+                    child: Icon(
+                      Icons.lens,
+                      size: 6,
+                      color: FrappePalette.grey[600],
+                    ),
+                  ),
+                );
+              },
+              connectorBuilder: (_, index, __) {
+                return timeline.SolidLineConnector();
+              },
+              itemCount: children.length,
+              contentsBuilder: (context, idx) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: children[idx],
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
+  }
+
+  List _processData() {
+    var _events = [
+      ...docinfo.comments.map(
+        (comment) {
+          var c = comment.toJson();
+          c["_category"] = "comments";
+          return c;
+        },
+      ).toList(),
+      ...docinfo.communications.map((communication) {
+        var c = communication.toJson();
+        c["_category"] = "communications";
+        return c;
+      }).toList(),
+      ...docinfo.versions.map((version) {
+        var v = version.toJson();
+        v["_category"] = "versions";
+        return v;
+      }).toList(),
+      ...docinfo.views.map((view) {
+        var v = view.toJson();
+        v["_category"] = "views";
+        return v;
+      }).toList(),
+    ];
+    var events = sortBy(_events, "creation", Order.desc);
+    return events;
   }
 }
