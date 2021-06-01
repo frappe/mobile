@@ -23,7 +23,7 @@ void main() async {
   await FlutterDownloader.initialize();
   await initApiConfig();
   await initLocalNotifications();
-  await initAutoSync();
+  // await initAutoSync();
 
   runApp(FrappeApp());
 }

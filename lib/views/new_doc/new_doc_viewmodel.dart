@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -34,27 +35,29 @@ class NewDocViewModel extends BaseViewModel {
 
     var isOnline = await verifyOnline();
     if (!isOnline) {
-      var qc = Queue.getQueueContainer();
-      var queueLength = qc.length;
-      var qObj = {
-        "type": "Create",
-        "doctype": meta.docs[0].name,
-        "title": hasTitle(meta.docs[0])
-            ? formValue[meta.docs[0].titleField] ??
-                "${meta.docs[0].name} ${queueLength + 1}"
-            : "${meta.docs[0].name} ${queueLength + 1}",
-        "data": [formValue],
-      };
-      Queue.add(qObj);
+      // var qc = Queue.getQueueContainer();
+      // var queueLength = qc.length;
+      // var qObj = {
+      //   "type": "Create",
+      //   "doctype": meta.docs[0].name,
+      //   "title": hasTitle(meta.docs[0])
+      //       ? formValue[meta.docs[0].titleField] ??
+      //           "${meta.docs[0].name} ${queueLength + 1}"
+      //       : "${meta.docs[0].name} ${queueLength + 1}",
+      //   "data": [formValue],
+      // };
+      // Queue.add(qObj);
 
+      // FrappeAlert.infoAlert(
+      //   title: 'No Internet Connection',
+      //   subtitle: 'Added to Queue',
+      //   context: context,
+      // );
+      // Navigator.of(context).pop();
       LoadingIndicator.stopLoading();
-
-      FrappeAlert.infoAlert(
-        title: 'No Internet Connection',
-        subtitle: 'Added to Queue',
-        context: context,
+      throw ErrorResponse(
+        statusCode: HttpStatus.serviceUnavailable,
       );
-      Navigator.of(context).pop();
     } else {
       try {
         var response = await locator<Api>().saveDocs(

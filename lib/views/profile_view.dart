@@ -19,16 +19,16 @@ class ProfileView extends StatelessWidget {
         padding: const EdgeInsets.only(top: 4.0),
         child: Column(
           children: [
-            PaddedCardListTile(
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => QueueList(),
-                  ),
-                );
-              },
-              title: "Queue",
-            ),
+            // PaddedCardListTile(
+            //   onTap: () {
+            //     Navigator.of(context).push(
+            //       MaterialPageRoute(
+            //         builder: (context) => QueueList(),
+            //       ),
+            //     );
+            //   },
+            //   title: "Queue",
+            // ),
             PaddedCardListTile(
               onTap: () async {
                 await clearLoginInfo();

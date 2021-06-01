@@ -97,47 +97,50 @@ class FormViewViewModel extends BaseViewModel {
     LoadingIndicator.loadingWithBackgroundDisabled("Saving");
     var isOnline = await verifyOnline();
     if (!isOnline) {
-      if (queuedData != null) {
-        queuedData["data"] = [
-          {
-            ...doc,
-            ...formValue,
-          }
-        ];
-        queuedData["updated_keys"] = {
-          ...queuedData["updated_keys"],
-          ...extractChangedValues(
-            doc,
-            formValue,
-          )
-        };
-        queuedData["title"] = getTitle(
-          meta.docs[0],
-          formValue,
-        );
+      // if (queuedData != null) {
+      //   queuedData["data"] = [
+      //     {
+      //       ...doc,
+      //       ...formValue,
+      //     }
+      //   ];
+      //   queuedData["updated_keys"] = {
+      //     ...queuedData["updated_keys"],
+      //     ...extractChangedValues(
+      //       doc,
+      //       formValue,
+      //     )
+      //   };
+      //   queuedData["title"] = getTitle(
+      //     meta.docs[0],
+      //     formValue,
+      //   );
 
-        Queue.putAt(
-          queuedData["qIdx"],
-          queuedData,
-        );
-      } else {
-        Queue.add(
-          {
-            "type": "Update",
-            "name": name,
-            "doctype": meta.docs[0].name,
-            "title": getTitle(meta.docs[0], formValue),
-            "updated_keys": extractChangedValues(doc, formValue),
-            "data": [
-              {
-                ...doc,
-                ...formValue,
-              }
-            ],
-          },
-        );
-      }
+      //   Queue.putAt(
+      //     queuedData["qIdx"],
+      //     queuedData,
+      //   );
+      // } else {
+      //   Queue.add(
+      //     {
+      //       "type": "Update",
+      //       "name": name,
+      //       "doctype": meta.docs[0].name,
+      //       "title": getTitle(meta.docs[0], formValue),
+      //       "updated_keys": extractChangedValues(doc, formValue),
+      //       "data": [
+      //         {
+      //           ...doc,
+      //           ...formValue,
+      //         }
+      //       ],
+      //     },
+      //   );
+      // }
       LoadingIndicator.stopLoading();
+      throw ErrorResponse(
+        statusCode: HttpStatus.serviceUnavailable,
+      );
     } else {
       formValue = {
         ...doc,
