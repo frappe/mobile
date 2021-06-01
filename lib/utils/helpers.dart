@@ -322,7 +322,7 @@ initAwesomeItems() async {
   var moduleDoctypesMapping = {};
 
   for (var item in deskSidebarItems.message) {
-    var desktopPage = await locator<Api>().getDesktopPage(item.label);
+    var desktopPage = await locator<Api>().getDesktopPage(item.name);
 
     var doctypes = [];
     desktopPage.message.cards.items.forEach(
