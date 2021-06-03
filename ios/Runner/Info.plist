@@ -24,12 +24,18 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>$(PRODUCT_NAME) music use</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>We need access to your bluetooth connection to upload data from your device for crash reports.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>We need access to your bluetooth connection to upload data from your device for crash reports.</string>
 	<key>NSCalendarsUsageDescription</key>
 	<string>$(PRODUCT_NAME) calendar use</string>
 	<key>NSContactsUsageDescription</key>
