@@ -18,7 +18,7 @@
 
 
 ## Development
-0) To run this Project first you need to [Setup Flutter](https://flutter.dev/docs/get-started/install)
+0) To run this Project first you need to [Setup Flutter 1.22.5](https://flutter.dev/docs/get-started/install)
 
 1) Install packages<br/>
 ```sh
