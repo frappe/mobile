@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:frappe_app/utils/helpers.dart';
+import 'package:frappe_app/utils/navigation_helper.dart';
 import 'package:frappe_app/widgets/padded_card_list_tile.dart';
 
 import 'package:provider/provider.dart';
@@ -39,8 +40,10 @@ class DeskView extends StatelessWidget {
       },
       builder: (context, model, child) {
         if (model.state == ViewState.busy) {
-          return Center(
-            child: CircularProgressIndicator(),
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         } else if (model.hasError) {
           return handleError(
@@ -55,23 +58,23 @@ class DeskView extends StatelessWidget {
             model.passedModule = module;
             module = null;
             model.getData();
-            return Center(
-              child: CircularProgressIndicator(),
+            return Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
             );
           } else {
             return Scaffold(
               backgroundColor: Palette.bgColor,
               appBar: buildAppBar(
-                isRoot: true,
+                context: context,
                 title: model.currentModule,
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ShowModules(
-                        model: model,
-                        title: model.currentModule,
-                      ),
+                  NavigationHelper.push(
+                    context: context,
+                    page: ShowModules(
+                      model: model,
+                      title: model.currentModule,
                     ),
                   );
                 },

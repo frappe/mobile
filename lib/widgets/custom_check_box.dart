@@ -488,7 +488,7 @@ class _CustomCheckboxState extends State<CustomCheckbox>
           ..shape = widget.shape ??
               themeData.checkboxTheme.shape ??
               const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(1.0)),
+                borderRadius: BorderRadius.all(Radius.circular(4.0)),
               )
           ..side = widget.side ?? themeData.checkboxTheme.side,
       ),

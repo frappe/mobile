@@ -259,13 +259,21 @@ List<Widget> generateLayout({
   fields.asMap().entries.forEach((entry) {
     var field = entry.value;
     var fIdx = entry.key;
+    var val;
+    var defaultValDoc = {};
 
-    var val = doc != null
-        ? doc[field.fieldname] ?? field.defaultValue
-        : field.defaultValue;
+    if (doc != null) {
+      val = doc[field.fieldname];
+    } else {
+      val = field.defaultValue;
 
-    if (val == '__user') {
-      val = Config().userId;
+      if (val == '__user') {
+        val = Config().userId;
+      }
+
+      defaultValDoc = {
+        field.fieldname: val,
+      };
     }
 
     if (val is List) {
@@ -318,14 +326,14 @@ List<Widget> generateLayout({
             visible: editMode ? true : val != null && val != '',
             child: makeControl(
               field: field,
-              doc: doc,
+              doc: doc ?? defaultValDoc,
             ),
           ),
         );
       } else {
         collapsibles.add(
           makeControl(
-            doc: doc,
+            doc: doc ?? defaultValDoc,
             field: field,
           ),
         );
@@ -336,7 +344,7 @@ List<Widget> generateLayout({
           Visibility(
             visible: editMode ? true : val != null && val != '',
             child: makeControl(
-              doc: doc,
+              doc: doc ?? defaultValDoc,
               field: field,
             ),
           ),
@@ -345,7 +353,7 @@ List<Widget> generateLayout({
         widgets.add(
           makeControl(
             field: field,
-            doc: doc,
+            doc: doc ?? defaultValDoc,
           ),
         );
       }

@@ -82,25 +82,28 @@ class _CustomFormBuilderCheckboxState extends State<CustomFormBuilderCheckbox> {
   }
 
   Widget _checkbox(FormFieldState<dynamic> field) {
-    return CustomCheckbox(
-      value: (field.value == null && !widget.tristate) ? false : field.value,
-      activeColor: widget.activeColor,
-      checkColor: widget.checkColor,
-      materialTapTargetSize: widget.materialTapTargetSize,
-      tristate: widget.tristate,
-      onChanged: _readOnly
-          ? null
-          : (bool value) {
-              FocusScope.of(context).requestFocus(FocusNode());
-              field.didChange(value);
-              widget.onChanged?.call(value);
-            },
-      focusColor: widget.focusColor,
-      hoverColor: widget.hoverColor,
-      focusNode: widget.focusNode,
-      autofocus: widget.autoFocus,
-      mouseCursor: widget.mouseCursor,
-      visualDensity: widget.visualDensity,
+    return SizedBox(
+      width: 24.0,
+      child: CustomCheckbox(
+        value: (field.value == null && !widget.tristate) ? false : field.value,
+        activeColor: widget.activeColor,
+        checkColor: widget.checkColor,
+        materialTapTargetSize: widget.materialTapTargetSize,
+        tristate: widget.tristate,
+        onChanged: _readOnly
+            ? null
+            : (bool value) {
+                FocusScope.of(context).requestFocus(FocusNode());
+                field.didChange(value);
+                widget.onChanged?.call(value);
+              },
+        focusColor: widget.focusColor,
+        hoverColor: widget.hoverColor,
+        focusNode: widget.focusNode,
+        autofocus: widget.autoFocus,
+        mouseCursor: widget.mouseCursor,
+        visualDensity: widget.visualDensity,
+      ),
     );
   }
 
@@ -117,6 +120,7 @@ class _CustomFormBuilderCheckboxState extends State<CustomFormBuilderCheckbox> {
   @override
   Widget build(BuildContext context) {
     // TODO
+
     return FormField(
       key: _fieldKey,
       enabled: !_readOnly,
@@ -136,10 +140,17 @@ class _CustomFormBuilderCheckboxState extends State<CustomFormBuilderCheckbox> {
           ),
           child: ListTile(
             dense: true,
+            visualDensity: VisualDensity(
+              horizontal: 0,
+              vertical: -4,
+            ),
             isThreeLine: false,
             contentPadding: widget.contentPadding,
             title: Row(children: [
               _leading(field),
+              SizedBox(
+                width: 8,
+              ),
               widget.label,
             ]),
             trailing: _trailing(field),

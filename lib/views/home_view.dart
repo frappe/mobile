@@ -15,9 +15,8 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  final PersistentTabController _controller =
-      PersistentTabController(initialIndex: 0);
-  String? module;
+  // final PersistentTabController _controller =
+  //     PersistentTabController(initialIndex: 0);
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +38,7 @@ class _HomeViewState extends State<HomeView> {
     // );
     return PersistentTabView(
       context,
-      controller: _controller,
+      // controller: _controller,
       decoration: NavBarDecoration(boxShadow: [BoxShadow()]),
       screens: _buildScreens(),
       items: _navBarsItems(),
@@ -49,17 +48,8 @@ class _HomeViewState extends State<HomeView> {
 
   List<Widget> _buildScreens() {
     return [
-      DeskView(module),
-      Awesombar(
-        (String selectedModule) {
-          setState(
-            () {
-              module = selectedModule;
-              _controller.index = 0;
-            },
-          );
-        },
-      ),
+      DeskView(),
+      Awesombar(),
       ProfileView(),
     ];
   }
@@ -70,10 +60,12 @@ class _HomeViewState extends State<HomeView> {
         title: 'Home',
         inactiveIcon: FrappeIcon(
           FrappeIcons.home_outlined,
+          size: 24,
           color: FrappePalette.grey[500],
         ),
         icon: FrappeIcon(
           FrappeIcons.home_filled,
+          size: 24,
         ),
         activeColorPrimary: FrappePalette.grey[800]!,
         inactiveColorPrimary: FrappePalette.grey[500],
@@ -83,10 +75,12 @@ class _HomeViewState extends State<HomeView> {
         icon: FrappeIcon(
           FrappeIcons.search,
           color: FrappePalette.grey[800],
+          size: 28,
         ),
         inactiveIcon: FrappeIcon(
           FrappeIcons.search,
           color: FrappePalette.grey[500],
+          size: 28,
         ),
         activeColorPrimary: FrappePalette.grey[800]!,
         inactiveColorPrimary: FrappePalette.grey[500],
@@ -95,7 +89,7 @@ class _HomeViewState extends State<HomeView> {
         title: 'Profile',
         icon: UserAvatar(
           uid: Config().userId!,
-          size: 12,
+          size: 16,
         ),
         activeColorPrimary: FrappePalette.grey[800]!,
         inactiveColorPrimary: FrappePalette.grey[500],

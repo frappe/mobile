@@ -300,7 +300,7 @@ class CardItem {
   late int? idx;
   late int? docstatus;
   late String label;
-  late int? hidden;
+  late dynamic hidden;
   late List<CardItemLink> links;
   late String? doctype;
 

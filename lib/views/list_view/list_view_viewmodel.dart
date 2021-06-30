@@ -32,14 +32,69 @@ class ListViewViewModel extends BaseViewModel {
   bool showLiked = false;
   var userId = Config().userId;
   late DesktopPageResponse desktopPageResponse;
+  late List<DoctypeField> sortableFields;
+  late DoctypeField sortField;
+  late String sortOrder;
 
   refresh() {
     pagewiseLoadController?.reset();
   }
 
+  updateSort(Map sort) {
+    sortField = sort["field"] as DoctypeField;
+    sortOrder = sort["order"];
+    getData();
+  }
+
+  getSortableFields() {
+    List<DoctypeField> _sortableFields = [];
+    var _fields = meta.docs[0].fields.where((element) => true).toList();
+
+    _fields.addAll([
+      DoctypeField(
+        fieldname: 'idx',
+        label: "Most Used",
+        reqd: 1,
+      ),
+      DoctypeField(
+        fieldname: 'modified',
+        label: "Last Modified On",
+        reqd: 1,
+      ),
+      DoctypeField(
+        fieldname: 'creation',
+        label: "Created On",
+        reqd: 1,
+      ),
+    ]);
+
+    var metaSortField = meta.docs[0].sortField!.split(",")[0].split(" ")[0];
+    var metaSortDoctypeField = _fields.firstWhere(
+      (field) => field.fieldname == metaSortField,
+      orElse: () => DoctypeField(
+        fieldname: metaSortField,
+        label: metaSortField.toUpperCase(),
+      ),
+    );
+    _sortableFields.add(metaSortDoctypeField);
+
+    _fields.forEach(
+      (field) {
+        if ((field.bold == 1 || field.reqd == 1) &&
+            field.fieldname != metaSortField) {
+          _sortableFields.add(field);
+        }
+      },
+    );
+
+    sortableFields = _sortableFields;
+    sortField = sortableFields[0];
+    sortOrder = meta.docs[0].sortOrder?.toLowerCase() ?? "desc";
+  }
+
   bool get hasError => error != null;
 
-  getData(DoctypeDoc meta) async {
+  getData() async {
     setState(ViewState.busy);
     try {
       var isOnline = await verifyOnline();
@@ -59,7 +114,7 @@ class ListViewViewModel extends BaseViewModel {
               }
 
               return [
-                meta.name,
+                meta.docs[0].name,
                 filter.field.fieldname,
                 filter.filterOperator.value,
                 value,
@@ -68,12 +123,13 @@ class ListViewViewModel extends BaseViewModel {
 
             return locator<Api>().fetchList(
               filters: transformedFilters,
-              meta: meta,
-              doctype: meta.name,
-              orderBy: '`tab${meta.name}`.`modified` desc',
+              meta: meta.docs[0],
+              doctype: meta.docs[0].name,
+              orderBy:
+                  '`tab${meta.docs[0].name}`.`${sortField.fieldname}` $sortOrder',
               fieldnames: generateFieldnames(
-                meta.name,
-                meta,
+                meta.docs[0].name,
+                meta.docs[0],
               ),
               pageLength: Constants.pageSize,
               offset: pageIndex! * Constants.pageSize,
@@ -88,7 +144,7 @@ class ListViewViewModel extends BaseViewModel {
               Duration(seconds: 0),
               () {
                 var response = OfflineStorage.getItem(
-                  '${meta.name}List',
+                  '${meta.docs[0].name}List',
                 );
                 return response["data"];
               },
@@ -208,13 +264,13 @@ class ListViewViewModel extends BaseViewModel {
     } else {
       Navigator.of(context).pop();
       meta = _meta;
-      getData(_meta.docs[0]);
+      getData();
     }
   }
 
   removeFilter(int index) {
     filters.removeAt(index);
-    getData(meta.docs[0]);
+    getData();
   }
 
   clearFilters() {
@@ -242,10 +298,10 @@ class ListViewViewModel extends BaseViewModel {
         );
 
         filters = appliedFiltersClone;
-        getData(meta.docs[0]);
+        getData();
       } else {
         filters = [];
-        getData(meta.docs[0]);
+        getData();
       }
     }
   }

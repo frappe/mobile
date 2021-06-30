@@ -36,6 +36,20 @@ class MultiSelect extends StatefulWidget {
 class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
   @override
   Widget build(BuildContext context) {
+    var initialValue;
+    if (widget.doc != null) {
+      if (widget.doc![widget.doctypeField.fieldname] != null) {
+        initialValue = widget.doc![widget.doctypeField.fieldname]
+            .split(',')
+            .where((e) => e != " ")
+            .toList();
+      } else {
+        initialValue = [];
+      }
+    } else {
+      initialValue = [];
+    }
+
     return FormBuilderChipsInput(
       key: widget.key,
       onChanged: widget.onChanged,
@@ -56,8 +70,7 @@ class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
         label: widget.doctypeField.label,
       ),
       name: widget.doctypeField.fieldname,
-      initialValue:
-          widget.doc != null ? widget.doc![widget.doctypeField.fieldname] : [],
+      initialValue: initialValue,
       findSuggestions: widget.findSuggestions ??
           (String query) async {
             if (query.length != 0) {
@@ -81,7 +94,7 @@ class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
       chipBuilder: (context, state, profile) {
         return InputChip(
           label: Text(
-            (profile as Map)["value"],
+            profile is Map ? profile["value"] : profile,
             style: TextStyle(fontSize: 12),
           ),
           deleteIconColor: Palette.iconColor,

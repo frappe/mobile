@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/widgets/header_app_bar.dart';
 import 'package:provider/provider.dart';
 
 import 'package:frappe_app/config/frappe_icons.dart';
@@ -51,7 +52,7 @@ class FormView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var connectionStatus = Provider.of<ConnectivityStatus>(
+    Provider.of<ConnectivityStatus>(
       context,
     );
     return BaseView<FormViewViewModel>(
@@ -95,10 +96,8 @@ class FormView extends StatelessWidget {
 
                 return Scaffold(
                   backgroundColor: Palette.bgColor,
-                  appBar: AppBar(
-                    elevation: 0.8,
-                    backgroundColor: Colors.white,
-                    title: Text('${meta.docs[0].name} Details'),
+                  appBar: buildAppBar(
+                    title: '${meta.docs[0].name} Details',
                     actions: [
                       if (model.editMode)
                         Padding(
@@ -192,12 +191,19 @@ class FormView extends StatelessWidget {
                                     ),
                                   ),
                                   children: [
-                                    CommentInput(
-                                      name: name!,
-                                      doctype: meta.docs[0].name,
-                                      callback: () {
-                                        model.getDocinfo();
-                                      },
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 16.0,
+                                        right: 16.0,
+                                        bottom: 24,
+                                      ),
+                                      child: CommentInput(
+                                        name: name!,
+                                        doctype: meta.docs[0].name,
+                                        callback: () {
+                                          model.getDocinfo();
+                                        },
+                                      ),
                                     )
                                   ],
                                 ),

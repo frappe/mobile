@@ -21,7 +21,7 @@ class CommentBox extends StatelessWidget {
   Widget build(BuildContext context) {
     var time = timeago.format(DateTime.parse(data.creation));
 
-    return Container(
+    return Card(
       color: Colors.white,
       child: Column(
         children: [
