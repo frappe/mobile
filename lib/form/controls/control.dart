@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 
 import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/form/controls/text.dart';
 import 'package:frappe_app/model/config.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/utils/enums.dart';
@@ -80,6 +81,15 @@ Widget makeControl({
     case "Small Text":
       {
         control = SmallText(
+          doctypeField: field,
+          doc: doc,
+        );
+      }
+      break;
+
+    case "Text":
+      {
+        control = ControlText(
           doctypeField: field,
           doc: doc,
         );
