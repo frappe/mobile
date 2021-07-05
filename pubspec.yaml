@@ -80,6 +80,11 @@ flutter_icons:
   image_path: "assets/frappe_icon.jpg"
 
 dependency_overrides:
+  json_table:
+    git:
+      url: https://github.com/sumitbhanushali/json_table
+      ref: b893c252d3786bb07498ded2f94717a5016ae66c
+  
   flutter_form_builder:
     git:
       url: https://github.com/sumitbhanushali/flutter_form_builder
