@@ -36,6 +36,14 @@ class MultiSelect extends StatefulWidget {
 class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
   @override
   Widget build(BuildContext context) {
+    List<String? Function(dynamic)> validators = [];
+
+    var f = setMandatory(widget.doctypeField);
+
+    if (f != null) {
+      validators.add(f(context));
+    }
+
     var initialValue;
     if (widget.doc != null) {
       if (widget.doc![widget.doctypeField.fieldname] != null) {
@@ -53,6 +61,7 @@ class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
     return FormBuilderChipsInput(
       key: widget.key,
       onChanged: widget.onChanged,
+      validator: FormBuilderValidators.compose(validators),
       valueTransformer: widget.valueTransformer ??
           (value) {
             return value
