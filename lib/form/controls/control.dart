@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 
 import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/form/controls/read_only.dart';
 import 'package:frappe_app/form/controls/text.dart';
 import 'package:frappe_app/model/config.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/widgets/custom_expansion_tile.dart';
+import 'package:frappe_app/widgets/section.dart';
 
 import '../../config/palette.dart';
 
@@ -99,6 +101,15 @@ Widget makeControl({
     case "Data":
       {
         control = Data(
+          doc: doc,
+          doctypeField: field,
+        );
+      }
+      break;
+
+    case "Read Only":
+      {
+        control = ReadOnly(
           doc: doc,
           doctypeField: field,
         );
@@ -246,29 +257,20 @@ List<Widget> generateLayout({
   Map? doc,
   bool editMode = true,
 }) {
-  if (fields.first.fieldtype != "Section Break" && viewType == ViewType.form) {
-    fields.insert(
-      0,
-      DoctypeField(
-        fieldtype: "Section Break",
-        label: null,
-        fieldname: "section",
-      ),
-    );
-  }
-
   List<Widget> collapsibles = [];
   List<Widget> widgets = [];
+  List<Widget> sections = [];
 
   List<String> collapsibleLabels = [];
+  List<String> sectionLabels = [];
 
   var isCollapsible = false;
+  var isSection = false;
 
   int cIdx = 0;
+  int sIdx = 0;
 
-  fields.asMap().entries.forEach((entry) {
-    var field = entry.value;
-    var fIdx = entry.key;
+  fields.forEach((field) {
     var val;
     var defaultValDoc = {};
 
@@ -293,7 +295,44 @@ List<Widget> generateLayout({
     }
 
     if (field.fieldtype == "Section Break") {
-      if (collapsibles.length > 0) {
+      if (sections.length > 0) {
+        var sectionVisibility = sections.any((element) {
+          if (element is Visibility) {
+            return element.visible == true;
+          } else {
+            return true;
+          }
+        });
+
+        widgets.add(
+          Visibility(
+            visible: sectionVisibility,
+            child: sectionLabels[sIdx] != ''
+                ? ListTileTheme(
+                    contentPadding: EdgeInsets.all(0),
+                    child: CustomExpansionTile(
+                      maintainState: true,
+                      initiallyExpanded: true,
+                      title: Text(
+                        sectionLabels[sIdx],
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      ),
+                      children: [...sections],
+                    ),
+                  )
+                : Section(
+                    title: sectionLabels[sIdx],
+                    children: [...sections],
+                  ),
+          ),
+        );
+
+        sIdx += 1;
+        sections.clear();
+      } else if (collapsibles.length > 0) {
         var sectionVisibility = collapsibles.any((element) {
           if (element is Visibility) {
             return element.visible == true;
@@ -308,7 +347,6 @@ List<Widget> generateLayout({
               contentPadding: EdgeInsets.all(0),
               child: CustomExpansionTile(
                 maintainState: true,
-                initiallyExpanded: cIdx == 0,
                 title: Text(
                   collapsibleLabels[cIdx],
                   style: TextStyle(
@@ -325,10 +363,34 @@ List<Widget> generateLayout({
         collapsibles.clear();
       }
 
-      isCollapsible = true;
-      collapsibleLabels.add(
-        field.label == null ? fields[fIdx + 1].label ?? "Form" : field.label!,
-      );
+      if (field.collapsible == 1) {
+        isSection = false;
+        isCollapsible = true;
+        collapsibleLabels.add(field.label!);
+      } else {
+        isCollapsible = false;
+        isSection = true;
+        sectionLabels.add(field.label != null ? field.label! : '');
+      }
+    } else if (isSection) {
+      if (viewType == ViewType.form) {
+        sections.add(
+          Visibility(
+            visible: editMode ? true : val != null && val != '',
+            child: makeControl(
+              doc: doc,
+              field: field,
+            ),
+          ),
+        );
+      } else {
+        sections.add(
+          makeControl(
+            field: field,
+            doc: doc,
+          ),
+        );
+      }
     } else if (isCollapsible) {
       if (viewType == ViewType.form) {
         collapsibles.add(
