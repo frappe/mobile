@@ -229,7 +229,11 @@ Widget buildDecoratedControl({
               padding: Palette.labelPadding,
               child: Text(
                 field.label ?? "",
-                style: Palette.secondaryTxtStyle,
+                style: TextStyle(
+                  color: FrappePalette.grey[700],
+                  fontWeight: FontWeight.w400,
+                  fontSize: 12,
+                ),
               ),
             ),
             SizedBox(width: 4),
@@ -255,7 +259,6 @@ List<Widget> generateLayout({
   required List<DoctypeField> fields,
   ViewType? viewType,
   Map? doc,
-  bool editMode = true,
 }) {
   List<Widget> collapsibles = [];
   List<Widget> widgets = [];
@@ -296,66 +299,45 @@ List<Widget> generateLayout({
 
     if (field.fieldtype == "Section Break") {
       if (sections.length > 0) {
-        var sectionVisibility = sections.any((element) {
-          if (element is Visibility) {
-            return element.visible == true;
-          } else {
-            return true;
-          }
-        });
-
         widgets.add(
-          Visibility(
-            visible: sectionVisibility,
-            child: sectionLabels[sIdx] != ''
-                ? ListTileTheme(
-                    contentPadding: EdgeInsets.all(0),
-                    child: CustomExpansionTile(
-                      maintainState: true,
-                      initiallyExpanded: true,
-                      title: Text(
-                        sectionLabels[sIdx],
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
+          sectionLabels[sIdx] != ''
+              ? ListTileTheme(
+                  contentPadding: EdgeInsets.all(0),
+                  child: CustomExpansionTile(
+                    maintainState: true,
+                    initiallyExpanded: true,
+                    title: Text(
+                      sectionLabels[sIdx],
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
                       ),
-                      children: [...sections],
                     ),
-                  )
-                : Section(
-                    title: sectionLabels[sIdx],
                     children: [...sections],
                   ),
-          ),
+                )
+              : Section(
+                  title: sectionLabels[sIdx],
+                  children: [...sections],
+                ),
         );
 
         sIdx += 1;
         sections.clear();
       } else if (collapsibles.length > 0) {
-        var sectionVisibility = collapsibles.any((element) {
-          if (element is Visibility) {
-            return element.visible == true;
-          } else {
-            return true;
-          }
-        });
         widgets.add(
-          Visibility(
-            visible: sectionVisibility,
-            child: ListTileTheme(
-              contentPadding: EdgeInsets.all(0),
-              child: CustomExpansionTile(
-                maintainState: true,
-                title: Text(
-                  collapsibleLabels[cIdx],
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                  ),
+          ListTileTheme(
+            contentPadding: EdgeInsets.all(0),
+            child: CustomExpansionTile(
+              maintainState: true,
+              title: Text(
+                collapsibleLabels[cIdx],
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
                 ),
-                children: [...collapsibles],
               ),
+              children: [...collapsibles],
             ),
           ),
         );
@@ -373,89 +355,43 @@ List<Widget> generateLayout({
         sectionLabels.add(field.label != null ? field.label! : '');
       }
     } else if (isSection) {
-      if (viewType == ViewType.form) {
-        sections.add(
-          Visibility(
-            visible: editMode ? true : val != null && val != '',
-            child: makeControl(
-              doc: doc,
-              field: field,
-            ),
-          ),
-        );
-      } else {
-        sections.add(
-          makeControl(
-            field: field,
-            doc: doc,
-          ),
-        );
-      }
+      sections.add(
+        makeControl(
+          field: field,
+          doc: doc,
+        ),
+      );
     } else if (isCollapsible) {
-      if (viewType == ViewType.form) {
-        collapsibles.add(
-          Visibility(
-            visible: editMode ? true : val != null && val != '',
-            child: makeControl(
-              field: field,
-              doc: doc ?? defaultValDoc,
-            ),
-          ),
-        );
-      } else {
-        collapsibles.add(
-          makeControl(
-            doc: doc ?? defaultValDoc,
-            field: field,
-          ),
-        );
-      }
+      collapsibles.add(
+        makeControl(
+          doc: doc ?? defaultValDoc,
+          field: field,
+        ),
+      );
     } else {
-      if (viewType == ViewType.form) {
-        widgets.add(
-          Visibility(
-            visible: editMode ? true : val != null && val != '',
-            child: makeControl(
-              doc: doc ?? defaultValDoc,
-              field: field,
-            ),
-          ),
-        );
-      } else {
-        widgets.add(
-          makeControl(
-            field: field,
-            doc: doc ?? defaultValDoc,
-          ),
-        );
-      }
+      widgets.add(
+        makeControl(
+          field: field,
+          doc: doc ?? defaultValDoc,
+        ),
+      );
     }
   });
 
   if (collapsibles.length > 0) {
-    var sectionVisibility = collapsibles.any((element) {
-      if (element is Visibility) {
-        return element.visible == true;
-      } else {
-        return true;
-      }
-    });
     widgets.add(
-      Visibility(
-        visible: sectionVisibility,
-        child: ListTileTheme(
-          contentPadding: EdgeInsets.all(0),
-          child: CustomExpansionTile(
-            maintainState: true,
-            title: Text(
-              collapsibleLabels[cIdx],
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 16,
-              ),
+      ListTileTheme(
+        contentPadding: EdgeInsets.all(0),
+        child: CustomExpansionTile(
+          maintainState: true,
+          title: Text(
+            collapsibleLabels[cIdx],
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 16,
             ),
-            children: [...collapsibles],
           ),
+          children: [...collapsibles],
         ),
       ),
     );

@@ -58,11 +58,11 @@ class FormView extends StatelessWidget {
     return BaseView<FormViewViewModel>(
       onModelReady: (model) {
         model.communicationOnly = true;
-        model.editMode = false;
         model.meta = meta;
         model.queued = queued;
         model.queuedData = queuedData;
         model.name = name;
+        model.isDirty = false;
         model.getData();
       },
       onModelClose: (model) {
@@ -81,7 +81,7 @@ class FormView extends StatelessWidget {
                       context: context,
                       onRetry: () {
                         model.communicationOnly = true;
-                        model.editMode = false;
+
                         model.getData();
                       });
                 }
@@ -95,25 +95,10 @@ class FormView extends StatelessWidget {
                 // var isLikedByUser = likedBy.contains(model.user);
 
                 return Scaffold(
-                  backgroundColor: Palette.bgColor,
+                  backgroundColor: FrappePalette.grey[50],
                   appBar: buildAppBar(
                     title: '${meta.docs[0].name} Details',
                     actions: [
-                      if (model.editMode)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 12.0,
-                            horizontal: 4,
-                          ),
-                          child: FrappeFlatButton(
-                            buttonType: ButtonType.secondary,
-                            title: 'Cancel',
-                            onPressed: () {
-                              _fbKey.currentState?.reset();
-                              model.toggleEdit();
-                            },
-                          ),
-                        ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           vertical: 12.0,
@@ -121,16 +106,19 @@ class FormView extends StatelessWidget {
                         ),
                         child: FrappeFlatButton(
                           buttonType: ButtonType.primary,
-                          title: model.editMode ? 'Save' : 'Edit',
-                          onPressed: model.editMode
-                              ? () => _handleUpdate(
+                          title: 'Save',
+                          onPressed: !model.isDirty
+                              ? () => {
+                                    FrappeAlert.warnAlert(
+                                      title: "No changes in document",
+                                      context: context,
+                                    )
+                                  }
+                              : () => _handleUpdate(
                                     doc: docs[0],
                                     model: model,
                                     context: context,
-                                  )
-                              : () {
-                                  model.toggleEdit();
-                                },
+                                  ),
                         ),
                       )
                     ],
@@ -171,11 +159,13 @@ class FormView extends StatelessWidget {
                                 },
                               ),
                             CustomForm(
+                              onChanged: () {
+                                model.handleFormDataChange();
+                              },
                               fields: meta.docs[0].fields,
                               formKey: _fbKey,
                               doc: docs[0],
                               viewType: ViewType.form,
-                              editMode: model.editMode,
                             ),
                             if (!queued)
                               ListTileTheme(
@@ -309,7 +299,6 @@ class DocInfo extends StatelessWidget {
         List tags = docInfo.tags.isNotEmpty ? docInfo.tags.split(',') : [];
 
         return Container(
-          color: FrappePalette.grey[50],
           width: double.infinity,
           padding: EdgeInsets.symmetric(
             horizontal: 20,

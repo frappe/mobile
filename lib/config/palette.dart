@@ -26,7 +26,7 @@ class Palette {
   static Color newIndicatorColor = Color.fromRGBO(255, 252, 231, 1);
 
   static EdgeInsets fieldPadding = const EdgeInsets.only(bottom: 24.0);
-  static EdgeInsets labelPadding = const EdgeInsets.only(bottom: 6.0);
+  static EdgeInsets labelPadding = const EdgeInsets.only(bottom: 4.0);
 
   // TODO: move
 
@@ -52,10 +52,12 @@ class Palette {
     return InputDecoration(
       suffixIcon: suffixIcon,
       prefixIcon: prefixIcon,
+      isDense: true,
       contentPadding: field == "check"
           ? EdgeInsets.zero
           : EdgeInsets.symmetric(
               horizontal: 10,
+              vertical: 8,
             ),
       border: OutlineInputBorder(
         borderSide: BorderSide.none,
@@ -71,7 +73,7 @@ class Palette {
       ),
       // hintText: label,
       filled: filled,
-      fillColor: Palette.fieldBgColor,
+      fillColor: Palette.bgColor,
     );
   }
 }

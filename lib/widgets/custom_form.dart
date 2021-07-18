@@ -9,20 +9,19 @@ class CustomForm extends StatelessWidget {
   final List<DoctypeField> fields;
   final Map? doc;
   final ViewType? viewType;
-  final bool editMode;
+  final void Function()? onChanged;
 
   const CustomForm({
     required this.formKey,
     required this.fields,
     this.viewType,
     this.doc,
-    this.editMode = true,
+    this.onChanged,
   });
 
   List<Widget> _generateChildren(
     List<DoctypeField> fields,
     Map? doc,
-    bool editMode,
   ) {
     List<DoctypeField> filteredFields;
 
@@ -49,14 +48,13 @@ class CustomForm extends StatelessWidget {
       fields: filteredFields,
       doc: doc,
       viewType: viewType,
-      editMode: editMode,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return FormBuilder(
-      enabled: editMode,
+      onChanged: onChanged,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       key: formKey,
       child: Container(
@@ -67,7 +65,6 @@ class CustomForm extends StatelessWidget {
             children: _generateChildren(
               fields,
               doc,
-              editMode,
             ),
           ),
         ),

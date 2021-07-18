@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:frappe_app/widgets/custom_check_box.dart';
 
 class CustomFormBuilderCheckbox extends StatefulWidget {
@@ -138,22 +139,7 @@ class _CustomFormBuilderCheckboxState extends State<CustomFormBuilderCheckbox> {
             enabled: !_readOnly,
             errorText: field.errorText,
           ),
-          child: ListTile(
-            dense: true,
-            visualDensity: VisualDensity(
-              horizontal: 0,
-              vertical: -4,
-            ),
-            isThreeLine: false,
-            contentPadding: widget.contentPadding,
-            title: Row(children: [
-              _leading(field),
-              SizedBox(
-                width: 8,
-              ),
-              widget.label,
-            ]),
-            trailing: _trailing(field),
+          child: GestureDetector(
             onTap: _readOnly
                 ? null
                 : () {
@@ -162,6 +148,13 @@ class _CustomFormBuilderCheckboxState extends State<CustomFormBuilderCheckbox> {
                     field.didChange(newValue);
                     widget.onChanged?.call(newValue);
                   },
+            child: Row(children: [
+              _leading(field),
+              SizedBox(
+                width: 8,
+              ),
+              widget.label,
+            ]),
           ),
         );
       },

@@ -21,9 +21,9 @@ class FormViewViewModel extends BaseViewModel {
   String? name;
   late DoctypeResponse meta;
   late bool queued;
+  late bool isDirty;
   Map? queuedData;
 
-  late bool editMode;
   ErrorResponse? error;
   late GetDocResponse formData;
   final user = Config().user;
@@ -31,18 +31,18 @@ class FormViewViewModel extends BaseViewModel {
   late bool communicationOnly;
 
   void refresh() {
-    editMode = false;
     notifyListeners();
+  }
+
+  handleFormDataChange() {
+    if (!isDirty) {
+      isDirty = true;
+      notifyListeners();
+    }
   }
 
   toggleSwitch(bool newVal) {
     communicationOnly = newVal;
-    notifyListeners();
-  }
-
-  void toggleEdit() {
-    editMode = !editMode;
-
     notifyListeners();
   }
 

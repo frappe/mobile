@@ -408,9 +408,12 @@ class DioApi implements Api {
     };
 
     final response = await DioHelper.dio.post(
-        '/method/frappe.core.doctype.communication.email.make',
-        data: queryParams,
-        options: Options(contentType: Headers.formUrlEncodedContentType));
+      '/method/frappe.core.doctype.communication.email.make',
+      data: queryParams,
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
     if (response.statusCode == 200) {
     } else {
       throw Exception('Something went wrong');
