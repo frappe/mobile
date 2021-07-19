@@ -132,7 +132,6 @@ class FormView extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Container(
-                              color: FrappePalette.grey[50],
                               width: double.infinity,
                               padding: EdgeInsets.symmetric(
                                 vertical: 10,
@@ -168,34 +167,38 @@ class FormView extends StatelessWidget {
                               viewType: ViewType.form,
                             ),
                             if (!queued)
-                              ListTileTheme(
-                                tileColor: Colors.white,
-                                child: CustomExpansionTile(
-                                  maintainState: true,
-                                  initiallyExpanded: false,
-                                  title: Text(
-                                    "Add a comment",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 16,
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: 10,
+                                ),
+                                child: ListTileTheme(
+                                  tileColor: Colors.white,
+                                  child: CustomExpansionTile(
+                                    maintainState: true,
+                                    title: Text(
+                                      "Add a comment",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16,
+                                      ),
                                     ),
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 16.0,
+                                          right: 16.0,
+                                          bottom: 24,
+                                        ),
+                                        child: CommentInput(
+                                          name: name!,
+                                          doctype: meta.docs[0].name,
+                                          callback: () {
+                                            model.getDocinfo();
+                                          },
+                                        ),
+                                      )
+                                    ],
                                   ),
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 16.0,
-                                        right: 16.0,
-                                        bottom: 24,
-                                      ),
-                                      child: CommentInput(
-                                        name: name!,
-                                        doctype: meta.docs[0].name,
-                                        callback: () {
-                                          model.getDocinfo();
-                                        },
-                                      ),
-                                    )
-                                  ],
                                 ),
                               ),
                             if (!queued)

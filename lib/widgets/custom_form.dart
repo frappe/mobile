@@ -30,14 +30,16 @@ class CustomForm extends StatelessWidget {
         (field) {
           return (field.readOnly != 1 || field.fieldtype == "Section Break") &&
               field.hidden != 1 &&
-              field.setOnlyOnce != 1;
+              field.setOnlyOnce != 1 &&
+              field.fieldtype != "Column Break";
         },
       ).toList();
     } else if (viewType == ViewType.newForm) {
       filteredFields = fields.where(
         (field) {
           return (field.readOnly != 1 || field.fieldtype == "Section Break") &&
-              field.hidden != 1;
+              field.hidden != 1 &&
+              field.fieldtype != "Column Break";
         },
       ).toList();
     } else {
@@ -47,7 +49,6 @@ class CustomForm extends StatelessWidget {
     return generateLayout(
       fields: filteredFields,
       doc: doc,
-      viewType: viewType,
     );
   }
 
@@ -57,15 +58,11 @@ class CustomForm extends StatelessWidget {
       onChanged: onChanged,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       key: formKey,
-      child: Container(
-        color: Colors.white,
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: SingleChildScrollView(
-          child: Column(
-            children: _generateChildren(
-              fields,
-              doc,
-            ),
+      child: SingleChildScrollView(
+        child: Column(
+          children: _generateChildren(
+            fields,
+            doc,
           ),
         ),
       ),

@@ -11,22 +11,25 @@ class Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        if (title != '')
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: Text(
-              title,
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 16,
+    return Container(
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          if (title != '')
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
               ),
             ),
-          ),
-        ...children,
-      ],
+          ...children,
+        ],
+      ),
     );
   }
 }

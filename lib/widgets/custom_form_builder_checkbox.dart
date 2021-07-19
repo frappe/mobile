@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:frappe_app/widgets/custom_check_box.dart';
 
 class CustomFormBuilderCheckbox extends StatefulWidget {
@@ -110,11 +109,6 @@ class _CustomFormBuilderCheckboxState extends State<CustomFormBuilderCheckbox> {
 
   Widget _leading(FormFieldState<dynamic> field) {
     if (widget.leadingInput) return _checkbox(field);
-    return null;
-  }
-
-  Widget _trailing(FormFieldState<dynamic> field) {
-    if (!widget.leadingInput) return _checkbox(field);
     return null;
   }
 

@@ -257,7 +257,6 @@ Widget buildDecoratedControl({
 
 List<Widget> generateLayout({
   required List<DoctypeField> fields,
-  ViewType? viewType,
   Map? doc,
 }) {
   List<Widget> collapsibles = [];
@@ -301,24 +300,41 @@ List<Widget> generateLayout({
       if (sections.length > 0) {
         widgets.add(
           sectionLabels[sIdx] != ''
-              ? ListTileTheme(
-                  contentPadding: EdgeInsets.all(0),
-                  child: CustomExpansionTile(
-                    maintainState: true,
-                    initiallyExpanded: true,
-                    title: Text(
-                      sectionLabels[sIdx],
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
+              ? Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 10.0,
+                  ),
+                  child: ListTileTheme(
+                    tileColor: Colors.white,
+                    child: CustomExpansionTile(
+                      maintainState: true,
+                      initiallyExpanded: true,
+                      title: Text(
+                        sectionLabels[sIdx],
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
                       ),
+                      children: [
+                        Container(
+                          color: Colors.white,
+                          child: Column(
+                            children: [...sections],
+                          ),
+                        )
+                      ],
                     ),
-                    children: [...sections],
                   ),
                 )
-              : Section(
-                  title: sectionLabels[sIdx],
-                  children: [...sections],
+              : Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 10.0,
+                  ),
+                  child: Section(
+                    title: sectionLabels[sIdx],
+                    children: [...sections],
+                  ),
                 ),
         );
 
@@ -326,18 +342,29 @@ List<Widget> generateLayout({
         sections.clear();
       } else if (collapsibles.length > 0) {
         widgets.add(
-          ListTileTheme(
-            contentPadding: EdgeInsets.all(0),
-            child: CustomExpansionTile(
-              maintainState: true,
-              title: Text(
-                collapsibleLabels[cIdx],
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
+          Padding(
+            padding: const EdgeInsets.only(
+              bottom: 10.0,
+            ),
+            child: ListTileTheme(
+              tileColor: Colors.white,
+              child: CustomExpansionTile(
+                maintainState: true,
+                title: Text(
+                  collapsibleLabels[cIdx],
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
                 ),
+                children: [
+                  Container(
+                      color: Colors.white,
+                      child: Column(
+                        children: [...collapsibles],
+                      ))
+                ],
               ),
-              children: [...collapsibles],
             ),
           ),
         );
@@ -356,23 +383,39 @@ List<Widget> generateLayout({
       }
     } else if (isSection) {
       sections.add(
-        makeControl(
-          field: field,
-          doc: doc,
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+          ),
+          child: makeControl(
+            field: field,
+            doc: doc,
+          ),
         ),
       );
     } else if (isCollapsible) {
       collapsibles.add(
-        makeControl(
-          doc: doc ?? defaultValDoc,
-          field: field,
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+          ),
+          child: makeControl(
+            doc: doc ?? defaultValDoc,
+            field: field,
+          ),
         ),
       );
     } else {
       widgets.add(
-        makeControl(
-          field: field,
-          doc: doc ?? defaultValDoc,
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+          ),
+          color: Colors.white,
+          child: makeControl(
+            field: field,
+            doc: doc ?? defaultValDoc,
+          ),
         ),
       );
     }
@@ -380,18 +423,30 @@ List<Widget> generateLayout({
 
   if (collapsibles.length > 0) {
     widgets.add(
-      ListTileTheme(
-        contentPadding: EdgeInsets.all(0),
-        child: CustomExpansionTile(
-          maintainState: true,
-          title: Text(
-            collapsibleLabels[cIdx],
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 16,
+      Padding(
+        padding: const EdgeInsets.only(
+          bottom: 10,
+        ),
+        child: ListTileTheme(
+          tileColor: Colors.white,
+          child: CustomExpansionTile(
+            maintainState: true,
+            title: Text(
+              collapsibleLabels[cIdx],
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+              ),
             ),
+            children: [
+              Container(
+                color: Colors.white,
+                child: Column(
+                  children: [...collapsibles],
+                ),
+              )
+            ],
           ),
-          children: [...collapsibles],
         ),
       ),
     );
