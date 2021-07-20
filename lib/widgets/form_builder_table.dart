@@ -24,25 +24,20 @@ class FormBuilderTable<T> extends FormBuilderField<T> {
           name: name,
           validator: validator,
           builder: (FormFieldState<dynamic> field) {
-            // final state = field as FormBuilderTableState<T>;
-            var selectedRowsIdxs = [];
-
-            if (value.isEmpty) {
-              return Container();
-            }
             return FutureBuilder(
               future: locator<Api>().getDoctype(doctype),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  var colCount = 3;
-                  List<JsonTableColumn> columns = [];
-                  var numFields = [];
-
                   var metaFields =
                       (snapshot.data as DoctypeResponse).docs[0].fields;
                   var tableFields = metaFields.where((field) {
                     return field.inListView == 1;
                   }).toList();
+                  var selectedRowsIdxs = [];
+
+                  var colCount = 3;
+                  List<JsonTableColumn> columns = [];
+                  var numFields = [];
 
                   tableFields.forEach(
                     (item) {
@@ -65,98 +60,107 @@ class FormBuilderTable<T> extends FormBuilderField<T> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      JsonTable(
-                        value,
-                        allowRowHighlight: true,
-                        rowHighlightColor: FrappePalette.grey[100],
-                        onRowHold: (index) {
-                          var idx = selectedRowsIdxs.indexOf(index);
-                          if (idx != -1) {
-                            selectedRowsIdxs.removeAt(idx);
-                          } else {
-                            selectedRowsIdxs.add(index);
-                          }
-                        },
-                        onRowSelect: (index, val) async {
-                          var v = await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return TableElement(
-                                      doc: val,
-                                      fields: tableFields,
-                                    );
-                                  },
-                                ),
-                              ) ??
-                              null;
+                      if (value.isNotEmpty)
+                        JsonTable(
+                          value,
+                          allowRowHighlight: true,
+                          rowHighlightColor: FrappePalette.grey[100],
+                          onRowHold: (index) {
+                            var idx = selectedRowsIdxs.indexOf(index);
+                            if (idx != -1) {
+                              selectedRowsIdxs.removeAt(idx);
+                            } else {
+                              selectedRowsIdxs.add(index);
+                            }
+                          },
+                          onRowSelect: (index, val) async {
+                            var v = await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return TableElement(
+                                        doc: val,
+                                        fields: tableFields,
+                                      );
+                                    },
+                                  ),
+                                ) ??
+                                null;
 
-                          if (v != null) {
-                            value[index] = v;
-                            field.didChange(value);
-                          }
-                        },
-                        tableCellBuilder: (value) {
-                          var isNum = double.tryParse(value) != null;
-                          return Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 4.0,
-                              vertical: 2.0,
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.horizontal(
-                                left: Radius.circular(6),
-                              ),
-                              border: Border.all(
-                                width: 0.1,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                value,
-                                textAlign:
-                                    isNum ? TextAlign.end : TextAlign.start,
-                                style: TextStyle(
-                                  fontSize: 14.0,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                        tableHeaderBuilder: (header) {
-                          return ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minWidth:
-                                  MediaQuery.of(context).size.width / colCount,
-                            ),
-                            child: Container(
+                            if (v != null) {
+                              value[index] = v;
+                              field.didChange(value);
+                            }
+                          },
+                          tableCellBuilder: (cellValue, index) {
+                            var isNum = double.tryParse(cellValue) != null;
+                            return Container(
                               padding: EdgeInsets.symmetric(
                                 horizontal: 4.0,
                                 vertical: 2.0,
                               ),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.horizontal(
-                                  left: Radius.circular(6),
+                                borderRadius: value.length - 1 == index[0] &&
+                                        index[1] == 0
+                                    ? BorderRadius.only(
+                                        bottomLeft: Radius.circular(6),
+                                      )
+                                    : null,
+                                border: Border.all(
+                                  width: 0.1,
                                 ),
-                                border: Border.all(width: 0.1),
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
-                                  header!,
-                                  textAlign: numFields.contains(header)
-                                      ? TextAlign.end
-                                      : TextAlign.start,
+                                  cellValue,
+                                  textAlign:
+                                      isNum ? TextAlign.end : TextAlign.start,
                                   style: TextStyle(
                                     fontSize: 14.0,
-                                    color: FrappePalette.grey[600],
                                   ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                        columns: columns,
+                            );
+                          },
+                          tableHeaderBuilder: (header, index) {
+                            return ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minWidth: MediaQuery.of(context).size.width /
+                                    colCount,
+                              ),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 4.0,
+                                  vertical: 2.0,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: index == 0
+                                      ? BorderRadius.only(
+                                          topLeft: Radius.circular(6),
+                                        )
+                                      : null,
+                                  border: Border.all(width: 0.1),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    header!,
+                                    textAlign: numFields.contains(header)
+                                        ? TextAlign.end
+                                        : TextAlign.start,
+                                    style: TextStyle(
+                                      fontSize: 14.0,
+                                      color: FrappePalette.grey[600],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          columns: columns,
+                        ),
+                      SizedBox(
+                        height: 5,
                       ),
                       Row(
                         children: [
