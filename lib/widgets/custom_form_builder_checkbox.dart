@@ -84,11 +84,11 @@ class _CustomFormBuilderCheckboxState extends State<CustomFormBuilderCheckbox> {
   Widget _checkbox(FormFieldState<dynamic> field) {
     return SizedBox(
       width: 24.0,
+      height: 24,
       child: CustomCheckbox(
         value: (field.value == null && !widget.tristate) ? false : field.value,
         activeColor: widget.activeColor,
         checkColor: widget.checkColor,
-        materialTapTargetSize: widget.materialTapTargetSize,
         tristate: widget.tristate,
         onChanged: _readOnly
             ? null
@@ -102,7 +102,7 @@ class _CustomFormBuilderCheckboxState extends State<CustomFormBuilderCheckbox> {
         focusNode: widget.focusNode,
         autofocus: widget.autoFocus,
         mouseCursor: widget.mouseCursor,
-        visualDensity: widget.visualDensity,
+        visualDensity: VisualDensity(horizontal: 0, vertical: -4),
       ),
     );
   }
@@ -133,22 +133,24 @@ class _CustomFormBuilderCheckboxState extends State<CustomFormBuilderCheckbox> {
             enabled: !_readOnly,
             errorText: field.errorText,
           ),
-          child: GestureDetector(
-            onTap: _readOnly
-                ? null
-                : () {
-                    FocusScope.of(context).requestFocus(FocusNode());
-                    final newValue = !(field.value ?? false);
-                    field.didChange(newValue);
-                    widget.onChanged?.call(newValue);
-                  },
-            child: Row(children: [
-              _leading(field),
-              SizedBox(
-                width: 8,
-              ),
-              widget.label,
-            ]),
+          child: Container(
+            child: GestureDetector(
+              onTap: _readOnly
+                  ? null
+                  : () {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      final newValue = !(field.value ?? false);
+                      field.didChange(newValue);
+                      widget.onChanged?.call(newValue);
+                    },
+              child: Row(children: [
+                _leading(field),
+                SizedBox(
+                  width: 8,
+                ),
+                widget.label,
+              ]),
+            ),
           ),
         );
       },

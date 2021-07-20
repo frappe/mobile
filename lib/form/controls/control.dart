@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 
 import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/form/controls/currency.dart';
 import 'package:frappe_app/form/controls/read_only.dart';
 import 'package:frappe_app/form/controls/text.dart';
 import 'package:frappe_app/model/config.dart';
@@ -152,6 +153,15 @@ Widget makeControl({
       }
       break;
 
+    case "Currency":
+      {
+        control = Currency(
+          doctypeField: field,
+          doc: doc,
+        );
+      }
+      break;
+
     case "Int":
       {
         control = Int(
@@ -201,7 +211,7 @@ Widget makeControl({
       control = Container();
       break;
   }
-  if (decorateControl && field.fieldtype != "Check") {
+  if (decorateControl) {
     return buildDecoratedControl(
       control: control,
       field: field,
@@ -225,17 +235,18 @@ Widget buildDecoratedControl({
       children: <Widget>[
         Row(
           children: [
-            Padding(
-              padding: Palette.labelPadding,
-              child: Text(
-                field.label ?? "",
-                style: TextStyle(
-                  color: FrappePalette.grey[700],
-                  fontWeight: FontWeight.w400,
-                  fontSize: 12,
+            if (field.fieldtype != "Check")
+              Padding(
+                padding: Palette.labelPadding,
+                child: Text(
+                  field.label ?? "",
+                  style: TextStyle(
+                    color: FrappePalette.grey[700],
+                    fontWeight: FontWeight.w400,
+                    fontSize: 12,
+                  ),
                 ),
               ),
-            ),
             SizedBox(width: 4),
             if (field.reqd == 1)
               Padding(
@@ -408,8 +419,10 @@ List<Widget> generateLayout({
     } else {
       widgets.add(
         Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
+          padding: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 10,
           ),
           color: Colors.white,
           child: makeControl(
