@@ -104,7 +104,12 @@ class FormBuilderTable<T> extends FormBuilderField<T> {
                                     ? BorderRadius.only(
                                         bottomLeft: Radius.circular(6),
                                       )
-                                    : null,
+                                    : value.length - 1 == index[0] &&
+                                            index[1] == colCount - 1
+                                        ? BorderRadius.only(
+                                            bottomRight: Radius.circular(6),
+                                          )
+                                        : null,
                                 border: Border.all(
                                   width: 0.1,
                                 ),
@@ -138,7 +143,11 @@ class FormBuilderTable<T> extends FormBuilderField<T> {
                                       ? BorderRadius.only(
                                           topLeft: Radius.circular(6),
                                         )
-                                      : null,
+                                      : index == columns.length - 1
+                                          ? BorderRadius.only(
+                                              topRight: Radius.circular(6),
+                                            )
+                                          : null,
                                   border: Border.all(width: 0.1),
                                 ),
                                 child: Padding(
