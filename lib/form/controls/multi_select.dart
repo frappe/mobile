@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/widgets/form_builder_chips_input.dart';
 
 import '../../model/doctype_response.dart';
@@ -14,6 +15,7 @@ import 'base_control.dart';
 
 class MultiSelect extends StatefulWidget {
   final DoctypeField doctypeField;
+  final OnControlChanged? onControlChanged;
 
   final Map? doc;
   final FutureOr<List<dynamic>> Function(String)? findSuggestions;
@@ -23,6 +25,7 @@ class MultiSelect extends StatefulWidget {
 
   MultiSelect({
     required this.doctypeField,
+    this.onControlChanged,
     this.doc,
     this.key,
     this.findSuggestions,
@@ -60,7 +63,14 @@ class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
 
     return FormBuilderChipsInput(
       key: widget.key,
-      onChanged: widget.onChanged,
+      onChanged: (val) {
+        if (widget.onControlChanged != null) {
+          FieldValue(
+            field: widget.doctypeField,
+            value: val,
+          );
+        }
+      },
       validator: FormBuilderValidators.compose(validators),
       valueTransformer: widget.valueTransformer ??
           (value) {

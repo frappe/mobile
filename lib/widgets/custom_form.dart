@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/form/controls/control.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/utils/enums.dart';
+import 'package:frappe_app/views/base_view.dart';
+import 'package:frappe_app/views/base_viewmodel.dart';
+import 'package:injectable/injectable.dart';
 
 class CustomForm extends StatelessWidget {
   final GlobalKey<FormBuilderState> formKey;
@@ -19,10 +23,11 @@ class CustomForm extends StatelessWidget {
     this.onChanged,
   });
 
-  List<Widget> _generateChildren(
-    List<DoctypeField> fields,
+  List<Widget> _generateChildren({
+    required List<DoctypeField> fields,
     Map? doc,
-  ) {
+    required OnControlChanged onControlChanged,
+  }) {
     List<DoctypeField> filteredFields;
 
     if (viewType == ViewType.form) {
@@ -49,23 +54,44 @@ class CustomForm extends StatelessWidget {
     return generateLayout(
       fields: filteredFields,
       doc: doc,
+      onControlChanged: onControlChanged,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return FormBuilder(
-      onChanged: onChanged,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      key: formKey,
-      child: SingleChildScrollView(
-        child: Column(
-          children: _generateChildren(
-            fields,
-            doc,
+    return BaseView<CustomFormViewModel>(
+      builder: (context, model, child) => FormBuilder(
+        onChanged: () {
+          if (formKey.currentState != null) {
+            formKey.currentState!.save();
+
+            model.handleFormDataChange(formKey.currentState!.value);
+          }
+          if (onChanged != null) {
+            onChanged!();
+          }
+        },
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        key: formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            children: _generateChildren(
+                fields: fields,
+                doc: doc,
+                onControlChanged: (v) {
+                  print(v.field.fieldname);
+                }),
           ),
         ),
       ),
     );
+  }
+}
+
+@lazySingleton
+class CustomFormViewModel extends BaseViewModel {
+  handleFormDataChange(Map formValue) {
+    // print(formValue);
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/widgets/form_builder_typeahead.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +20,7 @@ import 'base_input.dart';
 class LinkField extends StatefulWidget {
   final DoctypeField doctypeField;
   final Map? doc;
+  final OnControlChanged? onControlChanged;
 
   final key;
   final bool showInputBorder;
@@ -33,6 +35,7 @@ class LinkField extends StatefulWidget {
   LinkField({
     this.key,
     required this.doctypeField,
+    this.onControlChanged,
     this.doc,
     this.prefixIcon,
     this.onSuggestionSelected,
@@ -51,7 +54,7 @@ class LinkField extends StatefulWidget {
 class _LinkFieldState extends State<LinkField> with Control, ControlInput {
   @override
   Widget build(BuildContext context) {
-    List<String? Function(dynamic?)> validators = [];
+    List<String? Function(dynamic)> validators = [];
     var f = setMandatory(widget.doctypeField);
 
     if (f != null) {
@@ -60,13 +63,20 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
       );
     }
 
-    var connectionStatus = Provider.of<ConnectivityStatus>(
-      context,
-    );
     return Theme(
       data: Theme.of(context).copyWith(primaryColor: Colors.black),
       child: FormBuilderTypeAhead(
         key: widget.key,
+        onChanged: (val) {
+          if (widget.onControlChanged != null) {
+            widget.onControlChanged!(
+              FieldValue(
+                field: widget.doctypeField,
+                value: val,
+              ),
+            );
+          }
+        },
         controller: widget.controller,
         initialValue: widget.doc != null
             ? widget.doc![widget.doctypeField.fieldname]
@@ -112,7 +122,7 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
             (query) async {
               var lowercaseQuery = query.toLowerCase();
               var isOnline = await verifyOnline();
-              if (connectionStatus == ConnectivityStatus.offline && !isOnline) {
+              if (!isOnline) {
                 var linkFull = await OfflineStorage.getItem(
                     '${widget.doctypeField.options}LinkFull');
                 linkFull = linkFull["data"];

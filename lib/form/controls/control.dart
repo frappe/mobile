@@ -5,9 +5,9 @@ import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/form/controls/currency.dart';
 import 'package:frappe_app/form/controls/read_only.dart';
 import 'package:frappe_app/form/controls/text.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/config.dart';
 import 'package:frappe_app/model/doctype_response.dart';
-import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/widgets/custom_expansion_tile.dart';
 import 'package:frappe_app/widgets/section.dart';
 
@@ -30,6 +30,7 @@ import './multi_select.dart';
 
 Widget makeControl({
   required DoctypeField field,
+  OnControlChanged? onControlChanged,
   Map? doc,
   bool decorateControl = true,
 }) {
@@ -41,6 +42,7 @@ Widget makeControl({
         control = LinkField(
           doctypeField: field,
           doc: doc,
+          onControlChanged: onControlChanged,
         );
       }
       break;
@@ -50,6 +52,7 @@ Widget makeControl({
         control = AutoComplete(
           doctypeField: field,
           doc: doc,
+          onControlChanged: onControlChanged,
         );
       }
       break;
@@ -68,6 +71,7 @@ Widget makeControl({
         control = Select(
           doc: doc,
           doctypeField: field,
+          onControlChanged: onControlChanged,
         );
       }
       break;
@@ -77,6 +81,7 @@ Widget makeControl({
         control = MultiSelect(
           doctypeField: field,
           doc: doc,
+          onControlChanged: onControlChanged,
         );
       }
       break;
@@ -122,6 +127,7 @@ Widget makeControl({
         control = Check(
           doctypeField: field,
           doc: doc,
+          onControlChanged: onControlChanged,
         );
       }
       break;
@@ -268,6 +274,7 @@ Widget buildDecoratedControl({
 
 List<Widget> generateLayout({
   required List<DoctypeField> fields,
+  required OnControlChanged onControlChanged,
   Map? doc,
 }) {
   List<Widget> collapsibles = [];
@@ -401,6 +408,7 @@ List<Widget> generateLayout({
           child: makeControl(
             field: field,
             doc: doc,
+            onControlChanged: onControlChanged,
           ),
         ),
       );
@@ -413,6 +421,7 @@ List<Widget> generateLayout({
           child: makeControl(
             doc: doc ?? defaultValDoc,
             field: field,
+            onControlChanged: onControlChanged,
           ),
         ),
       );
@@ -428,6 +437,7 @@ List<Widget> generateLayout({
           child: makeControl(
             field: field,
             doc: doc ?? defaultValDoc,
+            onControlChanged: onControlChanged,
           ),
         ),
       );
