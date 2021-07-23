@@ -22,6 +22,9 @@ class MultiSelect extends StatefulWidget {
   final dynamic Function(List<dynamic>)? valueTransformer;
   final Function(List<dynamic>)? onChanged;
   final Key? key;
+  final Widget? prefixIcon;
+  final Color? color;
+  final Color? chipColor;
 
   MultiSelect({
     required this.doctypeField,
@@ -31,6 +34,9 @@ class MultiSelect extends StatefulWidget {
     this.findSuggestions,
     this.valueTransformer,
     this.onChanged,
+    this.prefixIcon,
+    this.color,
+    this.chipColor,
   });
   @override
   _MultiSelectState createState() => _MultiSelectState();
@@ -87,6 +93,14 @@ class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
           },
       decoration: Palette.formFieldDecoration(
         label: widget.doctypeField.label,
+        fillColor: widget.color,
+        prefixIcon: widget.prefixIcon != null
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [widget.prefixIcon!],
+              )
+            : null,
       ),
       name: widget.doctypeField.fieldname,
       initialValue: initialValue,
@@ -117,7 +131,7 @@ class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
             style: TextStyle(fontSize: 12),
           ),
           deleteIconColor: Palette.iconColor,
-          backgroundColor: Colors.white,
+          backgroundColor: widget.chipColor ?? Colors.white,
           shape: BeveledRectangleBorder(
             borderRadius: BorderRadius.all(
               Radius.circular(8),

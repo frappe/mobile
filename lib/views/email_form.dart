@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
+import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/form/controls/control.dart';
+import 'package:frappe_app/form/controls/data.dart';
+import 'package:frappe_app/form/controls/multi_select.dart';
+import 'package:frappe_app/form/controls/text_editor.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
+import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
 
 import '../app/locator.dart';
 import '../model/doctype_response.dart';
@@ -80,12 +85,14 @@ class _EmailFormState extends State<EmailForm> {
         fieldname: "subject",
         fieldtype: "Small Text",
         label: "Subject",
+        reqd: 1,
         defaultValue: '${widget.subjectField} (#${widget.name})',
       ),
       DoctypeField(
         fieldtype: "Text Editor",
         fieldname: "content",
         label: "Message",
+        reqd: 1,
         defaultValue: widget.body,
       ),
       DoctypeField(
@@ -114,113 +121,227 @@ class _EmailFormState extends State<EmailForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0.8,
-        title: Text('Send Email'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () async {
-              if (_fbKey.currentState != null) {
-                if (_fbKey.currentState!.saveAndValidate()) {
-                  var formValue = _fbKey.currentState!.value;
-
-                  await locator<Api>().sendEmail(
-                    recipients: formValue["recipients"],
-                    subject: formValue["subject"],
-                    content: formValue["content"],
-                    doctype: widget.doctype,
-                    doctypeName: widget.name,
-                  );
-                  widget.callback();
-                  Navigator.of(context).pop();
-                }
-              }
-            },
-            child: Text(
-              'Send',
-              style: TextStyle(
-                color: Colors.black,
-              ),
-            ),
-          )
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: 15,
-          horizontal: 20,
-        ),
-        child: FormBuilder(
-          key: _fbKey,
-          child: SingleChildScrollView(
-            child: Column(
+    return FractionallySizedBox(
+      heightFactor: 0.92,
+      child: FrappeBottomSheet(
+        title: "New Email",
+        bottomBar: Transform.translate(
+          offset: Offset(0.0, -1 * MediaQuery.of(context).viewInsets.bottom),
+          child: Container(
+            color: Colors.white,
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: makeControl(field: fields[0], doc: {
-                        fields[0].fieldname: fields[0].defaultValue,
-                      }),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          expanded = !expanded;
+                IconButton(
+                  onPressed: () {},
+                  icon: FrappeIcon(
+                    FrappeIcons.attachment,
+                    size: 26,
+                    color: FrappePalette.grey[600],
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: FrappeIcon(
+                    FrappeIcons.text_options,
+                    size: 50,
+                    color: FrappePalette.grey[600],
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                        context: context,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(20),
+                          ),
+                        ),
+                        builder: (context) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: makeControl(
+                                  field: fields[5],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: makeControl(
+                                  field: fields[6],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: makeControl(
+                                  field: fields[7],
+                                ),
+                              ),
+                            ],
+                          );
                         });
-                      },
-                      icon: FrappeIcon(
-                        expanded
-                            ? FrappeIcons.up_arrow
-                            : FrappeIcons.down_arrow,
-                        size: 12,
-                      ),
-                    ),
-                  ],
-                ),
-                Visibility(
-                  visible: expanded,
-                  child: makeControl(field: fields[1], doc: {
-                    fields[1].fieldname: fields[1].defaultValue,
-                  }),
-                ),
-                Visibility(
-                  visible: expanded,
-                  child: makeControl(field: fields[2], doc: {
-                    fields[2].fieldname: fields[2].defaultValue,
-                  }),
-                ),
-                makeControl(
-                  field: fields[3],
-                  doc: {
-                    fields[3].fieldname: fields[3].defaultValue,
                   },
+                  icon: FrappeIcon(
+                    FrappeIcons.send_settings,
+                    size: 50,
+                    color: FrappePalette.grey[600],
+                  ),
                 ),
-                makeControl(
-                  field: fields[4],
-                  doc: {
-                    fields[4].fieldname: fields[4].defaultValue,
-                  },
-                ),
-                Row(
-                  children: [
-                    Flexible(
-                      child: makeControl(
-                        field: fields[5],
-                      ),
+                Spacer(),
+                CircleAvatar(
+                  backgroundColor: FrappePalette.blue,
+                  child: IconButton(
+                    onPressed: () async {
+                      if (_fbKey.currentState != null) {
+                        if (_fbKey.currentState!.saveAndValidate()) {
+                          var formValue = _fbKey.currentState!.value;
+
+                          await locator<Api>().sendEmail(
+                            recipients: formValue["recipients"],
+                            subject: formValue["subject"],
+                            content: formValue["content"],
+                            doctype: widget.doctype,
+                            doctypeName: widget.name,
+                          );
+                          widget.callback();
+                          Navigator.of(context).pop();
+                        }
+                      }
+                    },
+                    icon: FrappeIcon(
+                      FrappeIcons.send_filled,
+                      size: 22,
                     ),
-                    Flexible(
-                      child: makeControl(
-                        field: fields[6],
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-                makeControl(
-                  field: fields[7],
+                SizedBox(
+                  width: 10,
                 ),
               ],
+            ),
+          ),
+        ),
+        body: Scaffold(
+          backgroundColor: Colors.white,
+          body: FormBuilder(
+            key: _fbKey,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: MultiSelect(
+                          color: Colors.white,
+                          chipColor: FrappePalette.grey[100],
+                          doctypeField: fields[0],
+                          prefixIcon: Text(
+                            "${fields[0].label!}:",
+                            style: TextStyle(
+                              color: FrappePalette.grey[500],
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          doc: {
+                            fields[0].fieldname: fields[0].defaultValue,
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            expanded = !expanded;
+                          });
+                        },
+                        icon: FrappeIcon(
+                          expanded
+                              ? FrappeIcons.up_arrow
+                              : FrappeIcons.down_arrow,
+                          size: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Visibility(
+                    visible: expanded,
+                    child: Column(
+                      children: [
+                        Divider(
+                          thickness: 1,
+                          color: FrappePalette.grey[200],
+                        ),
+                        MultiSelect(
+                          doctypeField: fields[1],
+                          color: Colors.white,
+                          chipColor: FrappePalette.grey[100],
+                          doc: {
+                            fields[1].fieldname: fields[1].defaultValue,
+                          },
+                          prefixIcon: Text(
+                            "${fields[1].label!}:",
+                            style: TextStyle(
+                              color: FrappePalette.grey[500],
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                        Divider(
+                          thickness: 1,
+                          color: FrappePalette.grey[200],
+                        ),
+                        MultiSelect(
+                          doctypeField: fields[2],
+                          color: Colors.white,
+                          doc: {
+                            fields[2].fieldname: fields[2].defaultValue,
+                          },
+                          prefixIcon: Text(
+                            "${fields[2].label!}:",
+                            style: TextStyle(
+                              color: FrappePalette.grey[500],
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(
+                    thickness: 1,
+                    color: FrappePalette.grey[200],
+                  ),
+                  Data(
+                    doctypeField: fields[3],
+                    color: Colors.white,
+                    prefixIcon: Text(
+                      "${fields[3].label!}:",
+                      style: TextStyle(
+                        color: FrappePalette.grey[500],
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    doc: {
+                      fields[3].fieldname: fields[3].defaultValue,
+                    },
+                  ),
+                  Divider(
+                    thickness: 1,
+                    color: FrappePalette.grey[200],
+                  ),
+                  TextEditor(
+                    doctypeField: fields[4],
+                    fullHeight: true,
+                    color: Colors.white,
+                    doc: {
+                      fields[4].fieldname: fields[4].defaultValue,
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -8,6 +8,8 @@ import 'base_control.dart';
 
 class Data extends StatelessWidget with Control, ControlInput {
   final DoctypeField doctypeField;
+  final Widget? prefixIcon;
+  final Color? color;
 
   final Key? key;
   final Map? doc;
@@ -16,6 +18,8 @@ class Data extends StatelessWidget with Control, ControlInput {
     required this.doctypeField,
     this.key,
     this.doc,
+    this.color,
+    this.prefixIcon,
   });
 
   @override
@@ -34,6 +38,19 @@ class Data extends StatelessWidget with Control, ControlInput {
       name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(
         label: doctypeField.label,
+        fillColor: color,
+        prefixIcon: prefixIcon != null
+            ? Padding(
+                padding: EdgeInsets.only(
+                  right: 6,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [prefixIcon!],
+                ),
+              )
+            : null,
       ),
       validator: FormBuilderValidators.compose(validators),
     );

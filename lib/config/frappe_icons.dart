@@ -43,4 +43,8 @@ class FrappeIcons {
   static const dot_vertical = '$_basePath/dot_vertical.svg';
   static const read_status = '$_basePath/read_status.svg';
   static const unread_status = '$_basePath/unread_status.svg';
+  static const send = '$_basePath/send.svg';
+  static const send_filled = '$_basePath/send_filled.svg';
+  static const send_settings = '$_basePath/send_settings.svg';
+  static const text_options = '$_basePath/text_options.svg';
 }

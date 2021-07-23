@@ -48,6 +48,7 @@ class Palette {
     Widget? prefixIcon,
     bool filled = true,
     String? field,
+    Color? fillColor,
   }) {
     return InputDecoration(
       suffixIcon: suffixIcon,
@@ -73,7 +74,7 @@ class Palette {
       ),
       // hintText: label,
       filled: filled,
-      fillColor: Palette.bgColor,
+      fillColor: fillColor ?? Palette.bgColor,
     );
   }
 }

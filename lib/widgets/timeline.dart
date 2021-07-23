@@ -9,6 +9,7 @@ import 'package:frappe_app/utils/navigation_helper.dart';
 import 'package:frappe_app/views/email_form.dart';
 import 'package:frappe_app/widgets/doc_version.dart';
 import 'package:frappe_app/widgets/email_box.dart';
+import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
 
 import 'package:timelines/timelines.dart' as timeline;
 
@@ -92,23 +93,19 @@ class Timeline extends StatelessWidget {
                 icon: FrappeIcon(
                   FrappeIcons.email,
                 ),
-                onPressed: () {
-                  Navigator.of(
-                    context,
-                    rootNavigator: true,
-                  ).push(
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return EmailForm(
-                          callback: () {
-                            refreshCallback();
-                          },
-                          subjectField: emailSubjectField,
-                          to: emailSenderField,
-                          doctype: doctype,
-                          name: name,
-                        );
+                onPressed: () async {
+                  showModalBottomSheet(
+                    context: context,
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    builder: (context) => EmailForm(
+                      callback: () {
+                        refreshCallback();
                       },
+                      subjectField: emailSubjectField,
+                      to: emailSenderField,
+                      doctype: doctype,
+                      name: name,
                     ),
                   );
                 },
@@ -129,9 +126,11 @@ class Timeline extends StatelessWidget {
               EmailBox(
                 data: event,
                 onReplyTo: () {
-                  NavigationHelper.push(
+                  showModalBottomSheet(
                     context: context,
-                    page: EmailForm(
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    builder: (context) => EmailForm(
                       callback: refreshCallback,
                       doctype: doctype,
                       subjectField: emailSubjectField,
@@ -142,9 +141,11 @@ class Timeline extends StatelessWidget {
                   );
                 },
                 onReplyAll: () {
-                  NavigationHelper.push(
+                  showModalBottomSheet(
                     context: context,
-                    page: EmailForm(
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    builder: (context) => EmailForm(
                       callback: refreshCallback,
                       doctype: doctype,
                       subjectField: emailSubjectField,

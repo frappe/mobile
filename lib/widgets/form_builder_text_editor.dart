@@ -22,6 +22,8 @@ class FormBuilderTextEditor<T> extends FormBuilderField<T> {
     FormFieldValidator<T>? validator,
     T? initialValue,
     bool enabled = true,
+    Color? color,
+    bool fullHeight = false,
   }) : super(
           key: key,
           initialValue: initialValue,
@@ -50,12 +52,14 @@ class FormBuilderTextEditor<T> extends FormBuilderField<T> {
                     },
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  maxHeight: 200,
-                  minHeight: 100,
+                  maxHeight:
+                      fullHeight ? MediaQuery.of(context).size.height : 200,
+                  minHeight:
+                      fullHeight ? MediaQuery.of(context).size.height : 100,
                   minWidth: double.infinity,
                 ),
                 child: Container(
-                  color: Palette.fieldBgColor,
+                  color: color ?? Palette.fieldBgColor,
                   child: SingleChildScrollView(
                     child: field.value != null
                         ? Html(
