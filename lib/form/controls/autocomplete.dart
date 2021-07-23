@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/widgets/form_builder_typeahead.dart';
 
 import '../../model/doctype_response.dart';
@@ -89,7 +91,16 @@ class _AutoCompleteState extends State<AutoComplete>
           validator: FormBuilderValidators.compose(validators),
           decoration: widget.inputDecoration ??
               Palette.formFieldDecoration(
-                prefixIcon: widget.prefixIcon,
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    widget.prefixIcon ??
+                        FrappeIcon(
+                          FrappeIcons.select,
+                        ),
+                  ],
+                ),
               ),
           selectionToTextTransformer: widget.selectionToTextTransformer ??
               (item) {
