@@ -77,11 +77,7 @@ class CustomForm extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: _generateChildren(
-                fields: fields,
-                doc: doc,
-                onControlChanged: (v) {
-                  print(v.field.fieldname);
-                }),
+                fields: fields, doc: doc, onControlChanged: (v) {}),
           ),
         ),
       ),

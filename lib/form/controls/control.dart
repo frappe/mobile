@@ -290,9 +290,21 @@ List<Widget> generateLayout({
   int cIdx = 0;
   int sIdx = 0;
 
+  // var dependsOnFields =
+  //     fields.where((field) => field.dependsOn != null).map((field) {
+  //   if (field.dependsOn!.startsWith("eval:")) {
+  //     return field.dependsOn!.split(".")[1].split("===")[0];
+  //   } else {
+  //     return "";
+  //   }
+  // }).toList();
+
   fields.forEach((field) {
     var val;
     var defaultValDoc = {};
+
+    // var attachListener =
+    //     dependsOnFields.indexOf(field.fieldname) == -1 ? false : true;
 
     if (doc != null) {
       val = doc[field.fieldname];
@@ -408,7 +420,7 @@ List<Widget> generateLayout({
           child: makeControl(
             field: field,
             doc: doc,
-            onControlChanged: onControlChanged,
+            // onControlChanged: attachListener ? onControlChanged : null,
           ),
         ),
       );
@@ -421,7 +433,7 @@ List<Widget> generateLayout({
           child: makeControl(
             doc: doc ?? defaultValDoc,
             field: field,
-            onControlChanged: onControlChanged,
+            // onControlChanged: attachListener ? onControlChanged : null,
           ),
         ),
       );
@@ -437,7 +449,7 @@ List<Widget> generateLayout({
           child: makeControl(
             field: field,
             doc: doc ?? defaultValDoc,
-            onControlChanged: onControlChanged,
+            // onControlChanged: attachListener ? onControlChanged : null,
           ),
         ),
       );
