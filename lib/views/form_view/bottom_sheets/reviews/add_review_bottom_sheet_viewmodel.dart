@@ -11,26 +11,12 @@ import 'package:injectable/injectable.dart';
 class AddReviewBottomSheetViewModel extends BaseViewModel {
   late List<DoctypeField> fields;
 
-  Map<String, dynamic> formObj = {};
-
-  validate() {
-    if (formObj["to_user"] == null) {
-      throw ErrorResponse(statusMessage: "To User is Required");
-    } else if (formObj["review_type"] == null) {
-      throw ErrorResponse(statusMessage: "Action is Required");
-    } else if (formObj["points"] == null) {
-      throw ErrorResponse(statusMessage: "Points are Required");
-    } else if (formObj["reason"] == null) {
-      throw ErrorResponse(statusMessage: "Reason is Required");
-    }
-  }
-
   addReview({
     required String doctype,
     required String name,
+    required Map formObj,
   }) async {
     try {
-      validate();
       await locator<Api>().addReview(
         doctype,
         name,
