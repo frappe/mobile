@@ -162,6 +162,8 @@ class FormViewViewModel extends BaseViewModel {
             docinfo: docinfo,
           );
 
+          isDirty = false;
+
           LoadingIndicator.stopLoading();
 
           refresh();
