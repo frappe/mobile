@@ -14,12 +14,15 @@ class Check extends StatelessWidget with Control, ControlInput {
   final OnControlChanged? onControlChanged;
   final Key? key;
   final Map? doc;
+  final Function? onChanged;
 
   const Check({
     required this.doctypeField,
+    this.onChanged,
     this.onControlChanged,
     this.key,
     this.doc,
+    
   });
 
   @override
@@ -36,24 +39,19 @@ class Check extends StatelessWidget with Control, ControlInput {
 
     // TODO fix overflow
     return CustomFormBuilderCheckbox(
+      name: doctypeField.fieldname,
       key: key,
       valueTransformer: (val) {
         return val == true ? 1 : 0;
       },
       activeColor: FrappePalette.blue,
-      leadingInput: true,
       initialValue: doc != null ? doc![doctypeField.fieldname] == 1 : null,
-      onChanged: (val) {
-        if (onControlChanged != null) {
-          onControlChanged!(
-            FieldValue(
-              field: doctypeField,
-              value: val,
-            ),
-          );
-        }
-      },
-      attribute: doctypeField.fieldname,
+      onChanged: onChanged != null
+          ? (val) {
+              val = val == true ? 1 : 0;
+              onChanged!(val);
+            }
+          : null,
       label: Text(
         doctypeField.label!,
       ),
@@ -62,7 +60,7 @@ class Check extends StatelessWidget with Control, ControlInput {
         filled: false,
         field: "check",
       ),
-      validators: validators,
+      // validator: validators,
     );
   }
 }
