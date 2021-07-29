@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 
@@ -60,7 +61,7 @@ class Check extends StatelessWidget with Control, ControlInput {
         filled: false,
         field: "check",
       ),
-      // validator: validators,
+      validator: FormBuilderValidators.compose(validators),
     );
   }
 }
