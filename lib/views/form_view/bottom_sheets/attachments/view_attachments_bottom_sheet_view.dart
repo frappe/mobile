@@ -88,8 +88,8 @@ class ViewAttachmentsBottomSheetView extends StatelessWidget {
                         buttonType: ButtonType.primary,
                         title: 'Upload',
                         onPressed: () async {
-                          await model.uploadFiles();
-                          Navigator.of(context).pop(true);
+                          var uploadedFiles = await model.uploadFiles();
+                          Navigator.of(context).pop(uploadedFiles);
                         },
                       ),
                     ],

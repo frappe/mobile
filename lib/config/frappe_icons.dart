@@ -47,4 +47,5 @@ class FrappeIcons {
   static const send_filled = '$_basePath/send_filled.svg';
   static const send_settings = '$_basePath/send_settings.svg';
   static const text_options = '$_basePath/text_options.svg';
+  static const small_file_attach = '$_basePath/small_file_attach.svg';
 }

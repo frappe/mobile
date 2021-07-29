@@ -3,6 +3,7 @@ import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/model/group_by_count_response.dart';
 import 'package:frappe_app/model/login_request.dart';
+import 'package:frappe_app/model/upload_file_response.dart';
 
 import '../../model/doctype_response.dart';
 import '../../model/desktop_page_response.dart';
@@ -75,7 +76,7 @@ abstract class Api {
 
   Future deleteComment(String name);
 
-  Future uploadFiles({
+  Future<List<UploadedFile>> uploadFiles({
     @required String doctype,
     @required String name,
     @required List<FrappeFile> files,
