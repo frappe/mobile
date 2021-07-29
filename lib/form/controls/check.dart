@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 
@@ -14,12 +15,15 @@ class Check extends StatelessWidget with Control, ControlInput {
   final OnControlChanged? onControlChanged;
   final Key? key;
   final Map? doc;
+  final Function? onChanged;
 
   const Check({
     required this.doctypeField,
+    this.onChanged,
     this.onControlChanged,
     this.key,
     this.doc,
+    
   });
 
   @override
@@ -36,12 +40,12 @@ class Check extends StatelessWidget with Control, ControlInput {
 
     // TODO fix overflow
     return CustomFormBuilderCheckbox(
+      name: doctypeField.fieldname,
       key: key,
       valueTransformer: (val) {
         return val == true ? 1 : 0;
       },
       activeColor: FrappePalette.blue,
-      leadingInput: true,
       initialValue: doc != null ? doc![doctypeField.fieldname] == 1 : null,
       onChanged: (val) {
         if (onControlChanged != null) {
@@ -62,7 +66,7 @@ class Check extends StatelessWidget with Control, ControlInput {
         filled: false,
         field: "check",
       ),
-      validators: validators,
+      validator: FormBuilderValidators.compose(validators),
     );
   }
 }
