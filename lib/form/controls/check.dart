@@ -48,7 +48,7 @@ class Check extends StatelessWidget with Control, ControlInput {
           onControlChanged!(
             FieldValue(
               field: doctypeField,
-              value: val,
+              value: val == true ? 1 : 0,
             ),
           );
         }

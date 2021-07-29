@@ -6,7 +6,7 @@ import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/utils/navigation_helper.dart';
-import 'package:frappe_app/views/email_form.dart';
+import 'package:frappe_app/views/send_email/send_email_view.dart';
 import 'package:frappe_app/widgets/doc_version.dart';
 import 'package:frappe_app/widgets/email_box.dart';
 import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
@@ -98,7 +98,7 @@ class Timeline extends StatelessWidget {
                     context: context,
                     useRootNavigator: true,
                     isScrollControlled: true,
-                    builder: (context) => EmailForm(
+                    builder: (context) => SendEmailView(
                       callback: () {
                         refreshCallback();
                       },
@@ -130,7 +130,7 @@ class Timeline extends StatelessWidget {
                     context: context,
                     useRootNavigator: true,
                     isScrollControlled: true,
-                    builder: (context) => EmailForm(
+                    builder: (context) => SendEmailView(
                       callback: refreshCallback,
                       doctype: doctype,
                       subjectField: emailSubjectField,
@@ -145,7 +145,7 @@ class Timeline extends StatelessWidget {
                     context: context,
                     useRootNavigator: true,
                     isScrollControlled: true,
-                    builder: (context) => EmailForm(
+                    builder: (context) => SendEmailView(
                       callback: refreshCallback,
                       doctype: doctype,
                       subjectField: emailSubjectField,

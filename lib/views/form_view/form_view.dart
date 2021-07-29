@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/model/upload_file_response.dart';
 import 'package:frappe_app/widgets/header_app_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -355,19 +356,19 @@ class DocInfo extends StatelessWidget {
                     : null,
                 actionIcon: FrappeIcons.attachment,
                 onTap: () async {
-                  bool refresh = await showModalBottomSheet(
-                        context: context,
-                        useRootNavigator: true,
-                        isScrollControlled: true,
-                        builder: (context) => ViewAttachmentsBottomSheetView(
-                          attachments: docInfo.attachments,
-                          name: name,
-                          doctype: doctype,
-                        ),
-                      ) ??
-                      false;
+                  List<UploadedFile>? uploadedFiles =
+                      await showModalBottomSheet(
+                    context: context,
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    builder: (context) => ViewAttachmentsBottomSheetView(
+                      attachments: docInfo.attachments,
+                      name: name,
+                      doctype: doctype,
+                    ),
+                  );
 
-                  if (refresh) {
+                  if (uploadedFiles != null) {
                     refreshCallback();
                   }
                 },
