@@ -23,7 +23,6 @@ class Check extends StatelessWidget with Control, ControlInput {
     this.onControlChanged,
     this.key,
     this.doc,
-    
   });
 
   @override
@@ -57,7 +56,6 @@ class Check extends StatelessWidget with Control, ControlInput {
           );
         }
       },
-      attribute: doctypeField.fieldname,
       label: Text(
         doctypeField.label!,
       ),
