@@ -10,38 +10,23 @@ class Config {
         defaultValue: false,
       );
 
-  String? get userId => Uri.decodeFull(
-        configContainer.get(
-          'userId',
-        ),
-      );
+  String? get userId =>
+      Uri.decodeFull(configContainer.get('userId', defaultValue: ""));
 
-  String get user => configContainer.get(
-        'user',
-      );
+  String get user => configContainer.get('user');
 
   String? get primaryCacheKey {
-    if (baseUrl != null && userId != null) {
-      return "$baseUrl$userId";
-    } else {
-      return null;
-    }
+    if (baseUrl == null || userId == null) return null;
+    return "$baseUrl$userId";
   }
 
-  String get version => configContainer.get(
-        'version',
-      );
+  String get version => configContainer.get('version');
 
-  String? get baseUrl => configContainer.get(
-        'baseUrl',
-      );
+  String? get baseUrl => configContainer.get('baseUrl');
 
   Uri? get uri {
-    if (baseUrl != null) {
-      return Uri.parse(baseUrl!);
-    } else {
-      return null;
-    }
+    if (baseUrl == null) return null;
+    return Uri.parse(baseUrl!);
   }
 
   static Future set(String k, dynamic v) async {
