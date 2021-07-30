@@ -1,5 +1,8 @@
 // @dart=2.9
 
+import 'dart:isolate';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -21,9 +24,16 @@ void main() async {
   await resetValues();
   await initDb();
   await FlutterDownloader.initialize();
+  FlutterDownloader.registerCallback(downloadCallback);
   await initApiConfig();
   await initLocalNotifications();
   // await initAutoSync();
 
   runApp(FrappeApp());
+}
+
+void downloadCallback(String id, DownloadTaskStatus status, int progress) {
+  final SendPort send =
+      IsolateNameServer.lookupPortByName('downloader_send_port');
+  send.send([id, status, progress]);
 }
