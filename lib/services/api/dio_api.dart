@@ -27,43 +27,41 @@ class DioApi implements Api {
       final response = await DioHelper.dio.post(
         '/method/login',
         data: loginRequest.toJson(),
-        options: Options(
-          validateStatus: (status) {
-            return status < 500;
-          },
-        ),
+        options: Options(validateStatus: (status) => status < 500),
       );
-      if (response.statusCode == 200) {
-        if (response.headers.map["set-cookie"] != null &&
-            response.headers.map["set-cookie"][3] != null) {
-          response.data["user_id"] =
-              response.headers.map["set-cookie"][3].split(';')[0].split('=')[1];
-        }
 
-        return LoginResponse.fromJson(response.data);
-      } else {
+      if (response.statusCode != HttpStatus.ok ||
+          response.headers.map["set-cookie"] == null ||
+          response.headers.map["set-cookie"][3] == null)
         throw ErrorResponse(
           statusCode: response.statusCode,
           statusMessage: response.data["message"],
         );
-      }
+
+      response.data["user_id"] =
+          response.headers.map["set-cookie"][3].split(';')[0].split('=')[1];
+
+      return LoginResponse.fromJson(response.data);
     } catch (e) {
-      if (e is DioError) {
-        var error = e.error;
-        if (error is SocketException) {
-          throw ErrorResponse(
-            statusCode: HttpStatus.serviceUnavailable,
-            statusMessage: error.message,
-          );
-        } else {
-          throw ErrorResponse(
-            statusMessage: error.message,
-            statusCode: error,
-          );
-        }
-      } else {
-        throw e;
+      if (!(e is DioError)) rethrow;
+
+      final error = e.error;
+      if (error is SocketException) {
+        throw ErrorResponse(
+          statusCode: HttpStatus.serviceUnavailable,
+          statusMessage: error.message,
+        );
       }
+
+      if (error is HandshakeException) {
+        throw ErrorResponse(
+          statusCode: HttpStatus.serviceUnavailable,
+          statusMessage: "Cannot connect securely to server."
+              " Please ensure that the server has a valid SSL configuration.",
+        );
+      }
+
+      throw ErrorResponse(statusMessage: error.message);
     }
   }
 
