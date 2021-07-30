@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
+import 'package:frappe_app/model/offline_storage.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -20,24 +21,32 @@ class CommentBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var time = timeago.format(DateTime.parse(data.creation));
+    String commenterName;
+    var allUsers = OfflineStorage.getItem('allUsers');
+    allUsers = allUsers["data"];
+
+    if (allUsers != null) {
+      var user = allUsers[data.owner];
+      commenterName = user["full_name"];
+    } else {
+      commenterName = data.owner;
+    }
 
     return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
       color: Colors.white,
       child: Column(
         children: [
           ListTile(
-            title: Text('${data.owner}'),
-            subtitle: Row(
-              children: [
-                Text("commented"),
-                SizedBox(
-                  width: 8,
-                ),
-                Text(
-                  time,
-                ),
-              ],
+            title: Text(
+              '$commenterName',
+              style: TextStyle(
+                fontSize: 13,
+              ),
             ),
+            subtitle: Text("commented $time"),
             trailing: Config().userId == data.owner
                 ? IconButton(
                     padding: EdgeInsets.zero,
