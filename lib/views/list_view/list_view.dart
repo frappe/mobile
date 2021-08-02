@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/utils/navigation_helper.dart';
 import 'package:frappe_app/views/base_view.dart';
 import 'package:frappe_app/views/list_view/bottom_sheets/filters_bottom_sheet_view.dart';
 import 'package:frappe_app/views/new_doc/new_doc_view.dart';
@@ -25,6 +26,7 @@ import '../../utils/enums.dart';
 import '../../widgets/header_app_bar.dart';
 import '../../widgets/frappe_button.dart';
 import '../../widgets/list_item.dart';
+import 'bottom_sheets/sort_by_fields_bottom_sheet_view.dart';
 
 class CustomListView extends StatelessWidget {
   final DoctypeResponse meta;
@@ -40,8 +42,9 @@ class CustomListView extends StatelessWidget {
     return BaseView<ListViewViewModel>(
       onModelReady: (model) {
         model.meta = meta;
-        model.getData(meta.docs[0]);
+        model.getData();
         model.getDesktopPage(module);
+        model.getSortableFields();
       },
       onModelClose: (model) {
         model.error = null;
@@ -59,7 +62,7 @@ class CustomListView extends StatelessWidget {
                   context: context,
                   onRetry: () {
                     model.meta = meta;
-                    model.getData(meta.docs[0]);
+                    model.getData();
                     model.getDesktopPage(meta.docs[0].module);
                   },
                 )
@@ -70,37 +73,62 @@ class CustomListView extends StatelessWidget {
                   child: Scaffold(
                     floatingActionButtonLocation:
                         FloatingActionButtonLocation.centerFloat,
-                    floatingActionButton: AddFilterButton(
-                      appliedFilters: model.filters.length,
-                      onPressed: () async {
-                        var fields = model.getFilterableFields(
-                          meta.docs[0].fields,
-                        );
+                    floatingActionButton: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AddFilterButton(
+                          appliedFilters: model.filters.length,
+                          onPressed: () async {
+                            var fields = model.getFilterableFields(
+                              meta.docs[0].fields,
+                            );
 
-                        List<Filter> appliedFilters =
-                            await showModalBottomSheet(
-                          useRootNavigator: true,
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (context) => FiltersBottomSheetView(
-                            fields: fields,
-                            filters: model.filters,
-                          ),
-                        );
+                            List<Filter> appliedFilters =
+                                await showModalBottomSheet(
+                              useRootNavigator: true,
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (context) => FiltersBottomSheetView(
+                                fields: fields,
+                                filters: model.filters,
+                              ),
+                            );
 
-                        model.applyFilters(appliedFilters);
-                      },
+                            model.applyFilters(appliedFilters);
+                          },
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        SortByButton(
+                          sortOrder: model.sortOrder,
+                          onPressed: () async {
+                            var sort = await showModalBottomSheet(
+                              context: context,
+                              useRootNavigator: true,
+                              isScrollControlled: true,
+                              builder: (context) => SortByFieldsBottomSheetView(
+                                fields: model.sortableFields,
+                                selectedField: model.sortField,
+                              ),
+                            ) as Map?;
+
+                            if (sort != null) {
+                              model.updateSort(sort);
+                            }
+                          },
+                          sortField: model.sortField.label!,
+                        ),
+                      ],
                     ),
                     appBar: buildAppBar(
                       title: model.meta.docs[0].name,
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ShowSiblingDoctypes(
-                              model: model,
-                              title: model.meta.docs[0].name,
-                            ),
+                        NavigationHelper.push(
+                          context: context,
+                          page: ShowSiblingDoctypes(
+                            model: model,
+                            title: model.meta.docs[0].name,
                           ),
                         );
                       },
@@ -390,6 +418,68 @@ class AddFilterButton extends StatelessWidget {
   }
 }
 
+class SortByButton extends StatelessWidget {
+  final String sortField;
+  final String sortOrder;
+  final void Function()? onPressed;
+
+  const SortByButton({
+    required this.sortField,
+    required this.onPressed,
+    required this.sortOrder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      style: TextButton.styleFrom(
+        backgroundColor: FrappePalette.grey[700],
+        padding: EdgeInsets.all(8),
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            color: Colors.transparent,
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(5),
+          ),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          FrappeIcon(
+            sortOrder == "desc"
+                ? FrappeIcons.sort_descending
+                : FrappeIcons.sort_ascending,
+            color: Colors.white,
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 100,
+            ),
+            child: Text(
+              "$sortField",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+        ],
+      ),
+      onPressed: onPressed,
+    );
+  }
+}
+
 class ShowSiblingDoctypes extends StatelessWidget {
   final ListViewViewModel model;
   final String title;
@@ -426,7 +516,7 @@ class ShowSiblingDoctypes extends StatelessWidget {
                             horizontal: 16,
                           ),
                           title: Text(
-                            item.label,
+                            item.label.toUpperCase(),
                             style: TextStyle(
                               color: FrappePalette.grey[600],
                               fontWeight: FontWeight.w600,

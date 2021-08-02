@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 
 import '../../config/frappe_palette.dart';
@@ -10,21 +12,22 @@ import 'base_input.dart';
 
 class Check extends StatelessWidget with Control, ControlInput {
   final DoctypeField doctypeField;
+  final OnControlChanged? onControlChanged;
   final Key? key;
   final Map? doc;
-
   final Function? onChanged;
 
   const Check({
     required this.doctypeField,
+    this.onChanged,
+    this.onControlChanged,
     this.key,
     this.doc,
-    this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    List<String? Function(dynamic?)> validators = [];
+    List<String? Function(dynamic)> validators = [];
 
     var f = setMandatory(doctypeField);
 
@@ -34,22 +37,24 @@ class Check extends StatelessWidget with Control, ControlInput {
       );
     }
 
-    // TODO fix overflow
     return CustomFormBuilderCheckbox(
+      name: doctypeField.fieldname,
       key: key,
       valueTransformer: (val) {
         return val == true ? 1 : 0;
       },
       activeColor: FrappePalette.blue,
-      leadingInput: true,
       initialValue: doc != null ? doc![doctypeField.fieldname] == 1 : null,
-      onChanged: onChanged != null
-          ? (val) {
-              val = val == true ? 1 : 0;
-              onChanged!(val);
-            }
-          : null,
-      attribute: doctypeField.fieldname,
+      onChanged: (val) {
+        if (onControlChanged != null) {
+          onControlChanged!(
+            FieldValue(
+              field: doctypeField,
+              value: val == true ? 1 : 0,
+            ),
+          );
+        }
+      },
       label: Text(
         doctypeField.label!,
       ),
@@ -58,7 +63,7 @@ class Check extends StatelessWidget with Control, ControlInput {
         filled: false,
         field: "check",
       ),
-      validators: validators,
+      validator: FormBuilderValidators.compose(validators),
     );
   }
 }

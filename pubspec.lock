@@ -656,9 +656,11 @@ packages:
   json_table:
     dependency: "direct main"
     description:
-      name: json_table
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: "0eee306ab5338340cd63749d3dcfbdd4a5382885"
+      resolved-ref: "0eee306ab5338340cd63749d3dcfbdd4a5382885"
+      url: "https://github.com/sumitbhanushali/json_table"
+    source: git
     version: "2.0.1"
   logging:
     dependency: transitive

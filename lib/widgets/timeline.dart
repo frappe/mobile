@@ -5,9 +5,11 @@ import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/utils/helpers.dart';
-import 'package:frappe_app/views/email_form.dart';
+import 'package:frappe_app/utils/navigation_helper.dart';
+import 'package:frappe_app/views/send_email/send_email_view.dart';
 import 'package:frappe_app/widgets/doc_version.dart';
 import 'package:frappe_app/widgets/email_box.dart';
+import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
 
 import 'package:timelines/timelines.dart' as timeline;
 
@@ -91,23 +93,19 @@ class Timeline extends StatelessWidget {
                 icon: FrappeIcon(
                   FrappeIcons.email,
                 ),
-                onPressed: () {
-                  Navigator.of(
-                    context,
-                    rootNavigator: true,
-                  ).push(
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return EmailForm(
-                          callback: () {
-                            refreshCallback();
-                          },
-                          subjectField: emailSubjectField,
-                          senderField: emailSenderField,
-                          doctype: doctype,
-                          doc: name,
-                        );
+                onPressed: () async {
+                  showModalBottomSheet(
+                    context: context,
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    builder: (context) => SendEmailView(
+                      callback: () {
+                        refreshCallback();
                       },
+                      subjectField: emailSubjectField,
+                      to: emailSenderField,
+                      doctype: doctype,
+                      name: name,
                     ),
                   );
                 },
@@ -124,7 +122,43 @@ class Timeline extends StatelessWidget {
           }
 
           if (event is Communication) {
-            children.add(EmailBox(event));
+            children.add(
+              EmailBox(
+                data: event,
+                onReplyTo: () {
+                  showModalBottomSheet(
+                    context: context,
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    builder: (context) => SendEmailView(
+                      callback: refreshCallback,
+                      doctype: doctype,
+                      subjectField: emailSubjectField,
+                      name: name,
+                      to: event.sender,
+                      body: "<blockquote> ${event.content} </blockquote>",
+                    ),
+                  );
+                },
+                onReplyAll: () {
+                  showModalBottomSheet(
+                    context: context,
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    builder: (context) => SendEmailView(
+                      callback: refreshCallback,
+                      doctype: doctype,
+                      subjectField: emailSubjectField,
+                      name: name,
+                      to: event.sender,
+                      cc: event.cc,
+                      bcc: event.bcc,
+                      body: "<blockquote> ${event.content} </blockquote>",
+                    ),
+                  );
+                },
+              ),
+            );
           } else if (event is Comment) {
             children.add(
               CommentBox(

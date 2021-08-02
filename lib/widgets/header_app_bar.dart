@@ -6,11 +6,11 @@ AppBar buildAppBar({
   bool expanded = false,
   List<Widget>? actions,
   void Function()? onPressed,
-  bool isRoot = false,
+  BuildContext? context,
 }) {
   double titleSpacing;
 
-  if (isRoot || expanded) {
+  if (context != null ? !Navigator.of(context).canPop() : false || expanded) {
     titleSpacing = NavigationToolbar.kMiddleSpacing;
   } else {
     titleSpacing = 0.0;
@@ -39,13 +39,14 @@ AppBar buildAppBar({
               ),
             ),
           ),
-          expanded
-              ? Icon(
-                  Icons.expand_less,
-                )
-              : Icon(
-                  Icons.expand_more,
-                ),
+          if (onPressed != null)
+            expanded
+                ? Icon(
+                    Icons.expand_less,
+                  )
+                : Icon(
+                    Icons.expand_more,
+                  )
         ],
       ),
     ),

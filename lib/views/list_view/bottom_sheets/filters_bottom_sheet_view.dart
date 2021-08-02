@@ -106,7 +106,7 @@ class FiltersBottomSheetView extends StatelessWidget {
           trailing: Row(
             children: [
               Text(
-                'Clear Filters',
+                'Clear All',
                 style: TextStyle(
                   color: FrappePalette.red[600],
                   fontSize: 13,
@@ -122,18 +122,21 @@ class FiltersBottomSheetView extends StatelessWidget {
                   var filter = entry.value;
                   var idx = entry.key;
 
-                  return AddFilter(
-                    fields: model.fields,
-                    filter: filter,
-                    onDelete: () {
-                      model.removeFilter(idx);
-                    },
-                    onUpdate: (Filter filter) {
-                      model.updateFilter(
-                        filter: filter,
-                        index: idx,
-                      );
-                    },
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 14.0),
+                    child: AddFilter(
+                      fields: model.fields,
+                      filter: filter,
+                      onDelete: () {
+                        model.removeFilter(idx);
+                      },
+                      onUpdate: (Filter filter) {
+                        model.updateFilter(
+                          filter: filter,
+                          index: idx,
+                        );
+                      },
+                    ),
                   );
                 },
               ).toList()
@@ -160,164 +163,198 @@ class AddFilter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: MediaQuery.of(context).size.width - 52,
-          child: Wrap(
-            children: [
-              FlatButton(
-                padding: EdgeInsets.zero,
-                onPressed: () async {
-                  Filter _filter = await showModalBottomSheet(
-                    useRootNavigator: true,
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (context) => EditFilterBottomSheetView(
-                      page: 1,
-                      fields: fields,
-                      filter: filter,
-                    ),
-                  );
-
-                  if (_filter != null && _filter.field != null) {
-                    onUpdate(_filter);
-                  }
-                },
-                child: Container(
-                  color: FrappePalette.grey[100],
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12.0,
-                      vertical: 4,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width - 110,
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        minHeight: 36,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(
+            6,
+          ),
+          color: FrappePalette.grey[100],
+        ),
+        padding: EdgeInsets.only(
+          left: 5,
+          right: 14,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width - 72,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 4.0, bottom: 6.0),
+                child: Wrap(
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        Filter _filter = await showModalBottomSheet(
+                          useRootNavigator: true,
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (context) => EditFilterBottomSheetView(
+                            page: 1,
+                            fields: fields,
+                            filter: filter,
                           ),
-                          child: Text(
-                            filter.field.label!,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: FrappePalette.grey[600],
+                        );
+
+                        if (_filter != null && _filter.field != null) {
+                          onUpdate(_filter);
+                        }
+                      },
+                      child: Card(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(7.0),
+                            color: Colors.white,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width - 110,
+                                  ),
+                                  child: Text(
+                                    filter.field.label!,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: FrappePalette.grey[600],
+                                    ),
+                                  ),
+                                ),
+                                FrappeIcon(
+                                  FrappeIcons.select,
+                                  size: 16,
+                                )
+                              ],
                             ),
                           ),
                         ),
-                        FrappeIcon(
-                          FrappeIcons.select,
-                          size: 20,
-                        )
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 8,
-              ),
-              FlatButton(
-                onPressed: () async {
-                  Filter _filter = await showModalBottomSheet(
-                    useRootNavigator: true,
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (context) => EditFilterBottomSheetView(
-                      page: 2,
-                      filter: filter,
+                    SizedBox(
+                      width: 10,
                     ),
-                  );
+                    GestureDetector(
+                      onTap: () async {
+                        Filter _filter = await showModalBottomSheet(
+                          useRootNavigator: true,
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (context) => EditFilterBottomSheetView(
+                            page: 2,
+                            filter: filter,
+                          ),
+                        );
 
-                  if (_filter != null && _filter.filterOperator != null) {
-                    onUpdate(_filter);
-                  }
-                },
-                padding: EdgeInsets.zero,
-                child: Container(
-                  color: FrappePalette.grey[100],
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12.0,
-                      vertical: 4,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          filter.filterOperator.label,
-                          style: TextStyle(
-                            color: FrappePalette.grey[600],
+                        if (_filter != null && _filter.filterOperator != null) {
+                          onUpdate(_filter);
+                        }
+                      },
+                      child: Card(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(7.0),
+                            color: Colors.white,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  filter.filterOperator.label,
+                                  style: TextStyle(
+                                    color: FrappePalette.grey[600],
+                                  ),
+                                ),
+                                FrappeIcon(
+                                  FrappeIcons.select,
+                                  size: 16,
+                                )
+                              ],
+                            ),
                           ),
                         ),
-                        FrappeIcon(
-                          FrappeIcons.select,
-                          size: 20,
-                        )
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 8,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: Container(
-                  padding: EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: FrappePalette.grey[100],
-                    borderRadius: BorderRadius.circular(
-                      6,
+                    SizedBox(
+                      width: 10,
                     ),
-                  ),
-                  child: GestureDetector(
-                    onTap: () async {
-                      Filter _filter = await showModalBottomSheet(
-                        useRootNavigator: true,
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (context) => EditFilterBottomSheetView(
-                          page: 3,
-                          filter: filter,
-                        ),
-                      );
+                    GestureDetector(
+                      onTap: () async {
+                        Filter _filter = await showModalBottomSheet(
+                          useRootNavigator: true,
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (context) => EditFilterBottomSheetView(
+                            page: 3,
+                            filter: filter,
+                          ),
+                        );
 
-                      if (_filter != null && _filter.value != null) {
-                        onUpdate(_filter);
-                      }
-                    },
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width - 110,
-                      ),
-                      child: Text(
-                        filter.value ?? "value",
-                        style: TextStyle(
-                          color: FrappePalette.grey[600],
+                        if (_filter != null && _filter.value != null) {
+                          onUpdate(_filter);
+                        }
+                      },
+                      child: Card(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(7.0),
+                            color: Colors.white,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width - 110,
+                              ),
+                              child: Text(
+                                filter.value ?? "value",
+                                style: TextStyle(
+                                  color: FrappePalette.grey[600],
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-        GestureDetector(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: FrappeIcon(
-              FrappeIcons.close_alt,
-              size: 16,
             ),
-          ),
-          onTap: onDelete,
+            GestureDetector(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 14.0,
+                ),
+                child: FrappeIcon(
+                  FrappeIcons.close_alt,
+                  size: 16,
+                ),
+              ),
+              onTap: onDelete,
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

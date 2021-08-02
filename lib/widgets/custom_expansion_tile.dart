@@ -262,7 +262,7 @@ class _CustomExpansionTileState extends State<CustomExpansionTile>
                             turns: _iconTurns,
                             child: FrappeIcon(
                               FrappeIcons.down_arrow,
-                              size: 16,
+                              size: 10,
                             ),
                           ),
                   ],

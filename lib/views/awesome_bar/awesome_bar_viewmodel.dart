@@ -3,6 +3,7 @@ import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/offline_storage.dart';
 import 'package:frappe_app/utils/loading_indicator.dart';
 import 'package:frappe_app/views/base_viewmodel.dart';
+import 'package:frappe_app/views/desk/desk_view.dart';
 import 'package:frappe_app/views/list_view/list_view.dart';
 import 'package:frappe_app/views/new_doc/new_doc_view.dart';
 import 'package:injectable/injectable.dart';
@@ -109,7 +110,6 @@ class AwesomBarViewModel extends BaseViewModel {
   onItemTap({
     required AwesomeBarItem awesomeBarItem,
     required BuildContext context,
-    required Function bottomNavCallback,
   }) async {
     // addToRecent(awesomeBarItem);
     try {
@@ -145,8 +145,12 @@ class AwesomBarViewModel extends BaseViewModel {
           ),
         );
       } else if (awesomeBarItem.type == "Module") {
-        bottomNavCallback(
-          awesomeBarItem.value,
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) {
+              return DeskView(awesomeBarItem.value);
+            },
+          ),
         );
       }
     } catch (e) {

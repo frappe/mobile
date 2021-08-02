@@ -8,6 +8,7 @@ import '../model/config.dart';
 initApiConfig() async {
   if (Config().baseUrl != null) {
     await DioHelper.init(Config().baseUrl!);
+    await DioHelper.initCookies();
   }
 }
 

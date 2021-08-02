@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/model/upload_file_response.dart';
+import 'package:frappe_app/widgets/header_app_bar.dart';
 import 'package:provider/provider.dart';
 
 import 'package:frappe_app/config/frappe_icons.dart';
@@ -51,17 +53,17 @@ class FormView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var connectionStatus = Provider.of<ConnectivityStatus>(
+    Provider.of<ConnectivityStatus>(
       context,
     );
     return BaseView<FormViewViewModel>(
       onModelReady: (model) {
         model.communicationOnly = true;
-        model.editMode = false;
         model.meta = meta;
         model.queued = queued;
         model.queuedData = queuedData;
         model.name = name;
+        model.isDirty = false;
         model.getData();
       },
       onModelClose: (model) {
@@ -80,7 +82,7 @@ class FormView extends StatelessWidget {
                       context: context,
                       onRetry: () {
                         model.communicationOnly = true;
-                        model.editMode = false;
+
                         model.getData();
                       });
                 }
@@ -94,27 +96,10 @@ class FormView extends StatelessWidget {
                 // var isLikedByUser = likedBy.contains(model.user);
 
                 return Scaffold(
-                  backgroundColor: Palette.bgColor,
-                  appBar: AppBar(
-                    elevation: 0.8,
-                    backgroundColor: Colors.white,
-                    title: Text('${meta.docs[0].name} Details'),
+                  backgroundColor: FrappePalette.grey[50],
+                  appBar: buildAppBar(
+                    title: '${meta.docs[0].name} Details',
                     actions: [
-                      if (model.editMode)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 12.0,
-                            horizontal: 4,
-                          ),
-                          child: FrappeFlatButton(
-                            buttonType: ButtonType.secondary,
-                            title: 'Cancel',
-                            onPressed: () {
-                              _fbKey.currentState?.reset();
-                              model.toggleEdit();
-                            },
-                          ),
-                        ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           vertical: 12.0,
@@ -122,16 +107,19 @@ class FormView extends StatelessWidget {
                         ),
                         child: FrappeFlatButton(
                           buttonType: ButtonType.primary,
-                          title: model.editMode ? 'Save' : 'Edit',
-                          onPressed: model.editMode
-                              ? () => _handleUpdate(
+                          title: 'Save',
+                          onPressed: !model.isDirty
+                              ? () => {
+                                    FrappeAlert.warnAlert(
+                                      title: "No changes in document",
+                                      context: context,
+                                    )
+                                  }
+                              : () => _handleUpdate(
                                     doc: docs[0],
                                     model: model,
                                     context: context,
-                                  )
-                              : () {
-                                  model.toggleEdit();
-                                },
+                                  ),
                         ),
                       )
                     ],
@@ -145,7 +133,6 @@ class FormView extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Container(
-                              color: FrappePalette.grey[50],
                               width: double.infinity,
                               padding: EdgeInsets.symmetric(
                                 vertical: 10,
@@ -172,34 +159,47 @@ class FormView extends StatelessWidget {
                                 },
                               ),
                             CustomForm(
+                              onChanged: () {
+                                model.handleFormDataChange();
+                              },
                               fields: meta.docs[0].fields,
                               formKey: _fbKey,
                               doc: docs[0],
                               viewType: ViewType.form,
-                              editMode: model.editMode,
                             ),
                             if (!queued)
-                              ListTileTheme(
-                                tileColor: Colors.white,
-                                child: CustomExpansionTile(
-                                  maintainState: true,
-                                  initiallyExpanded: false,
-                                  title: Text(
-                                    "Add a comment",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 16,
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: 10,
+                                ),
+                                child: ListTileTheme(
+                                  tileColor: Colors.white,
+                                  child: CustomExpansionTile(
+                                    maintainState: true,
+                                    title: Text(
+                                      "Add a comment",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16,
+                                      ),
                                     ),
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 16.0,
+                                          right: 16.0,
+                                          bottom: 24,
+                                        ),
+                                        child: CommentInput(
+                                          name: name!,
+                                          doctype: meta.docs[0].name,
+                                          callback: () {
+                                            model.getDocinfo();
+                                          },
+                                        ),
+                                      )
+                                    ],
                                   ),
-                                  children: [
-                                    CommentInput(
-                                      name: name!,
-                                      doctype: meta.docs[0].name,
-                                      callback: () {
-                                        model.getDocinfo();
-                                      },
-                                    )
-                                  ],
                                 ),
                               ),
                             if (!queued)
@@ -303,7 +303,6 @@ class DocInfo extends StatelessWidget {
         List tags = docInfo.tags.isNotEmpty ? docInfo.tags.split(',') : [];
 
         return Container(
-          color: FrappePalette.grey[50],
           width: double.infinity,
           padding: EdgeInsets.symmetric(
             horizontal: 20,
@@ -357,19 +356,19 @@ class DocInfo extends StatelessWidget {
                     : null,
                 actionIcon: FrappeIcons.attachment,
                 onTap: () async {
-                  bool refresh = await showModalBottomSheet(
-                        context: context,
-                        useRootNavigator: true,
-                        isScrollControlled: true,
-                        builder: (context) => ViewAttachmentsBottomSheetView(
-                          attachments: docInfo.attachments,
-                          name: name,
-                          doctype: doctype,
-                        ),
-                      ) ??
-                      false;
+                  List<UploadedFile>? uploadedFiles =
+                      await showModalBottomSheet(
+                    context: context,
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    builder: (context) => ViewAttachmentsBottomSheetView(
+                      attachments: docInfo.attachments,
+                      name: name,
+                      doctype: doctype,
+                    ),
+                  );
 
-                  if (refresh) {
+                  if (uploadedFiles != null) {
                     refreshCallback();
                   }
                 },

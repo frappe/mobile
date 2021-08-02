@@ -11,16 +11,20 @@ class TextEditor extends StatelessWidget with Control, ControlInput {
   final DoctypeField doctypeField;
   final Key? key;
   final Map? doc;
+  final Color? color;
+  final bool fullHeight;
 
   const TextEditor({
     required this.doctypeField,
     this.key,
     this.doc,
+    this.color,
+    this.fullHeight = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    List<String? Function(dynamic?)> validators = [];
+    List<String? Function(dynamic)> validators = [];
 
     var f = setMandatory(doctypeField);
 
@@ -32,9 +36,11 @@ class TextEditor extends StatelessWidget with Control, ControlInput {
 
     return FormBuilderTextEditor(
       key: key,
+      fullHeight: fullHeight,
       initialValue: doc != null ? doc![doctypeField.fieldname] : null,
       name: doctypeField.fieldname,
       context: context,
+      color: color,
       validator: FormBuilderValidators.compose(validators),
     );
   }

@@ -253,6 +253,7 @@ class DoctypeField {
   late int? idx;
   late int? docstatus;
   late String fieldname;
+  late String? dependsOn;
   late String? label;
   late String? fieldtype;
   late String? oldfieldtype;
@@ -306,6 +307,7 @@ class DoctypeField {
       this.docstatus,
       required this.fieldname,
       required this.label,
+      this.dependsOn,
       this.fieldtype,
       this.oldfieldtype,
       this.options,
@@ -357,6 +359,7 @@ class DoctypeField {
     idx = json['idx'];
     docstatus = json['docstatus'];
     fieldname = json['fieldname'];
+    dependsOn = json['depends_on'];
     label = json['label'];
     fieldtype = json['fieldtype'];
     oldfieldtype = json['oldfieldtype'];
@@ -411,6 +414,7 @@ class DoctypeField {
     data['idx'] = this.idx;
     data['docstatus'] = this.docstatus;
     data['fieldname'] = this.fieldname;
+    data['depends_on'] = this.dependsOn;
     data['label'] = this.label;
     data['fieldtype'] = this.fieldtype;
     data['oldfieldtype'] = this.oldfieldtype;

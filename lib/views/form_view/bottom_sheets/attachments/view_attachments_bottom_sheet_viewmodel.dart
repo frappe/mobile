@@ -1,5 +1,6 @@
 import 'package:frappe_app/app/locator.dart';
 import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/model/upload_file_response.dart';
 import 'package:frappe_app/services/api/api.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/views/base_viewmodel.dart';
@@ -42,11 +43,13 @@ class ViewAttachmenetsBottomSheetViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  uploadFiles() async {
-    await locator<Api>().uploadFiles(
+  Future<List<UploadedFile>> uploadFiles() async {
+    var uploadedFiles = await locator<Api>().uploadFiles(
       files: filesToUpload,
       doctype: doctype,
       name: name,
     );
+
+    return uploadedFiles;
   }
 }

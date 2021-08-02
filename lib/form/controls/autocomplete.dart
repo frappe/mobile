@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/palette.dart';
+import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/widgets/form_builder_typeahead.dart';
 
 import '../../model/doctype_response.dart';
@@ -14,6 +17,7 @@ typedef String SelectionToTextTransformer<T>(T selection);
 
 class AutoComplete extends StatefulWidget {
   final DoctypeField doctypeField;
+  final OnControlChanged? onControlChanged;
 
   final Map? doc;
   final void Function(dynamic)? onSuggestionSelected;
@@ -27,6 +31,7 @@ class AutoComplete extends StatefulWidget {
 
   AutoComplete({
     required this.doctypeField,
+    this.onControlChanged,
     this.doc,
     this.controller,
     this.inputDecoration,
@@ -54,7 +59,7 @@ class _AutoCompleteState extends State<AutoComplete>
 
   @override
   Widget build(BuildContext context) {
-    List<String? Function(dynamic?)> validators = [];
+    List<String? Function(dynamic)> validators = [];
 
     var f = setMandatory(widget.doctypeField);
 
@@ -72,14 +77,30 @@ class _AutoCompleteState extends State<AutoComplete>
           key: widget.key,
           controller: _typeAheadController,
           onSuggestionSelected: widget.onSuggestionSelected,
-          onChanged: (_) {
-            setState(() {});
+          onChanged: (val) {
+            if (widget.onControlChanged != null) {
+              widget.onControlChanged!(
+                FieldValue(
+                  field: widget.doctypeField,
+                  value: val,
+                ),
+              );
+            }
           },
           direction: AxisDirection.up,
           validator: FormBuilderValidators.compose(validators),
           decoration: widget.inputDecoration ??
               Palette.formFieldDecoration(
-                prefixIcon: widget.prefixIcon,
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    widget.prefixIcon ??
+                        FrappeIcon(
+                          FrappeIcons.select,
+                        ),
+                  ],
+                ),
               ),
           selectionToTextTransformer: widget.selectionToTextTransformer ??
               (item) {

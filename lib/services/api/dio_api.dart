@@ -9,6 +9,7 @@ import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/model/group_by_count_response.dart';
 import 'package:frappe_app/model/login_request.dart';
+import 'package:frappe_app/model/upload_file_response.dart';
 
 import '../../model/doctype_response.dart';
 import '../../model/desktop_page_response.dart';
@@ -382,35 +383,42 @@ class DioApi implements Api {
     }
   }
 
-  Future sendEmail(
-      {@required recipients,
-      cc,
-      bcc,
-      @required subject,
-      @required content,
-      @required doctype,
-      @required doctypeName,
-      sendEmail,
-      printHtml,
-      sendMeACopy,
-      printFormat,
-      emailTemplate,
-      attachments,
-      readReceipt,
-      printLetterhead}) async {
+  Future sendEmail({
+    @required recipients,
+    cc,
+    bcc,
+    @required subject,
+    @required content,
+    @required doctype,
+    @required doctypeName,
+    sendEmail,
+    printHtml,
+    sendMeACopy,
+    printFormat,
+    emailTemplate,
+    attachments,
+    readReceipt,
+    printLetterhead,
+  }) async {
     var queryParams = {
       'recipients': recipients,
       'subject': subject,
       'content': content,
       'doctype': doctype,
       'name': doctypeName,
-      'send_email': 1
+      'send_email': 1,
+      'attachments': json.encode(attachments),
+      'read_receipt': readReceipt,
+      'send_me_a_copy': sendMeACopy,
     };
 
     final response = await DioHelper.dio.post(
-        '/method/frappe.core.doctype.communication.email.make',
-        data: queryParams,
-        options: Options(contentType: Headers.formUrlEncodedContentType));
+      '/method/frappe.core.doctype.communication.email.make',
+      data: queryParams,
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
     if (response.statusCode == 200) {
     } else {
       throw Exception('Something went wrong');
@@ -554,11 +562,13 @@ class DioApi implements Api {
     }
   }
 
-  Future uploadFiles({
+  Future<List<UploadedFile>> uploadFiles({
     @required String doctype,
     @required String name,
     @required List<FrappeFile> files,
   }) async {
+    List<UploadedFile> uploadedFiles = [];
+
     for (FrappeFile frappeFile in files) {
       String fileName = frappeFile.file.path.split('/').last;
       FormData formData = FormData.fromMap({
@@ -576,10 +586,16 @@ class DioApi implements Api {
         "/method/upload_file",
         data: formData,
       );
-      if (response.statusCode != 200) {
+      if (response.statusCode == 200) {
+        var uploadedFilesResponse =
+            UploadedFileResponse.fromJson(response.data);
+        uploadedFiles.add(uploadedFilesResponse.uploadedFile);
+      } else {
         throw Exception('Something went wrong');
       }
     }
+
+    return uploadedFiles;
   }
 
   Future saveDocs(String doctype, Map formValue) async {
