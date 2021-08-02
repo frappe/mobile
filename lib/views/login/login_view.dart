@@ -133,23 +133,28 @@ class Login extends StatelessWidget {
                                         page: HomeView(),
                                       );
                                     }
-                                  } catch (e) {
-                                    var _e = e as ErrorResponse;
-
-                                    if (_e.statusCode ==
+                                  } on ErrorResponse catch (e) {
+                                    if (e.statusCode ==
                                         HttpStatus.unauthorized) {
                                       FrappeAlert.errorAlert(
                                         title: "Not Authorized",
-                                        subtitle: _e.statusMessage,
+                                        subtitle: e.statusMessage,
                                         context: context,
                                       );
                                     } else {
                                       FrappeAlert.errorAlert(
                                         title: "Error",
-                                        subtitle: _e.statusMessage,
+                                        subtitle: e.statusMessage,
                                         context: context,
                                       );
                                     }
+                                  } catch (e) {
+                                    print("$e");
+                                    FrappeAlert.errorAlert(
+                                      title: "Error",
+                                      subtitle: "Internal error occured!",
+                                      context: context,
+                                    );
                                   }
                                 }
                               }
