@@ -173,49 +173,43 @@ class _SendEmailViewState extends State<SendEmailView> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 16.0),
-                                child: buildDecoratedControl(
-                                  field: model.fields[5],
-                                  control: Check(
-                                    doctypeField: model.fields[5],
-                                    doc: {
-                                      model.fields[5].fieldname:
-                                          model.sendSettings[
-                                              model.fields[5].fieldname],
-                                    },
-                                    onControlChanged: (val) {
-                                      model.updateSendSetting(
-                                        fieldname: val.field.fieldname,
-                                        value: val.value,
-                                      );
-                                    },
-                                  ),
+                                child: Check(
+                                  doctypeField: model.fields[5],
+                                  doc: {
+                                    model.fields[5].fieldname:
+                                        model.sendSettings[
+                                            model.fields[5].fieldname],
+                                  },
+                                  onControlChanged: (val) {
+                                    model.updateSendSetting(
+                                      fieldname: val.field.fieldname,
+                                      value: val.value,
+                                    );
+                                  },
                                 ),
                               ),
+
                               Padding(
                                 padding: const EdgeInsets.only(left: 16.0),
-                                child: buildDecoratedControl(
-                                  field: model.fields[6],
-                                  control: Check(
-                                    doctypeField: model.fields[6],
-                                    doc: {
-                                      model.fields[6].fieldname:
-                                          model.sendSettings[
-                                              model.fields[6].fieldname],
-                                    },
-                                    onControlChanged: (val) {
-                                      model.updateSendSetting(
-                                        fieldname: val.field.fieldname,
-                                        value: val.value,
-                                      );
-                                    },
-                                  ),
+                                child: Check(
+                                  doctypeField: model.fields[6],
+                                  doc: {
+                                    model.fields[6].fieldname:
+                                        model.sendSettings[
+                                            model.fields[6].fieldname],
+                                  },
+                                  onControlChanged: (val) {
+                                    model.updateSendSetting(
+                                      fieldname: val.field.fieldname,
+                                      value: val.value,
+                                    );
+                                  },
                                 ),
                               ),
+
                               // Padding(
                               //   padding: const EdgeInsets.only(left: 16.0),
-                              //   child: buildDecoratedControl(
-                              //     field: model.fields[7],
-                              //     control: Check(
+                              //   child: Check(
                               //       doctypeField: model.fields[7],
                               //       doc: {
                               //         model.fields[7].fieldname:
@@ -230,7 +224,6 @@ class _SendEmailViewState extends State<SendEmailView> {
                               //       },
                               //     ),
                               //   ),
-                              // ),
                             ],
                           );
                         },
