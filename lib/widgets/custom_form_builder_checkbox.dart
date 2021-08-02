@@ -116,26 +116,44 @@ class CustomFormBuilderCheckbox extends FormBuilderField<bool> {
 
             return InputDecorator(
               decoration: state.decoration(),
-              child: CheckboxListTile(
-                dense: true,
-                isThreeLine: false,
-                title: label,
-                subtitle: subtitle,
-                value: (state.value == null && !tristate) ? false : state.value,
-                onChanged: state.enabled
-                    ? (val) {
+              child: GestureDetector(
+                onTap: state.enabled
+                    ? () {
+                        final newValue = !(field.value ?? false);
                         state.requestFocus();
-                        state.didChange(val);
+                        state.didChange(newValue);
                       }
                     : null,
-                checkColor: checkColor,
-                activeColor: activeColor,
-                secondary: secondary,
-                controlAffinity: controlAffinity,
-                autofocus: autofocus,
-                tristate: tristate,
-                contentPadding: contentPadding,
-                selected: selected,
+                child: Container(
+                  color: Colors.transparent,
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: CustomCheckbox(
+                          value: (state.value == null && !tristate)
+                              ? false
+                              : state.value,
+                          onChanged: state.enabled
+                              ? (val) {
+                                  state.requestFocus();
+                                  state.didChange(val);
+                                }
+                              : null,
+                          checkColor: checkColor,
+                          activeColor: activeColor,
+                          autofocus: autofocus,
+                          tristate: tristate,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      label,
+                    ],
+                  ),
+                ),
               ),
             );
           },

@@ -37,7 +37,6 @@ class Check extends StatelessWidget with Control, ControlInput {
       );
     }
 
-    // TODO fix overflow
     return CustomFormBuilderCheckbox(
       name: doctypeField.fieldname,
       key: key,
