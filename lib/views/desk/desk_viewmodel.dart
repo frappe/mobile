@@ -24,7 +24,7 @@ import '../../utils/helpers.dart';
 class DeskViewModel extends BaseViewModel {
   late String currentModule;
   String? passedModule;
-  List<DeskMessage> modules = [];
+  Map<String, List<DeskMessage>> modulesByCategory = {};
   late DesktopPageResponse desktopPage;
   ErrorResponse? error;
 
@@ -62,7 +62,15 @@ class DeskViewModel extends BaseViewModel {
       }
     }
 
-    modules = deskSidebarItems.message;
+    deskSidebarItems.message.forEach(
+      (module) {
+        if (modulesByCategory[module.category] == null) {
+          modulesByCategory[module.category!] = [module];
+        } else {
+          modulesByCategory[module.category]!.add(module);
+        }
+      },
+    );
   }
 
   getDesktopPage() async {
@@ -95,7 +103,8 @@ class DeskViewModel extends BaseViewModel {
     try {
       await getDeskSidebarItems();
 
-      currentModule = passedModule ?? modules[0].name;
+      currentModule = passedModule ??
+          modulesByCategory[modulesByCategory.keys.first]![0].name;
 
       await getDesktopPage();
       error = null;

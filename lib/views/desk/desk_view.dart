@@ -320,48 +320,52 @@ class ShowModules extends StatelessWidget {
             )
           : Builder(
               builder: (context) {
-                List<Widget> listItems = [
-                  ListTile(
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                    ),
-                    title: Text(
-                      'MODULE',
-                      style: TextStyle(
-                        color: FrappePalette.grey[600],
-                        fontWeight: FontWeight.w600,
-                        fontSize: 11,
+                List<Widget> listItems = [];
+                model.modulesByCategory.forEach(
+                  (category, modules) {
+                    listItems.add(ListTile(
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16,
                       ),
-                    ),
-                    visualDensity: VisualDensity(
-                      vertical: -4,
-                    ),
-                  ),
-                ];
-                model.modules.forEach(
-                  (element) {
-                    listItems.add(
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                        child: ListTile(
-                          visualDensity: VisualDensity(
-                            vertical: -4,
-                          ),
-                          tileColor: model.currentModule == element.name
-                              ? Palette.bgColor
-                              : Colors.white,
-                          title: Text(
-                            element.label,
-                          ),
-                          onTap: () {
-                            model.switchModule(
-                              element.name,
-                            );
-
-                            Navigator.of(context).pop();
-                          },
+                      title: Text(
+                        category.toUpperCase(),
+                        style: TextStyle(
+                          color: FrappePalette.grey[600],
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
                         ),
                       ),
+                      visualDensity: VisualDensity(
+                        vertical: -4,
+                      ),
+                    ));
+                    modules.forEach(
+                      (element) {
+                        listItems.add(
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 12.0),
+                            child: ListTile(
+                              visualDensity: VisualDensity(
+                                vertical: -4,
+                              ),
+                              tileColor: model.currentModule == element.name
+                                  ? Palette.bgColor
+                                  : Colors.white,
+                              title: Text(
+                                element.label,
+                              ),
+                              onTap: () {
+                                model.switchModule(
+                                  element.name,
+                                );
+
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ),
+                        );
+                      },
                     );
                   },
                 );
