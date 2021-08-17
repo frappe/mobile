@@ -22,7 +22,12 @@ import '../../views/base_view.dart';
 import '../../utils/frappe_alert.dart';
 import '../../utils/enums.dart';
 
-class Login extends StatelessWidget {
+class Login extends StatefulWidget {
+  @override
+  _LoginState createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
 
   @override

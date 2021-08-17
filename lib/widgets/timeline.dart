@@ -5,11 +5,9 @@ import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/utils/helpers.dart';
-import 'package:frappe_app/utils/navigation_helper.dart';
 import 'package:frappe_app/views/send_email/send_email_view.dart';
 import 'package:frappe_app/widgets/doc_version.dart';
 import 'package:frappe_app/widgets/email_box.dart';
-import 'package:frappe_app/widgets/frappe_bottom_sheet.dart';
 
 import 'package:timelines/timelines.dart' as timeline;
 
@@ -41,76 +39,78 @@ class Timeline extends StatelessWidget {
     return Builder(
       builder: (context) {
         List<Widget> children = [
-          Row(
-            children: [
-              Text(
-                'Activity',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 18,
-                  color: FrappePalette.grey[900],
+          Padding(
+            padding: const EdgeInsets.only(left: 6.0),
+            child: Row(
+              children: [
+                Text(
+                  'Activity',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18,
+                    color: FrappePalette.grey[900],
+                  ),
                 ),
-              ),
-              Spacer(),
-              Switch.adaptive(
-                value: communicationOnly,
-                activeColor: Colors.blue,
-                onChanged: (val) {
-                  switchCallback(val);
-                },
-              ),
-              Text(
-                "Communication Only",
-                style: TextStyle(
-                  fontWeight: FontWeight.w400,
-                  fontSize: 13,
-                  color: FrappePalette.grey[700],
+                Spacer(),
+                Switch.adaptive(
+                  value: communicationOnly,
+                  activeColor: Colors.blue,
+                  onChanged: (val) {
+                    switchCallback(val);
+                  },
                 ),
-              ),
-            ],
+                Text(
+                  "Communication Only",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 13,
+                    color: FrappePalette.grey[700],
+                  ),
+                ),
+              ],
+            ),
           ),
         ];
 
         children.add(
-          Row(
-            children: [
-              FlatButton.icon(
-                color: FrappePalette.grey[600],
-                shape: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.transparent,
-                  ),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(6),
-                  ),
+          Padding(
+            padding: const EdgeInsets.only(left: 6.0),
+            child: FlatButton.icon(
+              color: FrappePalette.grey[600],
+              shape: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.transparent,
                 ),
-                label: Text(
-                  'New Email',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(6),
                 ),
-                icon: FrappeIcon(
-                  FrappeIcons.email,
-                ),
-                onPressed: () async {
-                  showModalBottomSheet(
-                    context: context,
-                    useRootNavigator: true,
-                    isScrollControlled: true,
-                    builder: (context) => SendEmailView(
-                      callback: () {
-                        refreshCallback();
-                      },
-                      subjectField: emailSubjectField,
-                      to: emailSenderField,
-                      doctype: doctype,
-                      name: name,
-                    ),
-                  );
-                },
               ),
-            ],
+              label: Text(
+                'New Email',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              icon: FrappeIcon(
+                FrappeIcons.email,
+              ),
+              onPressed: () async {
+                showModalBottomSheet(
+                  context: context,
+                  useRootNavigator: true,
+                  isScrollControlled: true,
+                  builder: (context) => SendEmailView(
+                    callback: () {
+                      refreshCallback();
+                    },
+                    subjectField: emailSubjectField,
+                    to: emailSenderField,
+                    doctype: doctype,
+                    name: name,
+                  ),
+                );
+              },
+            ),
           ),
         );
 

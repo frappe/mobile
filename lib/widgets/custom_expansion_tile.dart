@@ -258,11 +258,14 @@ class _CustomExpansionTileState extends State<CustomExpansionTile>
                     ),
                     widget.leadingArrow
                         ? widget.trailing!
-                        : RotationTransition(
-                            turns: _iconTurns,
-                            child: FrappeIcon(
-                              FrappeIcons.down_arrow,
-                              size: 10,
+                        : Padding(
+                            padding: const EdgeInsets.only(bottom: 2.0),
+                            child: RotationTransition(
+                              turns: _iconTurns,
+                              child: FrappeIcon(
+                                FrappeIcons.down_arrow,
+                                size: 10,
+                              ),
                             ),
                           ),
                   ],

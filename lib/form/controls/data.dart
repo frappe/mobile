@@ -34,6 +34,7 @@ class Data extends StatelessWidget with Control, ControlInput {
 
     return FormBuilderTextField(
       key: key,
+      readOnly: doctypeField.readOnly == 1,
       initialValue: doc != null ? doc![doctypeField.fieldname] : null,
       name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(

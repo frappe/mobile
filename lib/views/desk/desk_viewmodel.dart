@@ -62,6 +62,8 @@ class DeskViewModel extends BaseViewModel {
       }
     }
 
+    modulesByCategory.clear();
+
     deskSidebarItems.message.forEach(
       (module) {
         if (modulesByCategory[module.category] == null) {

@@ -172,7 +172,10 @@ class _SendEmailViewState extends State<SendEmailView> {
                                 height: 20,
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(left: 16.0),
+                                padding: const EdgeInsets.only(
+                                  left: 16.0,
+                                  bottom: 18,
+                                ),
                                 child: Check(
                                   doctypeField: model.fields[5],
                                   doc: {
@@ -190,7 +193,10 @@ class _SendEmailViewState extends State<SendEmailView> {
                               ),
 
                               Padding(
-                                padding: const EdgeInsets.only(left: 16.0),
+                                padding: const EdgeInsets.only(
+                                  left: 16.0,
+                                  bottom: 18,
+                                ),
                                 child: Check(
                                   doctypeField: model.fields[6],
                                   doc: {

@@ -86,6 +86,16 @@ Widget makeControl({
       }
       break;
 
+    case "Table MultiSelect":
+      {
+        control = MultiSelect(
+          doctypeField: field,
+          doc: doc,
+          onControlChanged: onControlChanged,
+        );
+      }
+      break;
+
     case "Small Text":
       {
         control = SmallText(
@@ -412,23 +422,44 @@ List<Widget> generateLayout({
         sectionLabels.add(field.label != null ? field.label! : '');
       }
     } else if (isSection) {
-      sections.add(
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
+      var firstField = sections.isEmpty;
+      if (firstField) {
+        sections.add(
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 10,
+            ),
+            child: makeControl(
+              field: field,
+              doc: doc,
+              // onControlChanged: attachListener ? onControlChanged : null,
+            ),
           ),
-          child: makeControl(
-            field: field,
-            doc: doc,
-            // onControlChanged: attachListener ? onControlChanged : null,
+        );
+      } else {
+        sections.add(
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+            ),
+            child: makeControl(
+              field: field,
+              doc: doc,
+              // onControlChanged: attachListener ? onControlChanged : null,
+            ),
           ),
-        ),
-      );
+        );
+      }
     } else if (isCollapsible) {
       collapsibles.add(
         Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
+          padding: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 10,
           ),
           child: makeControl(
             doc: doc ?? defaultValDoc,
@@ -455,6 +486,51 @@ List<Widget> generateLayout({
       );
     }
   });
+
+  if (sections.length > 0) {
+    widgets.add(
+      sectionLabels[sIdx] != ''
+          ? Padding(
+              padding: const EdgeInsets.only(
+                bottom: 10.0,
+              ),
+              child: ListTileTheme(
+                tileColor: Colors.white,
+                child: CustomExpansionTile(
+                  maintainState: true,
+                  initiallyExpanded: true,
+                  title: Text(
+                    sectionLabels[sIdx],
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                    ),
+                  ),
+                  children: [
+                    Container(
+                      color: Colors.white,
+                      child: Column(
+                        children: [...sections],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            )
+          : Padding(
+              padding: const EdgeInsets.only(
+                top: 10.0,
+              ),
+              child: Section(
+                title: sectionLabels[sIdx],
+                children: [...sections],
+              ),
+            ),
+    );
+
+    sIdx += 1;
+    sections.clear();
+  }
 
   if (collapsibles.length > 0) {
     widgets.add(

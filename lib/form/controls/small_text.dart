@@ -22,7 +22,7 @@ class SmallText extends StatelessWidget with Control, ControlInput {
 
   @override
   Widget build(BuildContext context) {
-    List<String? Function(dynamic?)> validators = [];
+    List<String? Function(dynamic)> validators = [];
 
     var f = setMandatory(doctypeField);
 
@@ -35,6 +35,7 @@ class SmallText extends StatelessWidget with Control, ControlInput {
     return FormBuilderTextField(
       key: key,
       onChanged: onChanged,
+      readOnly: doctypeField.readOnly == 1 ? true : false,
       initialValue: doc != null ? doc![doctypeField.fieldname] : null,
       name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(

@@ -67,6 +67,9 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
       data: Theme.of(context).copyWith(primaryColor: Colors.black),
       child: FormBuilderTypeAhead(
         key: widget.key,
+        enabled: widget.doc != null && widget.doctypeField.setOnlyOnce == 1
+            ? false
+            : true,
         onChanged: (val) {
           if (widget.onControlChanged != null) {
             widget.onControlChanged!(

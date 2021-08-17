@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/model/upload_file_response.dart';
+import 'package:frappe_app/utils/indicator.dart';
 import 'package:frappe_app/widgets/header_app_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -87,6 +88,24 @@ class FormView extends StatelessWidget {
                       });
                 }
                 var docs = model.formData.docs;
+                late String status;
+
+                if (docs[0]["status"] == null) {
+                  var value = docs[0]["docstatus"];
+                  if (isSubmittable(meta.docs[0])) {
+                    if (value == 0) {
+                      value = "Draft";
+                    } else if (value == 1) {
+                      value = "Submitted";
+                    } else if (value == 2) {
+                      value = "Cancelled";
+                    }
+                  } else {
+                    status = value == 0 ? "Enabled" : "Disabled";
+                  }
+                } else {
+                  status = docs[0]["status"];
+                }
 
                 var builderContext;
 
@@ -138,13 +157,24 @@ class FormView extends StatelessWidget {
                                 vertical: 10,
                                 horizontal: 20,
                               ),
-                              child: Text(
-                                getTitle(meta.docs[0], docs[0]) ?? "",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: FrappePalette.grey[900],
-                                ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    getTitle(meta.docs[0], docs[0]) ?? "",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: FrappePalette.grey[900],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Indicator.buildStatusButton(
+                                    meta.docs[0].name,
+                                    status,
+                                  )
+                                ],
                               ),
                             ),
                             if (!queued)
