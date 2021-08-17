@@ -56,10 +56,16 @@ class _MultiSelectState extends State<MultiSelect> with Control, ControlInput {
     var initialValue;
     if (widget.doc != null) {
       if (widget.doc![widget.doctypeField.fieldname] != null) {
-        initialValue = widget.doc![widget.doctypeField.fieldname]
-            .split(',')
-            .where((e) => e != " ")
-            .toList();
+        if (widget.doctypeField.fieldtype == "Table MultiSelect") {
+          initialValue = widget.doc![widget.doctypeField.fieldname]
+              .map((e) => e[widget.doctypeField.fieldname])
+              .toList();
+        } else {
+          initialValue = widget.doc![widget.doctypeField.fieldname]
+              .split(',')
+              .where((e) => e != " ")
+              .toList();
+        }
       } else {
         initialValue = [];
       }

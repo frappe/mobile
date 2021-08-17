@@ -21,7 +21,7 @@ class AutoComplete extends StatefulWidget {
 
   final Map? doc;
   final void Function(dynamic)? onSuggestionSelected;
-  final Widget? prefixIcon;
+  final Widget? suffixIcon;
   final Key? key;
   final ItemBuilder? itemBuilder;
   final SuggestionsCallback? suggestionsCallback;
@@ -35,7 +35,7 @@ class AutoComplete extends StatefulWidget {
     this.doc,
     this.controller,
     this.inputDecoration,
-    this.prefixIcon,
+    this.suffixIcon,
     this.key,
     this.onSuggestionSelected,
     this.itemBuilder,
@@ -69,73 +69,70 @@ class _AutoCompleteState extends State<AutoComplete>
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Theme(
-        data: Theme.of(context).copyWith(primaryColor: Colors.black),
-        child: FormBuilderTypeAhead(
-          key: widget.key,
-          controller: _typeAheadController,
-          onSuggestionSelected: widget.onSuggestionSelected,
-          onChanged: (val) {
-            if (widget.onControlChanged != null) {
-              widget.onControlChanged!(
-                FieldValue(
-                  field: widget.doctypeField,
-                  value: val,
+    return Theme(
+      data: Theme.of(context).copyWith(primaryColor: Colors.black),
+      child: FormBuilderTypeAhead(
+        key: widget.key,
+        controller: _typeAheadController,
+        onSuggestionSelected: widget.onSuggestionSelected,
+        onChanged: (val) {
+          if (widget.onControlChanged != null) {
+            widget.onControlChanged!(
+              FieldValue(
+                field: widget.doctypeField,
+                value: val,
+              ),
+            );
+          }
+        },
+        direction: AxisDirection.up,
+        validator: FormBuilderValidators.compose(validators),
+        decoration: widget.inputDecoration ??
+            Palette.formFieldDecoration(
+              suffixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  widget.suffixIcon ??
+                      FrappeIcon(
+                        FrappeIcons.select,
+                      ),
+                ],
+              ),
+            ),
+        selectionToTextTransformer: widget.selectionToTextTransformer ??
+            (item) {
+              return item.toString();
+            },
+        name: widget.doctypeField.fieldname,
+        itemBuilder: widget.itemBuilder ??
+            (context, item) {
+              return ListTile(
+                title: Text(
+                  item.toString(),
                 ),
               );
-            }
-          },
-          direction: AxisDirection.up,
-          validator: FormBuilderValidators.compose(validators),
-          decoration: widget.inputDecoration ??
-              Palette.formFieldDecoration(
-                suffixIcon: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    widget.prefixIcon ??
-                        FrappeIcon(
-                          FrappeIcons.select,
+            },
+        initialValue: widget.doc != null
+            ? widget.doc![widget.doctypeField.fieldname]
+            : null,
+        suggestionsCallback: widget.suggestionsCallback ??
+            (query) {
+              var lowercaseQuery = query.toLowerCase();
+              List opts;
+              if (widget.doctypeField.options is String) {
+                opts = widget.doctypeField.options.split('\n');
+              } else {
+                opts = widget.doctypeField.options ?? [];
+              }
+              return opts
+                  .where(
+                    (option) => option.toLowerCase().contains(
+                          lowercaseQuery,
                         ),
-                  ],
-                ),
-              ),
-          selectionToTextTransformer: widget.selectionToTextTransformer ??
-              (item) {
-                return item.toString();
-              },
-          name: widget.doctypeField.fieldname,
-          itemBuilder: widget.itemBuilder ??
-              (context, item) {
-                return ListTile(
-                  title: Text(
-                    item.toString(),
-                  ),
-                );
-              },
-          initialValue: widget.doc != null
-              ? widget.doc![widget.doctypeField.fieldname]
-              : null,
-          suggestionsCallback: widget.suggestionsCallback ??
-              (query) {
-                var lowercaseQuery = query.toLowerCase();
-                List opts;
-                if (widget.doctypeField.options is String) {
-                  opts = widget.doctypeField.options.split('\n');
-                } else {
-                  opts = widget.doctypeField.options ?? [];
-                }
-                return opts
-                    .where(
-                      (option) => option.toLowerCase().contains(
-                            lowercaseQuery,
-                          ),
-                    )
-                    .toList();
-              },
-        ),
+                  )
+                  .toList();
+            },
       ),
     );
   }

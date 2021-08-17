@@ -87,7 +87,11 @@ class DocVersion extends StatelessWidget {
     txt += "<p><span>$time</span></p></div>";
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0, top: 4.0),
+      padding: const EdgeInsets.only(
+        bottom: 4.0,
+        top: 4.0,
+        left: 1,
+      ),
       child: Html(
         data: txt,
         style: {

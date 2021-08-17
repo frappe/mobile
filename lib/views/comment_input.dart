@@ -47,7 +47,7 @@ class _CommentInputState extends State<CommentInput> {
             key: key,
             suggestionPosition: SuggestionPosition.Top,
             maxLines: 5,
-            minLines: 1,
+            minLines: 2,
             decoration: Palette.formFieldDecoration(),
             mentions: [
               Mention(
