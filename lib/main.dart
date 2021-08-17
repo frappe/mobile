@@ -3,6 +3,8 @@
 import 'dart:isolate';
 import 'dart:ui';
 
+import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -29,7 +31,12 @@ void main() async {
   await initLocalNotifications();
   // await initAutoSync();
 
-  runApp(FrappeApp());
+  runApp(
+    DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (context) => FrappeApp(),
+    ),
+  );
 }
 
 void downloadCallback(String id, DownloadTaskStatus status, int progress) {
