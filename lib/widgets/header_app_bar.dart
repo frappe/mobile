@@ -19,6 +19,7 @@ AppBar buildAppBar({
     elevation: expanded ? 0 : 0.8,
     automaticallyImplyLeading: !expanded,
     titleSpacing: titleSpacing,
+    centerTitle: false,
     title: FlatButton(
       visualDensity: VisualDensity(
         horizontal: -4,
