@@ -56,6 +56,7 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
   Widget build(BuildContext context) {
     List<String? Function(dynamic)> validators = [];
     var f = setMandatory(widget.doctypeField);
+    late bool enabled;
 
     if (f != null) {
       validators.add(
@@ -63,13 +64,24 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
       );
     }
 
+    // if (widget.doctypeField.readOnly == 1 ||
+    //     (widget.doc != null && widget.doctypeField.setOnlyOnce == 1)) {
+    //   enabled = false;
+    // } else {
+    //   enabled = true;
+    // }
+
+    if (widget.doc != null && widget.doctypeField.setOnlyOnce == 1) {
+      enabled = false;
+    } else {
+      enabled = true;
+    }
+
     return Theme(
       data: Theme.of(context).copyWith(primaryColor: Colors.black),
       child: FormBuilderTypeAhead(
         key: widget.key,
-        enabled: widget.doc != null && widget.doctypeField.setOnlyOnce == 1
-            ? false
-            : true,
+        enabled: enabled,
         onChanged: (val) {
           if (widget.onControlChanged != null) {
             widget.onControlChanged!(

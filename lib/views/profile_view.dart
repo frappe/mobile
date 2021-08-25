@@ -32,16 +32,6 @@ class ProfileView extends StatelessWidget {
             // ),
             PaddedCardListTile(
               onTap: () async {
-                await clearLoginInfo();
-                NavigationHelper.clearAllAndNavigateTo(
-                  context: context,
-                  page: Login(),
-                );
-              },
-              title: "Logout",
-            ),
-            PaddedCardListTile(
-              onTap: () async {
                 var issueUrl = "https://github.com/frappe/mobile/issues";
                 if (await canLaunch(issueUrl)) {
                   await launch(
@@ -52,6 +42,16 @@ class ProfileView extends StatelessWidget {
                 }
               },
               title: "Report an Issue",
+            ),
+            PaddedCardListTile(
+              onTap: () async {
+                await clearLoginInfo();
+                NavigationHelper.clearAllAndNavigateTo(
+                  context: context,
+                  page: Login(),
+                );
+              },
+              title: "Logout",
             ),
           ],
         ),
