@@ -89,7 +89,7 @@ class _HomeViewState extends State<HomeView> {
         title: 'Profile',
         icon: UserAvatar(
           uid: Config().userId!,
-          size: 16,
+          size: 12,
         ),
         activeColorPrimary: FrappePalette.grey[800]!,
         inactiveColorPrimary: FrappePalette.grey[500],
