@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/model/desk_sidebar_items_response.dart';
 
 import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/utils/navigation_helper.dart';
@@ -19,7 +20,7 @@ import 'desk_viewmodel.dart';
 
 // ignore: must_be_immutable
 class DeskView extends StatelessWidget {
-  String? module;
+  DeskMessage? module;
 
   DeskView([
     this.module,
@@ -37,6 +38,7 @@ class DeskView extends StatelessWidget {
       },
       onModelClose: (model) {
         model.error = null;
+        model.modulesByCategory.clear();
       },
       builder: (context, model, child) {
         if (model.state == ViewState.busy) {
@@ -68,13 +70,13 @@ class DeskView extends StatelessWidget {
               backgroundColor: Palette.bgColor,
               appBar: buildAppBar(
                 context: context,
-                title: model.currentModule,
+                title: model.currentModuleTitle,
                 onPressed: () {
                   NavigationHelper.push(
                     context: context,
                     page: ShowModules(
                       model: model,
-                      title: model.currentModule,
+                      title: model.currentModuleTitle,
                     ),
                   );
                 },
@@ -357,7 +359,7 @@ class ShowModules extends StatelessWidget {
                               ),
                               onTap: () {
                                 model.switchModule(
-                                  element.name,
+                                  element,
                                 );
 
                                 Navigator.of(context).pop();

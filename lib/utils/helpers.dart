@@ -1,4 +1,5 @@
 // @dart=2.9
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:device_info/device_info.dart';
@@ -322,7 +323,18 @@ initAwesomeItems() async {
   var moduleDoctypesMapping = {};
 
   for (var item in deskSidebarItems.message) {
-    var desktopPage = await locator<Api>().getDesktopPage(item.name);
+    String module;
+    if (item.content != null) {
+      module = jsonEncode({
+        "name": item.name,
+        "title": item.name,
+        "content": item.content,
+      });
+    } else {
+      module = item.name;
+    }
+
+    var desktopPage = await locator<Api>().getDesktopPage(module);
 
     var doctypes = [];
     desktopPage.message.cards.items.forEach(

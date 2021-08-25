@@ -25,11 +25,13 @@ class DeskMessage {
   late String? icon;
   late String module;
   late String label;
+  late String? content;
 
   DeskMessage({
     required this.name,
     this.category,
     this.icon,
+    this.content,
     required this.module,
     required this.label,
   });
@@ -40,6 +42,7 @@ class DeskMessage {
     icon = json['icon'];
     module = json['module'];
     label = json['label'];
+    content = json['content'];
   }
 
   Map<String, dynamic> toJson() {
@@ -49,6 +52,7 @@ class DeskMessage {
     data['icon'] = this.icon;
     data['module'] = this.module;
     data['label'] = this.label;
+    data['content'] = this.content;
     return data;
   }
 }

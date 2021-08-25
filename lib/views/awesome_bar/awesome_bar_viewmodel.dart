@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frappe_app/app/locator.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/offline_storage.dart';
+import 'package:frappe_app/services/api/api.dart';
 import 'package:frappe_app/utils/loading_indicator.dart';
 import 'package:frappe_app/views/base_viewmodel.dart';
 import 'package:frappe_app/views/desk/desk_view.dart';
@@ -145,10 +147,13 @@ class AwesomBarViewModel extends BaseViewModel {
           ),
         );
       } else if (awesomeBarItem.type == "Module") {
+        var deskItems = await locator<Api>().getDeskSideBarItems();
+        var module = deskItems.message
+            .firstWhere((element) => element.name == awesomeBarItem.value);
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) {
-              return DeskView(awesomeBarItem.value);
+              return DeskView(module);
             },
           ),
         );
