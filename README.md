@@ -1,11 +1,15 @@
 
 # Frappe Mobile
 
-**Please Note, this Project is still in beta stage and requires Frappe Framework v13**
+Access your ERPNext desk or any other Frappe desk anytime from your smartphone.
 
-<kbd><img width="216" height="432" src="screenshots/desk.jpeg" alt="Desk" /></kbd>
-<kbd><img width="216" height="432" src="screenshots/awesomebar.jpeg" alt="Awesome Bar" /></kbd>
-<kbd><img width="216" height="432" src="screenshots/form_view.jpeg" alt="Form View" /></kbd>
+### Download the app
+<a href='https://play.google.com/store/apps/details?id=io.frappe.frappe_mobile&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="175"/></a>
+<a href='https://apps.apple.com/us/app/frappe-mobile/id1522707685'><img style="padding:12px" alt='Get it on AppStore' src='https://devimages-cdn.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg' width="140"/></a>
+
+<kbd><img width="216" height="432" src="screenshots/desk.png" alt="Desk" /></kbd>
+<kbd><img width="216" height="432" src="screenshots/awesomebar.png" alt="Awesome Bar" /></kbd>
+<kbd><img width="216" height="432" src="screenshots/form_view.png" alt="Form View" /></kbd>
 
 ## Features:
 1) Create/Update Docs
