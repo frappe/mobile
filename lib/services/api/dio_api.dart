@@ -68,7 +68,7 @@ class DioApi implements Api {
 
   Future<DeskSidebarItemsResponse> getDeskSideBarItems() async {
     try {
-      final response = await DioHelper.dio.post(
+      var response = await DioHelper.dio.post(
         '/method/frappe.desk.desktop.get_desk_sidebar_items',
         options: Options(
           validateStatus: (status) {
@@ -76,6 +76,18 @@ class DioApi implements Api {
           },
         ),
       );
+
+      if (response.statusCode == 417) {
+        response = await DioHelper.dio.post(
+          '/method/frappe.desk.desktop.get_wspace_sidebar_items',
+          options: Options(
+            validateStatus: (status) {
+              return status < 500;
+            },
+          ),
+        );
+        response.data["message"] = response.data["message"]["pages"];
+      }
 
       if (response.statusCode == HttpStatus.ok) {
         if (await OfflineStorage.storeApiResponse()) {
@@ -617,23 +629,28 @@ class DioApi implements Api {
       }
     } catch (e) {
       if (e is DioError) {
-        var error;
-        if (e.response != null) {
-          error = e.response;
-        } else {
-          error = e.error;
-        }
+        if (e.response != null &&
+            e.response.data != null &&
+            e.response.data["_server_messages"] != null) {
+          var errorMsgs = json.decode(e.response.data["_server_messages"]);
+          var errorMsg = json.decode(errorMsgs[0])["message"];
 
-        if (error is SocketException) {
           throw ErrorResponse(
-            statusCode: HttpStatus.serviceUnavailable,
-            statusMessage: error.message,
+            statusCode: e.response.statusCode,
+            statusMessage: errorMsg,
           );
         } else {
-          throw ErrorResponse(
-            statusCode: error.statusCode,
-            statusMessage: error.statusMessage,
-          );
+          if (e.error is SocketException) {
+            throw ErrorResponse(
+              statusCode: HttpStatus.serviceUnavailable,
+              statusMessage: e.error.message,
+            );
+          } else {
+            throw ErrorResponse(
+              statusCode: e.error.statusCode,
+              statusMessage: e.error.statusMessage,
+            );
+          }
         }
       } else {
         throw ErrorResponse();

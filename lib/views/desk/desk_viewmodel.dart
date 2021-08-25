@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:frappe_app/model/common.dart';
@@ -23,16 +24,27 @@ import '../../utils/helpers.dart';
 @lazySingleton
 class DeskViewModel extends BaseViewModel {
   late String currentModule;
-  String? passedModule;
+  late String currentModuleTitle;
+  DeskMessage? passedModule;
   Map<String, List<DeskMessage>> modulesByCategory = {};
   late DesktopPageResponse desktopPage;
   ErrorResponse? error;
 
   switchModule(
-    String newModule,
+    DeskMessage newModule,
   ) async {
     setState(ViewState.busy);
-    currentModule = newModule;
+    if (newModule.content != null) {
+      currentModule = jsonEncode({
+        "name": modulesByCategory[modulesByCategory.keys.first]![0].name,
+        "title": modulesByCategory[modulesByCategory.keys.first]![0].name,
+        "content": modulesByCategory[modulesByCategory.keys.first]![0].content!
+      });
+      currentModuleTitle = newModule.name;
+    } else {
+      currentModule = newModule.name;
+      currentModuleTitle = newModule.name;
+    }
     await getDesktopPage();
     setState(ViewState.idle);
   }
@@ -66,10 +78,14 @@ class DeskViewModel extends BaseViewModel {
 
     deskSidebarItems.message.forEach(
       (module) {
-        if (modulesByCategory[module.category] == null) {
-          modulesByCategory[module.category!] = [module];
+        var category = "MODULES";
+        if (module.category != null) {
+          category = module.category!;
+        }
+        if (modulesByCategory[category] == null) {
+          modulesByCategory[category] = [module];
         } else {
-          modulesByCategory[module.category]!.add(module);
+          modulesByCategory[category]!.add(module);
         }
       },
     );
@@ -105,8 +121,34 @@ class DeskViewModel extends BaseViewModel {
     try {
       await getDeskSidebarItems();
 
-      currentModule = passedModule ??
-          modulesByCategory[modulesByCategory.keys.first]![0].name;
+      if (passedModule != null) {
+        if (passedModule!.content != null) {
+          currentModule = jsonEncode({
+            "name": passedModule!.name,
+            "title": passedModule!.name,
+            "content": passedModule!.content!
+          });
+          currentModuleTitle = passedModule!.name;
+        } else {
+          currentModule = passedModule!.name;
+          currentModuleTitle = passedModule!.name;
+        }
+      } else if (modulesByCategory[modulesByCategory.keys.first]![0].content !=
+          null) {
+        currentModule = jsonEncode({
+          "name": modulesByCategory[modulesByCategory.keys.first]![0].name,
+          "title": modulesByCategory[modulesByCategory.keys.first]![0].name,
+          "content":
+              modulesByCategory[modulesByCategory.keys.first]![0].content!
+        });
+        currentModuleTitle =
+            modulesByCategory[modulesByCategory.keys.first]![0].name;
+      } else {
+        currentModule =
+            modulesByCategory[modulesByCategory.keys.first]![0].name;
+        currentModuleTitle =
+            modulesByCategory[modulesByCategory.keys.first]![0].name;
+      }
 
       await getDesktopPage();
       error = null;
