@@ -4,9 +4,8 @@
 Access your ERPNext desk or any other Frappe desk anytime from your smartphone.
 
 ### Download the app
-<a href='https://play.google.com/store/apps/details?id=io.frappe.frappe_mobile&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="170"/></a>
-
-&nbsp;&nbsp; <a href='https://apps.apple.com/us/app/frappe-mobile/id1522707685'><img alt='Get it on AppStore' src='https://devimages-cdn.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg' width="148"/></a>
+<a href='https://play.google.com/store/apps/details?id=io.frappe.frappe_mobile&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><kbd><img height="38" src="download_badges/download_on_the_play_store_badge.svg" alt="Get it on Google Play" /></kbd></a>
+<a href='https://apps.apple.com/us/app/frappe-mobile/id1522707685'><kbd><img src="download_badges/download_on_the_app_store_badge.svg" alt="Download on App Store" /></kbd></a>
 
 <kbd><img width="216" height="432" src="screenshots/desk.png" alt="Desk" /></kbd>
 <kbd><img width="216" height="432" src="screenshots/awesomebar.png" alt="Awesome Bar" /></kbd>
