@@ -36,9 +36,9 @@ class DeskViewModel extends BaseViewModel {
     setState(ViewState.busy);
     if (newModule.content != null) {
       currentModule = jsonEncode({
-        "name": modulesByCategory[modulesByCategory.keys.first]![0].name,
-        "title": modulesByCategory[modulesByCategory.keys.first]![0].name,
-        "content": modulesByCategory[modulesByCategory.keys.first]![0].content!
+        "name": newModule.name,
+        "title": newModule.name,
+        "content": newModule.content!
       });
       currentModuleTitle = newModule.name;
     } else {
@@ -94,23 +94,10 @@ class DeskViewModel extends BaseViewModel {
   getDesktopPage() async {
     DesktopPageResponse _desktopPage;
 
-    var isOnline = await verifyOnline();
-
-    if (!isOnline) {
-      var moduleDoctypes =
-          OfflineStorage.getItem('${currentModule}Doctypes')["data"];
-
-      if (moduleDoctypes != null) {
-        _desktopPage = DesktopPageResponse.fromJson(moduleDoctypes);
-      } else {
-        throw ErrorResponse(statusCode: HttpStatus.serviceUnavailable);
-      }
-    } else {
-      try {
-        _desktopPage = await locator<Api>().getDesktopPage(currentModule);
-      } catch (e) {
-        throw e as ErrorResponse;
-      }
+    try {
+      _desktopPage = await locator<Api>().getDesktopPage(currentModule);
+    } catch (e) {
+      throw e as ErrorResponse;
     }
 
     desktopPage = _desktopPage;
