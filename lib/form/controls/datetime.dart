@@ -22,6 +22,15 @@ class DatetimeField extends StatelessWidget with Control, ControlInput {
 
   @override
   Widget build(BuildContext context) {
+    DateTime? value;
+
+    if (doc != null) {
+      if (doc![doctypeField.fieldname] == "Now") {
+        value = DateTime.now();
+      } else {
+        value = parseDate(doc![doctypeField.fieldname]);
+      }
+    }
     List<String? Function(dynamic?)> validators = [];
 
     var f = setMandatory(doctypeField);
@@ -38,8 +47,7 @@ class DatetimeField extends StatelessWidget with Control, ControlInput {
         return val.toIso8601String();
       },
       resetIcon: Icon(Icons.close),
-      initialValue:
-          doc != null ? parseDate(doc![doctypeField.fieldname]) : null,
+      initialValue: value,
       name: doctypeField.fieldname,
       decoration: Palette.formFieldDecoration(
         label: doctypeField.label,
