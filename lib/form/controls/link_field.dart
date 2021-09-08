@@ -126,6 +126,11 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
                   title: Text(
                     item["value"],
                   ),
+                  subtitle: item["description"] != null
+                      ? Text(
+                          item["description"],
+                        )
+                      : null,
                 );
               } else {
                 return ListTile(
