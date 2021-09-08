@@ -158,17 +158,18 @@ class FormView extends StatelessWidget {
                                 horizontal: 20,
                               ),
                               child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    getTitle(meta.docs[0], docs[0]) ?? "",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: FrappePalette.grey[900],
+                                  Flexible(
+                                    child: Text(
+                                      getTitle(meta.docs[0], docs[0]) ?? "",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: FrappePalette.grey[900],
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
                                   ),
                                   Indicator.buildStatusButton(
                                     meta.docs[0].name,
