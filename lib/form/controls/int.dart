@@ -9,7 +9,7 @@ import 'base_input.dart';
 
 class Int extends StatelessWidget with Control, ControlInput {
   final DoctypeField doctypeField;
-  final void Function(String)? onChanged;
+  final void Function(String?)? onChanged;
   final Key? key;
   final Map? doc;
 
@@ -22,7 +22,7 @@ class Int extends StatelessWidget with Control, ControlInput {
 
   @override
   Widget build(BuildContext context) {
-    List<String? Function(dynamic?)> validators = [];
+    List<String? Function(dynamic)> validators = [];
 
     var f = setMandatory(doctypeField);
 
