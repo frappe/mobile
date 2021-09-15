@@ -8,7 +8,7 @@ import 'base_input.dart';
 
 class SmallText extends StatelessWidget with Control, ControlInput {
   final DoctypeField doctypeField;
-  final void Function(String)? onChanged;
+  final void Function(String?)? onChanged;
 
   final Key? key;
   final Map? doc;

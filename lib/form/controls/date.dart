@@ -36,7 +36,7 @@ class Date extends StatelessWidget with Control, ControlInput {
       key: key,
       inputType: InputType.date,
       valueTransformer: (val) {
-        return val.toIso8601String();
+        return val?.toIso8601String();
       },
       initialValue:
           doc != null ? parseDate(doc![doctypeField.fieldname]) : null,

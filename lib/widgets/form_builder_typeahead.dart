@@ -328,8 +328,8 @@ class FormBuilderTypeAhead<T> extends FormBuilderField<T> {
                         color: theme.disabledColor,
                       ),
                 focusNode: state.effectiveFocusNode,
-                decoration: state.decoration(),
-              ) as TextFieldConfiguration,
+                decoration: state.decoration,
+              ),
               // HACK to satisfy strictness
               suggestionsCallback: suggestionsCallback,
               itemBuilder: itemBuilder,

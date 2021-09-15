@@ -115,7 +115,7 @@ class CustomFormBuilderCheckbox extends FormBuilderField<bool> {
             final state = field as _CustomFormBuilderCheckboxState;
 
             return InputDecorator(
-              decoration: state.decoration(),
+              decoration: state.decoration,
               child: GestureDetector(
                 onTap: state.enabled
                     ? () {
