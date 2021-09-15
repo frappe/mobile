@@ -31,7 +31,7 @@ class DatetimeField extends StatelessWidget with Control, ControlInput {
         value = parseDate(doc![doctypeField.fieldname]);
       }
     }
-    List<String? Function(dynamic?)> validators = [];
+    List<String? Function(dynamic)> validators = [];
 
     var f = setMandatory(doctypeField);
 
@@ -44,7 +44,7 @@ class DatetimeField extends StatelessWidget with Control, ControlInput {
     return FormBuilderDateTimePicker(
       key: key,
       valueTransformer: (val) {
-        return val.toIso8601String();
+        return val?.toIso8601String();
       },
       resetIcon: Icon(Icons.close),
       initialValue: value,

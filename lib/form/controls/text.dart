@@ -9,7 +9,7 @@ import 'base_input.dart';
 // appended control due to naming conflict with Text widget
 class ControlText extends StatelessWidget with Control, ControlInput {
   final DoctypeField doctypeField;
-  final void Function(String)? onChanged;
+  final void Function(String?)? onChanged;
 
   final Key? key;
   final Map? doc;

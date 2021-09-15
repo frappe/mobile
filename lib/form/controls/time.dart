@@ -40,7 +40,7 @@ class Time extends StatelessWidget with Control, ControlInput {
           : null,
       inputType: InputType.time,
       valueTransformer: (val) {
-        return val.toIso8601String();
+        return val?.toIso8601String();
       },
       keyboardType: TextInputType.number,
       name: doctypeField.fieldname,
