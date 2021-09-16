@@ -40,6 +40,18 @@ class _FrappeAppState extends State<FrappeApp> {
 
   @override
   Widget build(BuildContext context) {
+    var theme = ThemeData(
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+      ),
+      textTheme: GoogleFonts.interTextTheme(
+        Theme.of(context).textTheme.apply(
+            // fontSizeFactor: 0.7,
+            ),
+      ),
+    );
+
     return Portal(
       child: LifeCycleManager(
         child: StreamProvider<ConnectivityStatus>(
@@ -50,16 +62,7 @@ class _FrappeAppState extends State<FrappeApp> {
             builder: EasyLoading.init(),
             debugShowCheckedModeBanner: false,
             title: 'Frappe',
-            theme: new ThemeData(
-              textTheme: GoogleFonts.interTextTheme(
-                Theme.of(context).textTheme.apply(
-                    // fontSizeFactor: 0.7,
-                    ),
-              ),
-              disabledColor: Colors.black,
-              primaryColor: Colors.white,
-              accentColor: Colors.black54,
-            ),
+            theme: theme,
             home: GestureDetector(
               onTap: () {
                 FocusScope.of(context).requestFocus(new FocusNode());
