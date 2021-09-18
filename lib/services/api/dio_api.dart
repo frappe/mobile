@@ -99,8 +99,8 @@ class DioApi implements Api {
         } catch (e) {
           response.data["message"] = [
             ...response.data["message"]["Modules"],
-            ...response.data["message"]["Administration"],
             ...response.data["message"]["Domains"],
+            ...response.data["message"]["Administration"],
           ];
           return DeskSidebarItemsResponse.fromJson(response.data);
         }
