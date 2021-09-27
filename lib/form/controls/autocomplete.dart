@@ -18,6 +18,7 @@ typedef String SelectionToTextTransformer<T>(T selection);
 class AutoComplete extends StatefulWidget {
   final DoctypeField doctypeField;
   final OnControlChanged? onControlChanged;
+  final List<DoctypeField>? dependentFields;
 
   final Map? doc;
   final void Function(dynamic)? onSuggestionSelected;
@@ -32,6 +33,7 @@ class AutoComplete extends StatefulWidget {
   AutoComplete({
     required this.doctypeField,
     this.onControlChanged,
+    this.dependentFields,
     this.doc,
     this.controller,
     this.inputDecoration,
@@ -82,6 +84,7 @@ class _AutoCompleteState extends State<AutoComplete>
                 field: widget.doctypeField,
                 value: val,
               ),
+              widget.dependentFields ?? [],
             );
           }
         },

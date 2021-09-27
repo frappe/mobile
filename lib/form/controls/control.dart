@@ -31,8 +31,9 @@ import './multi_select.dart';
 Widget makeControl({
   required DoctypeField field,
   OnControlChanged? onControlChanged,
-  Map? doc,
+  required Map doc,
   bool decorateControl = true,
+  List<DoctypeField>? dependentFields,
 }) {
   Widget control;
 
@@ -41,6 +42,7 @@ Widget makeControl({
       {
         control = LinkField(
           doctypeField: field,
+          dependentFields: dependentFields,
           doc: doc,
           onControlChanged: onControlChanged,
         );
@@ -51,6 +53,7 @@ Widget makeControl({
       {
         control = AutoComplete(
           doctypeField: field,
+          dependentFields: dependentFields,
           doc: doc,
           onControlChanged: onControlChanged,
         );
@@ -70,6 +73,7 @@ Widget makeControl({
       {
         control = Select(
           doc: doc,
+          dependentFields: dependentFields,
           doctypeField: field,
           onControlChanged: onControlChanged,
         );
@@ -135,6 +139,7 @@ Widget makeControl({
     case "Check":
       {
         control = Check(
+          dependentFields: dependentFields,
           doctypeField: field,
           doc: doc,
           onControlChanged: onControlChanged,
@@ -161,6 +166,7 @@ Widget makeControl({
       break;
 
     case "Float":
+    case "Percent":
       {
         control = Float(
           doctypeField: field,
@@ -285,11 +291,13 @@ Widget buildDecoratedControl({
 List<Widget> generateLayout({
   required List<DoctypeField> fields,
   required OnControlChanged onControlChanged,
-  Map? doc,
+  required Map doc,
 }) {
   List<Widget> collapsibles = [];
   List<Widget> widgets = [];
   List<Widget> sections = [];
+  var fieldDependentFieldsMapping = {};
+  var parentFieldNames = [];
 
   List<String> collapsibleLabels = [];
   List<String> sectionLabels = [];
@@ -300,192 +308,181 @@ List<Widget> generateLayout({
   int cIdx = 0;
   int sIdx = 0;
 
-  // var dependsOnFields =
-  //     fields.where((field) => field.dependsOn != null).map((field) {
-  //   if (field.dependsOn!.startsWith("eval:")) {
-  //     return field.dependsOn!.split(".")[1].split("===")[0];
-  //   } else {
-  //     return "";
-  //   }
-  // }).toList();
+  var dependentFields = fields
+      .where(
+        (element) => element.fetchFrom != null || element.dependsOn != null,
+      )
+      .toList();
 
-  fields.forEach((field) {
-    var val;
-    var defaultValDoc = {};
-
-    // var attachListener =
-    //     dependsOnFields.indexOf(field.fieldname) == -1 ? false : true;
-
-    if (doc != null) {
-      val = doc[field.fieldname];
-    } else {
-      val = field.defaultValue;
-
-      if (val == '__user') {
-        val = Config().userId;
-      }
-
-      defaultValDoc = {
-        field.fieldname: val,
-      };
+  dependentFields.forEach((dependentField) {
+    var parentField;
+    if (dependentField.fetchFrom != null) {
+      parentField = dependentField.fetchFrom!.split('.')[0];
+      parentFieldNames.add(parentField);
     }
-
-    if (val is List) {
-      if (val.isEmpty) {
-        val = null;
+    if (dependentField.dependsOn != null) {
+      if (dependentField.dependsOn!.startsWith("eval:doc")) {
+        parentField =
+            dependentField.dependsOn!.split("doc.")[1].split("==")[0].trim();
+        parentFieldNames.add(parentField);
+      } else {
+        parentField = dependentField.dependsOn!;
       }
     }
-
-    if (field.fieldtype == "Section Break") {
-      if (sections.length > 0) {
-        widgets.add(
-          sectionLabels[sIdx] != ''
-              ? Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 10.0,
-                  ),
-                  child: ListTileTheme(
-                    tileColor: Colors.white,
-                    child: CustomExpansionTile(
-                      maintainState: true,
-                      initiallyExpanded: true,
-                      title: Text(
-                        sectionLabels[sIdx],
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
-                      ),
-                      children: [
-                        Container(
-                          color: Colors.white,
-                          child: Column(
-                            children: [...sections],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 10.0,
-                  ),
-                  child: Section(
-                    title: sectionLabels[sIdx],
-                    children: [...sections],
-                  ),
-                ),
-        );
-
-        sIdx += 1;
-        sections.clear();
-      } else if (collapsibles.length > 0) {
-        widgets.add(
-          Padding(
-            padding: const EdgeInsets.only(
-              bottom: 10.0,
-            ),
-            child: ListTileTheme(
-              tileColor: Colors.white,
-              child: CustomExpansionTile(
-                maintainState: true,
-                title: Text(
-                  collapsibleLabels[cIdx],
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                  ),
-                ),
-                children: [
-                  Container(
-                      color: Colors.white,
-                      child: Column(
-                        children: [...collapsibles],
-                      ))
-                ],
-              ),
-            ),
-          ),
-        );
-        cIdx += 1;
-        collapsibles.clear();
-      }
-
-      if (field.collapsible == 1) {
-        isSection = false;
-        isCollapsible = true;
-        collapsibleLabels.add(field.label!);
-      } else {
-        isCollapsible = false;
-        isSection = true;
-        sectionLabels.add(field.label != null ? field.label! : '');
-      }
-    } else if (isSection) {
-      var firstField = sections.isEmpty;
-      if (firstField) {
-        sections.add(
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: 10,
-            ),
-            child: makeControl(
-              field: field,
-              doc: doc,
-              // onControlChanged: attachListener ? onControlChanged : null,
-            ),
-          ),
-        );
-      } else {
-        sections.add(
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-            ),
-            child: makeControl(
-              field: field,
-              doc: doc,
-              // onControlChanged: attachListener ? onControlChanged : null,
-            ),
-          ),
-        );
-      }
-    } else if (isCollapsible) {
-      collapsibles.add(
-        Padding(
-          padding: const EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 10,
-          ),
-          child: makeControl(
-            doc: doc ?? defaultValDoc,
-            field: field,
-            // onControlChanged: attachListener ? onControlChanged : null,
-          ),
-        ),
-      );
+    if (fieldDependentFieldsMapping[parentField] == null) {
+      fieldDependentFieldsMapping[parentField] = [dependentField];
     } else {
-      widgets.add(
-        Container(
-          padding: const EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 10,
-          ),
-          color: Colors.white,
-          child: makeControl(
-            field: field,
-            doc: doc ?? defaultValDoc,
-            // onControlChanged: attachListener ? onControlChanged : null,
-          ),
-        ),
-      );
+      fieldDependentFieldsMapping[parentField].add(dependentField);
     }
   });
+
+  parentFieldNames = parentFieldNames.toSet().toList();
+
+  fields.forEach(
+    (field) {
+      var attachListener = false;
+      if (parentFieldNames.contains(field.fieldname)) {
+        attachListener = true;
+      }
+      var controlWidget = Visibility(
+        visible: field.pVisibile ?? true,
+        child: Container(
+          color: Colors.white,
+          padding: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 10,
+          ),
+          child: makeControl(
+            field: field,
+            doc: doc,
+            onControlChanged: attachListener ? onControlChanged : null,
+            dependentFields: fieldDependentFieldsMapping[field.fieldname] ?? [],
+          ),
+        ),
+      );
+
+      // TODO handle in better way
+      var controlWidget2 = Visibility(
+        visible: field.pVisibile ?? true,
+        child: Container(
+          color: Colors.white,
+          padding: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+          ),
+          child: makeControl(
+            field: field,
+            doc: doc,
+            onControlChanged: attachListener ? onControlChanged : null,
+            dependentFields: fieldDependentFieldsMapping[field.fieldname] ?? [],
+          ),
+        ),
+      );
+
+      if (field.fieldtype == "Section Break") {
+        if (sections.length > 0) {
+          widgets.add(
+            sectionLabels[sIdx] != ''
+                ? Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: 10.0,
+                    ),
+                    child: ListTileTheme(
+                      tileColor: Colors.white,
+                      child: CustomExpansionTile(
+                        maintainState: true,
+                        initiallyExpanded: true,
+                        title: Text(
+                          sectionLabels[sIdx],
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                          ),
+                        ),
+                        children: [
+                          Container(
+                            color: Colors.white,
+                            child: Column(
+                              children: [...sections],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: 10.0,
+                    ),
+                    child: Section(
+                      title: sectionLabels[sIdx],
+                      children: [...sections],
+                    ),
+                  ),
+          );
+
+          sIdx += 1;
+          sections.clear();
+        } else if (collapsibles.length > 0) {
+          widgets.add(
+            Padding(
+              padding: const EdgeInsets.only(
+                bottom: 10.0,
+              ),
+              child: ListTileTheme(
+                tileColor: Colors.white,
+                child: CustomExpansionTile(
+                  maintainState: true,
+                  title: Text(
+                    collapsibleLabels[cIdx],
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                    ),
+                  ),
+                  children: [
+                    Container(
+                        color: Colors.white,
+                        child: Column(
+                          children: [...collapsibles],
+                        ))
+                  ],
+                ),
+              ),
+            ),
+          );
+          cIdx += 1;
+          collapsibles.clear();
+        }
+
+        if (field.collapsible == 1) {
+          isSection = false;
+          isCollapsible = true;
+          collapsibleLabels.add(field.label!);
+        } else {
+          isCollapsible = false;
+          isSection = true;
+          sectionLabels.add(field.label != null ? field.label! : '');
+        }
+      } else if (isSection) {
+        var firstField = sections.isEmpty;
+        if (firstField) {
+          sections.add(
+            controlWidget,
+          );
+        } else {
+          sections.add(
+            controlWidget2,
+          );
+        }
+      } else if (isCollapsible) {
+        collapsibles.add(controlWidget);
+      } else {
+        widgets.add(controlWidget);
+      }
+    },
+  );
 
   if (sections.length > 0) {
     widgets.add(

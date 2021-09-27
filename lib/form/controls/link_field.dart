@@ -21,6 +21,7 @@ class LinkField extends StatefulWidget {
   final DoctypeField doctypeField;
   final Map? doc;
   final OnControlChanged? onControlChanged;
+  final List<DoctypeField>? dependentFields;
 
   final key;
   final bool showInputBorder;
@@ -36,6 +37,7 @@ class LinkField extends StatefulWidget {
     this.key,
     required this.doctypeField,
     this.onControlChanged,
+    this.dependentFields,
     this.doc,
     this.prefixIcon,
     this.onSuggestionSelected,
@@ -82,28 +84,28 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
       child: FormBuilderTypeAhead(
         key: widget.key,
         enabled: enabled,
-        onChanged: (val) {
-          if (widget.onControlChanged != null) {
-            widget.onControlChanged!(
-              FieldValue(
-                field: widget.doctypeField,
-                value: val,
-              ),
-            );
-          }
-        },
         controller: widget.controller,
         initialValue: widget.doc != null
             ? widget.doc![widget.doctypeField.fieldname]
             : null,
         direction: AxisDirection.up,
         onSuggestionSelected: (item) {
+          var val = item is String
+              ? item
+              : item is Map
+                  ? item["value"]
+                  : null;
           if (widget.onSuggestionSelected != null) {
-            if (item is String) {
-              widget.onSuggestionSelected!(item);
-            } else if (item is Map) {
-              widget.onSuggestionSelected!(item["value"]);
-            }
+            widget.onSuggestionSelected!(val);
+          }
+          if (widget.onControlChanged != null) {
+            widget.onControlChanged!(
+              FieldValue(
+                field: widget.doctypeField,
+                value: val,
+              ),
+              widget.dependentFields ?? [],
+            );
           }
         },
         validator: FormBuilderValidators.compose(validators),

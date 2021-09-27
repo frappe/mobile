@@ -254,10 +254,11 @@ class DoctypeField {
   late int? docstatus;
   late String fieldname;
   late String? dependsOn;
+  late String? fetchFrom;
   late String? label;
   late String? fieldtype;
   late String? oldfieldtype;
-  late dynamic? options;
+  late dynamic options;
   late int? searchIndex;
   late int? hidden;
   late int? setOnlyOnce;
@@ -281,7 +282,7 @@ class DoctypeField {
   late int? inPreview;
   late int? readOnly;
   late int? length;
-  late dynamic? translatable;
+  late dynamic translatable;
   late int? rememberLastSelectedValue;
   late int? allowBulkEdit;
   late int? printHideIfNoValue;
@@ -291,60 +292,64 @@ class DoctypeField {
   late int? hideBorder;
   late int? hideDays;
   late int? hideSeconds;
-  late dynamic? defaultValue;
+  late dynamic defaultValue;
+  bool? pVisibile;
 
-  DoctypeField(
-      {this.doctype,
-      this.name,
-      this.owner,
-      this.creation,
-      this.modified,
-      this.modifiedBy,
-      this.parent,
-      this.parentfield,
-      this.parenttype,
-      this.idx,
-      this.docstatus,
-      required this.fieldname,
-      required this.label,
-      this.dependsOn,
-      this.fieldtype,
-      this.oldfieldtype,
-      this.options,
-      this.searchIndex,
-      this.hidden,
-      this.setOnlyOnce,
-      this.allowInQuickEntry,
-      this.printHide,
-      this.reportHide,
-      this.reqd,
-      this.bold,
-      this.inGlobalSearch,
-      this.collapsible,
-      this.unique,
-      this.noCopy,
-      this.allowOnSubmit,
-      this.showPreviewPopup,
-      this.permlevel,
-      this.ignoreUserPermissions,
-      this.columns,
-      this.inListView,
-      this.inStandardFilter,
-      this.isDefaultFilter = 0,
-      this.inPreview,
-      this.readOnly,
-      this.length,
-      this.translatable,
-      this.rememberLastSelectedValue,
-      this.allowBulkEdit,
-      this.printHideIfNoValue,
-      this.inFilter,
-      this.fetchIfEmpty,
-      this.ignoreXssFilter,
-      this.hideBorder,
-      this.hideDays,
-      this.hideSeconds,
-      this.defaultValue});
+  DoctypeField({
+    this.doctype,
+    this.name,
+    this.owner,
+    this.creation,
+    this.modified,
+    this.modifiedBy,
+    this.parent,
+    this.parentfield,
+    this.parenttype,
+    this.idx,
+    this.docstatus,
+    required this.fieldname,
+    required this.label,
+    this.dependsOn,
+    this.fetchFrom,
+    this.fieldtype,
+    this.oldfieldtype,
+    this.options,
+    this.searchIndex,
+    this.hidden,
+    this.setOnlyOnce,
+    this.allowInQuickEntry,
+    this.printHide,
+    this.reportHide,
+    this.reqd,
+    this.bold,
+    this.inGlobalSearch,
+    this.collapsible,
+    this.unique,
+    this.noCopy,
+    this.allowOnSubmit,
+    this.showPreviewPopup,
+    this.permlevel,
+    this.ignoreUserPermissions,
+    this.columns,
+    this.inListView,
+    this.inStandardFilter,
+    this.isDefaultFilter = 0,
+    this.inPreview,
+    this.readOnly,
+    this.length,
+    this.translatable,
+    this.rememberLastSelectedValue,
+    this.allowBulkEdit,
+    this.printHideIfNoValue,
+    this.inFilter,
+    this.fetchIfEmpty,
+    this.ignoreXssFilter,
+    this.hideBorder,
+    this.hideDays,
+    this.hideSeconds,
+    this.defaultValue,
+    this.pVisibile = true,
+  });
 
   DoctypeField.fromJson(Map<dynamic, dynamic> json) {
     doctype = json['doctype'];
@@ -360,6 +365,8 @@ class DoctypeField {
     docstatus = json['docstatus'];
     fieldname = json['fieldname'];
     dependsOn = json['depends_on'];
+    fetchFrom = json['fetch_from'];
+    pVisibile = json['p_visibile'];
     label = json['label'];
     fieldtype = json['fieldtype'];
     oldfieldtype = json['oldfieldtype'];
@@ -415,6 +422,8 @@ class DoctypeField {
     data['docstatus'] = this.docstatus;
     data['fieldname'] = this.fieldname;
     data['depends_on'] = this.dependsOn;
+    data['fetch_from'] = this.fetchFrom;
+    data['p_visible'] = this.pVisibile;
     data['label'] = this.label;
     data['fieldtype'] = this.fieldtype;
     data['oldfieldtype'] = this.oldfieldtype;

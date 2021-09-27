@@ -183,7 +183,7 @@ class _SendEmailViewState extends State<SendEmailView> {
                                         model.sendSettings[
                                             model.fields[5].fieldname],
                                   },
-                                  onControlChanged: (val) {
+                                  onControlChanged: (val, _) {
                                     model.updateSendSetting(
                                       fieldname: val.field.fieldname,
                                       value: val.value,
@@ -204,7 +204,7 @@ class _SendEmailViewState extends State<SendEmailView> {
                                         model.sendSettings[
                                             model.fields[6].fieldname],
                                   },
-                                  onControlChanged: (val) {
+                                  onControlChanged: (val, _) {
                                     model.updateSendSetting(
                                       fieldname: val.field.fieldname,
                                       value: val.value,

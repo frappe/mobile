@@ -13,12 +13,14 @@ import 'base_input.dart';
 class Check extends StatelessWidget with Control, ControlInput {
   final DoctypeField doctypeField;
   final OnControlChanged? onControlChanged;
+  final List<DoctypeField>? dependentFields;
   final Key? key;
   final Map? doc;
   final Function? onChanged;
 
   const Check({
     required this.doctypeField,
+    this.dependentFields,
     this.onChanged,
     this.onControlChanged,
     this.key,
@@ -40,6 +42,8 @@ class Check extends StatelessWidget with Control, ControlInput {
     return CustomFormBuilderCheckbox(
       name: doctypeField.fieldname,
       key: key,
+      enabled:
+          doctypeField.readOnly != null ? doctypeField.readOnly == 0 : true,
       valueTransformer: (val) {
         return val == true ? 1 : 0;
       },
@@ -48,15 +52,20 @@ class Check extends StatelessWidget with Control, ControlInput {
       onChanged: (val) {
         if (onControlChanged != null) {
           onControlChanged!(
-            FieldValue(
-              field: doctypeField,
-              value: val == true ? 1 : 0,
-            ),
-          );
+              FieldValue(
+                field: doctypeField,
+                value: val == true ? 1 : 0,
+              ),
+              dependentFields ?? []);
         }
       },
       label: Text(
         doctypeField.label!,
+        style: TextStyle(
+          color: FrappePalette.grey[700],
+          fontWeight: FontWeight.w400,
+          fontSize: 12,
+        ),
       ),
       decoration: Palette.formFieldDecoration(
         label: doctypeField.label,

@@ -131,24 +131,27 @@ class CustomFormBuilderCheckbox extends FormBuilderField<bool> {
                       SizedBox(
                         height: 24,
                         width: 24,
-                        child: CustomCheckbox(
-                          value: (state.value == null && !tristate)
-                              ? false
-                              : state.value,
-                          onChanged: state.enabled
-                              ? (val) {
-                                  state.requestFocus();
-                                  state.didChange(val);
-                                }
-                              : null,
-                          checkColor: checkColor,
-                          activeColor: activeColor,
-                          autofocus: autofocus,
-                          tristate: tristate,
+                        child: Transform.scale(
+                          scale: 0.8,
+                          child: CustomCheckbox(
+                            value: (state.value == null && !tristate)
+                                ? false
+                                : state.value,
+                            onChanged: state.enabled
+                                ? (val) {
+                                    state.requestFocus();
+                                    state.didChange(val);
+                                  }
+                                : null,
+                            checkColor: checkColor,
+                            activeColor: activeColor,
+                            autofocus: autofocus,
+                            tristate: tristate,
+                          ),
                         ),
                       ),
                       SizedBox(
-                        width: 8,
+                        width: 4,
                       ),
                       label,
                     ],

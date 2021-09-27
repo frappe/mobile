@@ -59,9 +59,12 @@ class FormBuilderTable<T> extends FormBuilderField<T> {
 
                   if (value.isEmpty) {
                     var v = {};
-                    tableFields.forEach((tableField) {
-                      v[tableField.fieldname] = "";
-                    });
+
+                    tableFields.forEach(
+                      (tableField) {
+                        v[tableField.fieldname] = "";
+                      },
+                    );
                     value.add(v);
                   }
 

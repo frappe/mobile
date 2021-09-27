@@ -10,16 +10,27 @@ class CustomTable extends StatelessWidget {
 
   CustomTable({
     required this.doctypeField,
-    this.doc,
+    required this.doc,
   });
 
   @override
   Widget build(BuildContext context) {
+    var value;
+    if (doc != null) {
+      if (doc![doctypeField.fieldname] is List) {
+        value = doc![doctypeField.fieldname];
+      } else {
+        value = [];
+      }
+    } else {
+      value = [];
+    }
+
     return FormBuilderTable(
       name: doctypeField.fieldname,
       context: context,
       doctype: doctypeField.options,
-      value: doc != null ? doc![doctypeField.fieldname] : [],
+      value: value,
     );
   }
 }
