@@ -193,10 +193,14 @@ class FormView extends StatelessWidget {
                               onChanged: () {
                                 model.handleFormDataChange();
                               },
-                              fields: meta.docs[0].fields,
+                              fields: meta.docs[0].fields.where(
+                                (field) {
+                                  return field.hidden != 1 &&
+                                      field.fieldtype != "Column Break";
+                                },
+                              ).toList(),
                               formKey: _fbKey,
                               doc: docs[0],
-                              viewType: ViewType.form,
                             ),
                             if (!queued)
                               Padding(

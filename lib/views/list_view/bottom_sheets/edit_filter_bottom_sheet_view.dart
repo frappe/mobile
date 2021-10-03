@@ -261,6 +261,9 @@ class _EditValueState extends State<EditValue> {
               } else {
                 return makeControl(
                   field: widget.model.filter.field,
+                  doc: {
+                    widget.model.filter.field.fieldname: "",
+                  },
                 );
               }
             }),

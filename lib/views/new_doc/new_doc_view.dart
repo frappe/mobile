@@ -39,6 +39,10 @@ class _NewDocState extends State<NewDoc> {
     );
 
     return BaseView<NewDocViewModel>(
+      onModelReady: (model) {
+        model.meta = widget.meta;
+        model.init();
+      },
       builder: (context, model, child) => Builder(
         builder: (context) {
           return Scaffold(
@@ -85,8 +89,8 @@ class _NewDocState extends State<NewDoc> {
             ),
             body: CustomForm(
               formKey: _fbKey,
-              fields: widget.meta.docs[0].fields,
-              viewType: ViewType.newForm,
+              doc: model.newDoc,
+              fields: model.newDocFields,
             ),
           );
         },
