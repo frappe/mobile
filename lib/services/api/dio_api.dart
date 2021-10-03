@@ -31,18 +31,20 @@ class DioApi implements Api {
         options: Options(validateStatus: (status) => status < 500),
       );
 
-      if (response.statusCode != HttpStatus.ok ||
-          response.headers.map["set-cookie"] == null ||
-          response.headers.map["set-cookie"][3] == null)
+      if (response.statusCode == HttpStatus.ok) {
+        if (response.headers.map["set-cookie"] != null &&
+            response.headers.map["set-cookie"][3] != null) {
+          response.data["user_id"] =
+              response.headers.map["set-cookie"][3].split(';')[0].split('=')[1];
+        }
+
+        return LoginResponse.fromJson(response.data);
+      } else {
         throw ErrorResponse(
-          statusCode: response.statusCode,
           statusMessage: response.data["message"],
+          statusCode: response.statusCode,
         );
-
-      response.data["user_id"] =
-          response.headers.map["set-cookie"][3].split(';')[0].split('=')[1];
-
-      return LoginResponse.fromJson(response.data);
+      }
     } catch (e) {
       if (!(e is DioError)) rethrow;
 
