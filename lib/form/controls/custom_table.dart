@@ -6,11 +6,11 @@ import '../../model/doctype_response.dart';
 
 class CustomTable extends StatelessWidget {
   final DoctypeField doctypeField;
-  final Map? doc;
+  final Map doc;
 
   CustomTable({
     required this.doctypeField,
-    this.doc,
+    required this.doc,
   });
 
   @override
@@ -19,7 +19,7 @@ class CustomTable extends StatelessWidget {
       name: doctypeField.fieldname,
       context: context,
       doctype: doctypeField.options,
-      value: doc != null ? doc![doctypeField.fieldname] : [],
+      value: doc[doctypeField.fieldname],
     );
   }
 }
