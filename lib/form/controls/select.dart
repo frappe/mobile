@@ -45,7 +45,7 @@ class Select extends StatelessWidget with Control, ControlInput {
 
     return FormBuilderDropdown(
       key: key,
-      onChanged: (val) {
+      onChanged: (dynamic val) {
         if (onControlChanged != null) {
           onControlChanged!(
             FieldValue(

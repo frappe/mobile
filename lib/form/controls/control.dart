@@ -30,8 +30,8 @@ import './multi_select.dart';
 
 Widget makeControl({
   required DoctypeField field,
+  required Map doc,
   OnControlChanged? onControlChanged,
-  Map? doc,
   bool decorateControl = true,
 }) {
   Widget control;
@@ -285,7 +285,7 @@ Widget buildDecoratedControl({
 List<Widget> generateLayout({
   required List<DoctypeField> fields,
   required OnControlChanged onControlChanged,
-  Map? doc,
+  required Map doc,
 }) {
   List<Widget> collapsibles = [];
   List<Widget> widgets = [];
@@ -310,31 +310,8 @@ List<Widget> generateLayout({
   // }).toList();
 
   fields.forEach((field) {
-    var val;
-    var defaultValDoc = {};
-
     // var attachListener =
     //     dependsOnFields.indexOf(field.fieldname) == -1 ? false : true;
-
-    if (doc != null) {
-      val = doc[field.fieldname];
-    } else {
-      val = field.defaultValue;
-
-      if (val == '__user') {
-        val = Config().userId;
-      }
-
-      defaultValDoc = {
-        field.fieldname: val,
-      };
-    }
-
-    if (val is List) {
-      if (val.isEmpty) {
-        val = null;
-      }
-    }
 
     if (field.fieldtype == "Section Break") {
       if (sections.length > 0) {
@@ -462,7 +439,7 @@ List<Widget> generateLayout({
             top: 10,
           ),
           child: makeControl(
-            doc: doc ?? defaultValDoc,
+            doc: doc,
             field: field,
             // onControlChanged: attachListener ? onControlChanged : null,
           ),
@@ -479,7 +456,7 @@ List<Widget> generateLayout({
           color: Colors.white,
           child: makeControl(
             field: field,
-            doc: doc ?? defaultValDoc,
+            doc: doc,
             // onControlChanged: attachListener ? onControlChanged : null,
           ),
         ),
