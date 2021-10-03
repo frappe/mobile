@@ -6,7 +6,7 @@ import '../../model/doctype_response.dart';
 
 class CustomTable extends StatelessWidget {
   final DoctypeField doctypeField;
-  final Map? doc;
+  final Map doc;
 
   CustomTable({
     required this.doctypeField,
@@ -15,22 +15,11 @@ class CustomTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var value;
-    if (doc != null) {
-      if (doc![doctypeField.fieldname] is List) {
-        value = doc![doctypeField.fieldname];
-      } else {
-        value = [];
-      }
-    } else {
-      value = [];
-    }
-
     return FormBuilderTable(
       name: doctypeField.fieldname,
       context: context,
       doctype: doctypeField.options,
-      value: value,
+      value: doc[doctypeField.fieldname],
     );
   }
 }

@@ -30,8 +30,8 @@ import './multi_select.dart';
 
 Widget makeControl({
   required DoctypeField field,
-  OnControlChanged? onControlChanged,
   required Map doc,
+  OnControlChanged? onControlChanged,
   bool decorateControl = true,
   List<DoctypeField>? dependentFields,
 }) {

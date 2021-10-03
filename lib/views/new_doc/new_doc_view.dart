@@ -38,18 +38,11 @@ class _NewDocState extends State<NewDoc> {
       context,
     );
 
-    var doc = {};
-
-    widget.meta.docs[0].fields.forEach(
-      (element) {
-        doc[element.fieldname] = element.defaultValue;
-        if (!doc[element.fieldname] is List) {
-          doc[element.fieldname] = [];
-        }
-      },
-    );
-
     return BaseView<NewDocViewModel>(
+      onModelReady: (model) {
+        model.meta = widget.meta;
+        model.init();
+      },
       builder: (context, model, child) => Builder(
         builder: (context) {
           return Scaffold(
@@ -96,9 +89,8 @@ class _NewDocState extends State<NewDoc> {
             ),
             body: CustomForm(
               formKey: _fbKey,
-              fields: widget.meta.docs[0].fields,
-              viewType: ViewType.newForm,
-              doc: doc,
+              doc: model.newDoc,
+              fields: model.newDocFields,
             ),
           );
         },

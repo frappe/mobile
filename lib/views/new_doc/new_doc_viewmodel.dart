@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/model/config.dart';
 import 'package:frappe_app/utils/loading_indicator.dart';
 import 'package:frappe_app/utils/navigation_helper.dart';
 import 'package:frappe_app/views/form_view/form_view.dart';
@@ -19,6 +20,32 @@ import '../../views/base_viewmodel.dart';
 
 @lazySingleton
 class NewDocViewModel extends BaseViewModel {
+  late Map newDoc;
+  late List<DoctypeField> newDocFields;
+  late DoctypeResponse meta;
+
+  init() {
+    newDocFields = meta.docs[0].fields.where(
+      (field) {
+        return field.hidden != 1 && field.fieldtype != "Column Break";
+      },
+    ).toList();
+
+    newDoc = {};
+
+    newDocFields.forEach((field) {
+      var defaultVal = field.defaultValue;
+      if (defaultVal == '__user') {
+        defaultVal = Config().userId;
+      }
+
+      if (field.fieldtype == "Table") {
+        defaultVal = [];
+      }
+      newDoc[field.fieldname] = defaultVal;
+    });
+  }
+
   saveDoc({
     required Map formValue,
     required DoctypeResponse meta,

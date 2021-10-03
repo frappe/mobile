@@ -14,14 +14,12 @@ class CustomForm extends StatefulWidget {
   final GlobalKey<FormBuilderState> formKey;
   final List<DoctypeField> fields;
   final Map doc;
-  final ViewType? viewType;
   final void Function()? onChanged;
 
   const CustomForm({
     required this.formKey,
     required this.fields,
     required this.doc,
-    this.viewType,
     this.onChanged,
   });
 
@@ -47,8 +45,9 @@ class _CustomFormState extends State<CustomForm> {
       key: widget.formKey,
       child: SingleChildScrollView(
         child: Column(
-          children: _generateChildren(
+          children: generateLayout(
             fields: widget.fields,
+            doc: widget.doc,
             onControlChanged: (fieldValue, dependentFields) {
               handleControlDependencies(
                 fieldValue: fieldValue,
@@ -59,37 +58,6 @@ class _CustomFormState extends State<CustomForm> {
           ),
         ),
       ),
-    );
-  }
-
-  List<Widget> _generateChildren({
-    required List<DoctypeField> fields,
-    required OnControlChanged onControlChanged,
-  }) {
-    List<DoctypeField> filteredFields = [];
-
-    if (widget.viewType == ViewType.form) {
-      filteredFields = fields.where(
-        (field) {
-          return field.hidden != 1 && field.fieldtype != "Column Break";
-        },
-      ).toList();
-    } else if (widget.viewType == ViewType.newForm) {
-      fields.forEach(
-        (field) {
-          if (field.hidden != 1 && field.fieldtype != "Column Break") {
-            filteredFields.add(field);
-          }
-        },
-      );
-    } else {
-      filteredFields = fields;
-    }
-
-    return generateLayout(
-      fields: filteredFields,
-      doc: widget.doc,
-      onControlChanged: onControlChanged,
     );
   }
 
