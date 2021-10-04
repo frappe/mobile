@@ -68,32 +68,45 @@ class _CustomFormState extends State<CustomForm> {
     required List<DoctypeField> dependentFields,
     required GlobalKey<FormBuilderState> formKey,
   }) async {
-    var dependsOnFields =
-        dependentFields.where((element) => element.dependsOn != null).toList();
+    var dependsOnFields = dependentFields
+        .where(
+          (element) => element.dependsOn != null,
+        )
+        .toList();
+    var formVal = formKey.currentState?.value;
+    var formValEncoded = jsonEncode(formKey.currentState?.value);
 
     dependsOnFields.forEach(
       (element) {
+        var df = widget.fields.firstWhere(
+          (e) => e.fieldname == element.fieldname,
+        );
+        var showField = false;
         if (element.dependsOn!.startsWith("eval")) {
-          var dd = jsonEncode(formKey.currentState?.value);
-          // print(dd);
           var docProperty = element.dependsOn!.split("eval:")[1];
-          var b = executeJS(jsString: """
-            var doc = $dd;
+          var evalResult = executeJS(jsString: """
+            var doc = $formValEncoded;
             $docProperty
             """);
 
-          print(b);
-        } else {
-          var showField = fieldValue.value == 1;
-          var df =
-              widget.fields.firstWhere((e) => e.fieldname == element.fieldname);
-          df.pVisibile = showField;
-          if (!showField) {
-            formKey.currentState?.removeInternalFieldValue(element.fieldname);
+          if (evalResult == 1 || evalResult == true) {
+            showField = true;
           }
+        } else {
+          showField = fieldValue.value == 1;
+        }
+        df.pVisibile = showField;
+        if (!showField) {
+          formKey.currentState?.removeInternalFieldValue(element.fieldname);
+        } else {
+          formKey.currentState?.setInternalFieldValue(
+            element.fieldname,
+            formVal![element.fieldname],
+          );
         }
       },
     );
+
     setState(() {});
 
     var fetchFromFields = dependentFields
