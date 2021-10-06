@@ -16,4 +16,12 @@ class Constants {
     // FilterOperator(label: "Not In", value: "not in"),
     FilterOperator(label: "Is", value: "is"),
   ];
+
+  static var filterOperatorLabelMapping = {
+    "like": "Like",
+    "=": "Equals",
+    "!=": "Not Equals",
+    "not like": "Not Like",
+    "is": "Is",
+  };
 }

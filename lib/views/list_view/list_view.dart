@@ -42,6 +42,7 @@ class CustomListView extends StatelessWidget {
     return BaseView<ListViewViewModel>(
       onModelReady: (model) {
         model.meta = meta;
+        model.init();
         model.getData();
         model.getDesktopPage(module);
         model.getSortableFields();
