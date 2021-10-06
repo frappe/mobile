@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:frappe_app/app/locator.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 
 import 'package:frappe_app/config/palette.dart';
@@ -8,6 +11,8 @@ import 'package:frappe_app/form/controls/text.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/config.dart';
 import 'package:frappe_app/model/doctype_response.dart';
+import 'package:frappe_app/services/api/api.dart';
+import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/widgets/custom_expansion_tile.dart';
 import 'package:frappe_app/widgets/section.dart';
 
@@ -344,8 +349,18 @@ List<Widget> generateLayout({
       if (parentFieldNames.contains(field.fieldname)) {
         attachListener = true;
       }
+
+      var fieldVisibility = true;
+
+      if (field.dependsOn != null) {
+        fieldVisibility = dependsOn(
+          doc: doc,
+          field: field,
+        );
+      }
+
       var controlWidget = Visibility(
-        visible: field.pVisibile ?? true,
+        visible: fieldVisibility,
         child: Container(
           color: Colors.white,
           padding: const EdgeInsets.only(
@@ -364,7 +379,7 @@ List<Widget> generateLayout({
 
       // TODO handle in better way
       var controlWidget2 = Visibility(
-        visible: field.pVisibile ?? true,
+        visible: fieldVisibility,
         child: Container(
           color: Colors.white,
           padding: const EdgeInsets.only(
@@ -469,13 +484,13 @@ List<Widget> generateLayout({
         }
 
         if (field.collapsible == 1) {
-          var cLabel = "${field.label!}@@${field.pVisibile ?? true}";
+          var cLabel = "${field.label!}@@$fieldVisibility";
           isSection = false;
           isCollapsible = true;
           collapsibleLabels.add(cLabel);
         } else {
           var sLabel =
-              "${field.label != null ? field.label! : ''}@@${field.pVisibile ?? true}";
+              "${field.label != null ? field.label! : ''}@@$fieldVisibility";
           isCollapsible = false;
           isSection = true;
           sectionLabels.add(sLabel);
@@ -590,4 +605,26 @@ List<Widget> generateLayout({
   }
 
   return widgets;
+}
+
+bool dependsOn({
+  required Map doc,
+  required DoctypeField field,
+}) {
+  var formValEncoded = jsonEncode(doc);
+  if (field.dependsOn!.startsWith("eval")) {
+    var docProperty = field.dependsOn!.split("eval:")[1];
+    var evalResult = executeJS(jsString: """
+            var doc = $formValEncoded;
+            $docProperty
+            """);
+
+    if (evalResult == 1 || evalResult == true) {
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return doc[field.dependsOn] == 1;
+  }
 }

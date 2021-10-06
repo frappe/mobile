@@ -28,14 +28,20 @@ class CustomForm extends StatefulWidget {
 }
 
 class _CustomFormState extends State<CustomForm> {
+  late Map formVal;
+
+  @override
+  void initState() {
+    super.initState();
+    formVal = widget.doc;
+  }
+
   @override
   Widget build(BuildContext context) {
     return FormBuilder(
       onChanged: () {
         if (widget.formKey.currentState != null) {
           widget.formKey.currentState!.save();
-
-          handleFormDataChange(widget.formKey.currentState!.value);
         }
         if (widget.onChanged != null) {
           widget.onChanged!();
@@ -47,11 +53,16 @@ class _CustomFormState extends State<CustomForm> {
         child: Column(
           children: generateLayout(
             fields: widget.fields,
-            doc: widget.doc,
+            doc: formVal,
             onControlChanged: (fieldValue, dependentFields) {
-              handleControlDependencies(
-                fieldValue: fieldValue,
+              widget.formKey.currentState!.save();
+              setState(() {
+                formVal = widget.formKey.currentState!.value;
+              });
+
+              handleFetchFrom(
                 dependentFields: dependentFields,
+                fieldValue: fieldValue,
                 formKey: widget.formKey,
               );
             },
@@ -61,54 +72,11 @@ class _CustomFormState extends State<CustomForm> {
     );
   }
 
-  handleFormDataChange(Map formValue) {}
-
-  handleControlDependencies({
+  handleFetchFrom({
     required FieldValue fieldValue,
     required List<DoctypeField> dependentFields,
     required GlobalKey<FormBuilderState> formKey,
   }) async {
-    var dependsOnFields = dependentFields
-        .where(
-          (element) => element.dependsOn != null,
-        )
-        .toList();
-    var formVal = formKey.currentState?.value;
-    var formValEncoded = jsonEncode(formKey.currentState?.value);
-
-    dependsOnFields.forEach(
-      (element) {
-        var df = widget.fields.firstWhere(
-          (e) => e.fieldname == element.fieldname,
-        );
-        var showField = false;
-        if (element.dependsOn!.startsWith("eval")) {
-          var docProperty = element.dependsOn!.split("eval:")[1];
-          var evalResult = executeJS(jsString: """
-            var doc = $formValEncoded;
-            $docProperty
-            """);
-
-          if (evalResult == 1 || evalResult == true) {
-            showField = true;
-          }
-        } else {
-          showField = fieldValue.value == 1;
-        }
-        df.pVisibile = showField;
-        if (!showField) {
-          formKey.currentState?.removeInternalFieldValue(element.fieldname);
-        } else {
-          formKey.currentState?.setInternalFieldValue(
-            element.fieldname,
-            formVal![element.fieldname],
-          );
-        }
-      },
-    );
-
-    setState(() {});
-
     var fetchFromFields = dependentFields
         .where((element) {
           return element.fetchFrom != null &&

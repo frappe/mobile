@@ -293,7 +293,6 @@ class DoctypeField {
   late int? hideDays;
   late int? hideSeconds;
   late dynamic defaultValue;
-  bool? pVisibile;
 
   DoctypeField({
     this.doctype,
@@ -348,7 +347,6 @@ class DoctypeField {
     this.hideDays,
     this.hideSeconds,
     this.defaultValue,
-    this.pVisibile = true,
   });
 
   DoctypeField.fromJson(Map<dynamic, dynamic> json) {
@@ -366,7 +364,6 @@ class DoctypeField {
     fieldname = json['fieldname'];
     dependsOn = json['depends_on'];
     fetchFrom = json['fetch_from'];
-    pVisibile = json['p_visibile'];
     label = json['label'];
     fieldtype = json['fieldtype'];
     oldfieldtype = json['oldfieldtype'];
@@ -423,7 +420,6 @@ class DoctypeField {
     data['fieldname'] = this.fieldname;
     data['depends_on'] = this.dependsOn;
     data['fetch_from'] = this.fetchFrom;
-    data['p_visible'] = this.pVisibile;
     data['label'] = this.label;
     data['fieldtype'] = this.fieldtype;
     data['oldfieldtype'] = this.oldfieldtype;
