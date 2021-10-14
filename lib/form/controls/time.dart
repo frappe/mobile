@@ -35,12 +35,15 @@ class Time extends StatelessWidget with Control, ControlInput {
 
     if (doc != null) {
       var value = doc![doctypeField.fieldname];
-      if ((value as String).contains("T")) {
-        value = doc![doctypeField.fieldname].split("T")[1];
+
+      if (value != null) {
+        if ((value as String).contains("T")) {
+          value = doc![doctypeField.fieldname].split("T")[1];
+        }
+        initialValue = DateFormat.Hms().parse(
+          value,
+        );
       }
-      initialValue = DateFormat.Hms().parse(
-        value,
-      );
     }
 
     return FormBuilderDateTimePicker(
