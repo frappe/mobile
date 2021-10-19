@@ -107,6 +107,12 @@ class ListViewViewModel extends BaseViewModel {
             Filter(
               field: meta.docs[0].fields.firstWhere(
                 (metaField) => metaField.fieldname == listFilter[1],
+                orElse: () {
+                  return DoctypeField(
+                    fieldname: listFilter[1],
+                    label: listFilter[1],
+                  );
+                },
               ),
               filterOperator: FilterOperator(
                 label: Constants.filterOperatorLabelMapping[listFilter[2]]!,
@@ -141,6 +147,12 @@ class ListViewViewModel extends BaseViewModel {
             Filter(
               field: meta.docs[0].fields.firstWhere(
                 (metaField) => metaField.fieldname == reportFilter[1],
+                orElse: () {
+                  return DoctypeField(
+                    fieldname: reportFilter[1],
+                    label: reportFilter[1],
+                  );
+                },
               ),
               filterOperator: FilterOperator(
                 label: Constants.filterOperatorLabelMapping[reportFilter[2]]!,
@@ -245,7 +257,7 @@ class ListViewViewModel extends BaseViewModel {
         context,
         screen: FormView(
           name: name,
-          meta: meta,
+          meta: meta.docs[0],
         ),
         withNavBar: true,
       );
@@ -332,7 +344,7 @@ class ListViewViewModel extends BaseViewModel {
       pushNewScreen(
         context,
         screen: FormView(
-          meta: _meta,
+          meta: _meta.docs[0],
           name: _meta.docs[0].name,
         ),
         withNavBar: true,
