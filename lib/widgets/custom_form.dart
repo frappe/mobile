@@ -24,6 +24,9 @@ class CustomForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseView<CustomFormViewModel>(
+      onModelReady: (model) {
+        model.doc = doc;
+      },
       builder: (context, model, child) => FormBuilder(
         onChanged: () {
           if (formKey.currentState != null) {
@@ -41,7 +44,7 @@ class CustomForm extends StatelessWidget {
           child: Column(
             children: generateLayout(
               fields: fields,
-              doc: doc,
+              doc: model.doc,
               onControlChanged: (v) {},
             ),
           ),
@@ -53,7 +56,10 @@ class CustomForm extends StatelessWidget {
 
 @lazySingleton
 class CustomFormViewModel extends BaseViewModel {
+  late Map doc;
+
   handleFormDataChange(Map formValue) {
-    // print(formValue);
+    doc = formValue;
+    notifyListeners();
   }
 }

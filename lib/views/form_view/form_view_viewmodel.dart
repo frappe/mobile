@@ -16,13 +16,10 @@ import '../../utils/enums.dart';
 import '../../utils/helpers.dart';
 import '../../model/queue.dart';
 
-@lazySingleton
 class FormViewViewModel extends BaseViewModel {
-  String? name;
-  late DoctypeResponse meta;
-  late bool queued;
+  late String name;
+  late DoctypeDoc meta;
   late bool isDirty;
-  Map? queuedData;
 
   ErrorResponse? error;
   late GetDocResponse formData;
@@ -32,6 +29,26 @@ class FormViewViewModel extends BaseViewModel {
 
   void refresh() {
     notifyListeners();
+  }
+
+  init({
+    String? doctype,
+    DoctypeDoc? constMeta,
+    required String constName,
+  }) async {
+    setState(ViewState.busy);
+    communicationOnly = true;
+    name = constName;
+    isDirty = false;
+    if (constMeta == null) {
+      if (doctype != null) {
+        var metaResponse = await locator<Api>().getDoctype(doctype);
+        meta = metaResponse.docs[0];
+      }
+    } else {
+      meta = constMeta;
+    }
+    getData();
   }
 
   handleFormDataChange() {
@@ -48,54 +65,51 @@ class FormViewViewModel extends BaseViewModel {
 
   Future getData() async {
     setState(ViewState.busy);
-    if (queued && queuedData != null) {
-      formData = GetDocResponse(
-        docs: queuedData!["data"],
-      );
-    } else {
-      try {
-        var isOnline = await verifyOnline();
-        var doctype = meta.docs[0].name;
 
-        if (!isOnline) {
-          var response = OfflineStorage.getItem(
-            '$doctype$name',
-          );
-          response = response["data"];
-          if (response != null) {
-            formData = GetDocResponse.fromJson(response);
-            docinfo = formData.docinfo;
-          } else {
-            error = ErrorResponse(
-              statusCode: HttpStatus.serviceUnavailable,
-            );
-          }
-        } else {
-          formData = await locator<Api>().getdoc(
-            doctype,
-            name!,
-          );
+    try {
+      // var isOnline = await verifyOnline();
+      var isOnline = true;
+      var doctype = meta.name;
+
+      if (!isOnline) {
+        var response = OfflineStorage.getItem(
+          '$doctype$name',
+        );
+        response = response["data"];
+        if (response != null) {
+          formData = GetDocResponse.fromJson(response);
           docinfo = formData.docinfo;
+        } else {
+          error = ErrorResponse(
+            statusCode: HttpStatus.serviceUnavailable,
+          );
         }
-      } catch (e) {
-        error = e as ErrorResponse;
+      } else {
+        formData = await locator<Api>().getdoc(
+          doctype,
+          name,
+        );
+        docinfo = formData.docinfo;
       }
+    } catch (e) {
+      error = e as ErrorResponse;
     }
+
     setState(ViewState.idle);
   }
 
   getDocinfo() async {
-    docinfo = await locator<Api>().getDocinfo(meta.docs[0].name, name!);
+    docinfo = await locator<Api>().getDocinfo(meta.name, name);
     notifyListeners();
   }
 
   Future handleUpdate({
     required Map formValue,
     required Map doc,
-    required Map? queuedData,
   }) async {
     LoadingIndicator.loadingWithBackgroundDisabled("Saving");
-    var isOnline = await verifyOnline();
+    // var isOnline = await verifyOnline();
+    var isOnline = true;
     if (!isOnline) {
       // if (queuedData != null) {
       //   queuedData["data"] = [
@@ -149,7 +163,7 @@ class FormViewViewModel extends BaseViewModel {
 
       try {
         var response = await locator<Api>().saveDocs(
-          meta.docs[0].name,
+          meta.name,
           formValue,
         );
 

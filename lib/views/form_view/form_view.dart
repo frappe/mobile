@@ -35,41 +35,33 @@ import '../../utils/enums.dart';
 
 import '../../widgets/custom_form.dart';
 import '../../widgets/frappe_button.dart';
+import '../base_widget.dart';
 import 'bottom_sheets/reviews/add_review_bottom_sheet_view.dart';
 
 class FormView extends StatelessWidget {
-  final String? name;
-  final bool queued;
-  final Map? queuedData;
-  final DoctypeResponse meta;
+  final String name;
+
+  final DoctypeDoc? meta;
+  final String? doctype;
 
   FormView({
-    required this.meta,
-    this.name,
-    this.queued = false,
-    this.queuedData,
+    required this.name,
+    this.meta,
+    this.doctype,
   });
 
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-
   @override
   Widget build(BuildContext context) {
-    Provider.of<ConnectivityStatus>(
-      context,
-    );
-    return BaseView<FormViewViewModel>(
+    return BaseWidget<FormViewViewModel>(
       onModelReady: (model) {
-        model.communicationOnly = true;
-        model.meta = meta;
-        model.queued = queued;
-        model.queuedData = queuedData;
-        model.name = name;
-        model.isDirty = false;
-        model.getData();
+        model.init(
+          doctype: doctype,
+          constName: name,
+          constMeta: meta,
+        );
       },
-      onModelClose: (model) {
-        model.error = null;
-      },
+      model: FormViewViewModel(),
       builder: (context, model, child) => model.state == ViewState.busy
           ? Scaffold(
               body: Center(
@@ -87,12 +79,13 @@ class FormView extends StatelessWidget {
                         model.getData();
                       });
                 }
+
                 var docs = model.formData.docs;
                 late String status;
 
                 if (docs[0]["status"] == null) {
                   var value = docs[0]["docstatus"];
-                  if (isSubmittable(meta.docs[0])) {
+                  if (isSubmittable(model.meta)) {
                     if (value == 0) {
                       value = "Draft";
                     } else if (value == 1) {
@@ -115,9 +108,14 @@ class FormView extends StatelessWidget {
                 // var isLikedByUser = likedBy.contains(model.user);
 
                 return Scaffold(
+                  floatingActionButton: FloatingActionButton(
+                    onPressed: () {
+                      print("abc${_fbKey.currentState!.value}");
+                    },
+                  ),
                   backgroundColor: FrappePalette.grey[50],
                   appBar: buildAppBar(
-                    title: '${meta.docs[0].name} Details',
+                    title: '${model.meta.name} Details',
                     actions: [
                       Padding(
                         padding: const EdgeInsets.symmetric(
@@ -163,7 +161,7 @@ class FormView extends StatelessWidget {
                                 children: [
                                   Flexible(
                                     child: Text(
-                                      getTitle(meta.docs[0], docs[0]) ?? "",
+                                      getTitle(model.meta, docs[0]) ?? "",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -172,28 +170,27 @@ class FormView extends StatelessWidget {
                                     ),
                                   ),
                                   Indicator.buildStatusButton(
-                                    meta.docs[0].name,
+                                    model.meta.name,
                                     status,
                                   )
                                 ],
                               ),
                             ),
-                            if (!queued)
-                              DocInfo(
-                                name: name!,
-                                meta: meta.docs[0],
-                                doc: docs[0],
-                                doctype: meta.docs[0].name,
-                                docInfo: model.docinfo!,
-                                refreshCallback: () {
-                                  model.getData();
-                                },
-                              ),
+                            DocInfo(
+                              name: name,
+                              meta: model.meta,
+                              doc: docs[0],
+                              doctype: model.meta.name,
+                              docInfo: model.docinfo!,
+                              refreshCallback: () {
+                                model.getData();
+                              },
+                            ),
                             CustomForm(
                               onChanged: () {
                                 model.handleFormDataChange();
                               },
-                              fields: meta.docs[0].fields.where(
+                              fields: model.meta.fields.where(
                                 (field) {
                                   return field.hidden != 1 &&
                                       field.fieldtype != "Column Break";
@@ -202,62 +199,59 @@ class FormView extends StatelessWidget {
                               formKey: _fbKey,
                               doc: docs[0],
                             ),
-                            if (!queued)
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  bottom: 10,
-                                ),
-                                child: ListTileTheme(
-                                  tileColor: Colors.white,
-                                  child: CustomExpansionTile(
-                                    maintainState: true,
-                                    title: Text(
-                                      "Add a comment",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 16,
-                                      ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: 10,
+                              ),
+                              child: ListTileTheme(
+                                tileColor: Colors.white,
+                                child: CustomExpansionTile(
+                                  maintainState: true,
+                                  title: Text(
+                                    "Add a comment",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
                                     ),
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: 16.0,
-                                          right: 16.0,
-                                          bottom: 24,
-                                        ),
-                                        child: CommentInput(
-                                          name: name!,
-                                          doctype: meta.docs[0].name,
-                                          callback: () {
-                                            model.getDocinfo();
-                                          },
-                                        ),
-                                      )
-                                    ],
                                   ),
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 16.0,
+                                        right: 16.0,
+                                        bottom: 24,
+                                      ),
+                                      child: CommentInput(
+                                        name: name,
+                                        doctype: model.meta.name,
+                                        callback: () {
+                                          model.getDocinfo();
+                                        },
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ),
-                            if (!queued)
-                              Timeline(
-                                docinfo: model.docinfo!,
-                                doctype: meta.docs[0].name,
-                                name: name!,
-                                communicationOnly: model.communicationOnly,
-                                switchCallback: (val) {
-                                  model.toggleSwitch(val);
-                                },
-                                refreshCallback: () {
-                                  model.getDocinfo();
-                                },
-                                emailSubjectField:
-                                    docs[0][meta.docs[0].subjectField] ??
-                                        getTitle(
-                                          meta.docs[0],
-                                          docs[0],
-                                        ),
-                                emailSenderField: docs[0]
-                                    [meta.docs[0].senderField],
-                              ),
+                            ),
+                            Timeline(
+                              docinfo: model.docinfo!,
+                              doctype: model.meta.name,
+                              name: name,
+                              communicationOnly: model.communicationOnly,
+                              switchCallback: (val) {
+                                model.toggleSwitch(val);
+                              },
+                              refreshCallback: () {
+                                model.getDocinfo();
+                              },
+                              emailSubjectField:
+                                  docs[0][model.meta.subjectField] ??
+                                      getTitle(
+                                        model.meta,
+                                        docs[0],
+                                      ),
+                              emailSenderField: docs[0][model.meta.senderField],
+                            ),
                           ],
                         ),
                       );
@@ -282,7 +276,6 @@ class FormView extends StatelessWidget {
           await model.handleUpdate(
             formValue: formValue,
             doc: doc,
-            queuedData: queuedData,
           );
           FrappeAlert.infoAlert(
             title: 'Changes Saved',

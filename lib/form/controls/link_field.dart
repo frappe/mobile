@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/utils/frappe_icon.dart';
+import 'package:frappe_app/views/form_view/form_view.dart';
 import 'package:frappe_app/widgets/form_builder_typeahead.dart';
-import 'package:provider/provider.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
 import '../../model/doctype_response.dart';
 import '../../app/locator.dart';
@@ -12,7 +15,6 @@ import '../../services/api/api.dart';
 
 import '../../utils/helpers.dart';
 import '../../model/offline_storage.dart';
-import '../../utils/enums.dart';
 
 import 'base_control.dart';
 import 'base_input.dart';
@@ -109,6 +111,23 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
         validator: FormBuilderValidators.compose(validators),
         decoration: Palette.formFieldDecoration(
           label: widget.doctypeField.label,
+          suffixIcon: widget.doc?[widget.doctypeField.fieldname] != null &&
+                  widget.doc?[widget.doctypeField.fieldname] != ""
+              ? IconButton(
+                  onPressed: () {
+                    pushNewScreen(
+                      context,
+                      screen: FormView(
+                          doctype: widget.doctypeField.options,
+                          name: widget.doc![widget.doctypeField.fieldname]),
+                    );
+                  },
+                  icon: FrappeIcon(
+                    FrappeIcons.arrow_right_2,
+                    size: 14,
+                  ),
+                )
+              : null,
         ),
         selectionToTextTransformer: (item) {
           if (item != null) {
