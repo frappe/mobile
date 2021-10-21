@@ -31,13 +31,24 @@ class Time extends StatelessWidget with Control, ControlInput {
       );
     }
 
+    var initialValue;
+
+    if (doc != null) {
+      var value = doc![doctypeField.fieldname];
+
+      if (value != null) {
+        if ((value as String).contains("T")) {
+          value = doc![doctypeField.fieldname].split("T")[1];
+        }
+        initialValue = DateFormat.Hms().parse(
+          value,
+        );
+      }
+    }
+
     return FormBuilderDateTimePicker(
       key: key,
-      initialValue: doc != null
-          ? DateFormat.Hms().parse(
-              doc![doctypeField.fieldname],
-            )
-          : null,
+      initialValue: initialValue,
       inputType: InputType.time,
       valueTransformer: (val) {
         return val?.toIso8601String();

@@ -4,6 +4,7 @@ class LoginRequest {
   late String? cmd;
   late String? otp;
   late String? tmpId;
+  late String device;
 
   LoginRequest({
     this.usr,
@@ -11,6 +12,7 @@ class LoginRequest {
     this.cmd,
     this.otp,
     this.tmpId,
+    this.device = "mobile",
   }) : assert(
           (usr != null && pwd != null) ||
               (cmd != null && otp != null && tmpId != null),
@@ -22,6 +24,7 @@ class LoginRequest {
     cmd = json['cmd'];
     otp = json['otp'];
     tmpId = json['tmp_id'];
+    device = json['device'];
   }
 
   Map<String, dynamic> toJson() {
@@ -31,6 +34,7 @@ class LoginRequest {
     data['cmd'] = this.cmd;
     data['otp'] = this.otp;
     data['tmp_id'] = this.tmpId;
+    data['device'] = this.device;
     return data;
   }
 }

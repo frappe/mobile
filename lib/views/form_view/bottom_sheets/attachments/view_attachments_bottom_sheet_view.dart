@@ -177,7 +177,7 @@ class ViewFilesToAttach extends StatelessWidget {
                 width: 12,
               ),
               Text(
-                filesToUpload[idx].file.name!,
+                filesToUpload[idx].file.name,
               )
             ],
           ),

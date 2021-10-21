@@ -94,6 +94,94 @@ class ListViewViewModel extends BaseViewModel {
 
   bool get hasError => error != null;
 
+  init() {
+    var userSettings = jsonDecode(meta.userSettings);
+    var userSettingsList = userSettings["List"];
+    var userSettingsReport = userSettings["Report"];
+
+    if (userSettingsList != null &&
+        (userSettingsList["filters"] as List).isNotEmpty) {
+      (userSettingsList["filters"] as List).forEach(
+        (listFilter) {
+          filters.add(
+            Filter(
+              field: meta.docs[0].fields.firstWhere(
+                (metaField) => metaField.fieldname == listFilter[1],
+                orElse: () {
+                  return DoctypeField(
+                    fieldname: listFilter[1],
+                    label: listFilter[1],
+                  );
+                },
+              ),
+              filterOperator: FilterOperator(
+                label: Constants.filterOperatorLabelMapping[listFilter[2]]!,
+                value: listFilter[2],
+              ),
+              value: listFilter[3].toString(),
+            ),
+          );
+        },
+      );
+
+      if (userSettingsList["sort_by"] != null) {
+        sortField = meta.docs[0].fields.firstWhere(
+          (metaField) => metaField.fieldname == userSettingsList["sort_by"],
+          orElse: () {
+            return DoctypeField(
+              fieldname: userSettingsList["sort_by"],
+              label: userSettingsList["sort_by"],
+            );
+          },
+        );
+      }
+
+      if (userSettingsList["sort_order"] != null) {
+        sortOrder = userSettingsList["sort_order"];
+      }
+    } else if (userSettingsReport != null &&
+        (userSettingsReport["filters"] as List).isNotEmpty) {
+      (userSettingsReport["filters"] as List).forEach(
+        (reportFilter) {
+          filters.add(
+            Filter(
+              field: meta.docs[0].fields.firstWhere(
+                (metaField) => metaField.fieldname == reportFilter[1],
+                orElse: () {
+                  return DoctypeField(
+                    fieldname: reportFilter[1],
+                    label: reportFilter[1],
+                  );
+                },
+              ),
+              filterOperator: FilterOperator(
+                label: Constants.filterOperatorLabelMapping[reportFilter[2]]!,
+                value: reportFilter[2],
+              ),
+              value: reportFilter[3].toString(),
+            ),
+          );
+        },
+      );
+
+      if (userSettingsReport["sort_by"] != null) {
+        sortField = meta.docs[0].fields.firstWhere(
+          (metaField) => metaField.fieldname == userSettingsReport["sort_by"],
+          orElse: () {
+            return DoctypeField(
+              fieldname: userSettingsReport["sort_by"],
+              label: userSettingsReport["sort_by"],
+            );
+          },
+        );
+      }
+
+      if (userSettingsReport["sort_order"] != null) {
+        sortOrder = userSettingsReport["sort_order"];
+      }
+    }
+  }
+
   getData() async {
     setState(ViewState.busy);
     try {
@@ -169,7 +257,7 @@ class ListViewViewModel extends BaseViewModel {
         context,
         screen: FormView(
           name: name,
-          meta: meta,
+          meta: meta.docs[0],
         ),
         withNavBar: true,
       );
@@ -256,7 +344,7 @@ class ListViewViewModel extends BaseViewModel {
       pushNewScreen(
         context,
         screen: FormView(
-          meta: _meta,
+          meta: _meta.docs[0],
           name: _meta.docs[0].name,
         ),
         withNavBar: true,

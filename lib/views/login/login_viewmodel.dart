@@ -52,6 +52,14 @@ class LoginViewModel extends BaseViewModel {
     );
   }
 
+  getSystemSettings() async {
+    var systemSettings = await locator<Api>().getSystemSettings();
+    OfflineStorage.putItem(
+      'systemSettings',
+      systemSettings.toJson(),
+    );
+  }
+
   Future<LoginResponse> login(LoginRequest loginRequest) async {
     loginButtonLabel = "Verifying...";
     notifyListeners();
@@ -75,6 +83,7 @@ class LoginViewModel extends BaseViewModel {
         await cacheAllUsers();
         await initAwesomeItems();
         await DioHelper.initCookies();
+        getSystemSettings();
 
         loginButtonLabel = "Success";
         notifyListeners();
