@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/model/config.dart';
 
 import 'package:frappe_app/utils/frappe_alert.dart';
 import 'package:frappe_app/utils/loading_indicator.dart';
@@ -101,6 +102,27 @@ class DeskViewModel extends BaseViewModel {
     }
 
     desktopPage = _desktopPage;
+    // TODO
+    // desktopPage.message.shortcuts.items.forEach(
+    //   (element) async {
+    //     if (element.format != null && element.statsFilter != null) {
+    //       var filters = element.statsFilter;
+
+    //       filters = filters!.replaceAll(
+    //         "frappe.session.user",
+    //         Config().userId!,
+    //       );
+
+    //       var count = await locator<Api>().getReportViewCount(
+    //         doctype: element.linkTo,
+    //         filters: jsonDecode(filters),
+    //         fields: [],
+    //       );
+
+    //       element.format = element.format!.replaceAll("{}", count.toString());
+    //     }
+    //   },
+    // );
   }
 
   getData() async {
@@ -160,7 +182,7 @@ class DeskViewModel extends BaseViewModel {
         pushNewScreen(
           context,
           screen: FormView(
-            meta: meta,
+            meta: meta.docs[0],
             name: meta.docs[0].name,
           ),
           withNavBar: true,

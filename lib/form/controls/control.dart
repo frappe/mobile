@@ -6,6 +6,7 @@ import 'package:frappe_app/config/frappe_palette.dart';
 
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/form/controls/currency.dart';
+import 'package:frappe_app/form/controls/dynamic_link.dart';
 import 'package:frappe_app/form/controls/read_only.dart';
 import 'package:frappe_app/form/controls/text.dart';
 import 'package:frappe_app/model/common.dart';
@@ -48,6 +49,16 @@ Widget makeControl({
         control = LinkField(
           doctypeField: field,
           dependentFields: dependentFields,
+          doc: doc,
+          onControlChanged: onControlChanged,
+        );
+      }
+      break;
+
+    case "Dynamic Link":
+      {
+        control = DynamicLink(
+          doctypeField: field,
           doc: doc,
           onControlChanged: onControlChanged,
         );

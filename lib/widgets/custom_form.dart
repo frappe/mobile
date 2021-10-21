@@ -9,8 +9,11 @@ import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/services/api/api.dart';
 import 'package:frappe_app/utils/enums.dart';
 import 'package:frappe_app/utils/helpers.dart';
+import 'package:frappe_app/views/base_view.dart';
+import 'package:frappe_app/views/base_viewmodel.dart';
+import 'package:injectable/injectable.dart';
 
-class CustomForm extends StatefulWidget {
+class CustomForm extends StatelessWidget {
   final GlobalKey<FormBuilderState> formKey;
   final List<DoctypeField> fields;
   final Map doc;
@@ -24,52 +27,51 @@ class CustomForm extends StatefulWidget {
   });
 
   @override
-  State<CustomForm> createState() => _CustomFormState();
-}
-
-class _CustomFormState extends State<CustomForm> {
-  late Map formVal;
-
-  @override
-  void initState() {
-    super.initState();
-    formVal = widget.doc;
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return FormBuilder(
-      onChanged: () {
-        if (widget.formKey.currentState != null) {
-          widget.formKey.currentState!.save();
-        }
-        if (widget.onChanged != null) {
-          widget.onChanged!();
-        }
+    return BaseView<CustomFormViewModel>(
+      onModelReady: (model) {
+        model.doc = doc;
       },
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      key: widget.formKey,
-      child: SingleChildScrollView(
-        child: Column(
-          children: generateLayout(
-            fields: widget.fields,
-            doc: formVal,
-            onControlChanged: (fieldValue, dependentFields) {
-              widget.formKey.currentState!.save();
-              setState(() {
-                formVal = widget.formKey.currentState!.value;
-              });
+      builder: (context, model, child) => FormBuilder(
+        onChanged: () {
+          if (formKey.currentState != null) {
+            formKey.currentState!.save();
 
-              handleFetchFrom(
-                dependentFields: dependentFields,
-                fieldValue: fieldValue,
-                formKey: widget.formKey,
-              );
-            },
+            model.handleFormDataChange(formKey.currentState!.value);
+          }
+          if (onChanged != null) {
+            onChanged!();
+          }
+        },
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        key: formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            children: generateLayout(
+              fields: fields,
+              doc: model.doc,
+              onControlChanged: (fieldValue, dependentFields) {
+                model.handleFetchFrom(
+                  dependentFields: dependentFields,
+                  fieldValue: fieldValue,
+                  formKey: formKey,
+                );
+              },
+            ),
           ),
         ),
       ),
     );
+  }
+}
+
+@lazySingleton
+class CustomFormViewModel extends BaseViewModel {
+  late Map doc;
+
+  handleFormDataChange(Map formValue) {
+    doc = formValue;
+    notifyListeners();
   }
 
   handleFetchFrom({
@@ -112,7 +114,6 @@ class _CustomFormState extends State<CustomForm> {
       );
 
       formKey.currentState!.patchValue(fetchDoc1);
-      setState(() {});
     }
   }
 }

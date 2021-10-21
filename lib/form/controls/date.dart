@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:frappe_app/model/offline_storage.dart';
+import 'package:frappe_app/model/system_settings_response.dart';
+import 'package:frappe_app/utils/constants.dart';
+import 'package:intl/intl.dart';
 
 import '../../config/palette.dart';
 import '../../model/doctype_response.dart';
@@ -32,12 +36,19 @@ class Date extends StatelessWidget with Control, ControlInput {
       );
     }
 
+    var dateFormat = SystemSettingsResponse.fromJson(
+      OfflineStorage.getItem("systemSettings")["data"],
+    ).message.defaults.dateFormat;
+
     return FormBuilderDateTimePicker(
       key: key,
       inputType: InputType.date,
       valueTransformer: (val) {
         return val?.toIso8601String();
       },
+      format: DateFormat(
+        Constants.frappeFlutterDateFormatMapping[dateFormat],
+      ),
       initialValue:
           doc != null ? parseDate(doc![doctypeField.fieldname]) : null,
       keyboardType: TextInputType.number,

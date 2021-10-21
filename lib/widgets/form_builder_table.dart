@@ -15,7 +15,7 @@ class FormBuilderTable<T> extends FormBuilderField<T> {
     required String name,
     required BuildContext context,
     required String doctype,
-    required List value,
+    required T initialValue,
     Key? key,
     FormFieldValidator<T>? validator,
     bool enabled = true,
@@ -23,11 +23,13 @@ class FormBuilderTable<T> extends FormBuilderField<T> {
           key: key,
           name: name,
           validator: validator,
+          initialValue: initialValue,
           builder: (FormFieldState<dynamic> field) {
             return FutureBuilder(
               future: locator<Api>().getDoctype(doctype),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
+                  var value = (initialValue as List);
                   var metaFields =
                       (snapshot.data as DoctypeResponse).docs[0].fields;
                   var tableFields = metaFields.where((field) {
@@ -90,6 +92,8 @@ class FormBuilderTable<T> extends FormBuilderField<T> {
                                     return TableElement(
                                       doc: val,
                                       fields: tableFields,
+                                      meta: (snapshot.data as DoctypeResponse)
+                                          .docs[0],
                                     );
                                   },
                                 ),
@@ -235,12 +239,14 @@ class FormBuilderTableState<T>
     extends FormBuilderFieldState<FormBuilderTable<T>, T> {}
 
 class TableElement extends StatefulWidget {
+  final DoctypeDoc meta;
   final List<DoctypeField> fields;
   final Map doc;
 
   TableElement({
-    required this.fields,
+    required this.meta,
     required this.doc,
+    required this.fields,
   });
 
   @override
@@ -275,7 +281,7 @@ class _TableElementState extends State<TableElement> {
         ],
       ),
       body: CustomForm(
-        fields: widget.fields,
+        fields: widget.meta.fields,
         formKey: _fbKey,
         doc: widget.doc,
       ),

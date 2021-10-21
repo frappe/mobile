@@ -1,8 +1,8 @@
 class DoctypeResponse {
   late List<DoctypeDoc> docs;
-  late String? userSettings;
+  late String userSettings;
 
-  DoctypeResponse({required this.docs, this.userSettings});
+  DoctypeResponse({required this.docs, required this.userSettings});
 
   DoctypeResponse.fromJson(Map<dynamic, dynamic> json) {
     if (json['docs'] != null) {

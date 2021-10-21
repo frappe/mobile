@@ -19,11 +19,10 @@ import '../../model/offline_storage.dart';
 import 'base_control.dart';
 import 'base_input.dart';
 
-class LinkField extends StatefulWidget {
+class DynamicLink extends StatefulWidget {
   final DoctypeField doctypeField;
-  final Map? doc;
+  final Map doc;
   final OnControlChanged? onControlChanged;
-  final List<DoctypeField>? dependentFields;
 
   final key;
   final bool showInputBorder;
@@ -35,12 +34,11 @@ class LinkField extends StatefulWidget {
   final AxisDirection direction;
   final TextEditingController? controller;
 
-  LinkField({
+  DynamicLink({
     this.key,
     required this.doctypeField,
     this.onControlChanged,
-    this.dependentFields,
-    this.doc,
+    required this.doc,
     this.prefixIcon,
     this.onSuggestionSelected,
     this.noItemsFoundBuilder,
@@ -52,10 +50,10 @@ class LinkField extends StatefulWidget {
   });
 
   @override
-  _LinkFieldState createState() => _LinkFieldState();
+  _DynamicLinkState createState() => _DynamicLinkState();
 }
 
-class _LinkFieldState extends State<LinkField> with Control, ControlInput {
+class _DynamicLinkState extends State<DynamicLink> with Control, ControlInput {
   @override
   Widget build(BuildContext context) {
     List<String? Function(dynamic)> validators = [];
@@ -75,7 +73,8 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
     //   enabled = true;
     // }
 
-    if (widget.doc != null && widget.doctypeField.setOnlyOnce == 1) {
+    if (widget.doc[widget.doctypeField.fieldname] != null &&
+        widget.doctypeField.setOnlyOnce == 1) {
       enabled = false;
     } else {
       enabled = true;
@@ -86,42 +85,40 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
       child: FormBuilderTypeAhead(
         key: widget.key,
         enabled: enabled,
+        onChanged: (val) {
+          // if (widget.onControlChanged != null) {
+          //   widget.onControlChanged!(
+          //     FieldValue(
+          //       field: widget.doctypeField,
+          //       value: val,
+          //     ),
+          //   );
+          // }
+        },
         controller: widget.controller,
-        initialValue: widget.doc != null
-            ? widget.doc![widget.doctypeField.fieldname]
-            : null,
+        initialValue: widget.doc[widget.doctypeField.fieldname],
         direction: AxisDirection.up,
         onSuggestionSelected: (item) {
-          var val = item is String
-              ? item
-              : item is Map
-                  ? item["value"]
-                  : null;
           if (widget.onSuggestionSelected != null) {
-            widget.onSuggestionSelected!(val);
-          }
-          if (widget.onControlChanged != null) {
-            widget.onControlChanged!(
-              FieldValue(
-                field: widget.doctypeField,
-                value: val,
-              ),
-              widget.dependentFields ?? [],
-            );
+            if (item is String) {
+              widget.onSuggestionSelected!(item);
+            } else if (item is Map) {
+              widget.onSuggestionSelected!(item["value"]);
+            }
           }
         },
         validator: FormBuilderValidators.compose(validators),
         decoration: Palette.formFieldDecoration(
           label: widget.doctypeField.label,
-          suffixIcon: widget.doc?[widget.doctypeField.fieldname] != null &&
-                  widget.doc?[widget.doctypeField.fieldname] != ""
+          suffixIcon: widget.doc[widget.doctypeField.fieldname] != null &&
+                  widget.doc[widget.doctypeField.fieldname] != ""
               ? IconButton(
                   onPressed: () {
                     pushNewScreen(
                       context,
                       screen: FormView(
-                          doctype: widget.doctypeField.options,
-                          name: widget.doc![widget.doctypeField.fieldname]),
+                          doctype: widget.doc[widget.doctypeField.options],
+                          name: widget.doc[widget.doctypeField.fieldname]),
                     );
                   },
                   icon: FrappeIcon(
@@ -162,7 +159,8 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
         suggestionsCallback: widget.suggestionsCallback ??
             (query) async {
               var lowercaseQuery = query.toLowerCase();
-              var isOnline = await verifyOnline();
+              // var isOnline = await verifyOnline();
+              var isOnline = true;
               if (!isOnline) {
                 var linkFull = await OfflineStorage.getItem(
                     '${widget.doctypeField.options}LinkFull');
@@ -189,7 +187,7 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
                 }
               } else {
                 var response = await locator<Api>().searchLink(
-                  doctype: widget.doctypeField.options,
+                  doctype: widget.doc[widget.doctypeField.options],
                   txt: lowercaseQuery,
                 );
 
