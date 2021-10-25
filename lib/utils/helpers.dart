@@ -80,7 +80,7 @@ String toTitleCase(String str) {
 }
 
 DateTime parseDate(val) {
-  if (val == null) {
+  if (val == null || val == "") {
     return null;
   } else if (val == "Today") {
     return DateTime.now();

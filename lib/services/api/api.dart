@@ -3,6 +3,7 @@ import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
 import 'package:frappe_app/model/group_by_count_response.dart';
 import 'package:frappe_app/model/login_request.dart';
+import 'package:frappe_app/model/system_settings_response.dart';
 import 'package:frappe_app/model/upload_file_response.dart';
 
 import '../../model/doctype_response.dart';
@@ -122,4 +123,12 @@ abstract class Api {
     required List currentFilters,
     required String field,
   });
+
+  Future<int> getReportViewCount({
+    required String doctype,
+    required Map filters,
+    required List<DoctypeField> fields,
+  });
+
+  Future<SystemSettingsResponse> getSystemSettings();
 }

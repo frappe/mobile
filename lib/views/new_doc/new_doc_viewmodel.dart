@@ -95,7 +95,7 @@ class NewDocViewModel extends BaseViewModel {
         NavigationHelper.pushReplacement(
           context: context,
           page: FormView(
-            meta: meta,
+            meta: meta.docs[0],
             name: response.data["docs"][0]["name"],
           ),
         );

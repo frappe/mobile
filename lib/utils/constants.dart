@@ -16,4 +16,21 @@ class Constants {
     // FilterOperator(label: "Not In", value: "not in"),
     FilterOperator(label: "Is", value: "is"),
   ];
+
+  static var filterOperatorLabelMapping = {
+    "like": "Like",
+    "=": "Equals",
+    "!=": "Not Equals",
+    "not like": "Not Like",
+    "is": "Is",
+  };
+
+  static var frappeFlutterDateFormatMapping = {
+    "dd-mm-yyyy": "d-M-y",
+    "yyyy-mm-dd": "y-M-d",
+    "dd/mm/yyyy": "d/M/y",
+    "dd.mm.yyyy": "d.M.y",
+    "mm/dd/yyyy": "M/d/y",
+    "mm-dd-yyyy": "M-d-y",
+  };
 }

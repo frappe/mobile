@@ -19,7 +19,7 @@ class CustomTable extends StatelessWidget {
       name: doctypeField.fieldname,
       context: context,
       doctype: doctypeField.options,
-      value: doc[doctypeField.fieldname],
+      initialValue: doc[doctypeField.fieldname],
     );
   }
 }
