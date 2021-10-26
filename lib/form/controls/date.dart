@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/model/offline_storage.dart';
@@ -36,8 +38,11 @@ class Date extends StatelessWidget with Control, ControlInput {
       );
     }
 
+    var systemSettings = jsonDecode(
+        jsonEncode(OfflineStorage.getItem("systemSettings")["data"]));
+
     var dateFormat = SystemSettingsResponse.fromJson(
-      OfflineStorage.getItem("systemSettings")["data"],
+      systemSettings,
     ).message.defaults.dateFormat;
 
     return FormBuilderDateTimePicker(
