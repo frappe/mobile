@@ -170,7 +170,7 @@ SPEC CHECKSUMS:
   DKPhotoGallery: 0290d32343574f06eaa4c26f8f2f8a1035e916be
   file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
-  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   flutter_downloader: 058b9c41564a90500f67f3e432e3524613a7fd83
   flutter_inappwebview: bfd58618f49dc62f2676de690fc6dcda1d6c3721
   flutter_keyboard_visibility: 0339d06371254c3eb25eeb90ba8d17dca8f9c069
@@ -190,8 +190,8 @@ SPEC CHECKSUMS:
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
   video_player: 9cc823b1d9da7e8427ee591e8438bfbcde500e6e
-  wakelock: b0843b2479edbf6504d8d262c2959446f35373aa
-  webview_flutter: 9f491a9b5a66f2573946a389b2677987b0ff8c0b
+  wakelock: d0fc7c864128eac40eba1617cb5264d9c940b46f
+  webview_flutter: 3603125dfd3bcbc9d8d418c3f80aeecf331c068b
 
 PODFILE CHECKSUM: c990cab2bdc393dc88aba776a5ef266622e941de
 
