@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/get_doc_response.dart';
+import 'package:frappe_app/model/get_versions_response.dart';
 import 'package:frappe_app/model/group_by_count_response.dart';
 import 'package:frappe_app/model/login_request.dart';
 import 'package:frappe_app/model/system_settings_response.dart';
@@ -131,4 +132,6 @@ abstract class Api {
   });
 
   Future<SystemSettingsResponse> getSystemSettings();
+
+  Future<GetVersionsResponse> getVersions();
 }

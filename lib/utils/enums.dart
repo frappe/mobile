@@ -27,3 +27,8 @@ enum ViewState {
   idle,
   busy,
 }
+
+enum ImageShape {
+  roundedRectangle,
+  circle,
+}
