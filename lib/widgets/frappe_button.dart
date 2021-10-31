@@ -102,7 +102,8 @@ class FrappeFlatButton extends StatelessWidget {
 
 class FrappeRaisedButton extends StatelessWidget {
   final void Function()? onPressed;
-  final String title;
+  final String? title;
+  final Widget? titleWidget;
   final String? icon;
   final double height;
   final double minWidth;
@@ -112,7 +113,8 @@ class FrappeRaisedButton extends StatelessWidget {
 
   FrappeRaisedButton({
     required this.onPressed,
-    required this.title,
+    this.titleWidget,
+    this.title,
     this.icon,
     this.iconSize,
     this.height = 36.0,
@@ -123,7 +125,8 @@ class FrappeRaisedButton extends StatelessWidget {
 
   FrappeRaisedButton.small({
     required this.onPressed,
-    required this.title,
+    this.title,
+    this.titleWidget,
     this.icon,
     this.iconSize,
     this.height = 32.0,
@@ -134,15 +137,22 @@ class FrappeRaisedButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget tWidget;
+    if (title != null) {
+      tWidget = Text(title!);
+    } else if (titleWidget != null) {
+      tWidget = titleWidget!;
+    } else {
+      tWidget = Text('');
+    }
+
     if (icon != null) {
       return ButtonTheme(
         height: height,
         minWidth: fullWidth ? double.infinity : minWidth,
         child: RaisedButton.icon(
           color: color,
-          label: Text(
-            title,
-          ),
+          label: tWidget,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(6.0),
           ),
@@ -163,9 +173,7 @@ class FrappeRaisedButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(6.0),
           ),
-          child: Text(
-            title,
-          ),
+          child: tWidget,
         ),
       );
     }
