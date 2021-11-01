@@ -134,4 +134,11 @@ abstract class Api {
   Future<SystemSettingsResponse> getSystemSettings();
 
   Future<GetVersionsResponse> getVersions();
+
+  Future<List> getList({
+    required List fields,
+    required int limit,
+    required String orderBy,
+    required String doctype,
+  });
 }

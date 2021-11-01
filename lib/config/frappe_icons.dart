@@ -55,4 +55,5 @@ class FrappeIcons {
   static const info_outlined = '$_basePath/info_outlined.svg';
   static const my_settings = '$_basePath/my_settings.svg';
   static const logout = '$_basePath/logout.svg';
+  static const notification = '$_basePath/notification.svg';
 }
