@@ -38,7 +38,7 @@ class Date extends StatelessWidget with Control, ControlInput {
       );
     }
 
-    var systemSettings = jsonDecode(
+   var systemSettings = jsonDecode(
       jsonEncode(
         OfflineStorage.getItem("systemSettings")["data"],
       ),
