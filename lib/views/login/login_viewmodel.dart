@@ -54,6 +54,7 @@ class LoginViewModel extends BaseViewModel {
 
   getSystemSettings() async {
     var systemSettings = await locator<Api>().getSystemSettings();
+    // TODO: check permission
     OfflineStorage.putItem(
       'systemSettings',
       systemSettings.toJson(),
