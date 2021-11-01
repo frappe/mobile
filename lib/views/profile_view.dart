@@ -44,10 +44,14 @@ class ProfileView extends StatelessWidget {
                 shape: ImageShape.roundedRectangle,
               ),
               SizedBox(
-                height: 16,
+                height: 6,
               ),
               Text(
                 Config().user,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: FrappePalette.grey[900],
+                ),
               ),
               // TODO: add view profile
               // SizedBox(
@@ -61,7 +65,7 @@ class ProfileView extends StatelessWidget {
               //   ),
               // ),
               SizedBox(
-                height: 20,
+                height: 14,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(
