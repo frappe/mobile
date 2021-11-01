@@ -28,7 +28,7 @@ class Date extends StatelessWidget with Control, ControlInput {
 
   @override
   Widget build(BuildContext context) {
-    List<String? Function(dynamic?)> validators = [];
+    List<String? Function(dynamic)> validators = [];
 
     var f = setMandatory(doctypeField);
 
@@ -39,11 +39,16 @@ class Date extends StatelessWidget with Control, ControlInput {
     }
 
     var systemSettings = jsonDecode(
-        jsonEncode(OfflineStorage.getItem("systemSettings")["data"]));
+      jsonEncode(
+        OfflineStorage.getItem("systemSettings")["data"],
+      ),
+    );
 
-    var dateFormat = SystemSettingsResponse.fromJson(
-      systemSettings,
-    ).message.defaults.dateFormat;
+    var dateFormat = systemSettings != null
+        ? SystemSettingsResponse.fromJson(
+            systemSettings,
+          ).message.defaults.dateFormat
+        : "dd-mm-yyyy";
 
     return FormBuilderDateTimePicker(
       key: key,
