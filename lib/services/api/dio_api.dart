@@ -1124,4 +1124,51 @@ class DioApi implements Api {
       }
     }
   }
+
+  Future<List> getList({
+    @required List fields,
+    @required int limit,
+    @required String orderBy,
+    @required String doctype,
+  }) async {
+    try {
+      final response = await DioHelper.dio.get(
+        '/method/frappe.desk.reportview.get_list',
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+        ),
+        queryParameters: {
+          "fields": jsonEncode(fields),
+          "limit": limit,
+          "order_by": orderBy,
+          "doctype": doctype,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return response.data["message"];
+      } else if (response.statusCode == HttpStatus.forbidden) {
+        throw ErrorResponse(
+          statusCode: response.statusCode,
+          statusMessage: response.statusMessage,
+        );
+      } else {
+        throw ErrorResponse();
+      }
+    } catch (e) {
+      if (e is DioError) {
+        var error = e.error;
+        if (error is SocketException) {
+          throw ErrorResponse(
+            statusCode: HttpStatus.serviceUnavailable,
+            statusMessage: error.message,
+          );
+        } else {
+          throw ErrorResponse(statusMessage: error.message);
+        }
+      } else {
+        throw ErrorResponse();
+      }
+    }
+  }
 }

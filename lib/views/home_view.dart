@@ -5,6 +5,7 @@ import 'package:frappe_app/model/config.dart';
 import 'package:frappe_app/utils/frappe_icon.dart';
 import 'package:frappe_app/views/awesome_bar/awesome_bar_view.dart';
 import 'package:frappe_app/views/desk/desk_view.dart';
+import 'package:frappe_app/views/notification_view.dart';
 import 'package:frappe_app/views/profile_view.dart';
 import 'package:frappe_app/widgets/user_avatar.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
@@ -50,6 +51,7 @@ class _HomeViewState extends State<HomeView> {
     return [
       DeskView(),
       Awesombar(),
+      NotifcationView(),
       ProfileView(),
     ];
   }
@@ -81,6 +83,21 @@ class _HomeViewState extends State<HomeView> {
           FrappeIcons.search,
           color: FrappePalette.grey[500],
           size: 28,
+        ),
+        activeColorPrimary: FrappePalette.grey[800]!,
+        inactiveColorPrimary: FrappePalette.grey[500],
+      ),
+      PersistentBottomNavBarItem(
+        title: 'Search',
+        icon: FrappeIcon(
+          FrappeIcons.notification,
+          color: FrappePalette.grey[800],
+          size: 22,
+        ),
+        inactiveIcon: FrappeIcon(
+          FrappeIcons.notification,
+          color: FrappePalette.grey[500],
+          size: 22,
         ),
         activeColorPrimary: FrappePalette.grey[800]!,
         inactiveColorPrimary: FrappePalette.grey[500],
