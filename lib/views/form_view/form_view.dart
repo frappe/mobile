@@ -108,11 +108,6 @@ class FormView extends StatelessWidget {
                 // var isLikedByUser = likedBy.contains(model.user);
 
                 return Scaffold(
-                  floatingActionButton: FloatingActionButton(
-                    onPressed: () {
-                      print("abc${_fbKey.currentState!.value}");
-                    },
-                  ),
                   backgroundColor: FrappePalette.grey[50],
                   appBar: buildAppBar(
                     title: '${model.meta.name} Details',

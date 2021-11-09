@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
+import 'package:frappe_app/utils/enums.dart';
 
 import '../model/offline_storage.dart';
 import '../utils/helpers.dart';
@@ -11,13 +12,15 @@ import '../utils/http.dart';
 class UserAvatar extends StatelessWidget {
   final String uid;
   final double? size;
+  final ImageShape shape;
 
   UserAvatar({
     required this.uid,
+    this.shape = ImageShape.circle,
     this.size,
   });
 
-  static Widget renderShape({
+  Widget renderShape({
     String? txt,
     ImageProvider? imageProvider,
     double? size,
@@ -27,27 +30,57 @@ class UserAvatar extends StatelessWidget {
       var colorIdx = random.nextInt(FrappePalette.colors.length);
       var backgroundColor = FrappePalette.colors[colorIdx][100];
       var textColor = FrappePalette.colors[colorIdx][600];
-      return CircleAvatar(
-        radius: size,
-        backgroundColor: backgroundColor,
-        backgroundImage: imageProvider,
-        child: txt != null
-            ? Center(
-                child: Text(
-                  txt,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: textColor,
+
+      if (shape == ImageShape.circle) {
+        return CircleAvatar(
+          radius: size,
+          backgroundColor: backgroundColor,
+          child: txt != null
+              ? Center(
+                  child: Text(
+                    txt,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: textColor,
+                    ),
                   ),
+                )
+              : null,
+        );
+      } else {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(
+            12,
+          ),
+          child: Container(
+            height: size,
+            width: size,
+            color: backgroundColor,
+            child: Center(
+              child: Text(
+                txt!,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: textColor,
                 ),
-              )
-            : null,
-      );
+              ),
+            ),
+          ),
+        );
+      }
     } else {
-      return CircleAvatar(
-        radius: size,
-        backgroundImage: imageProvider,
-      );
+      if (shape == ImageShape.circle) {
+        return CircleAvatar(
+          radius: size,
+          backgroundImage: imageProvider,
+        );
+      } else {
+        return Image(
+          height: size,
+          width: size,
+          image: imageProvider,
+        );
+      }
     }
   }
 
@@ -71,34 +104,34 @@ class UserAvatar extends StatelessWidget {
           httpHeaders: {
             // HttpHeaders.cookieHeader: DioHelper.cookies!,
           },
-          imageBuilder: (context, imageProvider) => UserAvatar.renderShape(
+          imageBuilder: (context, imageProvider) => renderShape(
             imageProvider: imageProvider,
             size: size,
           ),
-          placeholder: (context, url) => UserAvatar.renderShape(
+          placeholder: (context, url) => renderShape(
             txt: getInitials(
               user["full_name"],
             ),
             size: size,
           ),
-          errorWidget: (context, url, error) => UserAvatar.renderShape(
+          errorWidget: (context, url, error) => renderShape(
             txt: '',
             size: size,
           ),
         );
       } else if (user == null) {
-        return UserAvatar.renderShape(
+        return renderShape(
           txt: uid[0].toUpperCase(),
           size: size,
         );
       } else {
-        return UserAvatar.renderShape(
+        return renderShape(
           txt: getInitials(user["full_name"]),
           size: size,
         );
       }
     } else {
-      return UserAvatar.renderShape(
+      return renderShape(
         txt: uid[0].toUpperCase(),
         size: size,
       );

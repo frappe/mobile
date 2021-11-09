@@ -49,4 +49,11 @@ class FrappeIcons {
   static const send_settings = '$_basePath/send_settings.svg';
   static const text_options = '$_basePath/text_options.svg';
   static const small_file_attach = '$_basePath/small_file_attach.svg';
+  static const bug = '$_basePath/bug.svg';
+  static const external_link = '$_basePath/external_link.svg';
+  static const file = '$_basePath/file.svg';
+  static const info_outlined = '$_basePath/info_outlined.svg';
+  static const my_settings = '$_basePath/my_settings.svg';
+  static const logout = '$_basePath/logout.svg';
+  static const notification = '$_basePath/notification.svg';
 }
