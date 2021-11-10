@@ -254,6 +254,7 @@ class DoctypeField {
   late int? docstatus;
   late String fieldname;
   late String? dependsOn;
+  late String? mandatoryDependsOn;
   late String? fetchFrom;
   late String? label;
   late String? fieldtype;
@@ -293,6 +294,7 @@ class DoctypeField {
   late int? hideDays;
   late int? hideSeconds;
   late dynamic defaultValue;
+  late int pVisible = 1;
 
   DoctypeField({
     this.doctype,
@@ -309,6 +311,7 @@ class DoctypeField {
     required this.fieldname,
     required this.label,
     this.dependsOn,
+    this.mandatoryDependsOn,
     this.fetchFrom,
     this.fieldtype,
     this.oldfieldtype,
@@ -347,6 +350,7 @@ class DoctypeField {
     this.hideDays,
     this.hideSeconds,
     this.defaultValue,
+    this.pVisible = 1,
   });
 
   DoctypeField.fromJson(Map<dynamic, dynamic> json) {
@@ -363,6 +367,7 @@ class DoctypeField {
     docstatus = json['docstatus'];
     fieldname = json['fieldname'];
     dependsOn = json['depends_on'];
+    mandatoryDependsOn = json['mandatory_depends_on'];
     fetchFrom = json['fetch_from'];
     label = json['label'];
     fieldtype = json['fieldtype'];
@@ -419,6 +424,7 @@ class DoctypeField {
     data['docstatus'] = this.docstatus;
     data['fieldname'] = this.fieldname;
     data['depends_on'] = this.dependsOn;
+    data['mandatory_depends_on'] = this.mandatoryDependsOn;
     data['fetch_from'] = this.fetchFrom;
     data['label'] = this.label;
     data['fieldtype'] = this.fieldtype;

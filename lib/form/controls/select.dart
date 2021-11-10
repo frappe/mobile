@@ -13,7 +13,6 @@ import 'base_input.dart';
 class Select extends StatelessWidget with Control, ControlInput {
   final DoctypeField doctypeField;
   final OnControlChanged? onControlChanged;
-  final List<DoctypeField>? dependentFields;
 
   final Key? key;
   final Map? doc;
@@ -23,7 +22,6 @@ class Select extends StatelessWidget with Control, ControlInput {
     required this.doctypeField,
     this.doc,
     this.onControlChanged,
-    this.dependentFields,
   });
 
   @override
@@ -54,7 +52,6 @@ class Select extends StatelessWidget with Control, ControlInput {
               field: doctypeField,
               value: val,
             ),
-            dependentFields ?? [],
           );
         }
       },

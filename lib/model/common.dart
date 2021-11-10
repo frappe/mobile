@@ -104,4 +104,5 @@ class FieldValue {
 }
 
 typedef OnControlChanged = void Function(
-    FieldValue fieldValue, List<DoctypeField> dependentFields);
+  FieldValue fieldValue,
+);

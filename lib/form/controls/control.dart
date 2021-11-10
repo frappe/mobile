@@ -39,7 +39,6 @@ Widget makeControl({
   required Map doc,
   OnControlChanged? onControlChanged,
   bool decorateControl = true,
-  List<DoctypeField>? dependentFields,
 }) {
   Widget control;
 
@@ -48,7 +47,6 @@ Widget makeControl({
       {
         control = LinkField(
           doctypeField: field,
-          dependentFields: dependentFields,
           doc: doc,
           onControlChanged: onControlChanged,
         );
@@ -69,7 +67,6 @@ Widget makeControl({
       {
         control = AutoComplete(
           doctypeField: field,
-          dependentFields: dependentFields,
           doc: doc,
           onControlChanged: onControlChanged,
         );
@@ -89,7 +86,6 @@ Widget makeControl({
       {
         control = Select(
           doc: doc,
-          dependentFields: dependentFields,
           doctypeField: field,
           onControlChanged: onControlChanged,
         );
@@ -155,7 +151,6 @@ Widget makeControl({
     case "Check":
       {
         control = Check(
-          dependentFields: dependentFields,
           doctypeField: field,
           doc: doc,
           onControlChanged: onControlChanged,
@@ -312,8 +307,6 @@ List<Widget> generateLayout({
   List<Widget> collapsibles = [];
   List<Widget> widgets = [];
   List<Widget> sections = [];
-  var fieldDependentFieldsMapping = {};
-  var parentFieldNames = [];
 
   List<String> collapsibleLabels = [];
   List<String> sectionLabels = [];
@@ -324,51 +317,9 @@ List<Widget> generateLayout({
   int cIdx = 0;
   int sIdx = 0;
 
-  var dependentFields = fields
-      .where(
-        (element) => element.fetchFrom != null || element.dependsOn != null,
-      )
-      .toList();
-
-  dependentFields.forEach((dependentField) {
-    var parentField;
-    if (dependentField.fetchFrom != null) {
-      parentField = dependentField.fetchFrom!.split('.')[0];
-      parentFieldNames.add(parentField);
-    }
-    if (dependentField.dependsOn != null) {
-      if (dependentField.dependsOn!.startsWith("eval:doc")) {
-        parentField =
-            dependentField.dependsOn!.split("doc.")[1].split("==")[0].trim();
-        parentFieldNames.add(parentField);
-      } else {
-        parentField = dependentField.dependsOn!;
-      }
-    }
-    if (fieldDependentFieldsMapping[parentField] == null) {
-      fieldDependentFieldsMapping[parentField] = [dependentField];
-    } else {
-      fieldDependentFieldsMapping[parentField].add(dependentField);
-    }
-  });
-
-  parentFieldNames = parentFieldNames.toSet().toList();
-
   fields.forEach(
     (field) {
-      var attachListener = false;
-      if (parentFieldNames.contains(field.fieldname)) {
-        attachListener = true;
-      }
-
-      var fieldVisibility = true;
-
-      if (field.dependsOn != null) {
-        fieldVisibility = dependsOn(
-          doc: doc,
-          field: field,
-        );
-      }
+      var fieldVisibility = field.pVisible == 1;
 
       var controlWidget = Visibility(
         visible: fieldVisibility,
@@ -382,8 +333,7 @@ List<Widget> generateLayout({
           child: makeControl(
             field: field,
             doc: doc,
-            onControlChanged: attachListener ? onControlChanged : null,
-            dependentFields: fieldDependentFieldsMapping[field.fieldname] ?? [],
+            onControlChanged: onControlChanged,
           ),
         ),
       );
@@ -400,8 +350,7 @@ List<Widget> generateLayout({
           child: makeControl(
             field: field,
             doc: doc,
-            onControlChanged: attachListener ? onControlChanged : null,
-            dependentFields: fieldDependentFieldsMapping[field.fieldname] ?? [],
+            onControlChanged: onControlChanged,
           ),
         ),
       );
@@ -616,26 +565,4 @@ List<Widget> generateLayout({
   }
 
   return widgets;
-}
-
-bool dependsOn({
-  required Map doc,
-  required DoctypeField field,
-}) {
-  var formValEncoded = jsonEncode(doc);
-  if (field.dependsOn!.startsWith("eval")) {
-    var docProperty = field.dependsOn!.split("eval:")[1];
-    var evalResult = executeJS(jsString: """
-            var doc = $formValEncoded;
-            $docProperty
-            """);
-
-    if (evalResult == 1 || evalResult == true) {
-      return true;
-    } else {
-      return false;
-    }
-  } else {
-    return doc[field.dependsOn] == 1;
-  }
 }

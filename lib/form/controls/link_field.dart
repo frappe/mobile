@@ -23,7 +23,6 @@ class LinkField extends StatefulWidget {
   final DoctypeField doctypeField;
   final Map? doc;
   final OnControlChanged? onControlChanged;
-  final List<DoctypeField>? dependentFields;
 
   final key;
   final bool showInputBorder;
@@ -39,7 +38,6 @@ class LinkField extends StatefulWidget {
     this.key,
     required this.doctypeField,
     this.onControlChanged,
-    this.dependentFields,
     this.doc,
     this.prefixIcon,
     this.onSuggestionSelected,
@@ -106,7 +104,6 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
                 field: widget.doctypeField,
                 value: val,
               ),
-              widget.dependentFields ?? [],
             );
           }
         },
