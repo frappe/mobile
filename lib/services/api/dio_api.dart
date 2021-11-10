@@ -636,8 +636,7 @@ class DioApi implements Api {
         if (e.response != null &&
             e.response.data != null &&
             e.response.data["_server_messages"] != null) {
-          var errorMsgs = json.decode(e.response.data["_server_messages"]);
-          var errorMsg = json.decode(errorMsgs[0])["message"];
+          var errorMsg = getServerMessage(e.response.data["_server_messages"]);
 
           throw ErrorResponse(
             statusCode: e.response.statusCode,
@@ -836,8 +835,7 @@ class DioApi implements Api {
 
       if (response.statusCode == 200) {
         if (response.data["_server_messages"] != null) {
-          var errorMsgs = json.decode(response.data["_server_messages"]);
-          var errorMsg = json.decode(errorMsgs[0])["message"];
+          var errorMsg = getServerMessage(response.data["_server_messages"]);
 
           throw ErrorResponse(
             statusMessage: errorMsg,

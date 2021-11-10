@@ -375,3 +375,13 @@ executeJS({
     print('ERRO: ${e.details}');
   }
 }
+
+String getServerMessage(String serverMsgs) {
+  var errorMsgs = json.decode(serverMsgs) as List;
+  var errorStr = '';
+  errorMsgs.forEach((errorMsg) {
+    errorStr += json.decode(errorMsg)["message"];
+  });
+
+  return errorStr;
+}
