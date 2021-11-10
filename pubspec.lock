@@ -394,12 +394,10 @@ packages:
   flutter_form_builder:
     dependency: "direct main"
     description:
-      path: "."
-      ref: fa0dad1906d28e446bfec1e723b04553a7a7027e
-      resolved-ref: fa0dad1906d28e446bfec1e723b04553a7a7027e
-      url: "https://github.com/sumitbhanushali/flutter_form_builder"
-    source: git
-    version: "6.1.0+1"
+      name: flutter_form_builder
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "7.0.0"
   flutter_html:
     dependency: "direct main"
     description:
@@ -562,6 +560,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "9.1.0"
+  form_builder_validators:
+    dependency: "direct main"
+    description:
+      name: form_builder_validators
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "7.1.0"
   freezed_annotation:
     dependency: transitive
     description:
