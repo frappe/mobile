@@ -155,29 +155,33 @@ class CustomFormViewModel extends BaseViewModel {
         .toList();
 
     if (fetchFromFields.isNotEmpty) {
-      var fetchFromVal = await locator<Api>().getdoc(
-        fieldValue.field.options,
-        fieldValue.value.toString(),
-      );
+      try {
+        var fetchFromVal = await locator<Api>().getdoc(
+          fieldValue.field.options,
+          fieldValue.value.toString(),
+        );
 
-      var fetchDoc = fetchFromVal.docs[0];
-      Map<String, dynamic> fetchDoc1 = {};
-      fetchFromFields.forEach(
-        (element) {
-          var v;
-          // TODO use meta
-          if (fetchDoc[element["fetch_from_field"]] == 1) {
-            v = true;
-          } else if (fetchDoc[element["fetch_from_field"]] == 0) {
-            v = false;
-          } else {
-            v = fetchDoc[element["fetch_from_field"]].toString();
-          }
-          fetchDoc1[element["fieldname"] as String] = v;
-        },
-      );
+        var fetchDoc = fetchFromVal.docs[0];
+        Map<String, dynamic> fetchDoc1 = {};
+        fetchFromFields.forEach(
+          (element) {
+            var v;
+            // TODO use meta
+            if (fetchDoc[element["fetch_from_field"]] == 1) {
+              v = true;
+            } else if (fetchDoc[element["fetch_from_field"]] == 0) {
+              v = false;
+            } else {
+              v = fetchDoc[element["fetch_from_field"]].toString();
+            }
+            fetchDoc1[element["fieldname"] as String] = v;
+          },
+        );
 
-      formHelper.updateValues(fetchDoc1);
+        formHelper.updateValues(fetchDoc1);
+      } catch (e) {
+        print(e.toString());
+      }
     }
   }
 }
