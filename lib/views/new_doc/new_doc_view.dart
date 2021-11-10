@@ -2,6 +2,7 @@
 import 'dart:io';
 
 import 'package:frappe_app/model/common.dart';
+import 'package:frappe_app/utils/form_helper.dart';
 import 'package:frappe_app/utils/frappe_alert.dart';
 import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/views/base_view.dart';
@@ -29,7 +30,7 @@ class NewDoc extends StatefulWidget {
   _NewDocState createState() => _NewDocState();
 }
 
-final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+final formHelper = FormHelper();
 
 class _NewDocState extends State<NewDoc> {
   @override
@@ -58,8 +59,8 @@ class _NewDocState extends State<NewDoc> {
                       buttonType: ButtonType.primary,
                       title: 'Save',
                       onPressed: () async {
-                        if (_fbKey.currentState.saveAndValidate()) {
-                          var formValue = _fbKey.currentState.value;
+                        if (formHelper.saveAndValidate()) {
+                          var formValue = formHelper.getFormValue();
 
                           try {
                             await model.saveDoc(
@@ -88,7 +89,7 @@ class _NewDocState extends State<NewDoc> {
               ],
             ),
             body: CustomForm(
-              formKey: _fbKey,
+              formHelper: formHelper,
               doc: model.newDoc,
               fields: model.newDocFields,
             ),

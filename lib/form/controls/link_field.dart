@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/model/common.dart';
@@ -84,7 +85,20 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
       child: FormBuilderTypeAhead(
         key: widget.key,
         enabled: enabled,
-        onChanged: (val) {
+        controller: widget.controller,
+        initialValue: widget.doc != null
+            ? widget.doc![widget.doctypeField.fieldname]
+            : null,
+        direction: AxisDirection.up,
+        onSuggestionSelected: (item) {
+          var val = item is String
+              ? item
+              : item is Map
+                  ? item["value"]
+                  : null;
+          if (widget.onSuggestionSelected != null) {
+            widget.onSuggestionSelected!(val);
+          }
           if (widget.onControlChanged != null) {
             widget.onControlChanged!(
               FieldValue(
@@ -92,20 +106,6 @@ class _LinkFieldState extends State<LinkField> with Control, ControlInput {
                 value: val,
               ),
             );
-          }
-        },
-        controller: widget.controller,
-        initialValue: widget.doc != null
-            ? widget.doc![widget.doctypeField.fieldname]
-            : null,
-        direction: AxisDirection.up,
-        onSuggestionSelected: (item) {
-          if (widget.onSuggestionSelected != null) {
-            if (item is String) {
-              widget.onSuggestionSelected!(item);
-            } else if (item is Map) {
-              widget.onSuggestionSelected!(item["value"]);
-            }
           }
         },
         validator: FormBuilderValidators.compose(validators),

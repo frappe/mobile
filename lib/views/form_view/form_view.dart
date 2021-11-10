@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:frappe_app/model/upload_file_response.dart';
+import 'package:frappe_app/utils/form_helper.dart';
 import 'package:frappe_app/utils/indicator.dart';
 import 'package:frappe_app/widgets/header_app_bar.dart';
 import 'package:provider/provider.dart';
@@ -50,7 +51,7 @@ class FormView extends StatelessWidget {
     this.doctype,
   });
 
-  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+  final formHelper = FormHelper();
   @override
   Widget build(BuildContext context) {
     return BaseWidget<FormViewViewModel>(
@@ -191,7 +192,7 @@ class FormView extends StatelessWidget {
                                       field.fieldtype != "Column Break";
                                 },
                               ).toList(),
-                              formKey: _fbKey,
+                              formHelper: formHelper,
                               doc: docs[0],
                             ),
                             Padding(
@@ -263,29 +264,27 @@ class FormView extends StatelessWidget {
     required FormViewViewModel model,
     required BuildContext context,
   }) async {
-    if (_fbKey.currentState != null) {
-      if (_fbKey.currentState!.saveAndValidate()) {
-        var formValue = _fbKey.currentState!.value;
+    if (formHelper.saveAndValidate()) {
+      var formValue = formHelper.getFormValue();
 
-        try {
-          await model.handleUpdate(
-            formValue: formValue,
-            doc: doc,
-          );
-          FrappeAlert.infoAlert(
-            title: 'Changes Saved',
+      try {
+        await model.handleUpdate(
+          formValue: formValue,
+          doc: doc,
+        );
+        FrappeAlert.infoAlert(
+          title: 'Changes Saved',
+          context: context,
+        );
+      } catch (e) {
+        var _e = e as ErrorResponse;
+        if (_e.statusCode == HttpStatus.serviceUnavailable) {
+          noInternetAlert(context);
+        } else {
+          FrappeAlert.errorAlert(
+            title: _e.statusMessage,
             context: context,
           );
-        } catch (e) {
-          var _e = e as ErrorResponse;
-          if (_e.statusCode == HttpStatus.serviceUnavailable) {
-            noInternetAlert(context);
-          } else {
-            FrappeAlert.errorAlert(
-              title: _e.statusMessage,
-              context: context,
-            );
-          }
         }
       }
     }

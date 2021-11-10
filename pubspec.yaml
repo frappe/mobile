@@ -11,13 +11,14 @@ description: A new Flutter project.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.2.1+6
+version: 1.4.0+8
 
 environment:
     sdk: '>=2.12.0 <3.0.0'
 
 
 dependencies:
+  flutter_js: ^0.5.0+3
   device_preview: ^0.7.4
   flutter_secure_storage: ^4.2.1
   flutter_mentions: ^2.0.1
@@ -49,7 +50,8 @@ dependencies:
   cached_network_image: ^3.0.0
   google_fonts: ^2.0.0
   file_picker: ^4.0.2
-  flutter_form_builder: ^6.0.0
+  flutter_form_builder: ^7.0.0
+  form_builder_validators: ^7.1.0
   flutter_pagewise: ^2.0.1
   html: ^0.15.0
   url_launcher: ^6.0.3
@@ -87,11 +89,6 @@ dependency_overrides:
     git:
       url: https://github.com/sumitbhanushali/json_table
       ref: 0eee306ab5338340cd63749d3dcfbdd4a5382885
-  
-  flutter_form_builder:
-    git:
-      url: https://github.com/sumitbhanushali/flutter_form_builder
-      ref: fa0dad1906d28e446bfec1e723b04553a7a7027e
 
 
 # For information on the generic Dart part of this file, see the

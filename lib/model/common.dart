@@ -103,4 +103,6 @@ class FieldValue {
   }
 }
 
-typedef OnControlChanged = void Function(FieldValue fieldValue);
+typedef OnControlChanged = void Function(
+  FieldValue fieldValue,
+);

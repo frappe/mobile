@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:frappe_app/app/locator.dart';
 import 'package:frappe_app/config/frappe_palette.dart';
 
 import 'package:frappe_app/config/palette.dart';
@@ -9,6 +12,8 @@ import 'package:frappe_app/form/controls/text.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/config.dart';
 import 'package:frappe_app/model/doctype_response.dart';
+import 'package:frappe_app/services/api/api.dart';
+import 'package:frappe_app/utils/helpers.dart';
 import 'package:frappe_app/widgets/custom_expansion_tile.dart';
 import 'package:frappe_app/widgets/section.dart';
 
@@ -172,6 +177,7 @@ Widget makeControl({
       break;
 
     case "Float":
+    case "Percent":
       {
         control = Float(
           doctypeField: field,
@@ -311,209 +317,208 @@ List<Widget> generateLayout({
   int cIdx = 0;
   int sIdx = 0;
 
-  // var dependsOnFields =
-  //     fields.where((field) => field.dependsOn != null).map((field) {
-  //   if (field.dependsOn!.startsWith("eval:")) {
-  //     return field.dependsOn!.split(".")[1].split("===")[0];
-  //   } else {
-  //     return "";
-  //   }
-  // }).toList();
+  fields.forEach(
+    (field) {
+      var fieldVisibility = field.pVisible == 1;
 
-  fields.forEach((field) {
-    // var attachListener =
-    //     dependsOnFields.indexOf(field.fieldname) == -1 ? false : true;
+      var controlWidget = Visibility(
+        visible: fieldVisibility,
+        child: Container(
+          color: Colors.white,
+          padding: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 10,
+          ),
+          child: makeControl(
+            field: field,
+            doc: doc,
+            onControlChanged: onControlChanged,
+          ),
+        ),
+      );
 
-    if (field.fieldtype == "Section Break") {
-      if (sections.length > 0) {
-        widgets.add(
-          sectionLabels[sIdx] != ''
-              ? Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 10.0,
-                  ),
-                  child: ListTileTheme(
-                    tileColor: Colors.white,
-                    child: CustomExpansionTile(
-                      maintainState: true,
-                      initiallyExpanded: true,
-                      title: Text(
-                        sectionLabels[sIdx],
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
+      // TODO handle in better way
+      var controlWidget2 = Visibility(
+        visible: fieldVisibility,
+        child: Container(
+          color: Colors.white,
+          padding: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+          ),
+          child: makeControl(
+            field: field,
+            doc: doc,
+            onControlChanged: onControlChanged,
+          ),
+        ),
+      );
+
+      if (field.fieldtype == "Section Break") {
+        if (sections.length > 0) {
+          var sSplit = sectionLabels[sIdx].split("@@");
+          var sectionLabel = sSplit[0];
+          var sectionVisibility = sSplit[1];
+          widgets.add(
+            Visibility(
+              visible: sectionVisibility == "true",
+              child: sectionLabel != ''
+                  ? Padding(
+                      padding: const EdgeInsets.only(
+                        bottom: 10.0,
+                      ),
+                      child: ListTileTheme(
+                        tileColor: Colors.white,
+                        child: CustomExpansionTile(
+                          maintainState: true,
+                          initiallyExpanded: true,
+                          title: Text(
+                            sectionLabel,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
+                          ),
+                          children: [
+                            Container(
+                              color: Colors.white,
+                              child: Column(
+                                children: [...sections],
+                              ),
+                            )
+                          ],
                         ),
                       ),
-                      children: [
-                        Container(
-                          color: Colors.white,
-                          child: Column(
-                            children: [...sections],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 10.0,
-                  ),
-                  child: Section(
-                    title: sectionLabels[sIdx],
-                    children: [...sections],
-                  ),
-                ),
-        );
-
-        sIdx += 1;
-        sections.clear();
-      } else if (collapsibles.length > 0) {
-        widgets.add(
-          Padding(
-            padding: const EdgeInsets.only(
-              bottom: 10.0,
-            ),
-            child: ListTileTheme(
-              tileColor: Colors.white,
-              child: CustomExpansionTile(
-                maintainState: true,
-                title: Text(
-                  collapsibleLabels[cIdx],
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                  ),
-                ),
-                children: [
-                  Container(
-                      color: Colors.white,
-                      child: Column(
-                        children: [...collapsibles],
-                      ))
-                ],
-              ),
-            ),
-          ),
-        );
-        cIdx += 1;
-        collapsibles.clear();
-      }
-
-      if (field.collapsible == 1) {
-        isSection = false;
-        isCollapsible = true;
-        collapsibleLabels.add(field.label!);
-      } else {
-        isCollapsible = false;
-        isSection = true;
-        sectionLabels.add(field.label != null ? field.label! : '');
-      }
-    } else if (isSection) {
-      var firstField = sections.isEmpty;
-      if (firstField) {
-        sections.add(
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: 10,
-            ),
-            child: makeControl(
-              field: field,
-              doc: doc,
-              // onControlChanged: attachListener ? onControlChanged : null,
-            ),
-          ),
-        );
-      } else {
-        sections.add(
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-            ),
-            child: makeControl(
-              field: field,
-              doc: doc,
-              // onControlChanged: attachListener ? onControlChanged : null,
-            ),
-          ),
-        );
-      }
-    } else if (isCollapsible) {
-      collapsibles.add(
-        Padding(
-          padding: const EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 10,
-          ),
-          child: makeControl(
-            doc: doc,
-            field: field,
-            // onControlChanged: attachListener ? onControlChanged : null,
-          ),
-        ),
-      );
-    } else {
-      widgets.add(
-        Container(
-          padding: const EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 10,
-          ),
-          color: Colors.white,
-          child: makeControl(
-            field: field,
-            doc: doc,
-            // onControlChanged: attachListener ? onControlChanged : null,
-          ),
-        ),
-      );
-    }
-  });
-
-  if (sections.length > 0) {
-    widgets.add(
-      sectionLabels[sIdx] != ''
-          ? Padding(
-              padding: const EdgeInsets.only(
-                bottom: 10.0,
-              ),
-              child: ListTileTheme(
-                tileColor: Colors.white,
-                child: CustomExpansionTile(
-                  maintainState: true,
-                  initiallyExpanded: true,
-                  title: Text(
-                    sectionLabels[sIdx],
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 16,
-                    ),
-                  ),
-                  children: [
-                    Container(
-                      color: Colors.white,
-                      child: Column(
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.only(
+                        bottom: 10.0,
+                      ),
+                      child: Section(
+                        title: sectionLabel,
                         children: [...sections],
                       ),
-                    )
-                  ],
+                    ),
+            ),
+          );
+
+          sIdx += 1;
+          sections.clear();
+        } else if (collapsibles.length > 0) {
+          var cSplit = collapsibleLabels[cIdx].split("@@");
+          var collapsibleLabel = cSplit[0];
+          var collapsibleVisibility = cSplit[1];
+          widgets.add(
+            Visibility(
+              visible: collapsibleVisibility == "true",
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 10.0,
+                ),
+                child: ListTileTheme(
+                  tileColor: Colors.white,
+                  child: CustomExpansionTile(
+                    maintainState: true,
+                    title: Text(
+                      collapsibleLabel,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                      ),
+                    ),
+                    children: [
+                      Container(
+                          color: Colors.white,
+                          child: Column(
+                            children: [...collapsibles],
+                          ))
+                    ],
+                  ),
                 ),
               ),
-            )
-          : Padding(
-              padding: const EdgeInsets.only(
-                top: 10.0,
-              ),
-              child: Section(
-                title: sectionLabels[sIdx],
-                children: [...sections],
-              ),
             ),
+          );
+          cIdx += 1;
+          collapsibles.clear();
+        }
+
+        if (field.collapsible == 1) {
+          var cLabel = "${field.label!}@@$fieldVisibility";
+          isSection = false;
+          isCollapsible = true;
+          collapsibleLabels.add(cLabel);
+        } else {
+          var sLabel =
+              "${field.label != null ? field.label! : ''}@@$fieldVisibility";
+          isCollapsible = false;
+          isSection = true;
+          sectionLabels.add(sLabel);
+        }
+      } else if (isSection) {
+        var firstField = sections.isEmpty;
+        if (firstField) {
+          sections.add(
+            controlWidget,
+          );
+        } else {
+          sections.add(
+            controlWidget2,
+          );
+        }
+      } else if (isCollapsible) {
+        collapsibles.add(controlWidget);
+      } else {
+        widgets.add(controlWidget);
+      }
+    },
+  );
+
+  if (sections.length > 0) {
+    var sSplit = sectionLabels[sIdx].split("@@");
+    var sectionLabel = sSplit[0];
+    var sectionVisibility = sSplit[1];
+    widgets.add(
+      Visibility(
+        visible: sectionVisibility == "true",
+        child: sectionLabel != ''
+            ? Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 10.0,
+                ),
+                child: ListTileTheme(
+                  tileColor: Colors.white,
+                  child: CustomExpansionTile(
+                    maintainState: true,
+                    initiallyExpanded: true,
+                    title: Text(
+                      sectionLabel,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                      ),
+                    ),
+                    children: [
+                      Container(
+                        color: Colors.white,
+                        child: Column(
+                          children: [...sections],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              )
+            : Padding(
+                padding: const EdgeInsets.only(
+                  top: 10.0,
+                ),
+                child: Section(
+                  title: sectionLabel,
+                  children: [...sections],
+                ),
+              ),
+      ),
     );
 
     sIdx += 1;
@@ -521,30 +526,36 @@ List<Widget> generateLayout({
   }
 
   if (collapsibles.length > 0) {
+    var cSplit = collapsibleLabels[cIdx].split("@@");
+    var collapsibleLabel = cSplit[0];
+    var collapsibleVisibility = cSplit[1];
     widgets.add(
-      Padding(
-        padding: const EdgeInsets.only(
-          bottom: 10,
-        ),
-        child: ListTileTheme(
-          tileColor: Colors.white,
-          child: CustomExpansionTile(
-            maintainState: true,
-            title: Text(
-              collapsibleLabels[cIdx],
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 16,
-              ),
-            ),
-            children: [
-              Container(
-                color: Colors.white,
-                child: Column(
-                  children: [...collapsibles],
+      Visibility(
+        visible: collapsibleVisibility == "true",
+        child: Padding(
+          padding: const EdgeInsets.only(
+            bottom: 10,
+          ),
+          child: ListTileTheme(
+            tileColor: Colors.white,
+            child: CustomExpansionTile(
+              maintainState: true,
+              title: Text(
+                collapsibleLabel,
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
                 ),
-              )
-            ],
+              ),
+              children: [
+                Container(
+                  color: Colors.white,
+                  child: Column(
+                    children: [...collapsibles],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

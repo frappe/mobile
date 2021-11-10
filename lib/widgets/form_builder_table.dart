@@ -5,6 +5,7 @@ import 'package:frappe_app/config/frappe_palette.dart';
 import 'package:frappe_app/model/doctype_response.dart';
 import 'package:frappe_app/services/api/api.dart';
 import 'package:frappe_app/utils/enums.dart' as enums;
+import 'package:frappe_app/utils/form_helper.dart';
 import 'package:json_table/json_table.dart';
 
 import 'custom_form.dart';
@@ -61,9 +62,12 @@ class FormBuilderTable<T> extends FormBuilderField<T> {
 
                   if (value.isEmpty) {
                     var v = {};
-                    tableFields.forEach((tableField) {
-                      v[tableField.fieldname] = "";
-                    });
+
+                    tableFields.forEach(
+                      (tableField) {
+                        v[tableField.fieldname] = "";
+                      },
+                    );
                     value.add(v);
                   }
 
@@ -251,7 +255,7 @@ class TableElement extends StatefulWidget {
 }
 
 class _TableElementState extends State<TableElement> {
-  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+  final formHelper = FormHelper();
 
   @override
   Widget build(BuildContext context) {
@@ -266,8 +270,8 @@ class _TableElementState extends State<TableElement> {
             ),
             child: FrappeFlatButton(
               onPressed: () async {
-                if (_fbKey.currentState!.saveAndValidate()) {
-                  var formValue = _fbKey.currentState!.value;
+                if (formHelper.saveAndValidate()) {
+                  var formValue = formHelper.getFormValue();
                   Navigator.of(context).pop(formValue);
                 }
               },
@@ -279,7 +283,7 @@ class _TableElementState extends State<TableElement> {
       ),
       body: CustomForm(
         fields: widget.meta.fields,
-        formKey: _fbKey,
+        formHelper: formHelper,
         doc: widget.doc,
       ),
     );

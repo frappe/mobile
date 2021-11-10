@@ -4,7 +4,9 @@ import 'dart:io';
 
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_js/flutter_js.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:frappe_app/model/common.dart';
 import 'package:frappe_app/model/offline_storage.dart';
@@ -360,4 +362,26 @@ noInternetAlert(
     subtitle: "You are not connected to Internet. Retry after sometime.",
     context: context,
   );
+}
+
+executeJS({
+  @required String jsString,
+}) {
+  JavascriptRuntime flutterJs = getJavascriptRuntime();
+  try {
+    JsEvalResult jsResult = flutterJs.evaluate(jsString);
+    return jsResult.rawResult;
+  } on PlatformException catch (e) {
+    print('ERRO: ${e.details}');
+  }
+}
+
+String getServerMessage(String serverMsgs) {
+  var errorMsgs = json.decode(serverMsgs) as List;
+  var errorStr = '';
+  errorMsgs.forEach((errorMsg) {
+    errorStr += json.decode(errorMsg)["message"];
+  });
+
+  return errorStr;
 }

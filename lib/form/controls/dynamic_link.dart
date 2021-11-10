@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:frappe_app/config/frappe_icons.dart';
 import 'package:frappe_app/config/palette.dart';
 import 'package:frappe_app/model/common.dart';
@@ -86,14 +87,14 @@ class _DynamicLinkState extends State<DynamicLink> with Control, ControlInput {
         key: widget.key,
         enabled: enabled,
         onChanged: (val) {
-          if (widget.onControlChanged != null) {
-            widget.onControlChanged!(
-              FieldValue(
-                field: widget.doctypeField,
-                value: val,
-              ),
-            );
-          }
+          // if (widget.onControlChanged != null) {
+          //   widget.onControlChanged!(
+          //     FieldValue(
+          //       field: widget.doctypeField,
+          //       value: val,
+          //     ),
+          //   );
+          // }
         },
         controller: widget.controller,
         initialValue: widget.doc[widget.doctypeField.fieldname],
