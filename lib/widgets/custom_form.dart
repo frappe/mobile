@@ -104,9 +104,25 @@ class CustomFormViewModel extends BaseViewModel {
               field.pVisible = 0;
             }
           } else {
-            field.pVisible = doc[field.dependsOn] is String
-                ? int.parse(doc[field.dependsOn])
-                : doc[field.dependsOn];
+            var dependsOnVal = doc[field.dependsOn];
+            if (dependsOnVal is String) {
+              if (dependsOnVal.isEmpty) {
+                field.pVisible = 0;
+              } else {
+                if (dependsOnVal == "1") {
+                  field.pVisible = 1;
+                } else if (dependsOnVal == "0") {
+                  field.pVisible = 0;
+                } else {
+                  field.pVisible = 1;
+                }
+              }
+            } else if (doc[field.dependsOn] is List) {
+              field.pVisible = doc[field.dependsOn].isEmpty ? 0 : 1;
+            } else {
+              // always visible if handling of type is missing
+              field.pVisible = 1;
+            }
           }
         }
 
