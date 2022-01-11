@@ -1,3 +1,9 @@
+## Deprecation Warning
+
+We are deprecating mobile apps as [discussed here](https://discuss.erpnext.com/t/deprecating-erpnext-mobile-apps/84121). 
+
+If you willing to take the development forward, you can fork the repo and continue the development.
+
 
 # Frappe Mobile
 
